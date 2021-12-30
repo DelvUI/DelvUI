@@ -1,14 +1,12 @@
 ﻿using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
-using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using Dalamud.Logging;
 using Dalamud.Game.ClientState.Objects.Types;
 
 namespace DelvUI.Interface.Party
@@ -16,18 +14,18 @@ namespace DelvUI.Interface.Party
     public class PartyFramesHud : DraggableHudElement, IHudElementWithMouseOver, IHudElementWithPreview
     {
         private PartyFramesConfig Config => (PartyFramesConfig)_config;
-        private PartyFramesConfigs Configs;
+        private readonly PartyFramesConfigs Configs;
 
         private delegate void OpenContextMenu(IntPtr agentHud, int parentAddonId, int index);
         private readonly OpenContextMenu _openContextMenu;
 
-        private Vector2 _contentMargin = new Vector2(2, 2);
-        private static readonly int MaxMemberCount = 9; // 8 players + chocobo
+        private readonly Vector2 _contentMargin = new(2, 2);
+        private const int MaxMemberCount = 9; // 8 players + chocobo
 
         // layout
         private Vector2 _origin;
         private LayoutInfo _layoutInfo;
-        private uint _memberCount = 0;
+        private uint _memberCount;
         private bool _layoutDirty = true;
 
         private readonly List<PartyFramesBar> bars;
@@ -46,7 +44,7 @@ namespace DelvUI.Interface.Party
             bars = new List<PartyFramesBar>(MaxMemberCount);
             for (int i = 0; i < bars.Capacity; i++)
             {
-                PartyFramesBar bar = new PartyFramesBar("DelvUI_partyFramesBar" + i, Configs);
+                PartyFramesBar bar = new("DelvUI_partyFramesBar" + i, Configs);
                 bar.MovePlayerEvent += OnMovePlayer;
                 bar.OpenContextMenuEvent += OnOpenContextMenu;
 
@@ -121,12 +119,7 @@ namespace DelvUI.Interface.Party
 
         private void OnLayoutPropertyChanged(object sender, OnChangeBaseArgs args)
         {
-            if (args.PropertyName == "Size" ||
-                args.PropertyName == "FillRowsFirst" ||
-                args.PropertyName == "BarsAnchor" ||
-                args.PropertyName == "Padding" ||
-                args.PropertyName == "Rows" ||
-                args.PropertyName == "Columns")
+            if (args.PropertyName is "Size" or "FillRowsFirst" or "BarsAnchor" or "Padding" or "Rows" or "Columns")
             {
                 _layoutDirty = true;
             }
@@ -167,20 +160,20 @@ namespace DelvUI.Interface.Party
                 // layout
                 if (Config.FillRowsFirst)
                 {
-                    col = col + 1;
+                    col += 1;
                     if (col >= _layoutInfo.TotalColCount)
                     {
                         col = 0;
-                        row = row + 1;
+                        row += 1;
                     }
                 }
                 else
                 {
-                    row = row + 1;
+                    row += 1;
                     if (row >= _layoutInfo.TotalRowCount)
                     {
                         row = 0;
-                        col = col + 1;
+                        col += 1;
                     }
                 }
             }
@@ -191,30 +184,24 @@ namespace DelvUI.Interface.Party
             x = position.X;
             y = position.Y;
 
-            if (Config.BarsAnchor == DrawAnchor.Top ||
-                Config.BarsAnchor == DrawAnchor.Center ||
-                Config.BarsAnchor == DrawAnchor.Bottom)
+            switch (Config.BarsAnchor)
             {
-                x += (spaceSize.X - _layoutInfo.ContentSize.X) / 2f;
-            }
-            else if (Config.BarsAnchor == DrawAnchor.TopRight ||
-                Config.BarsAnchor == DrawAnchor.Right ||
-                Config.BarsAnchor == DrawAnchor.BottomRight)
-            {
-                x += spaceSize.X - _layoutInfo.ContentSize.X;
+                case DrawAnchor.Top or DrawAnchor.Center or DrawAnchor.Bottom:
+                    x += (spaceSize.X - _layoutInfo.ContentSize.X) / 2f;
+                    break;
+                case DrawAnchor.TopRight or DrawAnchor.Right or DrawAnchor.BottomRight:
+                    x += spaceSize.X - _layoutInfo.ContentSize.X;
+                    break;
             }
 
-            if (Config.BarsAnchor == DrawAnchor.Left ||
-                Config.BarsAnchor == DrawAnchor.Center ||
-                Config.BarsAnchor == DrawAnchor.Right)
+            switch (Config.BarsAnchor)
             {
-                y += (spaceSize.Y - _layoutInfo.ContentSize.Y) / 2f;
-            }
-            else if (Config.BarsAnchor == DrawAnchor.BottomLeft ||
-                Config.BarsAnchor == DrawAnchor.Bottom ||
-                Config.BarsAnchor == DrawAnchor.BottomRight)
-            {
-                y += spaceSize.Y - _layoutInfo.ContentSize.Y;
+                case DrawAnchor.Left or DrawAnchor.Center or DrawAnchor.Right:
+                    y += (spaceSize.Y - _layoutInfo.ContentSize.Y) / 2f;
+                    break;
+                case DrawAnchor.BottomLeft or DrawAnchor.Bottom or DrawAnchor.BottomRight:
+                    y += spaceSize.Y - _layoutInfo.ContentSize.Y;
+                    break;
             }
         }
 
@@ -222,7 +209,7 @@ namespace DelvUI.Interface.Party
         {
             foreach (PartyFramesBar bar in bars)
             {
-                bar.Position = bar.Position + delta;
+                bar.Position += delta;
             }
         }
 
@@ -237,10 +224,7 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
-        {
-            return (new List<Vector2>() { Config.Position + Size / 2f }, new List<Vector2>() { Size });
-        }
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes() => (new List<Vector2> { Config.Position + Size / 2f }, new List<Vector2> { Size });
 
         public void StopMouseover()
         {
@@ -250,7 +234,7 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        private Vector2 Size => new Vector2(
+        private Vector2 Size => new(
             Config.Columns * Configs.HealthBar.Size.X + (Config.Columns - 1) * Configs.HealthBar.Padding.X,
             Config.Rows * Configs.HealthBar.Size.Y + (Config.Rows - 1) * Configs.HealthBar.Padding.Y
         );
@@ -262,137 +246,124 @@ namespace DelvUI.Interface.Party
                 return;
             }
 
-            var windowFlags = ImGuiWindowFlags.NoScrollbar |
-                ImGuiWindowFlags.NoTitleBar |
-                ImGuiWindowFlags.NoSavedSettings |
-                ImGuiWindowFlags.NoMove |
-                ImGuiWindowFlags.NoResize;
+            Vector2 contentStartPos = origin + Config.Position;
 
-            if (Locked)
+            uint count = PartyManager.Instance.MemberCount;
+            if (count < 1)
             {
-                windowFlags |= ImGuiWindowFlags.NoBackground;
+                return;
             }
 
-            Action<ImDrawListPtr> drawBarsAction = (drawList) =>
+            // recalculate layout on settings or size change
+            if (_layoutDirty || _memberCount != count)
             {
-                Vector2 contentStartPos = origin + Config.Position;
+                _layoutInfo = LayoutHelper.CalculateLayout(
+                    Size,
+                    Configs.HealthBar.Size,
+                    count,
+                    Configs.HealthBar.Padding,
+                    Config.FillRowsFirst
+                );
+                UpdateBars(contentStartPos);
+            }
+            else if (_origin != contentStartPos)
+            {
+                UpdateBarsPosition(contentStartPos - _origin);
+            }
 
-                uint count = PartyManager.Instance.MemberCount;
-                if (count < 1)
+            _layoutDirty = false;
+            _origin = contentStartPos;
+            _memberCount = count;
+
+            GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            int targetIndex = -1;
+            int enmityLeaderIndex = -1;
+            int enmitySecondIndex = -1;
+            List<int> raisedIndexes = new();
+            List<int> cleanseIndexes = new();
+
+            // bars
+            for (int i = 0; i < count; i++)
+            {
+                IPartyFramesMember? member = bars[i].Member;
+
+                if (member != null)
                 {
-                    return;
-                }
-
-                // recalculate layout on settings or size change
-                if (_layoutDirty || _memberCount != count)
-                {
-                    _layoutInfo = LayoutHelper.CalculateLayout(
-                        Size,
-                        Configs.HealthBar.Size,
-                        count,
-                        Configs.HealthBar.Padding,
-                        Config.FillRowsFirst
-                    );
-                    UpdateBars(contentStartPos);
-                }
-                else if (_origin != contentStartPos)
-                {
-                    UpdateBarsPosition(contentStartPos - _origin);
-                }
-
-                _layoutDirty = false;
-                _origin = contentStartPos;
-                _memberCount = count;
-
-                GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-                int targetIndex = -1;
-                int enmityLeaderIndex = -1;
-                int enmitySecondIndex = -1;
-                List<int> raisedIndexes = new List<int>();
-                List<int> cleanseIndexes = new List<int>();
-
-                // bars
-                for (int i = 0; i < count; i++)
-                {
-                    IPartyFramesMember? member = bars[i].Member;
-
-                    if (member != null)
+                    if (target != null && member.ObjectId == target.ObjectId)
                     {
-                        if (target != null && member.ObjectId == target.ObjectId)
-                        {
-                            targetIndex = i;
-                            continue;
-                        }
-
-                        bool cleanseCheck = true;
-                        if (Configs.Trackers.Cleanse.CleanseJobsOnly)
-                        {
-                            cleanseCheck = Utils.IsOnCleanseJob();
-                        }
-
-                        if (Configs.Trackers.Cleanse.Enabled && Configs.Trackers.Cleanse.ChangeBorderCleanseColor && member.HasDispellableDebuff && cleanseCheck)
-                        {
-                            cleanseIndexes.Add(i);
-                            continue;
-                        }
-
-                        if (Configs.Trackers.Raise.Enabled && Configs.Trackers.Raise.ChangeBorderColorWhenRaised && member.RaiseTime.HasValue)
-                        {
-                            raisedIndexes.Add(i);
-                            continue;
-                        }
-
-                        if (Configs.HealthBar.ColorsConfig.ShowEnmityBorderColors)
-                        {
-                            if (member.EnmityLevel == EnmityLevel.Leader)
-                            {
-                                enmityLeaderIndex = i;
-                                continue;
-                            }
-                            else if (Configs.HealthBar.ColorsConfig.ShowSecondEnmity && member.EnmityLevel == EnmityLevel.Second &&
-                                (count > 4 || !Configs.HealthBar.ColorsConfig.HideSecondEnmityInLightParties))
-                            {
-                                enmitySecondIndex = i;
-                                continue;
-                            }
-                        }
+                        targetIndex = i;
+                        continue;
                     }
 
-                    bars[i].Draw(origin, drawList);
+                    bool cleanseCheck = true;
+                    if (Configs.Trackers.Cleanse.CleanseJobsOnly)
+                    {
+                        cleanseCheck = Utils.IsOnCleanseJob();
+                    }
+
+                    if (Configs.Trackers.Cleanse.Enabled && Configs.Trackers.Cleanse.ChangeBorderCleanseColor && member.HasDispellableDebuff && cleanseCheck)
+                    {
+                        cleanseIndexes.Add(i);
+                        continue;
+                    }
+
+                    if (Configs.Trackers.Raise.Enabled && Configs.Trackers.Raise.ChangeBorderColorWhenRaised && member.RaiseTime.HasValue)
+                    {
+                        raisedIndexes.Add(i);
+                        continue;
+                    }
+
+                    if (Configs.HealthBar.ColorsConfig.ShowEnmityBorderColors)
+                    {
+                        if (member.EnmityLevel == EnmityLevel.Leader)
+                        {
+                            enmityLeaderIndex = i;
+                            continue;
+                        }
+
+                        if (Configs.HealthBar.ColorsConfig.ShowSecondEnmity && member.EnmityLevel == EnmityLevel.Second &&
+                            (count > 4 || !Configs.HealthBar.ColorsConfig.HideSecondEnmityInLightParties))
+                        {
+                            enmitySecondIndex = i;
+                            continue;
+                        }
+                    }
                 }
 
-                // special colors for borders
+                bars[i].Draw(origin);
+            }
 
-                // 2nd enmity
-                if (enmitySecondIndex >= 0)
-                {
-                    bars[enmitySecondIndex].Draw(origin, drawList, Configs.HealthBar.ColorsConfig.EnmitySecondBordercolor);
-                }
+            // special colors for borders
 
-                // 1st enmity
-                if (enmityLeaderIndex >= 0)
-                {
-                    bars[enmityLeaderIndex].Draw(origin, drawList, Configs.HealthBar.ColorsConfig.EnmityLeaderBordercolor);
-                }
+            // 2nd enmity
+            if (enmitySecondIndex >= 0)
+            {
+                bars[enmitySecondIndex].Draw(origin, Configs.HealthBar.ColorsConfig.EnmitySecondBordercolor);
+            }
 
-                // raise
-                foreach (int index in raisedIndexes)
-                {
-                    bars[index].Draw(origin, drawList, Configs.Trackers.Raise.BorderColor);
-                }
+            // 1st enmity
+            if (enmityLeaderIndex >= 0)
+            {
+                bars[enmityLeaderIndex].Draw(origin, Configs.HealthBar.ColorsConfig.EnmityLeaderBordercolor);
+            }
 
-                // target
-                if (targetIndex >= 0)
-                {
-                    bars[targetIndex].Draw(origin, drawList, Configs.HealthBar.ColorsConfig.TargetBordercolor);
-                }
+            // raise
+            foreach (int index in raisedIndexes)
+            {
+                bars[index].Draw(origin, Configs.Trackers.Raise.BorderColor);
+            }
 
-                // cleanseable debuff
-                foreach (int index in cleanseIndexes)
-                {
-                    bars[index].Draw(origin, drawList, Configs.Trackers.Cleanse.BorderColor);
-                }
-            };
+            // target
+            if (targetIndex >= 0)
+            {
+                bars[targetIndex].Draw(origin, Configs.HealthBar.ColorsConfig.TargetBordercolor);
+            }
+
+            // cleanseable debuff
+            foreach (int index in cleanseIndexes)
+            {
+                bars[index].Draw(origin, Configs.Trackers.Cleanse.BorderColor);
+            }
 
             AddDrawAction(Config.StrataLevel, () =>
             {
@@ -400,9 +371,7 @@ namespace DelvUI.Interface.Party
                 ImGui.PushStyleColor(ImGuiCol.WindowBg, 0x66000000);
                 ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 1);
                 ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
-
-                DrawHelper.DrawInWindow(ID, origin + Config.Position - _contentMargin, Size + _contentMargin * 2, true, false, true, windowFlags, drawBarsAction);
-
+                
                 ImGui.PopStyleColor(2);
                 ImGui.PopStyleVar(2);
             });
@@ -443,9 +412,8 @@ namespace DelvUI.Interface.Party
             Trackers = trackers;
         }
 
-        public static PartyFramesConfigs GetConfigs()
-        {
-            return new PartyFramesConfigs(
+        public static PartyFramesConfigs GetConfigs() =>
+            new(
                 ConfigurationManager.Instance.GetConfigObject<PartyFramesHealthBarsConfig>(),
                 ConfigurationManager.Instance.GetConfigObject<PartyFramesManaBarConfig>(),
                 ConfigurationManager.Instance.GetConfigObject<PartyFramesCastbarConfig>(),
@@ -454,8 +422,6 @@ namespace DelvUI.Interface.Party
                 ConfigurationManager.Instance.GetConfigObject<PartyFramesDebuffsConfig>(),
                 ConfigurationManager.Instance.GetConfigObject<PartyFramesTrackersConfig>()
             );
-        }
-
     }
     #endregion
 }

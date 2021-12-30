@@ -10,6 +10,7 @@ using System.Numerics;
 using Dalamud.Game.ClientState.Objects.Types;
 using System.Collections.Generic;
 using DelvUI.Enums;
+using DelvUI.Interface.Bars;
 
 namespace DelvUI.Interface.Party
 {
@@ -19,23 +20,23 @@ namespace DelvUI.Interface.Party
         public PartyFramesBarEventHandler? MovePlayerEvent;
         public PartyFramesBarEventHandler? OpenContextMenuEvent;
 
-        private PartyFramesConfigs _configs;
+        private readonly PartyFramesConfigs _configs;
 
-        private LabelHud _nameLabelHud;
-        private LabelHud _healthLabelHud;
-        private LabelHud _orderLabelHud;
-        private LabelHud _statusLabelHud;
-        private LabelHud _raiseLabelHud;
-        private LabelHud _invulnLabelHud;
-        private PrimaryResourceHud _manaBarHud;
-        private CastbarHud _castbarHud;
-        private StatusEffectsListHud _buffsListHud;
-        private StatusEffectsListHud _debuffsListHud;
+        private readonly LabelHud _nameLabelHud;
+        private readonly LabelHud _healthLabelHud;
+        private readonly LabelHud _orderLabelHud;
+        private readonly LabelHud _statusLabelHud;
+        private readonly LabelHud _raiseLabelHud;
+        private readonly LabelHud _invulnLabelHud;
+        private readonly PrimaryResourceHud _manaBarHud;
+        private readonly CastbarHud _castbarHud;
+        private readonly StatusEffectsListHud _buffsListHud;
+        private readonly StatusEffectsListHud _debuffsListHud;
 
         public bool Visible = false;
         public Vector2 Position;
 
-        private SmoothHPHelper _smoothHPHelper = new SmoothHPHelper();
+        private readonly SmoothHPHelper _smoothHPHelper = new();
 
         private bool _wasHovering = false;
 
@@ -60,7 +61,7 @@ namespace DelvUI.Interface.Party
 
         public PluginConfigColor GetColor(float scale)
         {
-            if (Member == null || Member.MaxHP <= 0)
+            if (Member is not { MaxHP: > 0 })
             {
                 return _configs.HealthBar.ColorsConfig.OutOfReachBackgroundColor;
             }
@@ -111,7 +112,7 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        public void Draw(Vector2 origin, ImDrawListPtr drawList, PluginConfigColor? borderColor = null)
+        public void Draw(Vector2 origin, PluginConfigColor? borderColor = null)
         {
             if (!Visible || Member is null)
             {
@@ -171,8 +172,6 @@ namespace DelvUI.Interface.Party
                     : _configs.HealthBar.ColorsConfig.DeathIndicatorBackgroundColor;
             }
 
-            drawList.AddRectFilled(Position, Position + _configs.HealthBar.Size, bgColor.Base);
-
             // hp
             uint currentHp = Member.HP;
             uint maxHp = Member.MaxHP;
@@ -182,46 +181,71 @@ namespace DelvUI.Interface.Party
                 currentHp = _smoothHPHelper.GetNextHp((int)currentHp, (int)maxHp, _configs.HealthBar.SmoothHealthConfig.Velocity);
             }
 
-            var hpScale = maxHp > 0 ? (float)currentHp / (float)maxHp : 1;
-            var hpFillSize = new Vector2(_configs.HealthBar.Size.X * hpScale, _configs.HealthBar.Size.Y);
+            float hpScale = maxHp > 0 ? (float)currentHp / (float)maxHp : 1;
+            Vector2 hpFillSize = new(_configs.HealthBar.Size.X * hpScale, _configs.HealthBar.Size.Y);
+            Rect background = new(Position, Position + _configs.HealthBar.Size, bgColor);
             PluginConfigColor? hpColor = GetColor(hpScale);
 
             if (_configs.HealthBar.RangeConfig.Enabled)
             {
                 hpColor = GetDistanceColor(character, hpColor);
             }
+            
+            Rect healthFill = BarUtilities.GetFillRect(Position, hpFillSize, _configs.HealthBar.FillDirection, hpColor, currentHp, maxHp);
+            PluginConfigColor color = borderColor ?? GetBorderColor(character);
 
-            DrawHelper.DrawGradientFilledRect(Position, hpFillSize, hpColor, drawList);
+            BarHud bar = new(_configs.HealthBar.ID,
+                _configs.HealthBar.DrawBorder,
+                color,
+                _configs.HealthBar.BorderThickness,
+                actor: character,
+                current: currentHp,
+                max: maxHp);
+
+            bar.SetBackground(background);
+            bar.AddForegrounds(healthFill);
+
+            if (_configs.HealthBar.ColorsConfig.UseMissingHealthBar)
+            {
+                Vector2 healthMissingSize = _configs.HealthBar.Size - BarUtilities.GetFillDirectionOffset(healthFill.Size, _configs.HealthBar.FillDirection);
+                Vector2 healthMissingPos = _configs.HealthBar.FillDirection.IsInverted() ? Position : Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, _configs.HealthBar.FillDirection);
+                PluginConfigColor? missingHealthColor = _configs.HealthBar.ColorsConfig.HealthMissingColor;
+                bar.AddForegrounds(new Rect(healthMissingPos, healthMissingSize, missingHealthColor));
+            }
 
             // shield
             if (_configs.HealthBar.ShieldConfig.Enabled)
             {
-                if (_configs.HealthBar.ShieldConfig.FillHealthFirst && Member.MaxHP > 0)
+                if (Member.Shield > 0f)
                 {
-                    DrawHelper.DrawShield(Member.Shield, (float)currentHp / maxHp, Position, _configs.HealthBar.Size,
-                        _configs.HealthBar.ShieldConfig.Height, !_configs.HealthBar.ShieldConfig.HeightInPixels,
-                        _configs.HealthBar.ShieldConfig.Color, drawList);
-                }
-                else
-                {
-                    DrawHelper.DrawOvershield(Member.Shield, Position, _configs.HealthBar.Size,
-                        _configs.HealthBar.ShieldConfig.Height, !_configs.HealthBar.ShieldConfig.HeightInPixels,
-                        _configs.HealthBar.ShieldConfig.Color, drawList);
+                    bar.AddForegrounds(
+                        BarUtilities.GetShieldForeground(
+                            _configs.HealthBar.ShieldConfig,
+                            Position,
+                            _configs.HealthBar.Size,
+                            healthFill.Size,
+                            _configs.HealthBar.FillDirection,
+                            Member.Shield,
+                            currentHp,
+                            maxHp
+                        )
+                    );
                 }
             }
-
-            // border
-            Vector2 borderPos = Position - Vector2.One;
-            Vector2 borderSize = _configs.HealthBar.Size + Vector2.One * 2;
-            uint color = borderColor?.Base ?? _configs.HealthBar.ColorsConfig.BorderColor.Base;
-            int thickness = borderColor != null ? _configs.HealthBar.ColorsConfig.ActiveBorderThickness : _configs.HealthBar.ColorsConfig.InactiveBorderThickness;
-            drawList.AddRect(borderPos, borderPos + borderSize, color, 0, ImDrawFlags.None, thickness);
 
             // highlight
             if (_configs.HealthBar.ColorsConfig.ShowHighlight && isHovering)
             {
-                drawList.AddRectFilled(Position, Position + _configs.HealthBar.Size, _configs.HealthBar.ColorsConfig.HighlightColor.Base);
+                Rect highlight = new(Position, Position + _configs.HealthBar.Size, _configs.HealthBar.ColorsConfig.HighlightColor);
+                bar.AddForegrounds(highlight);
             }
+        }
+
+        private PluginConfigColor GetBorderColor(Character? character)
+        {
+            GameObject? target = Plugin.TargetManager.Target ?? Plugin.TargetManager.SoftTarget;
+
+            return character != null && character == target ? _configs.HealthBar.ColorsConfig.TargetBordercolor : _configs.HealthBar.BorderColor;
         }
 
         private PluginConfigColor GetDistanceColor(Character? character, PluginConfigColor color)
@@ -253,7 +277,7 @@ namespace DelvUI.Interface.Party
                 uint iconId = 0;
 
                 // chocobo icon
-                if (character is BattleNpc battleNpc && battleNpc.BattleNpcKind == BattleNpcSubKind.Chocobo)
+                if (character is BattleNpc { BattleNpcKind: BattleNpcSubKind.Chocobo })
                 {
                     iconId = JobsHelper.RoleIconIDForBattleCompanion + (uint)RoleIcon.Style * 100;
                 }
@@ -267,8 +291,8 @@ namespace DelvUI.Interface.Party
 
                 if (iconId > 0)
                 {
-                    var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, RoleIcon.FrameAnchor);
-                    var iconPos = Utils.GetAnchoredPosition(parentPos + RoleIcon.Position, RoleIcon.Size, RoleIcon.Anchor);
+                    Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, RoleIcon.FrameAnchor);
+                    Vector2 iconPos = Utils.GetAnchoredPosition(parentPos + RoleIcon.Position, RoleIcon.Size, RoleIcon.Anchor);
 
                     drawActions.Add((RoleIcon.StrataLevel, () =>
                     {
@@ -284,8 +308,8 @@ namespace DelvUI.Interface.Party
             // leader icon
             if (LeaderIcon.Enabled && Member.IsPartyLeader)
             {
-                var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, LeaderIcon.FrameAnchor);
-                var iconPos = Utils.GetAnchoredPosition(parentPos + LeaderIcon.Position, LeaderIcon.Size, LeaderIcon.Anchor);
+                Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, LeaderIcon.FrameAnchor);
+                Vector2 iconPos = Utils.GetAnchoredPosition(parentPos + LeaderIcon.Position, LeaderIcon.Size, LeaderIcon.Anchor);
 
                 drawActions.Add((LeaderIcon.StrataLevel, () =>
                 {
@@ -303,8 +327,8 @@ namespace DelvUI.Interface.Party
                 uint? iconId = IconIdForStatus(Member.Status);
                 if (iconId.HasValue)
                 {
-                    var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, PlayerStatus.Icon.FrameAnchor);
-                    var iconPos = Utils.GetAnchoredPosition(parentPos + PlayerStatus.Icon.Position, PlayerStatus.Icon.Size, PlayerStatus.Icon.Anchor);
+                    Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, PlayerStatus.Icon.FrameAnchor);
+                    Vector2 iconPos = Utils.GetAnchoredPosition(parentPos + PlayerStatus.Icon.Position, PlayerStatus.Icon.Size, PlayerStatus.Icon.Anchor);
 
                     drawActions.Add((PlayerStatus.Icon.StrataLevel, () =>
                     {
@@ -320,8 +344,8 @@ namespace DelvUI.Interface.Party
             // raise icon
             if (ShowingRaise())
             {
-                var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, RaiseTracker.Icon.FrameAnchor);
-                var iconPos = Utils.GetAnchoredPosition(parentPos + RaiseTracker.Icon.Position, RaiseTracker.Icon.Size, RaiseTracker.Icon.Anchor);
+                Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, RaiseTracker.Icon.FrameAnchor);
+                Vector2 iconPos = Utils.GetAnchoredPosition(parentPos + RaiseTracker.Icon.Position, RaiseTracker.Icon.Size, RaiseTracker.Icon.Anchor);
 
                 drawActions.Add((RaiseTracker.Icon.StrataLevel, () =>
                 {
@@ -336,8 +360,8 @@ namespace DelvUI.Interface.Party
             // invuln icon
             if (ShowingInvuln())
             {
-                var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, InvulnTracker.Icon.FrameAnchor);
-                var iconPos = Utils.GetAnchoredPosition(parentPos + InvulnTracker.Icon.Position, InvulnTracker.Icon.Size, InvulnTracker.Icon.Anchor);
+                Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, InvulnTracker.Icon.FrameAnchor);
+                Vector2 iconPos = Utils.GetAnchoredPosition(parentPos + InvulnTracker.Icon.Position, InvulnTracker.Icon.Size, InvulnTracker.Icon.Anchor);
 
                 drawActions.Add((InvulnTracker.Icon.StrataLevel, () =>
                 {
@@ -352,7 +376,7 @@ namespace DelvUI.Interface.Party
             // mana
             if (ShowMana())
             {
-                var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.ManaBar.HealthBarAnchor);
+                Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.ManaBar.HealthBarAnchor);
                 _manaBarHud.Actor = character;
                 _manaBarHud.PartyMember = Member;
 
@@ -364,7 +388,7 @@ namespace DelvUI.Interface.Party
             }
 
             // buffs / debuffs
-            var buffsPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.Buffs.HealthBarAnchor);
+            Vector2 buffsPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.Buffs.HealthBarAnchor);
             _buffsListHud.Actor = character;
             drawActions.Add((_configs.Buffs.StrataLevel, () =>
             {
@@ -372,7 +396,7 @@ namespace DelvUI.Interface.Party
             }
             ));
 
-            var debuffsPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.Debuffs.HealthBarAnchor);
+            Vector2 debuffsPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.Debuffs.HealthBarAnchor);
             _debuffsListHud.Actor = character;
             drawActions.Add((_configs.Debuffs.StrataLevel, () =>
             {
@@ -381,7 +405,7 @@ namespace DelvUI.Interface.Party
             ));
 
             // castbar
-            var castbarPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.CastBar.HealthBarAnchor);
+            Vector2 castbarPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.CastBar.HealthBarAnchor);
             _castbarHud.Actor = character;
             drawActions.Add((_configs.CastBar.StrataLevel, () =>
             {
@@ -390,10 +414,10 @@ namespace DelvUI.Interface.Party
             ));
 
             // name
-            var showingRaise = ShowingRaise();
-            var showingInvuln = ShowingInvuln();
+            bool showingRaise = ShowingRaise();
+            bool showingInvuln = ShowingInvuln();
 
-            var drawName = true;
+            bool drawName = true;
 
             if (showingRaise || showingInvuln)
             {
@@ -429,7 +453,7 @@ namespace DelvUI.Interface.Party
             // order
             if (character == null || character?.ObjectKind != ObjectKind.BattleNpc)
             {
-                var order = Member.ObjectId == player.ObjectId ? 1 : Member.Order;
+                int order = Member.ObjectId == player.ObjectId ? 1 : Member.Order;
                 _configs.HealthBar.OrderLabelConfig.SetText("[" + order + "]");
 
                 drawActions.Add((_configs.HealthBar.OrderLabelConfig.StrataLevel, () =>
@@ -455,8 +479,8 @@ namespace DelvUI.Interface.Party
             // raise label
             if (showingRaise)
             {
-                var duration = Math.Abs(Member.RaiseTime!.Value);
-                var text = duration < 10 ? duration.ToString("N1", CultureInfo.InvariantCulture) : Utils.DurationToString(duration);
+                float duration = Math.Abs(Member.RaiseTime!.Value);
+                string text = duration < 10 ? duration.ToString("N1", CultureInfo.InvariantCulture) : Utils.DurationToString(duration);
                 RaiseTracker.Icon.Label.SetText(text);
 
                 drawActions.Add((RaiseTracker.Icon.Label.StrataLevel, () =>
@@ -469,8 +493,8 @@ namespace DelvUI.Interface.Party
             // invuln label
             if (showingInvuln)
             {
-                var duration = Math.Abs(Member.InvulnStatus!.InvulnTime);
-                var text = duration < 10 ? duration.ToString("N1", CultureInfo.InvariantCulture) : Utils.DurationToString(duration);
+                float duration = Math.Abs(Member.InvulnStatus!.InvulnTime);
+                string text = duration < 10 ? duration.ToString("N1", CultureInfo.InvariantCulture) : Utils.DurationToString(duration);
                 InvulnTracker.Icon.Label.SetText(text);
 
                 drawActions.Add((InvulnTracker.Icon.Label.StrataLevel, () =>
@@ -484,10 +508,9 @@ namespace DelvUI.Interface.Party
         }
 
         private bool ShowingRaise() =>
-            Member != null && Member.RaiseTime.HasValue && RaiseTracker.Enabled &&
-            (Member.RaiseTime.Value > 0 || RaiseTracker.KeepIconAfterCastFinishes);
+            Member is { RaiseTime: { } } && RaiseTracker.Enabled && (Member.RaiseTime.Value > 0 || RaiseTracker.KeepIconAfterCastFinishes);
 
-        private bool ShowingInvuln() => Member != null && Member.InvulnStatus != null && InvulnTracker.Enabled && Member.InvulnStatus.InvulnTime > 0;
+        private bool ShowingInvuln() => Member is { InvulnStatus: { } } && InvulnTracker.Enabled && Member.InvulnStatus.InvulnTime > 0;
 
         private bool ShowMana()
         {
@@ -496,7 +519,7 @@ namespace DelvUI.Interface.Party
                 return false;
             }
 
-            var isHealer = JobsHelper.IsJobHealer(Member.JobId);
+            bool isHealer = JobsHelper.IsJobHealer(Member.JobId);
 
             return _configs.ManaBar.Enabled && Member.MaxHP > 0 && _configs.ManaBar.ManaBarDisplayMode switch
             {
