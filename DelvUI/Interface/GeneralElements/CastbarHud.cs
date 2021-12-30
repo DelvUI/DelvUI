@@ -57,7 +57,7 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            bool validIcon = LastUsedCast is { IconTexture: { } };
+            bool validIcon = LastUsedCast?.IconTexture is not null;
             Vector2 iconSize = Config.ShowIcon && validIcon ? new Vector2(Config.Size.Y, Config.Size.Y) : Vector2.Zero;
 
             PluginConfigColor fillColor = GetColor();
@@ -175,7 +175,7 @@ namespace DelvUI.Interface.GeneralElements
 
             if (doesCastBarFillToLeft)
             {
-                bool validIcon = LastUsedCast is { IconTexture: { } };
+                bool validIcon = LastUsedCast?.IconTexture is not null;
                 Vector2 iconSize = Config.ShowIcon && validIcon ? new Vector2(Config.Size.Y, Config.Size.Y) : Vector2.Zero;
                 slideCast = Config.ShowIcon ? new Rect(Config.Position, size + new Vector2(iconSize.X, 0), Config.SlideCastColor) : new Rect(Config.Position, size, Config.SlideCastColor);
             }

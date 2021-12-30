@@ -1,6 +1,8 @@
 # 0.6.1.3
 Features:
-- Added Thresholds for Bard Songs with the recommended song rotation (43, 34, 43).  
+- Added Thresholds for Bard Songs with the recommended song rotation (43, 34, 43).
+- Added option to change the Fill Direction of castbars.
+- Added option to use Reverse Fill in place of Background Color for castbars.
 
 Fixes:
 - Fixed Dancer Proc Bars so they can be individually disabled.
