@@ -69,6 +69,17 @@ namespace DelvUI.Interface.GeneralElements
             AddExtras(bar, totalCastTime);
             bar.AddForegrounds(progress);
 
+            if (Config.UseReverseFill)
+            {
+                Vector2 reverseFillSize = Config.Size - BarUtilities.GetFillDirectionOffset(progress.Size, Config.FillDirection);
+                Vector2 reverseFillPos = Config.FillDirection.IsInverted()
+                    ? Config.Position
+                    : Config.Position + BarUtilities.GetFillDirectionOffset(progress.Size, Config.FillDirection);
+
+                PluginConfigColor reverseFillColor = Config.ReverseFillColor;
+                bar.AddForegrounds(new Rect(reverseFillPos, reverseFillSize, reverseFillColor));
+            }
+
             Vector2 pos = origin + ParentPos();
             bar.Draw(pos);
 
