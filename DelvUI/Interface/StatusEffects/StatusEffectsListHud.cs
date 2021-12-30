@@ -393,11 +393,10 @@ namespace DelvUI.Interface.StatusEffects
                     !statusEffectData.Data.IsPermanent &&
                     !statusEffectData.Data.IsFcBuff)
                 {
-                    var duration = Math.Round(Math.Abs(statusEffectData.Status.RemainingTime));
-                    Config.IconConfig.DurationLabelConfig.SetText(Utils.DurationToString(duration));
-
                     AddDrawAction(Config.IconConfig.DurationLabelConfig.StrataLevel, () =>
                     {
+                        double duration = Math.Round(Math.Abs(statusEffectData.Status.RemainingTime));
+                        Config.IconConfig.DurationLabelConfig.SetText(Utils.DurationToString(duration));
                         _durationLabel.Draw(iconPos, Config.IconConfig.Size);
                     });
                 }
@@ -408,11 +407,9 @@ namespace DelvUI.Interface.StatusEffects
                     statusEffectData.Status.StackCount > 0 &&
                     !statusEffectData.Data.IsFcBuff)
                 {
-                    var text = $"{statusEffectData.Status.StackCount}";
-                    Config.IconConfig.StacksLabelConfig.SetText(text);
-
                     AddDrawAction(Config.IconConfig.StacksLabelConfig.StrataLevel, () =>
                     {
+                        Config.IconConfig.StacksLabelConfig.SetText($"{statusEffectData.Status.StackCount}");
                         _stacksLabel.Draw(iconPos, Config.IconConfig.Size);
                     });
                 }

@@ -219,9 +219,9 @@ namespace DelvUI.Interface.EnemyList
                 });
 
                 string letter = Config.Preview || _helper.EnemiesData.ElementAt(i).Letter == null ? ((char)(i + 65)).ToString() : _helper.EnemiesData.ElementAt(i).Letter!;
-                Configs.HealthBar.OrderLetterLabel.SetText($"[{letter}]");
                 AddDrawAction(Configs.HealthBar.OrderLetterLabel.StrataLevel, () =>
                 {
+                    Configs.HealthBar.OrderLetterLabel.SetText($"[{letter}]");
                     _orderLabelHud.Draw(origin + pos, Configs.HealthBar.Size);
                 });
 

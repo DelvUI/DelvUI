@@ -220,30 +220,29 @@ namespace DelvUI.Interface.PartyCooldowns
                         character = player;
                     }
 
-                    string? name = character == null ? "Fake Name" : null;
                     Vector2 labelPos = origin + pos;
-
                     AddDrawAction(_barConfig.NameLabel.StrataLevel, () =>
                     {
+                        string? name = character == null ? "Fake Name" : null;
                         _nameLabelHud.Draw(labelPos, size, character, name);
                     });
 
                     // time
-                    if (effectTime > 0)
-                    {
-                        _barConfig.TimeLabel.SetValue(effectTime);
-                    }
-                    else if (cooldownTime > 0)
-                    {
-                        _barConfig.TimeLabel.SetText(Utils.DurationToFullString(cooldownTime));
-                    }
-                    else
-                    {
-                        _barConfig.TimeLabel.SetText("");
-                    }
-
                     AddDrawAction(_barConfig.TimeLabel.StrataLevel, () =>
                     {
+                        if (effectTime > 0)
+                        {
+                            _barConfig.TimeLabel.SetValue(effectTime);
+                        }
+                        else if (cooldownTime > 0)
+                        {
+                            _barConfig.TimeLabel.SetText(Utils.DurationToFullString(cooldownTime));
+                        }
+                        else
+                        {
+                            _barConfig.TimeLabel.SetText("");
+                        }
+
                         _timeLabelHud.Draw(labelPos, size, character);
                     });
 
