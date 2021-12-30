@@ -394,14 +394,6 @@ namespace DelvUI.Interface.Party
                 }
             };
 
-            Action drawElementsAction = () =>
-            {
-                foreach (PartyFramesBar bar in bars)
-                {
-                    AddDrawActions(bar.GetElementsDrawActions(origin));
-                }
-            };
-
             AddDrawAction(Config.StrataLevel, () =>
             {
                 ImGui.PushStyleColor(ImGuiCol.Border, 0x66FFFFFF);
@@ -415,7 +407,10 @@ namespace DelvUI.Interface.Party
                 ImGui.PopStyleVar(2);
             });
 
-            drawElementsAction();
+            foreach (PartyFramesBar bar in bars)
+            {
+                AddDrawActions(bar.GetElementsDrawActions(origin));
+            }
         }
     }
 
