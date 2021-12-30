@@ -371,6 +371,10 @@ namespace DelvUI.Interface
 
             ClipRectsHelper.Instance.Update();
 
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(0, 0));
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
+
             ImGuiHelpers.ForceNextWindowMainViewport();
             ImGui.SetNextWindowPos(Vector2.Zero);
             ImGui.SetNextWindowSize(ImGui.GetMainViewport().Size);
@@ -388,6 +392,7 @@ namespace DelvUI.Interface
 
             if (!begin)
             {
+                ImGui.PopStyleVar(3);
                 ImGui.End();
                 return;
             }
@@ -427,6 +432,7 @@ namespace DelvUI.Interface
             // tooltip
             TooltipsHelper.Instance.Draw();
 
+            ImGui.PopStyleVar(3);
             ImGui.End();
         }
 
