@@ -165,7 +165,7 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [DisableParentSettings("HideWhenInactive", "FillDirection")]
+    [DisableParentSettings("HideWhenInactive")]
     public abstract class CastbarConfig : BarConfig
     {
         [Checkbox("Preview")]

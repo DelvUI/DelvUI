@@ -8,7 +8,6 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
@@ -16,8 +15,8 @@ namespace DelvUI.Interface.GeneralElements
     public class CastbarHud : ParentAnchoredDraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent, IHudElementWithPreview
     {
         private CastbarConfig Config => (CastbarConfig)_config;
-        private LabelHud _castNameLabel;
-        private LabelHud _castTimeLabel;
+        private readonly LabelHud _castNameLabel;
+        private readonly LabelHud _castTimeLabel;
 
         protected LastUsedCast? LastUsedCast;
 
@@ -37,10 +36,7 @@ namespace DelvUI.Interface.GeneralElements
             Config.Preview = false;
         }
 
-        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
-        {
-            return (new List<Vector2>() { Config.Position }, new List<Vector2>() { Config.Size });
-        }
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes() => (new List<Vector2> { Config.Position }, new List<Vector2> { Config.Size });
 
         public override void DrawChildren(Vector2 origin)
         {
@@ -55,20 +51,20 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            UpdateCurrentCast(out var currentCastTime, out var totalCastTime);
+            UpdateCurrentCast(out float currentCastTime, out float totalCastTime);
             if (totalCastTime == 0)
             {
                 return;
             }
 
-            bool validIcon = LastUsedCast != null && LastUsedCast.IconTexture != null;
+            bool validIcon = LastUsedCast is { IconTexture: { } };
             Vector2 iconSize = Config.ShowIcon && validIcon ? new Vector2(Config.Size.Y, Config.Size.Y) : Vector2.Zero;
 
             PluginConfigColor fillColor = GetColor();
-            Rect background = new Rect(Config.Position, Config.Size, Config.BackgroundColor);
+            Rect background = new(Config.Position, Config.Size, Config.BackgroundColor);
             Rect progress = BarUtilities.GetFillRect(Config.Position, Config.Size, Config.FillDirection, fillColor, currentCastTime, totalCastTime);
 
-            BarHud bar = new BarHud(Config, Actor);
+            BarHud bar = new(Config, Actor);
             bar.SetBackground(background);
             AddExtras(bar, totalCastTime);
             bar.AddForegrounds(progress);
@@ -96,15 +92,15 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             // cast name
-            bool isNameLeftAnchored = Config.CastNameLabel.TextAnchor == DrawAnchor.Left || Config.CastNameLabel.TextAnchor == DrawAnchor.TopLeft || Config.CastNameLabel.TextAnchor == DrawAnchor.BottomLeft;
-            var namePos = Config.ShowIcon && isNameLeftAnchored ? startPos + new Vector2(iconSize.X, 0) : startPos;
+            bool isNameLeftAnchored = Config.CastNameLabel.TextAnchor is DrawAnchor.Left or DrawAnchor.TopLeft or DrawAnchor.BottomLeft;
+            Vector2 namePos = Config.ShowIcon && isNameLeftAnchored ? startPos + new Vector2(iconSize.X, 0) : startPos;
             string? castName = LastUsedCast?.ActionText.CheckForUpperCase();
             Config.CastNameLabel.SetText(Config.Preview ? "Cast Name" : castName ?? "");
             _castNameLabel.Draw(namePos, Config.Size, Actor);
 
             // cast time
-            bool isTimeLeftAnchored = Config.CastTimeLabel.TextAnchor == DrawAnchor.Left || Config.CastTimeLabel.TextAnchor == DrawAnchor.TopLeft || Config.CastTimeLabel.TextAnchor == DrawAnchor.BottomLeft;
-            var timePos = Config.ShowIcon && isTimeLeftAnchored ? startPos + new Vector2(iconSize.X, 0) : startPos;
+            bool isTimeLeftAnchored = Config.CastTimeLabel.TextAnchor is DrawAnchor.Left or DrawAnchor.TopLeft or DrawAnchor.BottomLeft;
+            Vector2 timePos = Config.ShowIcon && isTimeLeftAnchored ? startPos + new Vector2(iconSize.X, 0) : startPos;
             float value = Config.Preview ? 0.5f : totalCastTime - currentCastTime;
             Config.CastTimeLabel.SetValue(value);
             _castTimeLabel.Draw(timePos, Config.Size, Actor);
@@ -126,8 +122,8 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            var currentCastId = battleChara.CastActionId;
-            var currentCastType = (ActionType)battleChara.CastActionType;
+            uint currentCastId = battleChara.CastActionId;
+            ActionType currentCastType = (ActionType)battleChara.CastActionType;
             currentCastTime = battleChara.CurrentCastTime;
             totalCastTime = battleChara.TotalCastTime;
 
@@ -161,9 +157,18 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            float slideCastWidth = Math.Min(Config.Size.X, (Config.SlideCastTime / 1000f) * Config.Size.X / totalCastTime);
-            Vector2 size = new Vector2(slideCastWidth, Config.Size.Y);
-            Rect slideCast = new Rect(Config.Position + Config.Size - size, size, Config.SlideCastColor);
+            bool doesCastBarFillToLeft = Config.FillDirection is BarDirection.Left;
+            float slideCastWidth = Math.Min(Config.Size.X, Config.SlideCastTime / 1000f * Config.Size.X / totalCastTime);
+            Vector2 size = new(slideCastWidth, Config.Size.Y);
+            Rect slideCast = new(Config.Position + Config.Size - size, size, Config.SlideCastColor);
+
+            if (doesCastBarFillToLeft)
+            {
+                bool validIcon = LastUsedCast is { IconTexture: { } };
+                Vector2 iconSize = Config.ShowIcon && validIcon ? new Vector2(Config.Size.Y, Config.Size.Y) : Vector2.Zero;
+                slideCast = Config.ShowIcon ? new Rect(Config.Position, size + new Vector2(iconSize.X, 0), Config.SlideCastColor) : new Rect(Config.Position, size, Config.SlideCastColor);
+            }
+
             bar.AddForegrounds(slideCast);
         }
 
