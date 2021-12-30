@@ -221,10 +221,11 @@ namespace DelvUI.Interface.PartyCooldowns
                     }
 
                     string? name = character == null ? "Fake Name" : null;
+                    Vector2 labelPos = origin + pos;
 
                     AddDrawAction(_barConfig.NameLabel.StrataLevel, () =>
                     {
-                        _nameLabelHud.Draw(origin + pos, size, character, name);
+                        _nameLabelHud.Draw(labelPos, size, character, name);
                     });
 
                     // time
@@ -243,7 +244,7 @@ namespace DelvUI.Interface.PartyCooldowns
 
                     AddDrawAction(_barConfig.TimeLabel.StrataLevel, () =>
                     {
-                        _timeLabelHud.Draw(origin + pos, size, character);
+                        _timeLabelHud.Draw(labelPos, size, character);
                     });
 
                     // tooltip
