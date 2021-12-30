@@ -2,6 +2,7 @@
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
+using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
@@ -164,7 +165,7 @@ namespace DelvUI.Interface.GeneralElements
                 }
             }
 
-            AddDrawActions(bar.GetDrawActions(pos, Config));
+            AddDrawActions(bar.GetDrawActions(pos, Config.StrataLevel));
 
             // role/job icon
             if (Config.RoleIconConfig.Enabled && character is PlayerCharacter)
@@ -180,7 +181,7 @@ namespace DelvUI.Interface.GeneralElements
                     var parentPos = Utils.GetAnchoredPosition(barPos + Config.Position, -Config.Size, Config.RoleIconConfig.FrameAnchor);
                     var iconPos = Utils.GetAnchoredPosition(parentPos + Config.RoleIconConfig.Position, Config.RoleIconConfig.Size, Config.RoleIconConfig.Anchor);
 
-                    AddDrawAction(Config.RoleIconConfig, () =>
+                    AddDrawAction(Config.RoleIconConfig.StrataLevel, () =>
                     {
                         DrawHelper.DrawInWindow(ID + "_jobIcon", iconPos, Config.RoleIconConfig.Size, false, false, (drawList) =>
                         {
@@ -354,7 +355,7 @@ namespace DelvUI.Interface.GeneralElements
             Vector2 startPos = new Vector2(Math.Min(pos.X, hEndPos.X), Math.Min(pos.Y, hEndPos.Y));
             Vector2 endPos = new Vector2(Math.Max(pos.X, hEndPos.X), Math.Max(pos.Y, hEndPos.Y)); ;
 
-            AddDrawAction(config, () =>
+            AddDrawAction(StrataLevel.LOWEST, () =>
             {
                 DrawHelper.DrawInWindow(ID + "_TankStance", startPos, endPos - startPos, false, false, (drawList) =>
                 {

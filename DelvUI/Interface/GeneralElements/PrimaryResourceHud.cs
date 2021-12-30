@@ -90,7 +90,8 @@ namespace DelvUI.Interface.GeneralElements
                 GetColor()
             );
 
-            bar.Draw(origin + ParentPos());
+            Vector2 pos = origin + ParentPos();
+            AddDrawActions(bar.GetDrawActions(pos, Config.StrataLevel));
         }
 
         private void GetResources(ref uint current, ref uint max, Character actor)

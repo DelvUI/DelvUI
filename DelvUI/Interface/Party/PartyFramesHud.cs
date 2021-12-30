@@ -9,6 +9,7 @@ using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using Dalamud.Logging;
+using Dalamud.Game.ClientState.Objects.Types;
 
 namespace DelvUI.Interface.Party
 {
@@ -46,7 +47,7 @@ namespace DelvUI.Interface.Party
             bars = new List<PartyFramesBar>(MaxMemberCount);
             for (int i = 0; i < bars.Capacity; i++)
             {
-                var bar = new PartyFramesBar("DelvUI_partyFramesBar" + i, Configs);
+                PartyFramesBar bar = new PartyFramesBar("DelvUI_partyFramesBar" + i, Configs);
                 bar.MovePlayerEvent += OnMovePlayer;
                 bar.OpenContextMenuEvent += OnOpenContextMenu;
 
@@ -93,7 +94,7 @@ namespace DelvUI.Interface.Party
         {
             if (Config.PlayerOrderOverrideEnabled && bar.Member != null)
             {
-                var offset = bar.Member.Order - 1 > Config.PlayerOrder ? -1 : -2;
+                int offset = bar.Member.Order - 1 > Config.PlayerOrder ? -1 : -2;
                 Config.PlayerOrder = Math.Max(0, Math.Min(7, bar.Member.Order + offset));
                 PartyManager.Instance.OnPlayerOrderChange();
 
@@ -137,10 +138,10 @@ namespace DelvUI.Interface.Party
 
         public void UpdateBars(Vector2 origin)
         {
-            var memberCount = PartyManager.Instance.MemberCount;
+            uint memberCount = PartyManager.Instance.MemberCount;
             uint row = 0;
             uint col = 0;
-            var spaceSize = Config.Size - _contentMargin * 2;
+            Vector2 spaceSize = Config.Size - _contentMargin * 2;
 
             for (int i = 0; i < bars.Count; i++)
             {
@@ -219,7 +220,7 @@ namespace DelvUI.Interface.Party
 
         private void UpdateBarsPosition(Vector2 delta)
         {
-            foreach (var bar in bars)
+            foreach (PartyFramesBar bar in bars)
             {
                 bar.Position = bar.Position + delta;
             }
@@ -230,7 +231,7 @@ namespace DelvUI.Interface.Party
             Config.Preview = false;
             PartyManager.Instance?.UpdatePreview();
 
-            foreach (var bar in bars)
+            foreach (PartyFramesBar bar in bars)
             {
                 bar.StopPreview();
             }
@@ -243,7 +244,7 @@ namespace DelvUI.Interface.Party
 
         public void StopMouseover()
         {
-            foreach (var bar in bars)
+            foreach (PartyFramesBar bar in bars)
             {
                 bar.StopMouseover();
             }
@@ -258,8 +259,8 @@ namespace DelvUI.Interface.Party
 
             var windowFlags = ImGuiWindowFlags.NoScrollbar |
                 ImGuiWindowFlags.NoTitleBar |
-                ImGuiWindowFlags.NoFocusOnAppearing |
-                ImGuiWindowFlags.NoBringToFrontOnFocus |
+                //ImGuiWindowFlags.NoFocusOnAppearing |
+                //ImGuiWindowFlags.NoBringToFrontOnFocus |
                 ImGuiWindowFlags.NoSavedSettings;
 
             bool canDrag = !Locked && !DraggingEnabled;
@@ -271,10 +272,10 @@ namespace DelvUI.Interface.Party
 
             Action<ImDrawListPtr> drawBarsAction = (drawList) =>
             {
-                var windowPos = ImGui.GetWindowPos();
-                var windowSize = ImGui.GetWindowSize();
-                var contentStartPos = windowPos + _contentMargin;
-                var maxSize = windowSize - _contentMargin * 2;
+                Vector2 windowPos = ImGui.GetWindowPos();
+                Vector2 windowSize = ImGui.GetWindowSize();
+                Vector2 contentStartPos = windowPos + _contentMargin;
+                Vector2 maxSize = windowSize - _contentMargin * 2;
 
                 if (canDrag)
                 {
@@ -294,7 +295,7 @@ namespace DelvUI.Interface.Party
                     }
                 }
 
-                var count = PartyManager.Instance.MemberCount;
+                uint count = PartyManager.Instance.MemberCount;
                 if (count < 1)
                 {
                     return;
@@ -323,17 +324,17 @@ namespace DelvUI.Interface.Party
                 _memberCount = count;
                 _size = maxSize;
 
-                var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-                var targetIndex = -1;
-                var enmityLeaderIndex = -1;
-                var enmitySecondIndex = -1;
+                GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+                int targetIndex = -1;
+                int enmityLeaderIndex = -1;
+                int enmitySecondIndex = -1;
                 List<int> raisedIndexes = new List<int>();
                 List<int> cleanseIndexes = new List<int>();
 
                 // bars
                 for (int i = 0; i < count; i++)
                 {
-                    var member = bars[i].Member;
+                    IPartyFramesMember? member = bars[i].Member;
 
                     if (member != null)
                     {
@@ -415,43 +416,51 @@ namespace DelvUI.Interface.Party
 
             Action drawElementsAction = () =>
             {
-                foreach (var bar in bars)
+                foreach (PartyFramesBar bar in bars)
                 {
-                    bar.DrawElements(origin);
+                    AddDrawActions(bar.GetElementsDrawActions(origin));
                 }
             };
 
             // no clipping when unlocked, creates way too many issues
             if (canDrag)
             {
-                // size and position
-                ImGui.SetNextWindowPos(origin + Config.Position, ImGuiCond.Appearing);
-                ImGui.SetNextWindowSize(Config.Size + _contentMargin * 2, ImGuiCond.Appearing);
-
-                ImGui.PushStyleColor(ImGuiCol.Border, 0x66FFFFFF);
-                ImGui.PushStyleColor(ImGuiCol.WindowBg, 0x66000000);
-                ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 1);
-                ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
-
-                bool begin = ImGui.Begin(ID + "_Drag", windowFlags);
-                if (!begin)
+                AddDrawAction(Config.StrataLevel, () =>
                 {
+                    // size and position
+                    ImGui.SetNextWindowPos(origin + Config.Position, ImGuiCond.Appearing);
+                    ImGui.SetNextWindowSize(Config.Size + _contentMargin * 2, ImGuiCond.Appearing);
+
+                    ImGui.PushStyleColor(ImGuiCol.Border, 0x66FFFFFF);
+                    ImGui.PushStyleColor(ImGuiCol.WindowBg, 0x66000000);
+                    ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 1);
+                    ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
+
+                    bool begin = ImGui.Begin(ID + "_Drag", windowFlags);
+                    if (!begin)
+                    {
+                        ImGui.End();
+                        return;
+                    }
+
+                    drawBarsAction(ImGui.GetWindowDrawList());
                     ImGui.End();
-                    return;
-                }
 
-                drawBarsAction(ImGui.GetWindowDrawList());
-                ImGui.End();
-
-                ImGui.PopStyleColor(2);
-                ImGui.PopStyleVar(2);
+                    ImGui.PopStyleColor(2);
+                    ImGui.PopStyleVar(2);
+                });
 
                 drawElementsAction();
             }
             else
             {
                 windowFlags |= ImGuiWindowFlags.NoBackground;
-                DrawHelper.DrawInWindow(ID, origin + Config.Position, Config.Size, !Locked, false, true, windowFlags, drawBarsAction);
+
+                AddDrawAction(Config.StrataLevel, () =>
+                {
+                    DrawHelper.DrawInWindow(ID, origin + Config.Position, Config.Size, !Locked, false, true, windowFlags, drawBarsAction);
+                });
+
                 drawElementsAction();
             }
         }

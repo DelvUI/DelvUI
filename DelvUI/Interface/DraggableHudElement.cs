@@ -53,7 +53,7 @@ namespace DelvUI.Interface
         {
             if (_draggingEnabled)
             {
-                AddDrawAction(_config, () =>
+                AddDrawAction(_config.StrataLevel, () =>
                 {
                     DrawDraggableArea(origin);
                 });

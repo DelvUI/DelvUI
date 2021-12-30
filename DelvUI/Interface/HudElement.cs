@@ -14,7 +14,7 @@ namespace DelvUI.Interface
 
         public string ID => _config.ID;
 
-        private SortedList<PluginConfigObject, Action> _drawActions = new SortedList<PluginConfigObject, Action>(new StrataLevelComparer<PluginConfigObject>());
+        private Dictionary<StrataLevel, List<Action>> _drawActions = new Dictionary<StrataLevel, List<Action>>();
 
         public HudElement(MovablePluginConfigObject config)
         {
@@ -26,22 +26,38 @@ namespace DelvUI.Interface
             _drawActions.Clear();
             CreateDrawActions(origin);
 
-            foreach (Action drawAction in _drawActions.Values)
+            // iterate like this so it goes in order
+            StrataLevel[] levels = (StrataLevel[])Enum.GetValues(typeof(StrataLevel));
+            foreach (StrataLevel key in levels)
             {
-                drawAction();
+                _drawActions.TryGetValue(key, out List<Action>? drawActions);
+                if (drawActions == null) { continue; }
+
+                foreach (Action drawAction in _drawActions[key])
+                {
+                    drawAction();
+                }
             }
         }
 
-        protected void AddDrawAction(PluginConfigObject config, Action drawAction)
+        protected void AddDrawAction(StrataLevel strataLevel, Action drawAction)
         {
-            _drawActions.Add(config, drawAction);
+            _drawActions.TryGetValue(strataLevel, out List<Action>? drawActions);
+
+            if (drawActions == null)
+            {
+                drawActions = new List<Action>();
+                _drawActions.Add(strataLevel, drawActions);
+            }
+
+            drawActions.Add(drawAction);
         }
 
-        protected void AddDrawActions(List<(PluginConfigObject, Action)> drawActions)
+        protected void AddDrawActions(List<(StrataLevel, Action)> drawActions)
         {
-            foreach ((PluginConfigObject config, Action drawAction) in drawActions)
+            foreach ((StrataLevel strataLevel, Action drawAction) in drawActions)
             {
-                _drawActions.Add(config, drawAction);
+                AddDrawAction(strataLevel, drawAction);
             }
         }
 

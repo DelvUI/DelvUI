@@ -115,14 +115,14 @@ namespace DelvUI.Interface.Bars
             }
         }
 
-        public List<(PluginConfigObject, Action)> GetDrawActions(Vector2 origin, PluginConfigObject config)
+        public List<(StrataLevel, Action)> GetDrawActions(Vector2 origin, StrataLevel strataLevel)
         {
-            List<(PluginConfigObject, Action)> drawActions = new List<(PluginConfigObject, Action)>();
+            List<(StrataLevel, Action)> drawActions = new List<(StrataLevel, Action)>();
 
             var barPos = Utils.GetAnchoredPosition(origin, BackgroundRect.Size, Anchor);
             var backgroundPos = barPos + BackgroundRect.Position;
 
-            drawActions.Add((config, () =>
+            drawActions.Add((strataLevel, () =>
             {
                 DrawRects(barPos, backgroundPos);
             }
@@ -131,7 +131,7 @@ namespace DelvUI.Interface.Bars
             // labels
             foreach (LabelHud label in LabelHuds)
             {
-                drawActions.Add((label.GetConfig(), () =>
+                drawActions.Add((label.GetConfig().StrataLevel, () =>
                 {
                     label.Draw(backgroundPos, BackgroundRect.Size, Actor, null, (uint?)Current, (uint?)Max);
                 }
