@@ -19,15 +19,6 @@ namespace DelvUI.Helpers
             RealColCount = realColCount;
             ContentSize = contentSize;
         }
-
-        public LayoutInfo(uint rows, uint columns, Vector2 contentSize)
-        {
-            TotalRowCount = rows;
-            TotalColCount = columns;
-            RealRowCount = rows;
-            RealColCount = columns;
-            ContentSize = contentSize;
-        }
     }
 
     public static class LayoutHelper
