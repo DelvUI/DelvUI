@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using Dalamud.Interface;
+using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
@@ -227,7 +228,7 @@ namespace DelvUI.Config.Attributes
     {
         public int min;
         public int max;
-        public int velocity;
+        public float velocity;
 
         public DragIntAttribute(string friendlyName) : base(friendlyName)
         {
@@ -245,7 +246,7 @@ namespace DelvUI.Config.Attributes
             {
                 field.SetValue(config, intVal);
 
-                TriggerChangeEvent<float>(config, field.Name, intVal);
+                TriggerChangeEvent<int>(config, field.Name, intVal);
 
                 return true;
             }
@@ -641,9 +642,7 @@ namespace DelvUI.Config.Attributes
             return false;
         }
     }
-    #endregion
 
-    #region field ordering attributes
     [AttributeUsage(AttributeTargets.Field)]
     public class AnchorAttribute : ComboAttribute
     {
@@ -653,6 +652,41 @@ namespace DelvUI.Config.Attributes
         }
     }
 
+    [AttributeUsage(AttributeTargets.Field)]
+    public class StrataLevelAttribute : ConfigAttribute
+    {
+        private string[] options = { "Lowest", "Low", "Mid-Low", "Mid", "Mid-High", "High", "Highest" };
+
+        public StrataLevelAttribute(string friendlyName) : base(friendlyName)
+        {
+        }
+
+        public override bool DrawField(FieldInfo field, PluginConfigObject config, string? ID, bool collapsingHeader)
+        {
+            object? fieldVal = field.GetValue(config);
+
+            int intVal = 0;
+            if (fieldVal != null)
+            {
+                intVal = (int)fieldVal;
+            }
+
+            if (ImGui.Combo(friendlyName + IDText(ID), ref intVal, options, options.Length, 4))
+            {
+                field.SetValue(config, (StrataLevel?)intVal);
+
+                TriggerChangeEvent<int>(config, field.Name, intVal);
+                ConfigurationManager.Instance?.OnStrataLevelChanged(config);
+
+                return true;
+            }
+
+            return false;
+        }
+    }
+    #endregion
+
+    #region field ordering attributes
     [AttributeUsage(AttributeTargets.Field)]
     public class OrderAttribute : Attribute
     {

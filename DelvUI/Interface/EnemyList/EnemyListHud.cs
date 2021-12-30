@@ -184,47 +184,69 @@ namespace DelvUI.Interface.EnemyList
                     hovered = true;
                 }
 
-                bar.Draw(origin);
+                AddDrawActions(bar.GetDrawActions(origin, Configs.HealthBar.StrataLevel));
 
                 // enmity icon
                 if (_iconsTexture != null && Configs.EnmityIcon.Enabled)
                 {
                     var parentPos = Utils.GetAnchoredPosition(origin + pos, -Configs.HealthBar.Size, Configs.EnmityIcon.HealthBarAnchor);
                     var iconPos = Utils.GetAnchoredPosition(parentPos + Configs.EnmityIcon.Position, Configs.EnmityIcon.Size, Configs.EnmityIcon.Anchor);
+                    int enmityIndex = Config.Preview ? Math.Min(3, i) : _helper.EnemiesData.ElementAt(i).EnmityLevel - 1;
 
-                    DrawHelper.DrawInWindow(ID + "_enmityIcon", iconPos, Configs.EnmityIcon.Size, false, false, (drawList) =>
+                    AddDrawAction(Configs.EnmityIcon.StrataLevel, () =>
                     {
-                        int enmityIndex = Config.Preview ? Math.Min(3, i) : _helper.EnemiesData.ElementAt(i).EnmityLevel - 1;
-                        float w = 48f / _iconsTexture.Width;
-                        float h = 48f / _iconsTexture.Height;
-                        Vector2 uv0 = new Vector2(w * enmityIndex, 0.48f);
-                        Vector2 uv1 = new Vector2(w * (enmityIndex + 1), 0.48f + h);
-                        drawList.AddImage(_iconsTexture.ImGuiHandle, iconPos, iconPos + Configs.EnmityIcon.Size, uv0, uv1);
+                        DrawHelper.DrawInWindow(ID + "_enmityIcon", iconPos, Configs.EnmityIcon.Size, false, false, (drawList) =>
+                        {
+                            float w = 48f / _iconsTexture.Width;
+                            float h = 48f / _iconsTexture.Height;
+                            Vector2 uv0 = new Vector2(w * enmityIndex, 0.48f);
+                            Vector2 uv1 = new Vector2(w * (enmityIndex + 1), 0.48f + h);
+                            drawList.AddImage(_iconsTexture.ImGuiHandle, iconPos, iconPos + Configs.EnmityIcon.Size, uv0, uv1);
+                        });
                     });
                 }
 
                 // labels
                 string? name = Config.Preview ? "Fake Name" : null;
-                _nameLabelHud.Draw(origin + pos, Configs.HealthBar.Size, character, name, currentHp, maxHp);
-                _healthLabelHud.Draw(origin + pos, Configs.HealthBar.Size, character, name, currentHp, maxHp);
+                AddDrawAction(Configs.HealthBar.NameLabel.StrataLevel, () =>
+                {
+                    _nameLabelHud.Draw(origin + pos, Configs.HealthBar.Size, character, name, currentHp, maxHp);
+                });
+
+                AddDrawAction(Configs.HealthBar.HealthLabel.StrataLevel, () =>
+                {
+                    _healthLabelHud.Draw(origin + pos, Configs.HealthBar.Size, character, name, currentHp, maxHp);
+                });
 
                 string letter = Config.Preview || _helper.EnemiesData.ElementAt(i).Letter == null ? ((char)(i + 65)).ToString() : _helper.EnemiesData.ElementAt(i).Letter!;
-                Configs.HealthBar.OrderLetterLabel.SetText($"[{letter}]");
-                _orderLabelHud.Draw(origin + pos, Configs.HealthBar.Size);
+                AddDrawAction(Configs.HealthBar.OrderLetterLabel.StrataLevel, () =>
+                {
+                    Configs.HealthBar.OrderLetterLabel.SetText($"[{letter}]");
+                    _orderLabelHud.Draw(origin + pos, Configs.HealthBar.Size);
+                });
 
                 // buffs / debuffs
                 var buffsPos = Utils.GetAnchoredPosition(origin + pos, -Configs.HealthBar.Size, Configs.Buffs.HealthBarAnchor);
                 _buffsListHud.Actor = character;
-                _buffsListHud.Draw(buffsPos);
+                AddDrawAction(Configs.Buffs.StrataLevel, () =>
+                {
+                    _buffsListHud.Draw(buffsPos);
+                });
 
                 var debuffsPos = Utils.GetAnchoredPosition(origin + pos, -Configs.HealthBar.Size, Configs.Debuffs.HealthBarAnchor);
                 _debuffsListHud.Actor = character;
-                _debuffsListHud.Draw(debuffsPos);
+                AddDrawAction(Configs.Debuffs.StrataLevel, () =>
+                {
+                    _debuffsListHud.Draw(debuffsPos);
+                });
 
                 // castbar
                 var castbarPos = Utils.GetAnchoredPosition(origin + pos, -Configs.HealthBar.Size, Configs.CastBar.HealthBarAnchor);
                 _castbarHud.Actor = character;
-                _castbarHud.Draw(castbarPos);
+                AddDrawAction(Configs.CastBar.StrataLevel, () =>
+                {
+                    _castbarHud.Draw(castbarPos);
+                });
             }
 
             // mouseover

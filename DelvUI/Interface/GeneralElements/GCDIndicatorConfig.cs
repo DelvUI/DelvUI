@@ -1,5 +1,6 @@
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Enums;
 using DelvUI.Interface.Bars;
 using System.Numerics;
 
@@ -11,11 +12,11 @@ namespace DelvUI.Interface.GeneralElements
     public class GCDIndicatorConfig : AnchorablePluginConfigObject
     {
         [Checkbox("Always Show")]
-        [Order(1)]
+        [Order(3)]
         public bool AlwaysShow = false;
 
         [Checkbox("Anchor To Mouse")]
-        [Order(2)]
+        [Order(4)]
         public bool AnchorToMouse = false;
 
         [ColorEdit4("Background Color")]
@@ -77,7 +78,7 @@ namespace DelvUI.Interface.GeneralElements
             new PluginConfigColor(Vector4.Zero)
         );
 
-        public new static GCDIndicatorConfig DefaultConfig() { return new GCDIndicatorConfig() { Enabled = false }; }
+        public new static GCDIndicatorConfig DefaultConfig() { return new GCDIndicatorConfig() { Enabled = false, Strata = StrataLevel.MID_HIGH }; }
     }
 
     [DisableParentSettings("Position", "Anchor", "HideWhenInactive", "FillColor", "BackgroundColor", "DrawBorder")]

@@ -141,8 +141,8 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            BarUtilities.GetBar(Config.BalanceBar, value, 1, 0, player, color)
-                .Draw(origin);
+            BarHud bar = BarUtilities.GetBar(Config.BalanceBar, value, 1, 0, player, color);
+            AddDrawActions(bar.GetDrawActions(origin, Config.BalanceBar.StrataLevel));
         }
 
         private void DrawWhiteManaBar(Vector2 origin, PlayerCharacter player)
@@ -154,8 +154,9 @@ namespace DelvUI.Interface.Jobs
             }
 
             Config.WhiteManaBar.Label.SetValue(mana);
-            BarUtilities.GetProgressBar(Config.WhiteManaBar, mana, 100, 0, player).
-                Draw(origin);
+
+            BarHud bar = BarUtilities.GetProgressBar(Config.WhiteManaBar, mana, 100, 0, player);
+            AddDrawActions(bar.GetDrawActions(origin, Config.WhiteManaBar.StrataLevel));
         }
 
         private void DrawBlackManaBar(Vector2 origin, PlayerCharacter player)
@@ -167,8 +168,9 @@ namespace DelvUI.Interface.Jobs
             }
 
             Config.BlackManaBar.Label.SetValue(mana);
-            BarUtilities.GetProgressBar(Config.BlackManaBar, mana, 100, 0, player).
-                Draw(origin);
+
+            BarHud bar = BarUtilities.GetProgressBar(Config.BlackManaBar, mana, 100, 0, player);
+            AddDrawActions(bar.GetDrawActions(origin, Config.BlackManaBar.StrataLevel));
         }
 
         private void DrawManaStacksBarBar(Vector2 origin, PlayerCharacter player)
@@ -179,8 +181,11 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            BarUtilities.GetChunkedBars(Config.ManaStacksBar, 3, manaStacks, 3f, 0, player)
-                .Draw(origin);
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.ManaStacksBar, 3, manaStacks, 3f, 0, player);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.ManaStacksBar.StrataLevel));
+            }
         }
 
         private void DrawDualCastBar(Vector2 origin, PlayerCharacter player)
@@ -193,20 +198,27 @@ namespace DelvUI.Interface.Jobs
             };
 
             Config.DualcastBar.Label.SetValue(duration);
-            BarUtilities.GetProgressBar(Config.DualcastBar, duration, 15f, 0, player).
-                Draw(origin);
+
+            BarHud bar = BarUtilities.GetProgressBar(Config.DualcastBar, duration, 15f, 0, player);
+            AddDrawActions(bar.GetDrawActions(origin, Config.DualcastBar.StrataLevel));
         }
 
         private void DrawVerstoneBar(Vector2 origin, PlayerCharacter player)
         {
-            BarUtilities.GetProcBar(Config.VerstoneBar, player, 1235, 30)?
-                .Draw(origin);
+            BarHud? bar = BarUtilities.GetProcBar(Config.VerstoneBar, player, 1235, 30);
+            if (bar != null)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.VerstoneBar.StrataLevel));
+            }
         }
 
         private void DrawVerfireBar(Vector2 origin, PlayerCharacter player)
         {
-            BarUtilities.GetProcBar(Config.VerfireBar, player, 1234, 30)?
-                .Draw(origin);
+            BarHud? bar = BarUtilities.GetProcBar(Config.VerfireBar, player, 1234, 30);
+            if (bar != null)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.VerfireBar.StrataLevel));
+            }
         }
     }
 

@@ -40,8 +40,11 @@ namespace DelvUI.Interface.GeneralElements
             var restedSize = Config.Size - BarUtilities.GetFillDirectionOffset(expBar.Size, Config.FillDirection);
             Rect restedBar = BarUtilities.GetFillRect(restedPos, restedSize, Config.FillDirection, Config.RestedExpColor, rested, required, 0f);
 
-            var bar = new BarHud(Config, Actor).AddForegrounds(expBar, restedBar).AddLabels(Config.LeftLabel, Config.RightLabel);
-            bar.Draw(origin);
+            BarHud bar = new BarHud(Config, Actor);
+            bar.AddForegrounds(expBar, restedBar);
+            bar.AddLabels(Config.LeftLabel, Config.RightLabel);
+
+            AddDrawActions(bar.GetDrawActions(origin, Config.StrataLevel));
         }
     }
 }

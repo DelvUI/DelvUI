@@ -112,7 +112,7 @@ namespace DelvUI.Interface.Jobs
             Config.ManaBar.Label.SetValue(player.CurrentMp);
 
             // hardcoded 9k as maxMP so the chunks are each 3k since that's what a DRK wants to see
-            BarUtilities.GetChunkedProgressBars(
+            BarHud[] bars = BarUtilities.GetChunkedProgressBars(
                 Config.ManaBar,
                 gauge.HasDarkArts ? 1 : 3,
                 player.CurrentMp,
@@ -121,7 +121,12 @@ namespace DelvUI.Interface.Jobs
                 player,
                 null,
                 gauge.HasDarkArts ? Config.ManaBar.DarkArtsColor : Config.ManaBar.FillColor
-                ).Draw(origin);
+            );
+
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.ManaBar.StrataLevel));
+            }
         }
 
         private void DrawDarkside(Vector2 origin, PlayerCharacter player)
@@ -132,8 +137,9 @@ namespace DelvUI.Interface.Jobs
             float timer = Math.Abs(gauge.DarksideTimeRemaining) / 1000;
 
             Config.DarksideBar.Label.SetValue(timer);
-            BarUtilities.GetProgressBar(Config.DarksideBar, timer, 60, 0, player)
-                .Draw(origin);
+
+            BarHud bar = BarUtilities.GetProgressBar(Config.DarksideBar, timer, 60, 0, player);
+            AddDrawActions(bar.GetDrawActions(origin, Config.DarksideBar.StrataLevel));
         }
 
         private void DrawBloodGauge(Vector2 origin, PlayerCharacter player)
@@ -142,8 +148,12 @@ namespace DelvUI.Interface.Jobs
             if (!Config.BloodGauge.HideWhenInactive || gauge.Blood > 0)
             {
                 Config.BloodGauge.Label.SetValue(gauge.Blood);
-                BarUtilities.GetChunkedProgressBars(Config.BloodGauge, 2, gauge.Blood, 100, 0, player)
-                    .Draw(origin);
+
+                BarHud[] bars = BarUtilities.GetChunkedProgressBars(Config.BloodGauge, 2, gauge.Blood, 100, 0, player);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.BloodGauge.StrataLevel));
+                }
             }
         }
 
@@ -154,8 +164,9 @@ namespace DelvUI.Interface.Jobs
             if (Config.BloodWeaponBar.HideWhenInactive && bloodWeaponDuration is 0) { return; }
 
             Config.BloodWeaponBar.Label.SetValue(bloodWeaponDuration);
-            BarUtilities.GetProgressBar(Config.BloodWeaponBar, bloodWeaponDuration, 10, 0f, player)
-                .Draw(origin);
+
+            BarHud bar = BarUtilities.GetProgressBar(Config.BloodWeaponBar, bloodWeaponDuration, 10, 0f, player);
+            AddDrawActions(bar.GetDrawActions(origin, Config.BloodWeaponBar.StrataLevel));
         }
 
         private void DrawDeliriumBar(Vector2 origin, PlayerCharacter player)
@@ -174,8 +185,12 @@ namespace DelvUI.Interface.Jobs
                 }
 
                 Config.DeliriumBar.Label.SetValue(deliriumDuration);
-                BarUtilities.GetChunkedBars(Config.DeliriumBar, chunks, player)
-                            .Draw(origin);
+
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.DeliriumBar, chunks, player);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.DeliriumBar.StrataLevel));
+                }
             }
         }
 
@@ -187,8 +202,8 @@ namespace DelvUI.Interface.Jobs
             float timer = Math.Abs(gauge.ShadowTimeRemaining) / 1000;
             Config.LivingShadowBar.Label.SetValue(timer);
 
-            BarUtilities.GetProgressBar(Config.LivingShadowBar, timer, 24, 0, player)
-                .Draw(origin);
+            BarHud bar = BarUtilities.GetProgressBar(Config.LivingShadowBar, timer, 24, 0, player);
+            AddDrawActions(bar.GetDrawActions(origin, Config.LivingShadowBar.StrataLevel));
         }
     }
 

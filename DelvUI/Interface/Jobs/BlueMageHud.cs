@@ -96,7 +96,11 @@ namespace DelvUI.Interface.Jobs
         protected void DrawBleedBar(Vector2 origin, PlayerCharacter player)
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            BarUtilities.GetDoTBar(Config.BleedBar, player, target, BleedID, BleedDurations)?.Draw(origin);
+            BarHud? bar = BarUtilities.GetDoTBar(Config.BleedBar, player, target, BleedID, BleedDurations);
+            if (bar != null)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.BleedBar.StrataLevel));
+            }
         }
 
         protected void DrawWindburnBar(Vector2 origin, PlayerCharacter player)
@@ -111,7 +115,11 @@ namespace DelvUI.Interface.Jobs
 
             if (dotExists)
             {
-                BarUtilities.GetDoTBar(Config.WindburnBar, player, target, 1723, 6f)?.Draw(origin);
+                BarHud? bar = BarUtilities.GetDoTBar(Config.WindburnBar, player, target, 1723, 6f);
+                if (bar != null)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.WindburnBar.StrataLevel));
+                }
             }
             else
             {
@@ -127,7 +135,8 @@ namespace DelvUI.Interface.Jobs
                         Config.WindburnBar.Label.SetText("Ready");
                     }
 
-                    BarUtilities.GetProgressBar(Config.WindburnBar, current, max, 0f, player).Draw(origin);
+                    BarHud bar = BarUtilities.GetProgressBar(Config.WindburnBar, current, max, 0f, player);
+                    AddDrawActions(bar.GetDrawActions(origin, Config.WindburnBar.StrataLevel));
                 }
             }
         }
@@ -141,14 +150,24 @@ namespace DelvUI.Interface.Jobs
             if (!Config.SurpanakhaBar.HideWhenInactive || current < max)
             {
                 Config.SurpanakhaBar.Label.SetValue((max - current) % 30);
-                BarUtilities.GetChunkedProgressBars(Config.SurpanakhaBar, 4, current, max, 0f, player).Draw(origin);
+
+                BarHud[] bars = BarUtilities.GetChunkedProgressBars(Config.SurpanakhaBar, 4, current, max, 0f, player);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.SurpanakhaBar.StrataLevel));
+                }
             }
         }
 
         protected void DrawOffGuardBar(Vector2 origin, PlayerCharacter player)
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            BarUtilities.GetDoTBar(Config.OffGuardBar, player, target, 1717, 15f)?.Draw(origin);
+
+            BarHud? bar = BarUtilities.GetDoTBar(Config.OffGuardBar, player, target, 1717, 15f);
+            if (bar != null)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.OffGuardBar.StrataLevel));
+            }
         }
 
         protected void DrawMoonFluteBar(Vector2 origin, PlayerCharacter player)
@@ -166,7 +185,9 @@ namespace DelvUI.Interface.Jobs
                 float buffDuration = buff?.RemainingTime ?? 0f;
 
                 Config.MoonFluteBar.Label.SetValue(buffDuration);
-                BarUtilities.GetProgressBar(Config.MoonFluteBar, buffDuration, 15f, 0, player, fillColor: buffColor).Draw(origin);
+
+                BarHud bar = BarUtilities.GetProgressBar(Config.MoonFluteBar, buffDuration, 15f, 0, player, fillColor: buffColor);
+                AddDrawActions(bar.GetDrawActions(origin, Config.MoonFluteBar.StrataLevel));
             }
         }
 
@@ -185,14 +206,19 @@ namespace DelvUI.Interface.Jobs
                 float buffDuration = buff?.RemainingTime ?? 0f;
 
                 Config.SpellAmpBar.Label.SetValue(buffDuration);
-                BarUtilities.GetProgressBar(Config.SpellAmpBar, buffDuration, 30f, 0, player, fillColor: buffColor).Draw(origin);
 
+                BarHud bar = BarUtilities.GetProgressBar(Config.SpellAmpBar, buffDuration, 30f, 0, player, fillColor: buffColor);
+                AddDrawActions(bar.GetDrawActions(origin, Config.SpellAmpBar.StrataLevel));
             }
         }
 
         protected void DrawTingleBar(Vector2 origin, PlayerCharacter player)
         {
-            BarUtilities.GetProcBar(Config.TingleBar, player, 2492, 15f)?.Draw(origin);
+            BarHud? bar = BarUtilities.GetProcBar(Config.TingleBar, player, 2492, 15f);
+            if (bar != null)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.TingleBar.StrataLevel));
+            }
         }
     }
 
