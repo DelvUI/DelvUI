@@ -131,7 +131,7 @@ namespace DelvUI.Interface.Party
         {
             Order = order + 1;
             Level = (uint)RNG.Next(1, 80);
-            JobId = (uint)RNG.Next(19, 38);
+            JobId = (uint)RNG.Next(19, 41);
             MaxHP = (uint)RNG.Next(90000, 150000);
             HP = order == 2 ? 0 : (uint)(MaxHP * RNG.Next(50, 100) / 100f);
             MaxMP = 10000;

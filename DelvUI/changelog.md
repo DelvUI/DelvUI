@@ -1,3 +1,10 @@
+# 0.6.1.3
+Features:
+- Added Thresholds for Bard Songs with the recommended song rotation (43, 34, 43).  
+
+Fixes:
+- Fixed Dancer Proc Bars so they can be individually disabled.
+
 # 0.6.1.2
 Features:
 - Astrologian Minor Arcana Bar now has a label to track cooldown of Minor Arcana whilst a Crown Card is drawn. Note that this will not work for users of the XIVCombo plugin that has selected the option to turn Minor Arcana into Crown Play.
