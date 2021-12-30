@@ -85,8 +85,11 @@ namespace DelvUI.Interface.Jobs
         {
             GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            BarUtilities.GetDoTBar(Config.DotBar, player, target, DotIDs, DotDurations)?.
-                    Draw(origin);
+            BarHud? bar = BarUtilities.GetDoTBar(Config.DotBar, player, target, DotIDs, DotDurations);
+            if (bar != null)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.DotBar.StrataLevel));
+            }
         }
 
         private void DrawAddersgallBar(Vector2 origin, PlayerCharacter player)
@@ -101,14 +104,20 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.AddersgallBar.HideWhenInactive || adderScale > 0)
             {
-                BarUtilities.GetChunkedBars(Config.AddersgallBar, 3, adderScale, 3, 0, player, glowConfig: glow, chunksToGlow: new[] { true, true, true })
-                    .Draw(origin);
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.AddersgallBar, 3, adderScale, 3, 0, player, glowConfig: glow, chunksToGlow: new[] { true, true, true });
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.AddersgallBar.StrataLevel));
+                }
             }
 
             if (!Config.AdderstingBar.HideWhenInactive && Config.AdderstingBar.Enabled || gauge.Addersting > 0)
             {
-                BarUtilities.GetChunkedBars(Config.AdderstingBar, 3, gauge.Addersting, 3, 0, player, glowConfig: glow, chunksToGlow: new[] { true, true, true })
-                    .Draw(origin);
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.AdderstingBar, 3, gauge.Addersting, 3, 0, player, glowConfig: glow, chunksToGlow: new[] { true, true, true });
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.AdderstingBar.StrataLevel));
+                }
             }
         }
 
@@ -119,8 +128,8 @@ namespace DelvUI.Interface.Jobs
             if (!Config.PhysisBar.HideWhenInactive || physisDuration > 0)
             {
                 Config.PhysisBar.Label.SetValue(physisDuration);
-                BarUtilities.GetProgressBar(Config.PhysisBar, physisDuration, 15f, 0f, player)
-                    .Draw(origin);
+                BarHud bar = BarUtilities.GetProgressBar(Config.PhysisBar, physisDuration, 15f, 0f, player);
+                AddDrawActions(bar.GetDrawActions(origin, Config.PhysisBar.StrataLevel));
             }
         }
 
@@ -135,8 +144,8 @@ namespace DelvUI.Interface.Jobs
                 float maxDuration = holosDuration > 0 ? 20f : 15f;
 
                 Config.KeracholeBar.Label.SetValue(duration);
-                BarUtilities.GetProgressBar(Config.KeracholeBar, duration, maxDuration, 0f, player)
-                    .Draw(origin);
+                BarHud bar = BarUtilities.GetProgressBar(Config.KeracholeBar, duration, maxDuration, 0f, player);
+                AddDrawActions(bar.GetDrawActions(origin, Config.KeracholeBar.StrataLevel));
             }
         }
     }

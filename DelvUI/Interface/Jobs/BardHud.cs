@@ -112,7 +112,11 @@ namespace DelvUI.Interface.Jobs
                     coda[i] = new Tuple<PluginConfigColor, float, LabelConfig?>(colors[order[i]], containsCoda[order[i]], null);
                 }
 
-                BarUtilities.GetChunkedBars(Config.CodaBar, coda, player).Draw(origin);
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.CodaBar, coda, player);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.CodaBar.StrataLevel));
+                }
             }
         }
 
@@ -123,8 +127,11 @@ namespace DelvUI.Interface.Jobs
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            BarUtilities.GetDoTBar(Config.CausticBiteDoTBar, player, target, CausticBiteDoTIDs, CausticBiteDoTDurations)?.
-                         Draw(origin);
+            BarHud? bar = BarUtilities.GetDoTBar(Config.CausticBiteDoTBar, player, target, CausticBiteDoTIDs, CausticBiteDoTDurations);
+            if (bar != null)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.CausticBiteDoTBar.StrataLevel));
+            }
         }
 
         private static List<uint> StormbiteDoTIDs = new List<uint> { 129, 1201 };
@@ -134,8 +141,11 @@ namespace DelvUI.Interface.Jobs
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            BarUtilities.GetDoTBar(Config.StormbiteDoTBar, player, target, StormbiteDoTIDs, StormbiteDoTDurations)?.
-                         Draw(origin);
+            BarHud? bar = BarUtilities.GetDoTBar(Config.StormbiteDoTBar, player, target, StormbiteDoTIDs, StormbiteDoTDurations);
+            if (bar != null)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.StormbiteDoTBar.StrataLevel));
+            }
         }
 
         private void HandleCurrentSong(Vector2 origin, PlayerCharacter player)
@@ -190,7 +200,7 @@ namespace DelvUI.Interface.Jobs
                         DrawStacksBar(origin, player, 0, 3, Config.StacksBar.WMStackColor);
                     }
 
-                    DrawSongTimerBar(origin, 0, EmptyColor, Config.SongGaugeBar.ThresholdConfig,  player);
+                    DrawSongTimerBar(origin, 0, EmptyColor, Config.SongGaugeBar.ThresholdConfig, player);
 
                     break;
 
@@ -231,8 +241,9 @@ namespace DelvUI.Interface.Jobs
 
             Config.SongGaugeBar.Label.SetValue(duration);
             Config.SongGaugeBar.ThresholdConfig = songThreshold;
-            BarUtilities.GetProgressBar(Config.SongGaugeBar, duration, 45f, 0f, player, songColor)
-                        .Draw(origin);
+
+            BarHud bar = BarUtilities.GetProgressBar(Config.SongGaugeBar, duration, 45f, 0f, player, songColor);
+            AddDrawActions(bar.GetDrawActions(origin, Config.SongGaugeBar.StrataLevel));
         }
 
         protected void DrawSoulVoiceBar(Vector2 origin, PlayerCharacter player)
@@ -247,7 +258,7 @@ namespace DelvUI.Interface.Jobs
 
             config.Label.SetValue(soulVoice);
 
-            BarUtilities.GetProgressBar(
+            BarHud bar = BarUtilities.GetProgressBar(
                 config,
                 config.ThresholdConfig,
                 new LabelConfig[] { config.Label },
@@ -257,7 +268,9 @@ namespace DelvUI.Interface.Jobs
                 player,
                 config.FillColor,
                 soulVoice == 100f && config.GlowConfig.Enabled ? config.GlowConfig : null
-            ).Draw(origin);
+            );
+
+            AddDrawActions(bar.GetDrawActions(origin, config.StrataLevel));
         }
 
         private void DrawStacksBar(Vector2 origin, PlayerCharacter player, int amount, int max, PluginConfigColor stackColor, BarGlowConfig? glowConfig = null)
@@ -265,8 +278,12 @@ namespace DelvUI.Interface.Jobs
             BardStacksBarConfig config = Config.StacksBar;
 
             config.FillColor = stackColor;
-            BarUtilities.GetChunkedBars(Config.StacksBar, max, amount, max, 0f, player, glowConfig: glowConfig).
-                         Draw(origin);
+
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.StacksBar, max, amount, max, 0f, player, glowConfig: glowConfig);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.CodaBar.StrataLevel));
+            }
         }
     }
 
@@ -361,7 +378,7 @@ namespace DelvUI.Interface.Jobs
         [ColorEdit4("Army's Paeon" + "##Song")]
         [Order(33)]
         public PluginConfigColor APColor = new(new Vector4(207f / 255f, 205f / 255f, 52f / 255f, 100f / 100f));
-        
+
         [NestedConfig("Wanderer's Minuet Threshold", 36, separator = false, spacing = true)]
         public ThresholdConfig WMThreshold = new ThresholdConfig()
         {
@@ -379,7 +396,7 @@ namespace DelvUI.Interface.Jobs
             ThresholdType = ThresholdType.Below,
             Value = 14
         };
-        
+
         [NestedConfig("Army's Paeon Threshold", 38, separator = false, spacing = true)]
         public ThresholdConfig APThreshold = new ThresholdConfig()
         {

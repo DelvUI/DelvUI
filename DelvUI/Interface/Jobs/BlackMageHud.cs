@@ -186,7 +186,7 @@ namespace DelvUI.Interface.Jobs
                 gauge.InAstralFire ? config.FireColor : gauge.InUmbralIce ? config.IceColor : config.FillColor
             );
 
-            bar.Draw(origin);
+            AddDrawActions(bar.GetDrawActions(origin, config.StrataLevel));
         }
 
         protected void DrawStacksBar(Vector2 origin)
@@ -200,8 +200,11 @@ namespace DelvUI.Interface.Jobs
             PluginConfigColor color = gauge.UmbralIceStacks > 0 ? Config.StacksBar.IceColor : Config.StacksBar.FireColor;
             byte stacks = gauge.UmbralIceStacks > 0 ? gauge.UmbralIceStacks : gauge.AstralFireStacks;
 
-            BarUtilities.GetChunkedBars(Config.StacksBar, 3, stacks, 3f, fillColor: color)
-                .Draw(origin);
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.StacksBar, 3, stacks, 3f, fillColor: color);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.StacksBar.StrataLevel));
+            }
         }
 
         protected void DrawUmbralHeartBar(Vector2 origin)
@@ -212,8 +215,11 @@ namespace DelvUI.Interface.Jobs
                 return;
             };
 
-            BarUtilities.GetChunkedBars(Config.UmbralHeartBar, 3, gauge.UmbralHearts, 3f)
-                .Draw(origin);
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.UmbralHeartBar, 3, gauge.UmbralHearts, 3f);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.UmbralHeartBar.StrataLevel));
+            }
         }
 
         protected void DrawTripleCastBar(Vector2 origin, PlayerCharacter player)
@@ -225,8 +231,11 @@ namespace DelvUI.Interface.Jobs
                 return;
             };
 
-            BarUtilities.GetChunkedBars(Config.TriplecastBar, 3, stackCount, 3f)
-                .Draw(origin);
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.TriplecastBar, 3, stackCount, 3f);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.TriplecastBar.StrataLevel));
+            }
         }
 
         protected void DrawEnochianBar(Vector2 origin, PlayerCharacter player)
@@ -240,8 +249,9 @@ namespace DelvUI.Interface.Jobs
 
             float timer = gauge.IsEnochianActive ? (30000f - gauge.EnochianTimer) : 0f;
             Config.EnochianBar.Label.SetValue(timer / 1000);
-            BarUtilities.GetProgressBar(Config.EnochianBar, timer / 1000, 30, 0f, player)
-                .Draw(origin);
+
+            BarHud bar = BarUtilities.GetProgressBar(Config.EnochianBar, timer / 1000, 30, 0f, player);
+            AddDrawActions(bar.GetDrawActions(origin, Config.EnochianBar.StrataLevel));
         }
 
         protected void DrawPolyglotBar(Vector2 origin, PlayerCharacter player)
@@ -257,15 +267,18 @@ namespace DelvUI.Interface.Jobs
             if (player.Level < 80)
             {
                 BarGlowConfig? glow = gauge.PolyglotStacks == 1 && Config.PolyglotBar.GlowConfig.Enabled ? Config.PolyglotBar.GlowConfig : null;
-                BarUtilities.GetBar(Config.PolyglotBar, gauge.PolyglotStacks, 1, 0, glowConfig: glow)
-                    .Draw(origin);
+                BarHud bar = BarUtilities.GetBar(Config.PolyglotBar, gauge.PolyglotStacks, 1, 0, glowConfig: glow);
+                AddDrawActions(bar.GetDrawActions(origin, Config.PolyglotBar.StrataLevel));
             }
             // 2 stacks for level 80+
             else
             {
                 BarGlowConfig? glow = Config.PolyglotBar.GlowConfig.Enabled ? Config.PolyglotBar.GlowConfig : null;
-                BarUtilities.GetChunkedBars(Config.PolyglotBar, 2, gauge.PolyglotStacks, 2f, 0, glowConfig: glow)
-                    .Draw(origin);
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.PolyglotBar, 2, gauge.PolyglotStacks, 2f, 0, glowConfig: glow);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.PolyglotBar.StrataLevel));
+                }
             }
         }
 
@@ -279,28 +292,37 @@ namespace DelvUI.Interface.Jobs
             };
 
             BarGlowConfig? glow = gauge.IsParadoxActive && Config.ParadoxBar.GlowConfig.Enabled ? Config.ParadoxBar.GlowConfig : null;
-            BarUtilities.GetBar(Config.ParadoxBar, gauge.IsParadoxActive ? 1 : 0, 1, 0, glowConfig: glow)
-                .Draw(origin);
+            BarHud bar = BarUtilities.GetBar(Config.ParadoxBar, gauge.IsParadoxActive ? 1 : 0, 1, 0, glowConfig: glow);
+            AddDrawActions(bar.GetDrawActions(origin, Config.ParadoxBar.StrataLevel));
         }
 
         protected void DrawThundercloudBar(Vector2 origin, PlayerCharacter player)
         {
-            BarUtilities.GetProcBar(Config.ThundercloudBar, player, 164, 40f)?
-                .Draw(origin);
+            BarHud? bar = BarUtilities.GetProcBar(Config.ThundercloudBar, player, 164, 40f);
+            if (bar != null)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.ThundercloudBar.StrataLevel));
+            }
         }
 
         protected void DrawFirestarterBar(Vector2 origin, PlayerCharacter player)
         {
-            BarUtilities.GetProcBar(Config.FirestarterBar, player, 165, 30f)?
-                .Draw(origin);
+            BarHud? bar = BarUtilities.GetProcBar(Config.FirestarterBar, player, 165, 30f);
+            if (bar != null)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.FirestarterBar.StrataLevel));
+            }
         }
 
         protected void DrawThunderDoTBar(Vector2 origin, PlayerCharacter player)
         {
             GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            BarUtilities.GetDoTBar(Config.ThunderDoTBar, player, target, ThunderDoTIDs, ThunderDoTDurations)?.
-                Draw(origin);
+            BarHud? bar = BarUtilities.GetDoTBar(Config.ThunderDoTBar, player, target, ThunderDoTIDs, ThunderDoTDurations);
+            if (bar != null)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.ThunderDoTBar.StrataLevel));
+            }
         }
     }
 
