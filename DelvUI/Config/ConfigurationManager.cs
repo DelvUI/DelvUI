@@ -339,10 +339,7 @@ namespace DelvUI.Config
 
             ConfigBaseNode.Save(ConfigDirectory);
 
-            if (ProfilesManager.Instance != null)
-            {
-                ProfilesManager.Instance.SaveCurrentProfile();
-            }
+            ProfilesManager.Instance?.SaveCurrentProfile();
 
             ConfigBaseNode.NeedsSave = false;
         }
@@ -356,7 +353,7 @@ namespace DelvUI.Config
                 return;
             }
 
-            ProfilesManager.Instance.UpdateCurrentProfile();
+            ProfilesManager.Instance?.UpdateCurrentProfile();
         }
 
         public string? ExportCurrentConfigs()
@@ -416,7 +413,11 @@ namespace DelvUI.Config
 
             string? oldSelection = ConfigBaseNode.SelectedOptionName;
             node.SelectedOptionName = oldSelection;
-            node.AddExtraSectionNode(ProfilesManager.Instance.ProfilesNode);
+
+            if (ProfilesManager.Instance != null)
+            {
+                node.AddExtraSectionNode(ProfilesManager.Instance.ProfilesNode);
+            }
 
             ConfigBaseNode.ConfigObjectResetEvent -= OnConfigObjectReset;
             ConfigBaseNode = node;
