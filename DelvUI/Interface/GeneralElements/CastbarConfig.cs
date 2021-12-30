@@ -169,11 +169,11 @@ namespace DelvUI.Interface.GeneralElements
     public abstract class CastbarConfig : BarConfig
     {
         [Checkbox("Preview")]
-        [Order(2)]
+        [Order(3)]
         public bool Preview = false;
 
         [Checkbox("Show Ability Icon")]
-        [Order(3)]
+        [Order(4)]
         public bool ShowIcon = true;
 
         [NestedConfig("Cast Name", 500)]
@@ -187,6 +187,8 @@ namespace DelvUI.Interface.GeneralElements
         {
             CastNameLabel = castNameConfig;
             CastTimeLabel = castTimeConfig;
+
+            Strata = StrataLevel.MID;
         }
     }
 

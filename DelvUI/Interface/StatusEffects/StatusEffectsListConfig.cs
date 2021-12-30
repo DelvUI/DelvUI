@@ -244,6 +244,8 @@ namespace DelvUI.Interface.StatusEffects
             SetGrowthDirections(growthDirections);
 
             IconConfig = iconConfig;
+
+            Strata = StrataLevel.HIGH;
         }
 
         private void SetGrowthDirections(GrowthDirections growthDirections)

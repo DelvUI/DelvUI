@@ -2,6 +2,7 @@
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
+using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
@@ -164,7 +165,7 @@ namespace DelvUI.Interface.GeneralElements
                 }
             }
 
-            bar.Draw(pos);
+            AddDrawActions(bar.GetDrawActions(pos, Config.StrataLevel));
 
             // role/job icon
             if (Config.RoleIconConfig.Enabled && character is PlayerCharacter)
@@ -180,9 +181,12 @@ namespace DelvUI.Interface.GeneralElements
                     var parentPos = Utils.GetAnchoredPosition(barPos + Config.Position, -Config.Size, Config.RoleIconConfig.FrameAnchor);
                     var iconPos = Utils.GetAnchoredPosition(parentPos + Config.RoleIconConfig.Position, Config.RoleIconConfig.Size, Config.RoleIconConfig.Anchor);
 
-                    DrawHelper.DrawInWindow(ID + "_jobIcon", iconPos, Config.RoleIconConfig.Size, false, false, (drawList) =>
+                    AddDrawAction(Config.RoleIconConfig.StrataLevel, () =>
                     {
-                        DrawHelper.DrawIcon(iconId, iconPos, Config.RoleIconConfig.Size, false, drawList);
+                        DrawHelper.DrawInWindow(ID + "_jobIcon", iconPos, Config.RoleIconConfig.Size, false, false, (drawList) =>
+                        {
+                            DrawHelper.DrawIcon(iconId, iconPos, Config.RoleIconConfig.Size, false, drawList);
+                        });
                     });
                 }
             }
@@ -351,48 +355,51 @@ namespace DelvUI.Interface.GeneralElements
             Vector2 startPos = new Vector2(Math.Min(pos.X, hEndPos.X), Math.Min(pos.Y, hEndPos.Y));
             Vector2 endPos = new Vector2(Math.Max(pos.X, hEndPos.X), Math.Max(pos.Y, hEndPos.Y)); ;
 
-            DrawHelper.DrawInWindow(ID + "_TankStance", startPos, endPos - startPos, false, false, (drawList) =>
+            AddDrawAction(StrataLevel.LOWEST, () =>
             {
-                // TODO: clean up hacky math 
-                // there's some 1px errors prob due to negative sizes
-                // couldn't figure it out so I did the hacky fixes
-
-                // vertical
-                drawList.AddRectFilled(pos, vEndPos, color.Base);
-
-                if (config.Corner == TankStanceCorner.TopRight)
+                DrawHelper.DrawInWindow(ID + "_TankStance", startPos, endPos - startPos, false, false, (drawList) =>
                 {
-                    drawList.AddLine(pos, pos + new Vector2(0, vSize.Y + 1), 0xFF000000);
-                }
-                else
-                {
-                    drawList.AddLine(pos, pos + new Vector2(0, vSize.Y), 0xFF000000);
-                }
+                    // TODO: clean up hacky math 
+                    // there's some 1px errors prob due to negative sizes
+                    // couldn't figure it out so I did the hacky fixes
 
-                drawList.AddLine(pos + vSize, pos + vSize + new Vector2(-vSize.X, 0), 0xFF000000);
+                    // vertical
+                    drawList.AddRectFilled(pos, vEndPos, color.Base);
 
-                // horizontal
-                drawList.AddRectFilled(pos, hEndPos, color.Base);
+                    if (config.Corner == TankStanceCorner.TopRight)
+                    {
+                        drawList.AddLine(pos, pos + new Vector2(0, vSize.Y + 1), 0xFF000000);
+                    }
+                    else
+                    {
+                        drawList.AddLine(pos, pos + new Vector2(0, vSize.Y), 0xFF000000);
+                    }
 
-                if (config.Corner == TankStanceCorner.BottomLeft)
-                {
-                    drawList.AddLine(pos, pos + new Vector2(hSize.X + 1, 0), 0xFF000000);
-                }
-                else
-                {
-                    drawList.AddLine(pos, pos + new Vector2(hSize.X, 0), 0xFF000000);
-                }
+                    drawList.AddLine(pos + vSize, pos + vSize + new Vector2(-vSize.X, 0), 0xFF000000);
 
-                if (config.Corner == TankStanceCorner.BottomRight)
-                {
-                    drawList.AddLine(pos + new Vector2(0, 1), pos + new Vector2(0, hSize.Y), 0xFF000000);
-                }
-                else
-                {
-                    drawList.AddLine(pos, pos + new Vector2(0, hSize.Y), 0xFF000000);
-                }
+                    // horizontal
+                    drawList.AddRectFilled(pos, hEndPos, color.Base);
 
-                drawList.AddLine(pos + hSize, pos + hSize + new Vector2(0, -hSize.Y), 0xFF000000);
+                    if (config.Corner == TankStanceCorner.BottomLeft)
+                    {
+                        drawList.AddLine(pos, pos + new Vector2(hSize.X + 1, 0), 0xFF000000);
+                    }
+                    else
+                    {
+                        drawList.AddLine(pos, pos + new Vector2(hSize.X, 0), 0xFF000000);
+                    }
+
+                    if (config.Corner == TankStanceCorner.BottomRight)
+                    {
+                        drawList.AddLine(pos + new Vector2(0, 1), pos + new Vector2(0, hSize.Y), 0xFF000000);
+                    }
+                    else
+                    {
+                        drawList.AddLine(pos, pos + new Vector2(0, hSize.Y), 0xFF000000);
+                    }
+
+                    drawList.AddLine(pos + hSize, pos + hSize + new Vector2(0, -hSize.Y), 0xFF000000);
+                });
             });
         }
 

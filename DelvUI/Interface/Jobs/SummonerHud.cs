@@ -106,8 +106,11 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.IfritBar.HideWhenInactive || stackCount > 1)
             {
-                BarUtilities.GetChunkedBars(Config.IfritBar, 1, stackCount, 1, 0, player)
-                    .Draw(origin);
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.IfritBar, 1, stackCount, 1, 0, player);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.IfritBar.StrataLevel));
+                }
             }
         }
 
@@ -118,8 +121,11 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.TitanBar.HideWhenInactive || stackCount > 1)
             {
-                BarUtilities.GetChunkedBars(Config.TitanBar, 1, stackCount, 1, 0, player)
-                    .Draw(origin);
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.TitanBar, 1, stackCount, 1, 0, player);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.TitanBar.StrataLevel));
+                }
             }
         }
 
@@ -130,8 +136,11 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.GarudaBar.HideWhenInactive || stackCount > 1)
             {
-                BarUtilities.GetChunkedBars(Config.GarudaBar, 1, stackCount, 1, 0, player)
-                    .Draw(origin);
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.GarudaBar, 1, stackCount, 1, 0, player);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.GarudaBar.StrataLevel));
+                }
             }
         }
 
@@ -167,8 +176,11 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            BarUtilities.GetChunkedBars(Config.AetherflowBar, 2, stackCount, 2, 0, player)
-                .Draw(origin);
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.AetherflowBar, 2, stackCount, 2, 0, player);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.AetherflowBar.StrataLevel));
+            }
         }
 
         private void DrawTranceBar(Vector2 origin, PlayerCharacter player)
@@ -211,9 +223,11 @@ namespace DelvUI.Interface.Jobs
                 {
                     return;
                 }
+
                 Config.TranceBar.Label.SetValue(tranceDuration / 1000f);
-                BarUtilities.GetProgressBar(Config.TranceBar, tranceDuration / 1000f, maxDuration, 0, player, tranceColor).
-                    Draw(origin);
+
+                BarHud bar = BarUtilities.GetProgressBar(Config.TranceBar, tranceDuration / 1000f, maxDuration, 0, player, tranceColor);
+                AddDrawActions(bar.GetDrawActions(origin, Config.TranceBar.StrataLevel));
             }
             else
             {
@@ -231,8 +245,8 @@ namespace DelvUI.Interface.Jobs
                             Config.TranceBar.Label.SetText("READY");
                         }
 
-                        BarUtilities.GetProgressBar(Config.TranceBar, currentCooldown, maxDuration, 0, player, tranceColor)
-                            .Draw(origin);
+                        BarHud bar = BarUtilities.GetProgressBar(Config.TranceBar, currentCooldown, maxDuration, 0, player, tranceColor);
+                        AddDrawActions(bar.GetDrawActions(origin, Config.TranceBar.StrataLevel));
                     }
                 }
             }
@@ -243,8 +257,12 @@ namespace DelvUI.Interface.Jobs
             SummonerStacksBarConfig config = Config.StacksBar;
 
             config.FillColor = stackColor;
-            BarUtilities.GetChunkedBars(Config.StacksBar, max, amount, max, 0f, player, glowConfig: glowConfig).
-                         Draw(origin);
+
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.StacksBar, max, amount, max, 0f, player, glowConfig: glowConfig);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.StacksBar.StrataLevel));
+            }
         }
     }
 

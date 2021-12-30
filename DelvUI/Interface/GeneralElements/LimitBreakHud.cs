@@ -1,12 +1,9 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
-using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Logging;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -45,9 +42,12 @@ namespace DelvUI.Interface.GeneralElements
 
             Config.Label.SetValue(helper.LimitBreakLevel / limitBreakChunks);
 
-            BarUtilities.GetChunkedProgressBars(Config, limitBreakChunks, currentLimitBreak, maxLimitBreak).Draw(origin);
+            BarHud[] bars = BarUtilities.GetChunkedProgressBars(Config, limitBreakChunks, currentLimitBreak, maxLimitBreak);
+
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.StrataLevel));
+            }
         }
     }
-
-
 }

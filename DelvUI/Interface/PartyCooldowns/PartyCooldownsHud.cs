@@ -179,7 +179,8 @@ namespace DelvUI.Interface.PartyCooldowns
 
                         bar.SetBackground(background);
                         bar.AddForegrounds(fill);
-                        bar.Draw(origin);
+
+                        AddDrawActions(bar.GetDrawActions(origin, _barConfig.StrataLevel));
                     }
 
                     // icon
@@ -189,23 +190,26 @@ namespace DelvUI.Interface.PartyCooldowns
                         Vector2 iconSize = new Vector2(size.Y);
                         bool recharging = effectTime == 0 && cooldownTime > 0;
 
-                        DrawHelper.DrawInWindow(barId + "_icon", iconPos, iconSize, false, false, (drawList) =>
+                        AddDrawAction(_barConfig.StrataLevel, () =>
                         {
-                            uint color = recharging ? 0xAAFFFFFF : 0xFFFFFFFF;
-                            DrawHelper.DrawIcon(cooldown.Data.IconId, iconPos, iconSize, false, color, drawList);
-
-                            if (_barConfig.ShowIconCooldownAnimation && effectTime == 0 && cooldownTime > 0)
+                            DrawHelper.DrawInWindow(barId + "_icon", iconPos, iconSize, false, false, (drawList) =>
                             {
-                                DrawHelper.DrawIconCooldown(iconPos, iconSize, cooldownTime, cooldown.Data.CooldownDuration, drawList);
-                            }
+                                uint color = recharging ? 0xAAFFFFFF : 0xFFFFFFFF;
+                                DrawHelper.DrawIcon(cooldown.Data.IconId, iconPos, iconSize, false, color, drawList);
 
-                            if (_barConfig.DrawBorder)
-                            {
-                                bool active = effectTime > 0 && _barConfig.ChangeIconBorderWhenActive;
-                                uint iconBorderColor = active ? _barConfig.IconActiveBorderColor.Base : _barConfig.BorderColor.Base;
-                                int thickness = active ? _barConfig.IconActiveBorderThickness : _barConfig.BorderThickness;
-                                drawList.AddRect(iconPos, iconPos + iconSize, iconBorderColor, 0, ImDrawFlags.None, thickness);
-                            }
+                                if (_barConfig.ShowIconCooldownAnimation && effectTime == 0 && cooldownTime > 0)
+                                {
+                                    DrawHelper.DrawIconCooldown(iconPos, iconSize, cooldownTime, cooldown.Data.CooldownDuration, drawList);
+                                }
+
+                                if (_barConfig.DrawBorder)
+                                {
+                                    bool active = effectTime > 0 && _barConfig.ChangeIconBorderWhenActive;
+                                    uint iconBorderColor = active ? _barConfig.IconActiveBorderColor.Base : _barConfig.BorderColor.Base;
+                                    int thickness = active ? _barConfig.IconActiveBorderThickness : _barConfig.BorderThickness;
+                                    drawList.AddRect(iconPos, iconPos + iconSize, iconBorderColor, 0, ImDrawFlags.None, thickness);
+                                }
+                            });
                         });
                     }
 
@@ -216,23 +220,31 @@ namespace DelvUI.Interface.PartyCooldowns
                         character = player;
                     }
 
-                    string? name = character == null ? "Fake Name" : null;
-                    _nameLabelHud.Draw(origin + pos, size, character, name);
+                    Vector2 labelPos = origin + pos;
+                    AddDrawAction(_barConfig.NameLabel.StrataLevel, () =>
+                    {
+                        string? name = character == null ? "Fake Name" : null;
+                        _nameLabelHud.Draw(labelPos, size, character, name);
+                    });
 
                     // time
-                    if (effectTime > 0)
+                    AddDrawAction(_barConfig.TimeLabel.StrataLevel, () =>
                     {
-                        _barConfig.TimeLabel.SetValue(effectTime);
-                    }
-                    else if (cooldownTime > 0)
-                    {
-                        _barConfig.TimeLabel.SetText(Utils.DurationToFullString(cooldownTime));
-                    }
-                    else
-                    {
-                        _barConfig.TimeLabel.SetText("");
-                    }
-                    _timeLabelHud.Draw(origin + pos, size, character);
+                        if (effectTime > 0)
+                        {
+                            _barConfig.TimeLabel.SetValue(effectTime);
+                        }
+                        else if (cooldownTime > 0)
+                        {
+                            _barConfig.TimeLabel.SetText(Utils.DurationToFullString(cooldownTime));
+                        }
+                        else
+                        {
+                            _barConfig.TimeLabel.SetText("");
+                        }
+
+                        _timeLabelHud.Draw(labelPos, size, character);
+                    });
 
                     // tooltip
                     pos = origin + new Vector2(Config.Position.X + offsetX, y);

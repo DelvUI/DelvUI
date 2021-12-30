@@ -15,7 +15,8 @@ namespace DelvUI.Interface.GeneralElements
         [Order(10)]
         public string Text;
 
-        public EditableLabelConfig(Vector2 position, string text, DrawAnchor frameAnchor, DrawAnchor textAnchor) : base(position, text, frameAnchor, textAnchor)
+        public EditableLabelConfig(Vector2 position, string text, DrawAnchor frameAnchor, DrawAnchor textAnchor)
+            : base(position, text, frameAnchor, textAnchor)
         {
             Text = text;
         }
@@ -129,6 +130,8 @@ namespace DelvUI.Interface.GeneralElements
             FrameAnchor = frameAnchor;
             TextAnchor = textAnchor;
             Position = position;
+
+            Strata = StrataLevel.HIGHEST;
         }
 
         public virtual string GetText() => _text;

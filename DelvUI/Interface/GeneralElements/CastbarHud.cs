@@ -8,7 +8,6 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
@@ -74,24 +73,27 @@ namespace DelvUI.Interface.GeneralElements
             bar.AddForegrounds(progress);
 
             Vector2 pos = origin + ParentPos();
-            bar.Draw(pos);
+            AddDrawActions(bar.GetDrawActions(pos, Config.StrataLevel));
 
             // icon
             Vector2 startPos = Config.Position + Utils.GetAnchoredPosition(pos, Config.Size, Config.Anchor);
             if (Config.ShowIcon)
             {
-                DrawHelper.DrawInWindow(ID + "_icon", startPos, Config.Size, false, false, (drawList) =>
+                AddDrawAction(Config.StrataLevel, () =>
                 {
-                    if (validIcon)
+                    DrawHelper.DrawInWindow(ID + "_icon", startPos, Config.Size, false, false, (drawList) =>
                     {
-                        ImGui.SetCursorPos(startPos);
-                        ImGui.Image(LastUsedCast!.IconTexture!.ImGuiHandle, iconSize);
-                    }
+                        if (validIcon)
+                        {
+                            ImGui.SetCursorPos(startPos);
+                            ImGui.Image(LastUsedCast!.IconTexture!.ImGuiHandle, iconSize);
+                        }
 
-                    if (Config.DrawBorder)
-                    {
-                        drawList.AddRect(startPos, startPos + iconSize, Config.BorderColor.Base, 0, ImDrawFlags.None, Config.BorderThickness);
-                    }
+                        if (Config.DrawBorder)
+                        {
+                            drawList.AddRect(startPos, startPos + iconSize, Config.BorderColor.Base, 0, ImDrawFlags.None, Config.BorderThickness);
+                        }
+                    });
                 });
             }
 
@@ -100,14 +102,22 @@ namespace DelvUI.Interface.GeneralElements
             var namePos = Config.ShowIcon && isNameLeftAnchored ? startPos + new Vector2(iconSize.X, 0) : startPos;
             string? castName = LastUsedCast?.ActionText.CheckForUpperCase();
             Config.CastNameLabel.SetText(Config.Preview ? "Cast Name" : castName ?? "");
-            _castNameLabel.Draw(namePos, Config.Size, Actor);
+
+            AddDrawAction(Config.CastNameLabel.StrataLevel, () =>
+            {
+                _castNameLabel.Draw(namePos, Config.Size, Actor);
+            });
 
             // cast time
             bool isTimeLeftAnchored = Config.CastTimeLabel.TextAnchor == DrawAnchor.Left || Config.CastTimeLabel.TextAnchor == DrawAnchor.TopLeft || Config.CastTimeLabel.TextAnchor == DrawAnchor.BottomLeft;
             var timePos = Config.ShowIcon && isTimeLeftAnchored ? startPos + new Vector2(iconSize.X, 0) : startPos;
             float value = Config.Preview ? 0.5f : totalCastTime - currentCastTime;
             Config.CastTimeLabel.SetValue(value);
-            _castTimeLabel.Draw(timePos, Config.Size, Actor);
+
+            AddDrawAction(Config.CastTimeLabel.StrataLevel, () =>
+            {
+                _castTimeLabel.Draw(timePos, Config.Size, Actor);
+            });
         }
 
         private void UpdateCurrentCast(out float currentCastTime, out float totalCastTime)
