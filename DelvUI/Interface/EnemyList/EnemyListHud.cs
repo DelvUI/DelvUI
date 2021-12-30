@@ -191,12 +191,12 @@ namespace DelvUI.Interface.EnemyList
                 {
                     var parentPos = Utils.GetAnchoredPosition(origin + pos, -Configs.HealthBar.Size, Configs.EnmityIcon.HealthBarAnchor);
                     var iconPos = Utils.GetAnchoredPosition(parentPos + Configs.EnmityIcon.Position, Configs.EnmityIcon.Size, Configs.EnmityIcon.Anchor);
+                    int enmityIndex = Config.Preview ? Math.Min(3, i) : _helper.EnemiesData.ElementAt(i).EnmityLevel - 1;
 
                     AddDrawAction(Configs.EnmityIcon.StrataLevel, () =>
                     {
                         DrawHelper.DrawInWindow(ID + "_enmityIcon", iconPos, Configs.EnmityIcon.Size, false, false, (drawList) =>
                         {
-                            int enmityIndex = Config.Preview ? Math.Min(3, i) : _helper.EnemiesData.ElementAt(i).EnmityLevel - 1;
                             float w = 48f / _iconsTexture.Width;
                             float h = 48f / _iconsTexture.Height;
                             Vector2 uv0 = new Vector2(w * enmityIndex, 0.48f);
