@@ -172,7 +172,7 @@ namespace DelvUI.Config
         private void OnLogout(object? sender, EventArgs? args)
         {
             SaveConfigurations();
-            ProfilesManager.Instance.SaveCurrentProfile();
+            ProfilesManager.Instance?.SaveCurrentProfile();
         }
 
         private void OnJobChanged(uint jobId)

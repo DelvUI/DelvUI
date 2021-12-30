@@ -390,9 +390,10 @@ namespace DelvUI.Interface
               | ImGuiWindowFlags.NoSavedSettings
             );
 
+            ImGui.PopStyleVar(3);
+
             if (!begin)
             {
-                ImGui.PopStyleVar(3);
                 ImGui.End();
                 return;
             }
@@ -432,7 +433,6 @@ namespace DelvUI.Interface
             // tooltip
             TooltipsHelper.Instance.Draw();
 
-            ImGui.PopStyleVar(3);
             ImGui.End();
         }
 
