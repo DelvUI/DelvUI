@@ -196,8 +196,11 @@ namespace DelvUI.Interface.Jobs
                 new(chunkColors[1], chunkColors[1] != EmptyColor ? 1f : 0f, Config.AstrodyneBar.Label),
                 new(chunkColors[2], chunkColors[2] != EmptyColor ? 1f : 0f, null) };
 
-            BarUtilities.GetChunkedBars(Config.AstrodyneBar, astrodyneChunks, player, Config.AstrodyneBar.AstrodyneGlowConfig, chucksToGlow)
-                .Draw(origin);
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.AstrodyneBar, astrodyneChunks, player, Config.AstrodyneBar.AstrodyneGlowConfig, chucksToGlow);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.AstrodyneBar.StrataLevel));
+            }
         }
 
         private void DrawDraw(Vector2 origin, PlayerCharacter player)
@@ -313,8 +316,8 @@ namespace DelvUI.Interface.Jobs
             LabelConfig[] labels = new LabelConfig[] { Config.DrawBar.Label, Config.DrawBar.DrawDrawChargesLabel, Config.DrawBar.DrawDrawLabel };
             BarGlowConfig? glowConfig = Config.DrawBar.DrawGlowConfig.Enabled && Math.Abs(cardMax - 1f) == 0f ? Config.DrawBar.DrawGlowConfig : null;
 
-            BarUtilities.GetBar(Config.DrawBar, cardPresent, cardMax, 0f, player, cardColor, glowConfig, labels)
-                .Draw(origin);
+            BarHud bar = BarUtilities.GetBar(Config.DrawBar, cardPresent, cardMax, 0f, player, cardColor, glowConfig, labels);
+            AddDrawActions(bar.GetDrawActions(origin, Config.DrawBar.StrataLevel));
         }
 
         private void DrawMinorArcana(Vector2 pos, PlayerCharacter player)
@@ -388,14 +391,18 @@ namespace DelvUI.Interface.Jobs
             }
 
             LabelConfig[] labels = { Config.MinorArcanaBar.Label, Config.MinorArcanaBar.CrownDrawTimerLabel };
-            BarUtilities.GetBar(Config.MinorArcanaBar, crownCardPresent, crownCardMax, 0f, player, crownCardColor, labels: labels)
-                .Draw(pos);
+            BarHud bar = BarUtilities.GetBar(Config.MinorArcanaBar, crownCardPresent, crownCardMax, 0f, player, crownCardColor, labels: labels);
+            AddDrawActions(bar.GetDrawActions(pos, Config.MinorArcanaBar.StrataLevel));
         }
 
         private void DrawDot(Vector2 origin, PlayerCharacter player)
         {
             GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            BarUtilities.GetDoTBar(Config.DotBar, player, target, DotIDs, DotDuration)?.Draw(origin);
+            BarHud? bar = BarUtilities.GetDoTBar(Config.DotBar, player, target, DotIDs, DotDuration);
+            if (bar != null)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.DotBar.StrataLevel));
+            }
         }
 
         private void DrawLightspeed(Vector2 origin, PlayerCharacter player)
@@ -408,8 +415,9 @@ namespace DelvUI.Interface.Jobs
             }
 
             Config.LightspeedBar.Label.SetValue(lightspeedDuration);
-            BarUtilities.GetProgressBar(Config.LightspeedBar, lightspeedDuration, LIGHTSPEED_MAX_DURATION, 0, player)
-                .Draw(origin);
+
+            BarHud bar = BarUtilities.GetProgressBar(Config.LightspeedBar, lightspeedDuration, LIGHTSPEED_MAX_DURATION, 0, player);
+            AddDrawActions(bar.GetDrawActions(origin, Config.LightspeedBar.StrataLevel));
         }
 
         private void DrawStar(Vector2 origin, PlayerCharacter player)
@@ -426,8 +434,10 @@ namespace DelvUI.Interface.Jobs
             PluginConfigColor currentStarColor = starPreCookingBuff > 0 ? Config.StarBar.StarEarthlyColor : Config.StarBar.StarGiantColor;
 
             Config.StarBar.Label.SetValue(currentStarDuration);
-            BarUtilities.GetProgressBar(Config.StarBar, currentStarDuration, STAR_MAX_DURATION, 0f, player, currentStarColor, Config.StarBar.StarGlowConfig.Enabled && starPostCookingBuff > 0 ? Config.StarBar.StarGlowConfig : null)
-                .Draw(origin); // Star Countdown after Star is ready 
+
+            // Star Countdown after Star is ready 
+            BarHud bar = BarUtilities.GetProgressBar(Config.StarBar, currentStarDuration, STAR_MAX_DURATION, 0f, player, currentStarColor, Config.StarBar.StarGlowConfig.Enabled && starPostCookingBuff > 0 ? Config.StarBar.StarGlowConfig : null);
+            AddDrawActions(bar.GetDrawActions(origin, Config.StarBar.StrataLevel));
         }
     }
 

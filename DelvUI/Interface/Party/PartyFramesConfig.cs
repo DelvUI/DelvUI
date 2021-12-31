@@ -13,7 +13,6 @@ using System.Numerics;
 namespace DelvUI.Interface.Party
 {
     [Exportable(false)]
-    [DisableParentSettings("Position")]
     [Section("Party Frames", true)]
     [SubSection("General", 0)]
     public class PartyFramesConfig : MovablePluginConfigObject
@@ -21,16 +20,22 @@ namespace DelvUI.Interface.Party
         public new static PartyFramesConfig DefaultConfig()
         {
             var config = new PartyFramesConfig();
-            config.Position = new Vector2(-ImGui.GetMainViewport().Size.X / 3 - config.Size.X / 2, -config.Size.Y / 2);
+            config.Position = new Vector2(-ImGui.GetMainViewport().Size.X / 3 - 180, -120);
 
             return config;
         }
 
-        public Vector2 Size = new Vector2(380, 340);
-
         [Checkbox("Preview", isMonitored = true)]
         [Order(4)]
         public bool Preview = false;
+
+        [DragInt("Rows", spacing = true, isMonitored = true, min = 1, max = 8, velocity = 0.2f)]
+        [Order(10)]
+        public int Rows = 4;
+
+        [DragInt("Columns", isMonitored = true, min = 1, max = 8, velocity = 0.2f)]
+        [Order(11)]
+        public int Columns = 2;
 
         [Anchor("Bars Anchor", isMonitored = true, spacing = true)]
         [Order(15)]
@@ -701,7 +706,7 @@ namespace DelvUI.Interface.Party
         }
     }
 
-    [DisableParentSettings("Position")]
+    [DisableParentSettings("Position", "Strata")]
     [Exportable(false)]
     public class PartyFramesCleanseTrackerConfig : MovablePluginConfigObject
     {

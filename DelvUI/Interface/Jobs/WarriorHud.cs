@@ -73,8 +73,9 @@ namespace DelvUI.Interface.Jobs
             if (!Config.SurgingTempestBar.HideWhenInactive || surgingTempestDuration > 0)
             {
                 Config.SurgingTempestBar.Label.SetValue(surgingTempestDuration);
-                BarUtilities.GetProgressBar(Config.SurgingTempestBar, surgingTempestDuration, 60f, 0, player)
-                    .Draw(origin);
+
+                BarHud bar = BarUtilities.GetProgressBar(Config.SurgingTempestBar, surgingTempestDuration, 60f, 0, player);
+                AddDrawActions(bar.GetDrawActions(origin, Config.SurgingTempestBar.StrataLevel));
             }
         }
 
@@ -88,8 +89,11 @@ namespace DelvUI.Interface.Jobs
                 Config.BeastGauge.Label.SetValue(gauge.BeastGauge);
 
                 var color = nascentChaosDuration == 0 ? Config.BeastGauge.BeastGaugeColor : Config.BeastGauge.NascentChaosColor;
-                BarUtilities.GetChunkedProgressBars(Config.BeastGauge, 2, gauge.BeastGauge, 100, 0, player, fillColor: color)
-                    .Draw(origin);
+                BarHud[] bars = BarUtilities.GetChunkedProgressBars(Config.BeastGauge, 2, gauge.BeastGauge, 100, 0, player, fillColor: color);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.BeastGauge.StrataLevel));
+                }
             }
         }
 
@@ -123,7 +127,7 @@ namespace DelvUI.Interface.Jobs
                 {
                     if (!Config.InnerReleaseBar.HideWhenInactive)
                     {
-                        BarUtilities.GetChunkedProgressBars(
+                        BarHud[] bars = BarUtilities.GetChunkedProgressBars(
                             Config.InnerReleaseBar,
                             1,
                             1,
@@ -132,13 +136,18 @@ namespace DelvUI.Interface.Jobs
                             player,
                             fillColor: Config.InnerReleaseBar.CooldownFinishedColor,
                             glowConfig: primalRendGlow,
-                            chunksToGlow: new[] { true })
-                            .Draw(origin);
+                            chunksToGlow: new[] { true }
+                        );
+
+                        foreach (BarHud bar in bars)
+                        {
+                            AddDrawActions(bar.GetDrawActions(origin, Config.InnerReleaseBar.StrataLevel));
+                        }
                     }
                 }
                 else
                 {
-                    BarUtilities.GetChunkedProgressBars(
+                    BarHud[] bars = BarUtilities.GetChunkedProgressBars(
                         Config.InnerReleaseBar,
                         1,
                         currentCooldown,
@@ -147,8 +156,13 @@ namespace DelvUI.Interface.Jobs
                         player,
                         fillColor: Config.InnerReleaseBar.CooldownInProgressColor,
                         glowConfig: primalRendGlow,
-                        chunksToGlow: new[] { true })
-                        .Draw(origin);
+                        chunksToGlow: new[] { true }
+                    );
+
+                    foreach (BarHud bar in bars)
+                    {
+                        AddDrawActions(bar.GetDrawActions(origin, Config.InnerReleaseBar.StrataLevel));
+                    }
                 }
 
                 return;
@@ -168,7 +182,7 @@ namespace DelvUI.Interface.Jobs
                     innerReleaseDuration = Math.Min(innerReleaseDuration, innerReleaseMaxDuration);
                 }
 
-                BarUtilities.GetChunkedProgressBars(
+                BarHud[] bars = BarUtilities.GetChunkedProgressBars(
                     Config.InnerReleaseBar,
                     3,
                     (innerReleaseStacks - 1) * innerReleaseMaxDuration + innerReleaseDuration,
@@ -176,8 +190,13 @@ namespace DelvUI.Interface.Jobs
                     0,
                     player,
                     primalRendGlow,
-                    chunksToGlow: new[] { true, true, true })
-                    .Draw(origin);
+                    chunksToGlow: new[] { true, true, true }
+                );
+
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.InnerReleaseBar.StrataLevel));
+                }
             }
         }
     }

@@ -439,4 +439,29 @@ namespace DelvUI.Interface
 
         #endregion
     }
+
+    internal class StrataLevelComparer<TKey> : IComparer<TKey> where TKey : PluginConfigObject
+    {
+        public int Compare(TKey? a, TKey? b)
+        {
+            MovablePluginConfigObject? configA = a is MovablePluginConfigObject ? a as MovablePluginConfigObject : null;
+            MovablePluginConfigObject? configB = b is MovablePluginConfigObject ? b as MovablePluginConfigObject : null;
+
+            if (configA == null && configB == null) { return 0; }
+            if (configA == null && configB != null) { return -1; }
+            if (configA != null && configB == null) { return 1; }
+
+            if (configA!.StrataLevel == configB!.StrataLevel)
+            {
+                return configA.ID.CompareTo(configB.ID);
+            }
+
+            if (configA.StrataLevel < configB.StrataLevel)
+            {
+                return -1;
+            }
+
+            return 1;
+        }
+    }
 }

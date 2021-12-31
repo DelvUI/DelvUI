@@ -4,6 +4,7 @@ using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -100,12 +101,49 @@ namespace DelvUI.Interface.Bars
             return this;
         }
 
-        public void Draw(Vector2 origin, bool needsInput = false)
+        public void Draw(Vector2 origin)
         {
             var barPos = Utils.GetAnchoredPosition(origin, BackgroundRect.Size, Anchor);
             var backgroundPos = barPos + BackgroundRect.Position;
 
-            DrawHelper.DrawInWindow(ID, backgroundPos, BackgroundRect.Size, needsInput, false, (drawList) =>
+            DrawRects(barPos, backgroundPos);
+
+            // labels
+            foreach (LabelHud label in LabelHuds)
+            {
+                label.Draw(backgroundPos, BackgroundRect.Size, Actor, null, (uint?)Current, (uint?)Max);
+            }
+        }
+
+        public List<(StrataLevel, Action)> GetDrawActions(Vector2 origin, StrataLevel strataLevel)
+        {
+            List<(StrataLevel, Action)> drawActions = new List<(StrataLevel, Action)>();
+
+            var barPos = Utils.GetAnchoredPosition(origin, BackgroundRect.Size, Anchor);
+            var backgroundPos = barPos + BackgroundRect.Position;
+
+            drawActions.Add((strataLevel, () =>
+            {
+                DrawRects(barPos, backgroundPos);
+            }
+            ));
+
+            // labels
+            foreach (LabelHud label in LabelHuds)
+            {
+                drawActions.Add((label.GetConfig().StrataLevel, () =>
+                {
+                    label.Draw(backgroundPos, BackgroundRect.Size, Actor, null, (uint?)Current, (uint?)Max);
+                }
+                ));
+            }
+
+            return drawActions;
+        }
+
+        private void DrawRects(Vector2 barPos, Vector2 backgroundPos)
+        {
+            DrawHelper.DrawInWindow(ID, backgroundPos, BackgroundRect.Size, false, false, (drawList) =>
             {
                 // Draw background
                 drawList.AddRectFilled(backgroundPos, backgroundPos + BackgroundRect.Size, BackgroundRect.Color.Base);
@@ -131,12 +169,6 @@ namespace DelvUI.Interface.Bars
                     drawList.AddRect(glowPosition, glowPosition + glowSize, GlowColor.Base, 0, ImDrawFlags.None, GlowSize);
                 }
             });
-
-            // Draw Labels
-            foreach (LabelHud label in LabelHuds)
-            {
-                label.Draw(backgroundPos, BackgroundRect.Size, Actor, null, (uint?)Current, (uint?)Max);
-            }
         }
     }
 }

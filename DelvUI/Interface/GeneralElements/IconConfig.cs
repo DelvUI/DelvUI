@@ -2,8 +2,9 @@
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Interface.Party;
-using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
@@ -14,7 +15,11 @@ namespace DelvUI.Interface.GeneralElements
         [Order(15)]
         public DrawAnchor FrameAnchor = DrawAnchor.Center;
 
-        public IconConfig() { } // don't remove (used by json converter)
+        // don't remove (used by json converter)
+        public IconConfig()
+        {
+            Strata = StrataLevel.MID_HIGH;
+        }
 
         public IconConfig(Vector2 position, Vector2 size, DrawAnchor anchor, DrawAnchor frameAnchor)
         {
@@ -22,6 +27,8 @@ namespace DelvUI.Interface.GeneralElements
             Size = size;
             Anchor = anchor;
             FrameAnchor = frameAnchor;
+
+            Strata = StrataLevel.MID_HIGH;
         }
     }
 

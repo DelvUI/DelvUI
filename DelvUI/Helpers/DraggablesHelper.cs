@@ -89,7 +89,7 @@ namespace DelvUI.Helpers
         public static void DrawElements(
             Vector2 origin,
             HudHelper hudHelper,
-            List<DraggableHudElement> elements,
+            IList<DraggableHudElement> elements,
             JobHud? jobHud,
             DraggableHudElement? selectedElement)
         {
