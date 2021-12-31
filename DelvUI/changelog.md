@@ -1,3 +1,6 @@
+# 0.6.2.1
+- Fixed slide cast being drawn on top of the cast progress.
+
 # 0.6.2.0
 Features:
 - Party Frames layout is now configured with the new Rows and Column settings:
