@@ -339,44 +339,47 @@ namespace DelvUI.Interface.StatusEffects
             var windowPos = minPos - margin;
             var windowSize = maxPos - minPos;
 
-            DrawHelper.DrawInWindow(ID, windowPos, windowSize + margin * 2, true, false, (drawList) =>
+            AddDrawAction(Config.StrataLevel, () =>
             {
-                // area
-                if (Config.Preview)
+                DrawHelper.DrawInWindow(ID, windowPos, windowSize + margin * 2, true, false, (drawList) =>
                 {
-                    drawList.AddRectFilled(areaPos, areaPos + Config.Size, 0x88000000);
-                }
-
-                for (var i = 0; i < count; i++)
-                {
-                    var iconPos = iconPositions[i];
-                    var statusEffectData = list[i];
-
-                    // icon
-                    var cropIcon = Config.IconConfig.CropIcon;
-                    int stackCount = cropIcon ? 1 : statusEffectData.Data.MaxStacks > 0 ? statusEffectData.Status.StackCount : 0;
-                    DrawHelper.DrawIcon<LuminaStatus>(drawList, statusEffectData.Data, iconPos, Config.IconConfig.Size, false, cropIcon, stackCount);
-
-                    // border
-                    var borderConfig = GetBorderConfig(statusEffectData);
-                    if (borderConfig != null && cropIcon)
+                    // area
+                    if (Config.Preview)
                     {
-                        drawList.AddRect(iconPos, iconPos + Config.IconConfig.Size, borderConfig.Color.Base, 0, ImDrawFlags.None, borderConfig.Thickness);
+                        drawList.AddRectFilled(areaPos, areaPos + Config.Size, 0x88000000);
                     }
 
-                    // Draw dispell indicator above dispellable status effect on uncropped icons
-                    if (borderConfig != null && !cropIcon && statusEffectData.Data.CanDispel)
+                    for (var i = 0; i < count; i++)
                     {
-                        var dispellIndicatorColor = new Vector4(141f / 255f, 206f / 255f, 229f / 255f, 100f / 100f);
-                        // 24x32
-                        drawList.AddRectFilled(
-                            iconPos + new Vector2(Config.IconConfig.Size.X * .07f, Config.IconConfig.Size.Y * .07f),
-                            iconPos + new Vector2(Config.IconConfig.Size.X * .93f, Config.IconConfig.Size.Y * .14f),
-                            ImGui.ColorConvertFloat4ToU32(dispellIndicatorColor),
-                            8f
-                        );
+                        var iconPos = iconPositions[i];
+                        var statusEffectData = list[i];
+
+                        // icon
+                        var cropIcon = Config.IconConfig.CropIcon;
+                        int stackCount = cropIcon ? 1 : statusEffectData.Data.MaxStacks > 0 ? statusEffectData.Status.StackCount : 0;
+                        DrawHelper.DrawIcon<LuminaStatus>(drawList, statusEffectData.Data, iconPos, Config.IconConfig.Size, false, cropIcon, stackCount);
+
+                        // border
+                        var borderConfig = GetBorderConfig(statusEffectData);
+                        if (borderConfig != null && cropIcon)
+                        {
+                            drawList.AddRect(iconPos, iconPos + Config.IconConfig.Size, borderConfig.Color.Base, 0, ImDrawFlags.None, borderConfig.Thickness);
+                        }
+
+                        // Draw dispell indicator above dispellable status effect on uncropped icons
+                        if (borderConfig != null && !cropIcon && statusEffectData.Data.CanDispel)
+                        {
+                            var dispellIndicatorColor = new Vector4(141f / 255f, 206f / 255f, 229f / 255f, 100f / 100f);
+                            // 24x32
+                            drawList.AddRectFilled(
+                                    iconPos + new Vector2(Config.IconConfig.Size.X * .07f, Config.IconConfig.Size.Y * .07f),
+                                    iconPos + new Vector2(Config.IconConfig.Size.X * .93f, Config.IconConfig.Size.Y * .14f),
+                                    ImGui.ColorConvertFloat4ToU32(dispellIndicatorColor),
+                                    8f
+                                );
+                        }
                     }
-                }
+                });
             });
 
             // labels need to be drawn separated since they have their own window for clipping
@@ -390,10 +393,12 @@ namespace DelvUI.Interface.StatusEffects
                     !statusEffectData.Data.IsPermanent &&
                     !statusEffectData.Data.IsFcBuff)
                 {
-                    var duration = Math.Round(Math.Abs(statusEffectData.Status.RemainingTime));
-                    Config.IconConfig.DurationLabelConfig.SetText(Utils.DurationToString(duration));
-
-                    _durationLabel.Draw(iconPos, Config.IconConfig.Size);
+                    AddDrawAction(Config.IconConfig.DurationLabelConfig.StrataLevel, () =>
+                    {
+                        double duration = Math.Round(Math.Abs(statusEffectData.Status.RemainingTime));
+                        Config.IconConfig.DurationLabelConfig.SetText(Utils.DurationToString(duration));
+                        _durationLabel.Draw(iconPos, Config.IconConfig.Size);
+                    });
                 }
 
                 // stacks
@@ -402,10 +407,11 @@ namespace DelvUI.Interface.StatusEffects
                     statusEffectData.Status.StackCount > 0 &&
                     !statusEffectData.Data.IsFcBuff)
                 {
-                    var text = $"{statusEffectData.Status.StackCount}";
-                    Config.IconConfig.StacksLabelConfig.SetText(text);
-
-                    _stacksLabel.Draw(iconPos, Config.IconConfig.Size);
+                    AddDrawAction(Config.IconConfig.StacksLabelConfig.StrataLevel, () =>
+                    {
+                        Config.IconConfig.StacksLabelConfig.SetText($"{statusEffectData.Status.StackCount}");
+                        _stacksLabel.Draw(iconPos, Config.IconConfig.Size);
+                    });
                 }
 
                 // tooltips / interaction

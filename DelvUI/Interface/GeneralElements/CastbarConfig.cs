@@ -165,15 +165,15 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [DisableParentSettings("HideWhenInactive", "FillDirection")]
+    [DisableParentSettings("HideWhenInactive")]
     public abstract class CastbarConfig : BarConfig
     {
         [Checkbox("Preview")]
-        [Order(2)]
+        [Order(3)]
         public bool Preview = false;
 
         [Checkbox("Show Ability Icon")]
-        [Order(3)]
+        [Order(4)]
         public bool ShowIcon = true;
 
         [NestedConfig("Cast Name", 500)]
@@ -182,11 +182,21 @@ namespace DelvUI.Interface.GeneralElements
         [NestedConfig("Cast Time", 505)]
         public NumericLabelConfig CastTimeLabel;
 
+        [Checkbox("Reverse Fill Background Color")]
+        [Order(510)]
+        public bool UseReverseFill = false;
+
+        [ColorEdit4("Color" + "##ReverseFill")]
+        [Order(515, collapseWith = nameof(UseReverseFill))]
+        public PluginConfigColor ReverseFillColor = new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+
         public CastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, NumericLabelConfig castTimeConfig)
             : base(position, size, new PluginConfigColor(new(0f / 255f, 162f / 255f, 252f / 255f, 100f / 100f)), BarDirection.Right)
         {
             CastNameLabel = castNameConfig;
             CastTimeLabel = castTimeConfig;
+
+            Strata = StrataLevel.MID;
         }
     }
 

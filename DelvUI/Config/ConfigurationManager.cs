@@ -21,6 +21,7 @@ using System.Reflection;
 namespace DelvUI.Config
 {
     public delegate void ConfigurationManagerEventHandler(ConfigurationManager configurationManager);
+    public delegate void StrataLevelsEventHandler(ConfigurationManager configurationManager, PluginConfigObject config);
 
     public class ConfigurationManager : IDisposable
     {
@@ -92,6 +93,7 @@ namespace DelvUI.Config
         public event ConfigurationManagerEventHandler? ResetEvent;
         public event ConfigurationManagerEventHandler? LockEvent;
         public event ConfigurationManagerEventHandler? ConfigClosedEvent;
+        public event StrataLevelsEventHandler? StrataLevelsChangedEvent;
 
         public ConfigurationManager()
         {
@@ -170,7 +172,7 @@ namespace DelvUI.Config
         private void OnLogout(object? sender, EventArgs? args)
         {
             SaveConfigurations();
-            ProfilesManager.Instance.SaveCurrentProfile();
+            ProfilesManager.Instance?.SaveCurrentProfile();
         }
 
         private void OnJobChanged(uint jobId)
@@ -229,6 +231,13 @@ namespace DelvUI.Config
                 PluginLog.Error("Error checking version: " + e.Message);
             }
         }
+
+        #region strata
+        public void OnStrataLevelChanged(PluginConfigObject config)
+        {
+            StrataLevelsChangedEvent?.Invoke(this, config);
+        }
+        #endregion
 
         #region windows
         public void ToggleConfigWindow()
@@ -330,10 +339,7 @@ namespace DelvUI.Config
 
             ConfigBaseNode.Save(ConfigDirectory);
 
-            if (ProfilesManager.Instance != null)
-            {
-                ProfilesManager.Instance.SaveCurrentProfile();
-            }
+            ProfilesManager.Instance?.SaveCurrentProfile();
 
             ConfigBaseNode.NeedsSave = false;
         }
@@ -347,7 +353,7 @@ namespace DelvUI.Config
                 return;
             }
 
-            ProfilesManager.Instance.UpdateCurrentProfile();
+            ProfilesManager.Instance?.UpdateCurrentProfile();
         }
 
         public string? ExportCurrentConfigs()
@@ -407,7 +413,11 @@ namespace DelvUI.Config
 
             string? oldSelection = ConfigBaseNode.SelectedOptionName;
             node.SelectedOptionName = oldSelection;
-            node.AddExtraSectionNode(ProfilesManager.Instance.ProfilesNode);
+
+            if (ProfilesManager.Instance != null)
+            {
+                node.AddExtraSectionNode(ProfilesManager.Instance.ProfilesNode);
+            }
 
             ConfigBaseNode.ConfigObjectResetEvent -= OnConfigObjectReset;
             ConfigBaseNode = node;
@@ -533,7 +543,11 @@ namespace DelvUI.Config
             ["0.4.0.0"] = new List<Type>() {
                 typeof(PartyFramesIconsConfig),
                 typeof(PartyFramesTrackersConfig)
-            }
+            },
+            ["0.6.2.0"] = new List<Type>() {
+                typeof(PartyFramesHealthBarsConfig)
+            },
+
         };
         #endregion
     }

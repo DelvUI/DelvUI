@@ -106,7 +106,7 @@ namespace DelvUI.Interface.Jobs
             return (ninjutsuBuff is not null, kassatsuBuff is not null, tcjBuff is not null);
         }
 
-        private void DrawMudraBars(Vector2 pos, PlayerCharacter player)
+        private void DrawMudraBars(Vector2 origin, PlayerCharacter player)
         {
             var (hasNinjutsuBuff, hasKassatsuBuff, hasTCJBuff) = GetMudraBuffs(player, out Status? ninjutsuBuff, out Status? kassatsuBuff, out Status? tcjBuff);
 
@@ -145,8 +145,11 @@ namespace DelvUI.Interface.Jobs
                 PluginConfigColor fillColor = hasTCJBuff ? Config.MudraBar.TCJBarColor : hasKassatsuBuff ? Config.MudraBar.KassatsuBarColor : Config.MudraBar.FillColor;
                 Rect foreground = BarUtilities.GetFillRect(Config.MudraBar.Position, Config.MudraBar.Size, Config.MudraBar.FillDirection, fillColor, current, max);
 
-                BarHud bar = new BarHud(Config.MudraBar, player).AddForegrounds(foreground).AddLabels(Config.MudraBar.Label);
-                bar.Draw(pos);
+                BarHud bar = new BarHud(Config.MudraBar, player);
+                bar.AddForegrounds(foreground);
+                bar.AddLabels(Config.MudraBar.Label);
+
+                AddDrawActions(bar.GetDrawActions(origin, Config.MudraBar.StrataLevel));
             }
             else
             {
@@ -156,13 +159,17 @@ namespace DelvUI.Interface.Jobs
                 if (!Config.MudraBar.HideWhenInactive || current < max)
                 {
                     Config.MudraBar.Label.SetValue((max - current) % 20);
-                    BarUtilities.GetChunkedProgressBars(Config.MudraBar, 2, current, max, 0f, player)
-                        .Draw(pos);
+
+                    BarHud[] bars = BarUtilities.GetChunkedProgressBars(Config.MudraBar, 2, current, max, 0f, player);
+                    foreach (BarHud bar in bars)
+                    {
+                        AddDrawActions(bar.GetDrawActions(origin, Config.MudraBar.StrataLevel));
+                    }
                 }
             }
         }
 
-        private void DrawHutonGauge(Vector2 pos, PlayerCharacter player)
+        private void DrawHutonGauge(Vector2 origin, PlayerCharacter player)
         {
             NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
             float hutonDuration = gauge.HutonTimer / 1000f;
@@ -170,24 +177,29 @@ namespace DelvUI.Interface.Jobs
             if (!Config.HutonBar.HideWhenInactive || gauge.HutonTimer > 0)
             {
                 Config.HutonBar.Label.SetValue(hutonDuration);
-                BarUtilities.GetProgressBar(Config.HutonBar, hutonDuration, 60f, 0f, player)
-                    .Draw(pos);
+
+                BarHud bar = BarUtilities.GetProgressBar(Config.HutonBar, hutonDuration, 60f, 0f, player);
+                AddDrawActions(bar.GetDrawActions(origin, Config.HutonBar.StrataLevel));
             }
         }
 
-        private void DrawNinkiGauge(Vector2 pos, PlayerCharacter player)
+        private void DrawNinkiGauge(Vector2 origin, PlayerCharacter player)
         {
             NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
 
             if (!Config.NinkiBar.HideWhenInactive || gauge.Ninki > 0)
             {
                 Config.NinkiBar.Label.SetValue(gauge.Ninki);
-                BarUtilities.GetChunkedProgressBars(Config.NinkiBar, 2, gauge.Ninki, 100, 0, player)
-                    .Draw(pos);
+
+                BarHud[] bars = BarUtilities.GetChunkedProgressBars(Config.NinkiBar, 2, gauge.Ninki, 100, 0, player);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.NinkiBar.StrataLevel));
+                }
             }
         }
 
-        private void DrawTrickAttackBar(Vector2 pos, PlayerCharacter player)
+        private void DrawTrickAttackBar(Vector2 origin, PlayerCharacter player)
         {
             GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             float trickDuration = 0f;
@@ -200,20 +212,22 @@ namespace DelvUI.Interface.Jobs
             if (!Config.TrickAttackBar.HideWhenInactive || trickDuration > 0)
             {
                 Config.TrickAttackBar.Label.SetValue(trickDuration);
-                BarUtilities.GetProgressBar(Config.TrickAttackBar, trickDuration, 15f, 0f, player)
-                    .Draw(pos);
+
+                BarHud bar = BarUtilities.GetProgressBar(Config.TrickAttackBar, trickDuration, 15f, 0f, player);
+                AddDrawActions(bar.GetDrawActions(origin, Config.TrickAttackBar.StrataLevel));
             }
         }
 
-        private void DrawSuitonBar(Vector2 pos, PlayerCharacter player)
+        private void DrawSuitonBar(Vector2 origin, PlayerCharacter player)
         {
             float suitonDuration = player.StatusList.FirstOrDefault(o => o.StatusId == 507 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
 
             if (!Config.SuitonBar.HideWhenInactive || suitonDuration > 0)
             {
                 Config.SuitonBar.Label.SetValue(suitonDuration);
-                BarUtilities.GetProgressBar(Config.SuitonBar, suitonDuration, 20f, 0f, player)
-                    .Draw(pos);
+
+                BarHud bar = BarUtilities.GetProgressBar(Config.SuitonBar, suitonDuration, 20f, 0f, player);
+                AddDrawActions(bar.GetDrawActions(origin, Config.SuitonBar.StrataLevel));
             }
         }
 

@@ -95,8 +95,12 @@ namespace DelvUI.Interface.Jobs
             if (!Config.OathGauge.HideWhenInactive || gauge.OathGauge > 0)
             {
                 Config.OathGauge.Label.SetValue(gauge.OathGauge);
-                BarUtilities.GetChunkedProgressBars(Config.OathGauge, 2, gauge.OathGauge, 100, 0, player)
-                    .Draw(origin);
+
+                BarHud[] bars = BarUtilities.GetChunkedProgressBars(Config.OathGauge, 2, gauge.OathGauge, 100, 0, player);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.OathGauge.StrataLevel));
+                }
             }
         }
 
@@ -107,8 +111,9 @@ namespace DelvUI.Interface.Jobs
             if (!Config.FightOrFlightBar.HideWhenInactive || fightOrFlightDuration > 0)
             {
                 Config.FightOrFlightBar.Label.SetValue(fightOrFlightDuration);
-                BarUtilities.GetProgressBar(Config.FightOrFlightBar, fightOrFlightDuration, 25f, 0f, player)
-                    .Draw(origin);
+
+                BarHud bar = BarUtilities.GetProgressBar(Config.FightOrFlightBar, fightOrFlightDuration, 25f, 0f, player);
+                AddDrawActions(bar.GetDrawActions(origin, Config.FightOrFlightBar.StrataLevel));
             }
         }
 
@@ -128,8 +133,12 @@ namespace DelvUI.Interface.Jobs
                 }
 
                 Config.RequiescatStacksBar.Label.SetValue(requiescatDuration);
-                BarUtilities.GetChunkedBars(Config.RequiescatStacksBar, chunks, player)
-                    .Draw(origin);
+
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.RequiescatStacksBar, chunks, player);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.RequiescatStacksBar.StrataLevel));
+                }
             }
         }
 
@@ -139,16 +148,22 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.AtonementBar.HideWhenInactive && stackCount == 0) { return; };
 
-            BarUtilities.GetChunkedBars(Config.AtonementBar, 3, stackCount, 3f, 0, player)
-                .Draw(origin);
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.AtonementBar, 3, stackCount, 3f, 0, player);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.AtonementBar.StrataLevel));
+            }
         }
 
         private void DrawDoTBar(Vector2 origin, PlayerCharacter player)
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            BarUtilities.GetDoTBar(Config.GoringBladeBar, player, target, DoTIDs, DoTDurations)?.
-                Draw(origin);
+            BarHud? bar = BarUtilities.GetDoTBar(Config.GoringBladeBar, player, target, DoTIDs, DoTDurations);
+            if (bar != null)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.GoringBladeBar.StrataLevel));
+            }
         }
     }
 

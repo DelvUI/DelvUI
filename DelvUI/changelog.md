@@ -1,3 +1,19 @@
+# 0.6.2.0
+Features:
+- Party Frames layout is now configured with the new Rows and Column settings:
+    + Party Frames are not longer draggable / resizable when the config window is opened.
+    + This is a breaking change in the config. When updating, the Party Frames will likely be in a bad position and with an incorrect layout. Use the Position, Rows and Columns settings to correct it. The actual elements inside the frames should remain exactly the same as before the update.
+- Added Strata Level settings to most UI elements (these allow the user to choose which elements are drawn on top of others).
+- Castbars have been given the option to set a Fill Direction.
+- Castbars now has a Reverse Fill option to use in place of normal Background Color settings.
+- Added more settings to Party Frames health bars so they are more in line with other unit frames.
+- Added "dead" status icon in the Party Frames.
+- Added Thresholds for Bard Songs with the recommended song rotation (43, 34, 43).
+
+Fixes:
+- Fixed Dancer Proc Bars so they can be individually disabled.
+- Fixed Reaper and Sage not appearing in Party Frames on preview mode.
+
 # 0.6.1.2
 Features:
 - Astrologian Minor Arcana Bar now has a label to track cooldown of Minor Arcana whilst a Crown Card is drawn. Note that this will not work for users of the XIVCombo plugin that has selected the option to turn Minor Arcana into Crown Play.

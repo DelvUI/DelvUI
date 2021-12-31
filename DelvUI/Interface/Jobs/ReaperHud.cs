@@ -81,7 +81,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawDeathsDesignBar(Vector2 pos, PlayerCharacter player)
+        private void DrawDeathsDesignBar(Vector2 origin, PlayerCharacter player)
         {
             GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             float duration = 0f;
@@ -94,36 +94,48 @@ namespace DelvUI.Interface.Jobs
             if (!Config.DeathsDesignBar.HideWhenInactive || duration > 0)
             {
                 Config.DeathsDesignBar.Label.SetValue(duration);
-                BarUtilities.GetChunkedProgressBars(Config.DeathsDesignBar, 2, duration, 60f, 0f, player)
-                    .Draw(pos);
+
+                BarHud[] bars = BarUtilities.GetChunkedProgressBars(Config.DeathsDesignBar, 2, duration, 60f, 0f, player);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.DeathsDesignBar.StrataLevel));
+                }
             }
         }
 
-        private void DrawSoulGauge(Vector2 pos, RPRGauge gauge, PlayerCharacter player)
+        private void DrawSoulGauge(Vector2 origin, RPRGauge gauge, PlayerCharacter player)
         {
             float soul = gauge.Soul;
 
             if (!Config.SoulBar.HideWhenInactive || soul > 0)
             {
                 Config.SoulBar.Label.SetValue(soul);
-                BarUtilities.GetChunkedProgressBars(Config.SoulBar, 2, soul, 100f, 0f, player)
-                    .Draw(pos);
+
+                BarHud[] bars = BarUtilities.GetChunkedProgressBars(Config.SoulBar, 2, soul, 100f, 0f, player);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.SoulBar.StrataLevel));
+                }
             }
         }
 
-        private void DrawShroudGauge(Vector2 pos, RPRGauge gauge, PlayerCharacter player)
+        private void DrawShroudGauge(Vector2 origin, RPRGauge gauge, PlayerCharacter player)
         {
             float shroud = gauge.Shroud;
 
             if (!Config.ShroudBar.HideWhenInactive || shroud > 0)
             {
                 Config.ShroudBar.Label.SetValue(shroud);
-                BarUtilities.GetChunkedProgressBars(Config.ShroudBar, 2, shroud, 100f, 0f, player)
-                    .Draw(pos);
+
+                BarHud[] bars = BarUtilities.GetChunkedProgressBars(Config.ShroudBar, 2, shroud, 100f, 0f, player);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.ShroudBar.StrataLevel));
+                }
             }
         }
 
-        private void DrawDeathGauge(Vector2 pos, RPRGauge gauge, PlayerCharacter player)
+        private void DrawDeathGauge(Vector2 origin, RPRGauge gauge, PlayerCharacter player)
         {
             var lemureShroud = gauge.LemureShroud;
             var voidShroud = gauge.VoidShroud;
@@ -149,8 +161,12 @@ namespace DelvUI.Interface.Jobs
                 }
 
                 Config.DeathGauge.EnshroudTimerLabel.SetValue(gauge.EnshroudedTimeRemaining / 1000);
-                BarUtilities.GetChunkedBars(Config.DeathGauge, deathChunks, player)
-                    .Draw(pos);
+
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.DeathGauge, deathChunks, player);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.DeathGauge.StrataLevel));
+                }
             }
         }
     }

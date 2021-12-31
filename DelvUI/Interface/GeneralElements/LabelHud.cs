@@ -15,6 +15,11 @@ namespace DelvUI.Interface.GeneralElements
         {
         }
 
+        protected override void CreateDrawActions(Vector2 origin)
+        {
+            // unused
+        }
+
         public override void Draw(Vector2 origin)
         {
             Draw(origin);

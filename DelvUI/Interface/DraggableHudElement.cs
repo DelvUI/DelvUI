@@ -49,16 +49,21 @@ namespace DelvUI.Interface
 
         public virtual Vector2 ParentPos() { return Vector2.Zero; } // override
 
-        public sealed override void Draw(Vector2 origin)
+        protected sealed override void CreateDrawActions(Vector2 origin)
         {
             if (_draggingEnabled)
             {
-                DrawDraggableArea(origin);
+                AddDrawAction(_config.StrataLevel, () =>
+                {
+                    DrawDraggableArea(origin);
+                });
                 return;
             }
 
             DrawChildren(origin);
         }
+
+        public virtual void DrawChildren(Vector2 origin) { }
 
         private bool CalculateNeedsInput(Vector2 pos, Vector2 size, bool selected)
         {
@@ -171,8 +176,6 @@ namespace DelvUI.Interface
             var textOutlineColor = Selected ? 0xFF000000 : 0xEE000000;
             DrawHelper.DrawOutlinedText(_displayName, contentPos + contentSize / 2f - textSize / 2f, textColor, textOutlineColor, drawList);
         }
-
-        public virtual void DrawChildren(Vector2 origin) { }
 
         #region draggable area
         protected Vector2? _minPos = null;

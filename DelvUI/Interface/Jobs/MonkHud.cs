@@ -108,7 +108,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawFormsBar(Vector2 pos, PlayerCharacter player)
+        private void DrawFormsBar(Vector2 origin, PlayerCharacter player)
         {
             Status? form = player.StatusList.FirstOrDefault(o => o.StatusId is 107 or 108 or 109 or 2513 && o.RemainingTime > 0f);
 
@@ -125,12 +125,13 @@ namespace DelvUI.Interface.Jobs
                 } : "";
 
                 Config.FormsBar.Label.SetText(label);
-                BarUtilities.GetProgressBar(Config.FormsBar, formDuration, 30f, 0, player)
-                    .Draw(pos);
+
+                BarHud bar = BarUtilities.GetProgressBar(Config.FormsBar, formDuration, 30f, 0, player);
+                AddDrawActions(bar.GetDrawActions(origin, Config.FormsBar.StrataLevel));
             }
         }
 
-        private void DrawPerfectBalanceBar(Vector2 pos, PlayerCharacter player)
+        private void DrawPerfectBalanceBar(Vector2 origin, PlayerCharacter player)
         {
             Status? perfectBalance = player.StatusList.Where(o => o.StatusId is 110 && o.RemainingTime > 0f).FirstOrDefault();
             if (!Config.PerfectBalanceBar.HideWhenInactive || perfectBalance is not null)
@@ -148,22 +149,29 @@ namespace DelvUI.Interface.Jobs
                 }
 
                 Config.PerfectBalanceBar.PerfectBalanceLabel.SetValue(duration);
-                BarUtilities.GetChunkedBars(Config.PerfectBalanceBar, chunks, player)
-                    .Draw(pos);
+
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.PerfectBalanceBar, chunks, player);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.PerfectBalanceBar.StrataLevel));
+                }
             }
         }
 
-        private void DrawChakraGauge(Vector2 pos, PlayerCharacter player)
+        private void DrawChakraGauge(Vector2 origin, PlayerCharacter player)
         {
             var gauge = Plugin.JobGauges.Get<MNKGauge>();
             if (!Config.ChakraBar.HideWhenInactive || gauge.Chakra > 0)
             {
-                BarUtilities.GetChunkedBars(Config.ChakraBar, 5, gauge.Chakra, 5, 0, player)
-                    .Draw(pos);
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.ChakraBar, 5, gauge.Chakra, 5, 0, player);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.ChakraBar.StrataLevel));
+                }
             }
         }
 
-        private void DrawBeastChakraGauge(Vector2 pos, PlayerCharacter player)
+        private void DrawBeastChakraGauge(Vector2 origin, PlayerCharacter player)
         {
             var gauge = Plugin.JobGauges.Get<MNKGauge>();
             if (!Config.MastersGauge.HideWhenInactive ||
@@ -198,8 +206,12 @@ namespace DelvUI.Interface.Jobs
                 }
 
                 Config.MastersGauge.BlitzTimerLabel.SetValue(gauge.BlitzTimeRemaining / 1000);
-                BarUtilities.GetChunkedBars(Config.MastersGauge, chunks, player)
-                    .Draw(pos);
+
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.MastersGauge, chunks, player);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.MastersGauge.StrataLevel));
+                }
             }
         }
 
@@ -211,34 +223,39 @@ namespace DelvUI.Interface.Jobs
             _ => new PluginConfigColor(new(0, 0, 0, 0))
         };
 
-        private void DrawTwinSnakesBar(Vector2 pos, PlayerCharacter player)
+        private void DrawTwinSnakesBar(Vector2 origin, PlayerCharacter player)
         {
             float twinSnakesDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 3001 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
             if (!Config.TwinSnakesBar.HideWhenInactive || twinSnakesDuration > 0)
             {
                 Config.TwinSnakesBar.Label.SetValue(twinSnakesDuration);
-                BarUtilities.GetProgressBar(Config.TwinSnakesBar, twinSnakesDuration, 15f, 0f, player)
-                    .Draw(pos);
+
+                BarHud bar = BarUtilities.GetProgressBar(Config.TwinSnakesBar, twinSnakesDuration, 15f, 0f, player);
+                AddDrawActions(bar.GetDrawActions(origin, Config.TwinSnakesBar.StrataLevel));
             }
         }
 
-        private void DrawLeadenFistBar(Vector2 pos, PlayerCharacter player)
+        private void DrawLeadenFistBar(Vector2 origin, PlayerCharacter player)
         {
             float leadenFistDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1861 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
             if (!Config.LeadenFistBar.HideWhenInactive || leadenFistDuration > 0)
             {
                 Config.LeadenFistBar.Label.SetValue(leadenFistDuration);
-                BarUtilities.GetProgressBar(Config.LeadenFistBar, leadenFistDuration, 30f, 0f, player)
-                    .Draw(pos);
+
+                BarHud bar = BarUtilities.GetProgressBar(Config.LeadenFistBar, leadenFistDuration, 30f, 0f, player);
+                AddDrawActions(bar.GetDrawActions(origin, Config.LeadenFistBar.StrataLevel));
             }
         }
 
-        private void DrawDemolishBar(Vector2 pos, PlayerCharacter player)
+        private void DrawDemolishBar(Vector2 origin, PlayerCharacter player)
         {
             GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            BarUtilities.GetDoTBar(Config.DemolishBar, player, target, 246, 18f)?.
-                Draw(pos);
+            BarHud? bar = BarUtilities.GetDoTBar(Config.DemolishBar, player, target, 246, 18f);
+            if (bar != null)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.DemolishBar.StrataLevel));
+            }
         }
     }
 

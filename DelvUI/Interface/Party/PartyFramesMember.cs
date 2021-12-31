@@ -18,7 +18,8 @@ namespace DelvUI.Interface.Party
     {
         None,
         ViewingCutscene,
-        Offline
+        Offline,
+        Dead
     }
 
     public unsafe class PartyFramesMember : IPartyFramesMember
@@ -101,12 +102,17 @@ namespace DelvUI.Interface.Party
 
             var gameObject = Plugin.ObjectTable.SearchById(ObjectId);
             Character = gameObject is Character ? (Character)gameObject : null;
+
+            if (status == PartyMemberStatus.None && Character != null && MaxHP > 0 && HP <= 0)
+            {
+                Status = PartyMemberStatus.Dead;
+            }
         }
     }
 
     public class FakePartyFramesMember : IPartyFramesMember
     {
-        private static readonly Random RNG = new Random((int)ImGui.GetTime());
+        public static readonly Random RNG = new Random((int)ImGui.GetTime());
 
         public uint ObjectId => GameObject.InvalidGameObjectId;
         public Character? Character => null;
@@ -131,14 +137,14 @@ namespace DelvUI.Interface.Party
         {
             Order = order + 1;
             Level = (uint)RNG.Next(1, 80);
-            JobId = (uint)RNG.Next(19, 38);
+            JobId = (uint)RNG.Next(19, 41);
             MaxHP = (uint)RNG.Next(90000, 150000);
-            HP = order == 2 ? 0 : (uint)(MaxHP * RNG.Next(50, 100) / 100f);
+            HP = order == 2 || order == 3 ? 0 : (uint)(MaxHP * RNG.Next(50, 100) / 100f);
             MaxMP = 10000;
-            MP = order == 2 ? 0 : (uint)(MaxMP * RNG.Next(100) / 100f);
-            Shield = order == 2 ? 0 : RNG.Next(30) / 100f;
+            MP = order == 2 || order == 3 ? 0 : (uint)(MaxMP * RNG.Next(100) / 100f);
+            Shield = order == 2 || order == 3 ? 0 : RNG.Next(30) / 100f;
             EnmityLevel = order <= 1 ? (EnmityLevel)order + 1 : EnmityLevel.Last;
-            Status = (PartyMemberStatus)RNG.Next(0, 2);
+            Status = order < 3 ? PartyMemberStatus.None : (order == 3 ? PartyMemberStatus.Dead : (PartyMemberStatus)RNG.Next(0, 3));
             IsPartyLeader = order == 0;
             HasDispellableDebuff = RNG.Next(0, 2) == 1;
             RaiseTime = order == 2 ? RNG.Next(0, 60) : null;
