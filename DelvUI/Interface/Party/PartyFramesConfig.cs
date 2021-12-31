@@ -2,6 +2,7 @@
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
+using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
@@ -64,25 +65,20 @@ namespace DelvUI.Interface.Party
 
     [Exportable(false)]
     [Disableable(false)]
+    [DisableParentSettings("Position", "Anchor", "BackgroundColor", "FillColor", "HideWhenInactive", "DrawBorder", "BorderColor", "BorderThickness")]
     [Section("Party Frames", true)]
     [SubSection("Health Bar", 0)]
-    public class PartyFramesHealthBarsConfig : PluginConfigObject
+    public class PartyFramesHealthBarsConfig : BarConfig
     {
         public new static PartyFramesHealthBarsConfig DefaultConfig()
         {
-            var config = new PartyFramesHealthBarsConfig();
-            config.ColorsConfig.ColorByHealth.Enabled = false;
-
+            var config = new PartyFramesHealthBarsConfig(Vector2.Zero, new(180, 80), new PluginConfigColor(Vector4.Zero));
             return config;
         }
 
-        [DragInt2("Size", isMonitored = true)]
-        [Order(30)]
-        public Vector2 Size = new Vector2(180, 80);
-
-        [DragInt2("Padding", isMonitored = true)]
-        [Order(35)]
-        public Vector2 Padding = new Vector2(1, 1);
+        [DragInt2("Padding", isMonitored = true, min = 0)]
+        [Order(31)]
+        public Vector2 Padding = new Vector2(0, 0);
 
         [NestedConfig("Name Label", 40)]
         public EditableLabelConfig NameLabelConfig = new EditableLabelConfig(Vector2.Zero, "[name:first-initial]. [name:last-initial].", DrawAnchor.Center, DrawAnchor.Center);
@@ -104,26 +100,62 @@ namespace DelvUI.Interface.Party
 
         [NestedConfig("Use Smooth Transitions", 70)]
         public SmoothHealthConfig SmoothHealthConfig = new SmoothHealthConfig();
+
+        public PartyFramesHealthBarsConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor, BarDirection fillDirection = BarDirection.Right)
+            : base(position, size, fillColor, fillDirection)
+        {
+        }
+
+        protected override PluginConfigObject? InternalLoad(FileInfo fileInfo, string currentVersion, string? previousVersion)
+        {
+            if (previousVersion == null) { return null; }
+
+            // change introduced in 0.6.2.0
+            Version previous = new Version(previousVersion);
+            if (previous.Major > 0 || previous.Minor > 6 || previous.Minor == 6 && previous.Build >= 2) { return null; }
+
+            PartyFramesHealthBarsConfig? config = LoadFromJson<PartyFramesHealthBarsConfig>(fileInfo.FullName);
+            if (config == null) { return null; }
+
+            config.FillDirection = BarDirection.Right;
+
+            return config;
+        }
+
+        public override void ImportFromOldVersion(Dictionary<Type, PluginConfigObject> oldConfigObjects, string currentVersion, string? previousVersion)
+        {
+            if (previousVersion == null) { return; }
+
+            // change introduced in 0.6.2.0
+            Version previous = new Version(previousVersion);
+            if (previous.Major > 0 || previous.Minor > 6 || previous.Minor == 6 && previous.Build >= 2) { return; }
+
+            FillDirection = BarDirection.Right;
+        }
     }
 
     [Disableable(false)]
     [Exportable(false)]
     public class PartyFramesColorsConfig : PluginConfigObject
     {
+        [Checkbox("Show Border")]
+        [Order(4)]
+        public bool ShowBorder = true;
+
         [ColorEdit4("Border Color")]
-        [Order(5)]
+        [Order(5, collapseWith = nameof(ShowBorder))]
         public PluginConfigColor BorderColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Target Border Color")]
-        [Order(6)]
+        [Order(6, collapseWith = nameof(ShowBorder))]
         public PluginConfigColor TargetBordercolor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
         [DragInt("Inactive Border Thickness", min = 1, max = 10, help = "This is the border thickness that will be used when the border is in the default state (aka not targetted, not showing enmity, etc).")]
-        [Order(6)]
+        [Order(6, collapseWith = nameof(ShowBorder))]
         public int InactiveBorderThickness = 1;
 
         [DragInt("Active Border Thickness", min = 1, max = 10, help = "This is the border thickness that will be used when the border active (aka targetted, showing enmity, etc).")]
-        [Order(7)]
+        [Order(7, collapseWith = nameof(ShowBorder))]
         public int ActiveBorderThickness = 1;
 
         [ColorEdit4("Background Color", spacing = true)]
@@ -156,6 +188,13 @@ namespace DelvUI.Interface.Party
         [ColorEdit4("Highlight Color")]
         [Order(45, collapseWith = nameof(ShowHighlight))]
         public PluginConfigColor HighlightColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 5f / 100f));
+        [Checkbox("Missing Health Color", spacing = true)]
+        [Order(46)]
+        public bool UseMissingHealthBar = false;
+
+        [ColorEdit4("Color" + "##MissingHealth")]
+        [Order(47, collapseWith = nameof(UseMissingHealthBar))]
+        public PluginConfigColor HealthMissingColor = new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
         [Checkbox("Show Enmity Border Colors", spacing = true)]
         [Order(50)]

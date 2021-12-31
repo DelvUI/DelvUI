@@ -6,6 +6,7 @@ Features:
 - Added Strata Level settings to most UI elements (these allow the user to choose which elements are drawn on top of others).
 - Castbars have been given the option to set a Fill Direction.
 - Castbars now has a Reverse Fill option to use in place of normal Background Color settings.
+- Added more settings to Party Frames health bars so they are more in line with other unit frames.
 - Added "dead" status icon in the Party Frames.
 - Added Thresholds for Bard Songs with the recommended song rotation (43, 34, 43).
 
