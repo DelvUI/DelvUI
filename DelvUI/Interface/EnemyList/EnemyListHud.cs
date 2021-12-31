@@ -227,24 +227,24 @@ namespace DelvUI.Interface.EnemyList
 
                 // buffs / debuffs
                 var buffsPos = Utils.GetAnchoredPosition(origin + pos, -Configs.HealthBar.Size, Configs.Buffs.HealthBarAnchor);
-                _buffsListHud.Actor = character;
                 AddDrawAction(Configs.Buffs.StrataLevel, () =>
                 {
+                    _buffsListHud.Actor = character;
                     _buffsListHud.Draw(buffsPos);
                 });
 
                 var debuffsPos = Utils.GetAnchoredPosition(origin + pos, -Configs.HealthBar.Size, Configs.Debuffs.HealthBarAnchor);
-                _debuffsListHud.Actor = character;
                 AddDrawAction(Configs.Debuffs.StrataLevel, () =>
                 {
+                    _debuffsListHud.Actor = character;
                     _debuffsListHud.Draw(debuffsPos);
                 });
 
                 // castbar
                 var castbarPos = Utils.GetAnchoredPosition(origin + pos, -Configs.HealthBar.Size, Configs.CastBar.HealthBarAnchor);
-                _castbarHud.Actor = character;
                 AddDrawAction(Configs.CastBar.StrataLevel, () =>
                 {
+                    _castbarHud.Actor = character;
                     _castbarHud.Draw(castbarPos);
                 });
             }

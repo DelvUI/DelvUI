@@ -353,11 +353,10 @@ namespace DelvUI.Interface.Party
             if (ShowMana())
             {
                 var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.ManaBar.HealthBarAnchor);
-                _manaBarHud.Actor = character;
-                _manaBarHud.PartyMember = Member;
-
                 drawActions.Add((_configs.ManaBar.StrataLevel, () =>
                 {
+                    _manaBarHud.Actor = character;
+                    _manaBarHud.PartyMember = Member;
                     _manaBarHud.Draw(parentPos);
                 }
                 ));
@@ -365,26 +364,26 @@ namespace DelvUI.Interface.Party
 
             // buffs / debuffs
             var buffsPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.Buffs.HealthBarAnchor);
-            _buffsListHud.Actor = character;
             drawActions.Add((_configs.Buffs.StrataLevel, () =>
             {
+                _buffsListHud.Actor = character;
                 _buffsListHud.Draw(buffsPos);
             }
             ));
 
             var debuffsPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.Debuffs.HealthBarAnchor);
-            _debuffsListHud.Actor = character;
             drawActions.Add((_configs.Debuffs.StrataLevel, () =>
             {
+                _debuffsListHud.Actor = character;
                 _debuffsListHud.Draw(debuffsPos);
             }
             ));
 
             // castbar
             var castbarPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.CastBar.HealthBarAnchor);
-            _castbarHud.Actor = character;
             drawActions.Add((_configs.CastBar.StrataLevel, () =>
             {
+                _castbarHud.Actor = character;
                 _castbarHud.Draw(castbarPos);
             }
             ));
@@ -430,10 +429,10 @@ namespace DelvUI.Interface.Party
             if (character == null || character?.ObjectKind != ObjectKind.BattleNpc)
             {
                 var order = Member.ObjectId == player.ObjectId ? 1 : Member.Order;
-                _configs.HealthBar.OrderLabelConfig.SetText("[" + order + "]");
 
                 drawActions.Add((_configs.HealthBar.OrderLabelConfig.StrataLevel, () =>
                 {
+                    _configs.HealthBar.OrderLabelConfig.SetText("[" + order + "]");
                     _orderLabelHud.Draw(Position, _configs.HealthBar.Size);
                 }
                 ));
@@ -443,10 +442,9 @@ namespace DelvUI.Interface.Party
             string? statusString = StringForStatus(Member.Status);
             if (PlayerStatus.Enabled && PlayerStatus.Label.Enabled && statusString != null)
             {
-                PlayerStatus.Label.SetText(statusString);
-
                 drawActions.Add((PlayerStatus.Label.StrataLevel, () =>
                 {
+                    PlayerStatus.Label.SetText(statusString);
                     _statusLabelHud.Draw(Position, _configs.HealthBar.Size);
                 }
                 ));
@@ -457,10 +455,10 @@ namespace DelvUI.Interface.Party
             {
                 var duration = Math.Abs(Member.RaiseTime!.Value);
                 var text = duration < 10 ? duration.ToString("N1", CultureInfo.InvariantCulture) : Utils.DurationToString(duration);
-                RaiseTracker.Icon.Label.SetText(text);
 
                 drawActions.Add((RaiseTracker.Icon.Label.StrataLevel, () =>
                 {
+                    RaiseTracker.Icon.Label.SetText(text);
                     _raiseLabelHud.Draw(Position, _configs.HealthBar.Size);
                 }
                 ));
@@ -471,10 +469,10 @@ namespace DelvUI.Interface.Party
             {
                 var duration = Math.Abs(Member.InvulnStatus!.InvulnTime);
                 var text = duration < 10 ? duration.ToString("N1", CultureInfo.InvariantCulture) : Utils.DurationToString(duration);
-                InvulnTracker.Icon.Label.SetText(text);
 
                 drawActions.Add((InvulnTracker.Icon.Label.StrataLevel, () =>
                 {
+                    InvulnTracker.Icon.Label.SetText(text);
                     _invulnLabelHud.Draw(Position, _configs.HealthBar.Size);
                 }
                 ));
