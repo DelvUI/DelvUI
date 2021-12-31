@@ -638,7 +638,8 @@ namespace DelvUI.Interface.Party
 
             if (_config.Preview)
             {
-                for (int i = 0; i < 8; i++)
+                int count = FakePartyFramesMember.RNG.Next(4, 9);
+                for (int i = 0; i < count; i++)
                 {
                     _groupMembers.Add(new FakePartyFramesMember(i));
                 }

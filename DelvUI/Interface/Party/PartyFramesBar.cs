@@ -10,6 +10,7 @@ using System.Numerics;
 using Dalamud.Game.ClientState.Objects.Types;
 using System.Collections.Generic;
 using DelvUI.Enums;
+using DelvUI.Interface.Bars;
 
 namespace DelvUI.Interface.Party
 {
@@ -111,12 +112,14 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        public void Draw(Vector2 origin, ImDrawListPtr drawList, PluginConfigColor? borderColor = null)
+        public List<(StrataLevel, Action)> GetBarDrawActions(Vector2 origin, PluginConfigColor? borderColor = null)
         {
+            List<(StrataLevel, Action)> drawActions = new List<(StrataLevel, Action)>();
+
             if (!Visible || Member is null)
             {
                 StopMouseover();
-                return;
+                return drawActions;
             }
 
             // click
@@ -171,7 +174,7 @@ namespace DelvUI.Interface.Party
                     : _configs.HealthBar.ColorsConfig.DeathIndicatorBackgroundColor;
             }
 
-            drawList.AddRectFilled(Position, Position + _configs.HealthBar.Size, bgColor.Base);
+            Rect background = new Rect(Position, _configs.HealthBar.Size, bgColor);
 
             // hp
             uint currentHp = Member.HP;
@@ -182,46 +185,76 @@ namespace DelvUI.Interface.Party
                 currentHp = _smoothHPHelper.GetNextHp((int)currentHp, (int)maxHp, _configs.HealthBar.SmoothHealthConfig.Velocity);
             }
 
-            var hpScale = maxHp > 0 ? (float)currentHp / (float)maxHp : 1;
-            var hpFillSize = new Vector2(_configs.HealthBar.Size.X * hpScale, _configs.HealthBar.Size.Y);
+            float hpScale = maxHp > 0 ? (float)currentHp / (float)maxHp : 1;
             PluginConfigColor? hpColor = GetColor(hpScale);
-
             if (_configs.HealthBar.RangeConfig.Enabled)
             {
                 hpColor = GetDistanceColor(character, hpColor);
             }
 
-            DrawHelper.DrawGradientFilledRect(Position, hpFillSize, hpColor, drawList);
+            Rect healthFill = BarUtilities.GetFillRect(Position, _configs.HealthBar.Size, _configs.HealthBar.FillDirection, hpColor, currentHp, maxHp);
+
+            // bar
+            int thickness = borderColor != null ? _configs.HealthBar.ColorsConfig.ActiveBorderThickness : _configs.HealthBar.ColorsConfig.InactiveBorderThickness;
+            borderColor = borderColor ?? GetBorderColor(character);
+
+            BarHud bar = new BarHud(
+                _configs.HealthBar.ID,
+                _configs.HealthBar.ColorsConfig.ShowBorder,
+                borderColor,
+                thickness,
+                actor: character,
+                current: currentHp,
+                max: maxHp
+            );
+
+            bar.SetBackground(background);
+            bar.AddForegrounds(healthFill);
+
+            // missing health
+            if (_configs.HealthBar.ColorsConfig.UseMissingHealthBar)
+            {
+                Vector2 healthMissingSize = _configs.HealthBar.Size - BarUtilities.GetFillDirectionOffset(healthFill.Size, _configs.HealthBar.FillDirection);
+                Vector2 healthMissingPos = _configs.HealthBar.FillDirection.IsInverted() ? Position : Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, _configs.HealthBar.FillDirection);
+                PluginConfigColor? missingHealthColor = _configs.HealthBar.ColorsConfig.HealthMissingColor;
+                bar.AddForegrounds(new Rect(healthMissingPos, healthMissingSize, missingHealthColor));
+            }
 
             // shield
             if (_configs.HealthBar.ShieldConfig.Enabled)
             {
-                if (_configs.HealthBar.ShieldConfig.FillHealthFirst && Member.MaxHP > 0)
+                if (Member.Shield > 0f)
                 {
-                    DrawHelper.DrawShield(Member.Shield, (float)currentHp / maxHp, Position, _configs.HealthBar.Size,
-                        _configs.HealthBar.ShieldConfig.Height, !_configs.HealthBar.ShieldConfig.HeightInPixels,
-                        _configs.HealthBar.ShieldConfig.Color, drawList);
-                }
-                else
-                {
-                    DrawHelper.DrawOvershield(Member.Shield, Position, _configs.HealthBar.Size,
-                        _configs.HealthBar.ShieldConfig.Height, !_configs.HealthBar.ShieldConfig.HeightInPixels,
-                        _configs.HealthBar.ShieldConfig.Color, drawList);
+                    bar.AddForegrounds(
+                        BarUtilities.GetShieldForeground(
+                            _configs.HealthBar.ShieldConfig,
+                            Position,
+                            _configs.HealthBar.Size,
+                            healthFill.Size,
+                            _configs.HealthBar.FillDirection,
+                            Member.Shield,
+                            currentHp,
+                            maxHp
+                        )
+                    );
                 }
             }
-
-            // border
-            Vector2 borderPos = Position - Vector2.One;
-            Vector2 borderSize = _configs.HealthBar.Size + Vector2.One * 2;
-            uint color = borderColor?.Base ?? _configs.HealthBar.ColorsConfig.BorderColor.Base;
-            int thickness = borderColor != null ? _configs.HealthBar.ColorsConfig.ActiveBorderThickness : _configs.HealthBar.ColorsConfig.InactiveBorderThickness;
-            drawList.AddRect(borderPos, borderPos + borderSize, color, 0, ImDrawFlags.None, thickness);
 
             // highlight
             if (_configs.HealthBar.ColorsConfig.ShowHighlight && isHovering)
             {
-                drawList.AddRectFilled(Position, Position + _configs.HealthBar.Size, _configs.HealthBar.ColorsConfig.HighlightColor.Base);
+                Rect highlight = new Rect(Position, _configs.HealthBar.Size, _configs.HealthBar.ColorsConfig.HighlightColor);
+                bar.AddForegrounds(highlight);
             }
+
+            return bar.GetDrawActions(Vector2.Zero, _configs.HealthBar.StrataLevel);
+        }
+
+        private PluginConfigColor GetBorderColor(Character? character)
+        {
+            GameObject? target = Plugin.TargetManager.Target ?? Plugin.TargetManager.SoftTarget;
+
+            return character != null && character == target ? _configs.HealthBar.ColorsConfig.TargetBordercolor : _configs.HealthBar.BorderColor;
         }
 
         private PluginConfigColor GetDistanceColor(Character? character, PluginConfigColor color)

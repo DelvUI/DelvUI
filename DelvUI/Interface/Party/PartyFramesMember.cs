@@ -106,7 +106,7 @@ namespace DelvUI.Interface.Party
 
     public class FakePartyFramesMember : IPartyFramesMember
     {
-        private static readonly Random RNG = new Random((int)ImGui.GetTime());
+        public static readonly Random RNG = new Random((int)ImGui.GetTime());
 
         public uint ObjectId => GameObject.InvalidGameObjectId;
         public Character? Character => null;

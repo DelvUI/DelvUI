@@ -543,7 +543,11 @@ namespace DelvUI.Config
             ["0.4.0.0"] = new List<Type>() {
                 typeof(PartyFramesIconsConfig),
                 typeof(PartyFramesTrackersConfig)
-            }
+            },
+            ["0.6.2.0"] = new List<Type>() {
+                typeof(PartyFramesHealthBarsConfig)
+            },
+
         };
         #endregion
     }
