@@ -182,7 +182,7 @@ namespace DelvUI.Interface.GeneralElements
         [NestedConfig("Cast Time", 505)]
         public NumericLabelConfig CastTimeLabel;
 
-        [Checkbox("Reverse Fill Background Color")]
+        [Checkbox("Reverse Fill Background Color", spacing = true)]
         [Order(510)]
         public bool UseReverseFill = false;
 

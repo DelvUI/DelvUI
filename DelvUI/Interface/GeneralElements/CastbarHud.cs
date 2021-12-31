@@ -66,7 +66,6 @@ namespace DelvUI.Interface.GeneralElements
 
             BarHud bar = new(Config, Actor);
             bar.SetBackground(background);
-            bar.AddForegrounds(progress);
 
             if (Config.UseReverseFill)
             {
@@ -78,7 +77,10 @@ namespace DelvUI.Interface.GeneralElements
                 PluginConfigColor reverseFillColor = Config.ReverseFillColor;
                 bar.AddForegrounds(new Rect(reverseFillPos, reverseFillSize, reverseFillColor));
             }
+
             AddExtras(bar, totalCastTime);
+
+            bar.AddForegrounds(progress);
 
             Vector2 pos = origin + ParentPos();
             AddDrawActions(bar.GetDrawActions(pos, Config.StrataLevel));
@@ -179,12 +181,11 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            bool doesCastBarFillToLeft = Config.FillDirection is BarDirection.Left;
             float slideCastWidth = Math.Min(Config.Size.X, Config.SlideCastTime / 1000f * Config.Size.X / totalCastTime);
             Vector2 size = new(slideCastWidth, Config.Size.Y);
             Rect slideCast = new(Config.Position + Config.Size - size, size, Config.SlideCastColor);
 
-            if (doesCastBarFillToLeft)
+            if (Config.FillDirection is BarDirection.Left)
             {
                 bool validIcon = LastUsedCast?.IconTexture is not null;
                 Vector2 iconSize = Config.ShowIcon && validIcon ? new Vector2(Config.Size.Y, Config.Size.Y) : Vector2.Zero;
