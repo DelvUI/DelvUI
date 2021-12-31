@@ -76,9 +76,9 @@ namespace DelvUI.Interface.Party
             return config;
         }
 
-        [DragInt2("Padding", isMonitored = true)]
+        [DragInt2("Padding", isMonitored = true, min = 0)]
         [Order(31)]
-        public Vector2 Padding = new Vector2(1, 1);
+        public Vector2 Padding = new Vector2(0, 0);
 
         [NestedConfig("Name Label", 40)]
         public EditableLabelConfig NameLabelConfig = new EditableLabelConfig(Vector2.Zero, "[name:first-initial]. [name:last-initial].", DrawAnchor.Center, DrawAnchor.Center);

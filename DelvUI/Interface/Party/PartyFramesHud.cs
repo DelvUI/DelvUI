@@ -158,8 +158,8 @@ namespace DelvUI.Interface.Party
                 // anchor and position
                 CalculateBarPosition(origin, Size, out var x, out var y);
                 bar.Position = new Vector2(
-                    x + Configs.HealthBar.Size.X * col + Configs.HealthBar.Padding.X * col,
-                    y + Configs.HealthBar.Size.Y * row + Configs.HealthBar.Padding.Y * row
+                    x + Configs.HealthBar.Size.X * col + (Configs.HealthBar.Padding.X - 1) * col,
+                    y + Configs.HealthBar.Size.Y * row + (Configs.HealthBar.Padding.Y - 1) * row
                 );
 
                 // layout
