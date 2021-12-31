@@ -511,6 +511,7 @@ namespace DelvUI.Interface.Party
             {
                 PartyMemberStatus.ViewingCutscene => 61508,
                 PartyMemberStatus.Offline => 61504,
+                PartyMemberStatus.Dead => 61502,
                 _ => null
             };
         }
@@ -521,6 +522,7 @@ namespace DelvUI.Interface.Party
             {
                 PartyMemberStatus.ViewingCutscene => "[Viewing Cutscene]",
                 PartyMemberStatus.Offline => "[Offline]",
+                PartyMemberStatus.Dead => "[Dead]",
                 _ => null
             };
         }
