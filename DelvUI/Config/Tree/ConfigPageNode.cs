@@ -262,7 +262,7 @@ namespace DelvUI.Config.Tree
             MethodInfo? methodInfo = ConfigObject.GetType().GetMethod("Load");
             MethodInfo? function = methodInfo?.MakeGenericMethod(ConfigObject.GetType());
 
-            object[] args = previousVersion != null ? new object[] { finalPath, currentVersion, previousVersion } : new object[] { finalPath, currentVersion };
+            object?[] args = new object?[] { finalPath, currentVersion, previousVersion };
             PluginConfigObject? config = (PluginConfigObject?)function?.Invoke(ConfigObject, args);
 
             ConfigObject = config ?? ConfigObject;
