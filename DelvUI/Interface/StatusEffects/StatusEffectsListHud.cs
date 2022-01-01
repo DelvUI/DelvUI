@@ -341,7 +341,7 @@ namespace DelvUI.Interface.StatusEffects
 
             AddDrawAction(Config.StrataLevel, () =>
             {
-                DrawHelper.DrawInWindow(ID, windowPos, windowSize + margin * 2, true, false, (drawList) =>
+                DrawHelper.DrawInWindow(ID, windowPos, windowSize + margin * 2, !Config.DisableInteraction, false, (drawList) =>
                 {
                     // area
                     if (Config.Preview)

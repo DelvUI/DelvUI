@@ -225,6 +225,10 @@ namespace DelvUI.Interface.StatusEffects
         [Order(60)]
         public bool ShowTooltips = true;
 
+        [Checkbox("Disable Interaction", help = "Enabling this will disable right clicking buffs off, or the shortcut to blacklist/whitelist a status effect.")]
+        [Order(61)]
+        public bool DisableInteraction = false;
+
         [NestedConfig("Icons", 65)]
         public StatusEffectIconConfig IconConfig;
 

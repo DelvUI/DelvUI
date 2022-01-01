@@ -1,4 +1,8 @@
-# 0.6.2.2
+# 0.6.3.0
+Features:
+- Added setting to status effects lists to disable mouse interactions.
+
+Fixes:
 - Fixed party frames border color not working.
 - Fixed party members health label not visible on preview mode.
 
