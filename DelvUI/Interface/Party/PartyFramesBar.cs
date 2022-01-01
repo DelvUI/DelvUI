@@ -254,7 +254,7 @@ namespace DelvUI.Interface.Party
         {
             GameObject? target = Plugin.TargetManager.Target ?? Plugin.TargetManager.SoftTarget;
 
-            return character != null && character == target ? _configs.HealthBar.ColorsConfig.TargetBordercolor : _configs.HealthBar.BorderColor;
+            return character != null && character == target ? _configs.HealthBar.ColorsConfig.TargetBordercolor : _configs.HealthBar.ColorsConfig.BorderColor;
         }
 
         private PluginConfigColor GetDistanceColor(Character? character, PluginConfigColor color)
