@@ -1,13 +1,31 @@
-﻿using DelvUI.Config;
-using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using Dalamud.Logging;
+using DelvUI.Config;
+using DelvUI.Interface.GeneralElements;
+using ImGuiNET;
 
 namespace DelvUI.Helpers
 {
+    public class FontScope : IDisposable
+    {
+        private bool _fontPushed;
+
+        public FontScope(bool fontPushed)
+        {
+            _fontPushed = fontPushed;
+        }
+
+        public void Dispose()
+        {
+            if (_fontPushed)
+            {
+                ImGui.PopFont();
+            }
+        }
+    }
+
     public class FontsManager : IDisposable
     {
         #region Singleton
@@ -82,21 +100,21 @@ namespace DelvUI.Helpers
             return false;
         }
 
-        public bool PushFont(string? fontId)
+        public FontScope PushFont(string? fontId)
         {
             if (fontId == null || _config == null || !_config.Fonts.ContainsKey(fontId))
             {
-                return false;
+                return new FontScope(false);
             }
 
             var index = _config.Fonts.IndexOfKey(fontId);
             if (index < 0 || index >= _fonts.Count)
             {
-                return false;
+                return new FontScope(false);
             }
 
             ImGui.PushFont(_fonts[index]);
-            return true;
+            return new FontScope(true);
         }
 
         public unsafe void BuildFonts()
