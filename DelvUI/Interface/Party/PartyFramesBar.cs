@@ -449,7 +449,7 @@ namespace DelvUI.Interface.Party
             }
 
             // health label
-            if (character != null)
+            if (Member.MaxHP > 0)
             {
                 drawActions.Add((_configs.HealthBar.HealthLabelConfig.StrataLevel, () =>
                 {

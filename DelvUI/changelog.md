@@ -1,5 +1,6 @@
 # 0.6.2.2
 - Fixed party frames border color not working.
+- Fixed party members health label not visible on preview mode.
 
 # 0.6.2.1
 - Fixed slide cast being drawn on top of the cast progress.
