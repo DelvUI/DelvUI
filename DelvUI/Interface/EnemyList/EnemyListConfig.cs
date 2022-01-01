@@ -114,6 +114,10 @@ namespace DelvUI.Interface.EnemyList
         [Order(50)]
         public PluginConfigColor TargetBordercolor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
+        [DragInt("Target Border Thickness", min = 1, max = 10)]
+        [Order(51)]
+        public int TargetBorderThickness = 1;
+
         [Checkbox("Show Enmity Border Colors", spacing = true)]
         [Order(60)]
         public bool ShowEnmityBorderColors = true;

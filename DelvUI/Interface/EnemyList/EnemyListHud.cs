@@ -156,7 +156,7 @@ namespace DelvUI.Interface.EnemyList
                     Configs.HealthBar.ID + $"_{i}",
                     Configs.HealthBar.DrawBorder,
                     borderColor,
-                    Configs.HealthBar.BorderThickness,
+                    GetBorderThickness(character),
                     DrawAnchor.TopLeft,
                     current: currentHp,
                     max: maxHp
@@ -298,6 +298,17 @@ namespace DelvUI.Interface.EnemyList
                 >= 1 => Configs.HealthBar.Colors.EnmitySecondBorderColor,
                 _ => Configs.HealthBar.BorderColor
             };
+        }
+
+        private int GetBorderThickness(Character? character)
+        {
+            GameObject? target = Plugin.TargetManager.Target ?? Plugin.TargetManager.SoftTarget;
+            if (character != null && character == target)
+            {
+                return Configs.HealthBar.Colors.TargetBorderThickness;
+            }
+
+            return Configs.HealthBar.BorderThickness;
         }
 
         private PluginConfigColor GetDistanceColor(Character? character, PluginConfigColor color)
