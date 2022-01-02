@@ -1,6 +1,7 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
+using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using System.Numerics;
 
@@ -222,6 +223,9 @@ namespace DelvUI.Interface.GeneralElements
         [NestedConfig("Shields", 140)]
         public ShieldConfig ShieldConfig = new ShieldConfig();
 
+        [NestedConfig("Custom Mouseover Area", 150)]
+        public MouseoverAreaConfig MouseoverAreaConfig = new MouseoverAreaConfig();
+
         public UnitFrameConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig, EditableLabelConfig optionalLabelConfig)
             : base(position, size, new PluginConfigColor(new(40f / 255f, 40f / 255f, 40f / 255f, 100f / 100f)))
         {
@@ -233,6 +237,7 @@ namespace DelvUI.Interface.GeneralElements
             BackgroundColor = new PluginConfigColor(new(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
             RoleIconConfig.Enabled = false;
             ColorByHealth.Enabled = false;
+            MouseoverAreaConfig.Enabled = false;
         }
 
         public UnitFrameConfig() : base(Vector2.Zero, Vector2.Zero, new(Vector4.Zero)) { } // don't remove
@@ -264,5 +269,55 @@ namespace DelvUI.Interface.GeneralElements
         [DragFloat("Velocity", min = 1f, max = 100f)]
         [Order(5)]
         public float Velocity = 25f;
+    }
+
+    [Exportable(false)]
+    public class MouseoverAreaConfig : PluginConfigObject
+    {
+        [Checkbox("Preview")]
+        [Order(5)]
+        public bool Preview = false;
+
+        [DragInt2("Top Left Offset", min = -500, max = 500)]
+        [Order(10)]
+        public Vector2 TopLeftOffset = Vector2.Zero;
+
+        [DragInt2("Bottom Right Offset", min = -500, max = 500)]
+        [Order(11)]
+        public Vector2 BottomRightOffset = Vector2.Zero;
+
+        public MouseoverAreaConfig()
+        {
+            Enabled = false;
+        }
+
+        public (Vector2, Vector2) GetArea(Vector2 pos, Vector2 size)
+        {
+            if (!Enabled) { return (pos, pos + size); }
+
+            Vector2 start = pos + TopLeftOffset;
+            Vector2 end = pos + size + BottomRightOffset;
+
+            return (start, end);
+        }
+
+        public BarHud? GetBar(Vector2 pos, Vector2 size, string id, DrawAnchor anchor = DrawAnchor.TopLeft)
+        {
+            if (!Enabled || !Preview) { return null; }
+
+            BarHud bar = new BarHud(
+                id,
+                true,
+                new(Vector4.One),
+                2
+            );
+
+            var barPos = Utils.GetAnchoredPosition(Vector2.Zero, size, anchor);
+            var (start, end) = GetArea(barPos + pos, size);
+            Rect background = new Rect(start, end - start, new(new(1, 1, 1, 0.5f)));
+            bar.SetBackground(background);
+
+            return bar;
+        }
     }
 }

@@ -101,6 +101,7 @@ namespace DelvUI.Interface.EnemyList
             _castbarHud.StopPreview();
             _buffsListHud.StopPreview();
             _debuffsListHud.StopPreview();
+            Configs.HealthBar.MouseoverAreaConfig.Preview = false;
         }
 
         public void StopMouseover()
@@ -174,7 +175,8 @@ namespace DelvUI.Interface.EnemyList
                 }
 
                 // highlight
-                bool isHovering = ImGui.IsMouseHoveringRect(origin + pos, origin + pos + Configs.HealthBar.Size);
+                var (areaStart, areaEnd) = Configs.HealthBar.MouseoverAreaConfig.GetArea(origin + pos, Configs.HealthBar.Size);
+                bool isHovering = ImGui.IsMouseHoveringRect(areaStart, areaEnd);
                 if (isHovering && Configs.HealthBar.Colors.ShowHighlight)
                 {
                     Rect highlight = new Rect(pos, Configs.HealthBar.Size, Configs.HealthBar.Colors.HighlightColor);
@@ -185,6 +187,18 @@ namespace DelvUI.Interface.EnemyList
                 }
 
                 AddDrawActions(bar.GetDrawActions(origin, Configs.HealthBar.StrataLevel));
+
+                // mouseover area
+                BarHud? mouseoverAreaBar = Configs.HealthBar.MouseoverAreaConfig.GetBar(
+                    pos,
+                    Configs.HealthBar.Size,
+                    Configs.HealthBar.ID + "_mouseoverArea"
+                );
+
+                if (mouseoverAreaBar != null)
+                {
+                    AddDrawActions(mouseoverAreaBar.GetDrawActions(origin, StrataLevel.HIGHEST));
+                }
 
                 // enmity icon
                 if (_iconsTexture != null && Configs.EnmityIcon.Enabled)

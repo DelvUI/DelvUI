@@ -49,23 +49,26 @@ namespace DelvUI.Interface.EnemyList
     [SubSection("Health Bar", 0)]
     public class EnemyListHealthBarConfig : BarConfig
     {
-        [NestedConfig("Colors", 70)]
-        public EnemyListHealthBarColorsConfig Colors = new EnemyListHealthBarColorsConfig();
-
-        [NestedConfig("Change Alpha Based on Range", 80)]
-        public EnemyListRangeConfig RangeConfig = new EnemyListRangeConfig();
-
-        [NestedConfig("Use Smooth Transitions", 90)]
-        public SmoothHealthConfig SmoothHealthConfig = new SmoothHealthConfig();
-
-        [NestedConfig("Name Label", 100)]
+        [NestedConfig("Name Label", 70)]
         public EditableLabelConfig NameLabel = new EditableLabelConfig(new Vector2(-5, 12), "[name:first-npcfull]", DrawAnchor.TopRight, DrawAnchor.BottomRight);
 
-        [NestedConfig("Health Label", 105)]
+        [NestedConfig("Health Label", 80)]
         public EditableLabelConfig HealthLabel = new EditableLabelConfig(new Vector2(30, 0), "[health:percent]%", DrawAnchor.Left, DrawAnchor.Left);
 
-        [NestedConfig("Order Letter Label", 105)]
+        [NestedConfig("Order Letter Label", 90)]
         public LabelConfig OrderLetterLabel = new LabelConfig(new Vector2(5, 0), "", DrawAnchor.Left, DrawAnchor.Left);
+
+        [NestedConfig("Colors", 100)]
+        public EnemyListHealthBarColorsConfig Colors = new EnemyListHealthBarColorsConfig();
+
+        [NestedConfig("Change Alpha Based on Range", 110)]
+        public EnemyListRangeConfig RangeConfig = new EnemyListRangeConfig();
+
+        [NestedConfig("Use Smooth Transitions", 120)]
+        public SmoothHealthConfig SmoothHealthConfig = new SmoothHealthConfig();
+
+        [NestedConfig("Custom Mouseover Area", 130)]
+        public MouseoverAreaConfig MouseoverAreaConfig = new MouseoverAreaConfig();
 
         public new static EnemyListHealthBarConfig DefaultConfig()
         {
@@ -77,6 +80,8 @@ namespace DelvUI.Interface.EnemyList
             config.NameLabel.FontID = FontsConfig.DefaultMediumFontKey;
             config.HealthLabel.FontID = FontsConfig.DefaultMediumFontKey;
             config.OrderLetterLabel.FontID = FontsConfig.DefaultMediumFontKey;
+
+            config.MouseoverAreaConfig.Enabled = false;
 
             return config;
         }
