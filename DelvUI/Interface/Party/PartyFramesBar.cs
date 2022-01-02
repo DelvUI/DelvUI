@@ -101,6 +101,7 @@ namespace DelvUI.Interface.Party
             _castbarHud.StopPreview();
             _buffsListHud.StopPreview();
             _debuffsListHud.StopPreview();
+            _configs.HealthBar.MouseoverAreaConfig.Preview = false;
         }
 
         public void StopMouseover()
@@ -123,7 +124,8 @@ namespace DelvUI.Interface.Party
             }
 
             // click
-            bool isHovering = ImGui.IsMouseHoveringRect(Position, Position + _configs.HealthBar.Size);
+            var (areaStart, areaEnd) = _configs.HealthBar.MouseoverAreaConfig.GetArea(Position, _configs.HealthBar.Size);
+            bool isHovering = ImGui.IsMouseHoveringRect(areaStart, areaEnd);
             Character? character = Member.Character;
 
             if (isHovering)
@@ -247,14 +249,28 @@ namespace DelvUI.Interface.Party
                 bar.AddForegrounds(highlight);
             }
 
-            return bar.GetDrawActions(Vector2.Zero, _configs.HealthBar.StrataLevel);
+            drawActions = bar.GetDrawActions(Vector2.Zero, _configs.HealthBar.StrataLevel);
+
+            // mouseover area
+            BarHud? mouseoverAreaBar = _configs.HealthBar.MouseoverAreaConfig.GetBar(
+                Position,
+                _configs.HealthBar.Size,
+                _configs.HealthBar.ID + "_mouseoverArea"
+            );
+
+            if (mouseoverAreaBar != null)
+            {
+                drawActions.AddRange(mouseoverAreaBar.GetDrawActions(Vector2.Zero, StrataLevel.HIGHEST));
+            }
+
+            return drawActions;
         }
 
         private PluginConfigColor GetBorderColor(Character? character)
         {
             GameObject? target = Plugin.TargetManager.Target ?? Plugin.TargetManager.SoftTarget;
 
-            return character != null && character == target ? _configs.HealthBar.ColorsConfig.TargetBordercolor : _configs.HealthBar.BorderColor;
+            return character != null && character == target ? _configs.HealthBar.ColorsConfig.TargetBordercolor : _configs.HealthBar.ColorsConfig.BorderColor;
         }
 
         private PluginConfigColor GetDistanceColor(Character? character, PluginConfigColor color)
@@ -449,7 +465,7 @@ namespace DelvUI.Interface.Party
             }
 
             // health label
-            if (character != null)
+            if (Member.MaxHP > 0)
             {
                 drawActions.Add((_configs.HealthBar.HealthLabelConfig.StrataLevel, () =>
                 {

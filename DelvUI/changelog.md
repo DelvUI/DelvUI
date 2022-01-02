@@ -1,3 +1,15 @@
+# 0.6.3.0
+Features:
+- Added setting to Status Effects Lists to disable mouse interactions.
+- Added target border thickness setting to the Enemy List.
+- Added Bard's Radiant Finale as a trackable party cooldown.
+- Added Dancer's Technical Finish as a trackable party cooldown.
+- Added a Custom Mouseover Area setting too all types of unit frames.
+
+Fixes:
+- Fixed Party Frames border color not working.
+- Fixed party members health label not visible on preview mode.
+
 # 0.6.2.1
 - Fixed slide cast being drawn on top of the cast progress.
 

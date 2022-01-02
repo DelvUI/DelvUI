@@ -13,6 +13,7 @@ namespace DelvUI.Interface.PartyCooldowns
         public readonly IPartyFramesMember? Member;
 
         public double LastTimeUsed = 0;
+        public double OverridenCooldownStartTime = -1;
 
         public PartyCooldown(PartyCooldownData data, uint sourceID, IPartyFramesMember? member)
         {
@@ -34,9 +35,11 @@ namespace DelvUI.Interface.PartyCooldowns
 
         public float CooldownTimeRemaining()
         {
-            double timeSinceUse = ImGui.GetTime() - LastTimeUsed;
+            double timeSinceUse = OverridenCooldownStartTime != -1 ? ImGui.GetTime() - OverridenCooldownStartTime : ImGui.GetTime() - LastTimeUsed;
             if (timeSinceUse > Data.CooldownDuration)
             {
+                OverridenCooldownStartTime = -1;
+                LastTimeUsed = 0;
                 return 0;
             }
 
