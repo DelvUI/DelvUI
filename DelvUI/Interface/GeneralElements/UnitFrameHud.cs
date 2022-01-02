@@ -15,7 +15,7 @@ using System.Runtime.InteropServices;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public unsafe class UnitFrameHud : DraggableHudElement, IHudElementWithActor, IHudElementWithMouseOver
+    public unsafe class UnitFrameHud : DraggableHudElement, IHudElementWithActor, IHudElementWithMouseOver, IHudElementWithPreview
     {
         public UnitFrameConfig Config => (UnitFrameConfig)_config;
 
@@ -50,6 +50,11 @@ namespace DelvUI.Interface.GeneralElements
             return (new List<Vector2>() { Config.Position }, new List<Vector2>() { Config.Size });
         }
 
+        public void StopPreview()
+        {
+            Config.MouseoverAreaConfig.Preview = false;
+        }
+
         public void StopMouseover()
         {
             if (_wasHovering)
@@ -80,7 +85,8 @@ namespace DelvUI.Interface.GeneralElements
 
             // Check if mouse is hovering over the box properly
             var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
-            if (ImGui.IsMouseHoveringRect(startPos, startPos + Config.Size) && !DraggingEnabled)
+            var (areaStart, areaEnd) = Config.MouseoverAreaConfig.GetArea(startPos, Config.Size);
+            if (ImGui.IsMouseHoveringRect(areaStart, areaEnd) && !DraggingEnabled)
             {
                 InputsHelper.Instance.SetTarget(Actor);
                 _wasHovering = true;
@@ -166,6 +172,19 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             AddDrawActions(bar.GetDrawActions(pos, Config.StrataLevel));
+
+            // mouseover area
+            BarHud? mouseoverAreaBar = Config.MouseoverAreaConfig.GetBar(
+                Config.Position,
+                Config.Size,
+                Config.ID + "_mouseoverArea",
+                Config.Anchor
+            );
+
+            if (mouseoverAreaBar != null)
+            {
+                AddDrawActions(mouseoverAreaBar.GetDrawActions(pos, StrataLevel.HIGHEST));
+            }
 
             // role/job icon
             if (Config.RoleIconConfig.Enabled && character is PlayerCharacter)

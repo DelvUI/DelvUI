@@ -73,6 +73,8 @@ namespace DelvUI.Interface.Party
         public new static PartyFramesHealthBarsConfig DefaultConfig()
         {
             var config = new PartyFramesHealthBarsConfig(Vector2.Zero, new(180, 80), new PluginConfigColor(Vector4.Zero));
+            config.MouseoverAreaConfig.Enabled = false;
+
             return config;
         }
 
@@ -100,6 +102,9 @@ namespace DelvUI.Interface.Party
 
         [NestedConfig("Use Smooth Transitions", 70)]
         public SmoothHealthConfig SmoothHealthConfig = new SmoothHealthConfig();
+
+        [NestedConfig("Custom Mouseover Area", 75)]
+        public MouseoverAreaConfig MouseoverAreaConfig = new MouseoverAreaConfig();
 
         public PartyFramesHealthBarsConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor, BarDirection fillDirection = BarDirection.Right)
             : base(position, size, fillColor, fillDirection)

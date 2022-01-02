@@ -185,21 +185,25 @@ namespace DelvUI.Interface
             _playerUnitFrameHud = new PlayerUnitFrameHud(playerUnitFrameConfig, "Player");
             _hudElements.Add(playerUnitFrameConfig, _playerUnitFrameHud);
             _hudElementsUsingPlayer.Add(_playerUnitFrameHud);
+            _hudElementsWithPreview.Add(_playerUnitFrameHud);
 
             var targetUnitFrameConfig = ConfigurationManager.Instance.GetConfigObject<TargetUnitFrameConfig>();
             _targetUnitFrameHud = new UnitFrameHud(targetUnitFrameConfig, "Target");
             _hudElements.Add(targetUnitFrameConfig, _targetUnitFrameHud);
             _hudElementsUsingTarget.Add(_targetUnitFrameHud);
+            _hudElementsWithPreview.Add(_targetUnitFrameHud);
 
             var targetOfTargetUnitFrameConfig = ConfigurationManager.Instance.GetConfigObject<TargetOfTargetUnitFrameConfig>();
             _totUnitFrameHud = new UnitFrameHud(targetOfTargetUnitFrameConfig, "Target of Target");
             _hudElements.Add(targetOfTargetUnitFrameConfig, _totUnitFrameHud);
             _hudElementsUsingTargetOfTarget.Add(_totUnitFrameHud);
+            _hudElementsWithPreview.Add(_totUnitFrameHud);
 
             var focusTargetUnitFrameConfig = ConfigurationManager.Instance.GetConfigObject<FocusTargetUnitFrameConfig>();
             _focusTargetUnitFrameHud = new UnitFrameHud(focusTargetUnitFrameConfig, "Focus Target");
             _hudElements.Add(focusTargetUnitFrameConfig, _focusTargetUnitFrameHud);
             _hudElementsUsingFocusTarget.Add(_focusTargetUnitFrameHud);
+            _hudElementsWithPreview.Add(_focusTargetUnitFrameHud);
 
             var partyFramesConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesConfig>();
             var partyFramesHud = new PartyFramesHud(partyFramesConfig, "Party Frames");
