@@ -8,7 +8,9 @@ using FFXIVClientStructs.FFXIV.Client.Game;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Numerics;
+using System.Text;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -122,7 +124,17 @@ namespace DelvUI.Interface.GeneralElements
             bool isTimeLeftAnchored = Config.CastTimeLabel.TextAnchor is DrawAnchor.Left or DrawAnchor.TopLeft or DrawAnchor.BottomLeft;
             Vector2 timePos = Config.ShowIcon && isTimeLeftAnchored ? startPos + new Vector2(iconSize.X, 0) : startPos;
             float value = Config.Preview ? 0.5f : totalCastTime - currentCastTime;
-            Config.CastTimeLabel.SetValue(value);
+
+            if (Config.ShowMaxCastTime)
+            {
+                string format = "0".Repeat(Config.CastTimeLabel.NumberFormat);
+                Config.CastTimeLabel.SetText(value.ToString($"####0.{format}", CultureInfo.InvariantCulture)
+                    + " / " + totalCastTime.ToString($"####0.{format}", CultureInfo.InvariantCulture));
+            }
+            else
+            {
+                Config.CastTimeLabel.SetValue(value);
+            }
 
             AddDrawAction(Config.CastTimeLabel.StrataLevel, () =>
             {
