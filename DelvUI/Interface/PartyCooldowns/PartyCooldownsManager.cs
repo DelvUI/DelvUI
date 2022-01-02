@@ -98,6 +98,8 @@ namespace DelvUI.Interface.PartyCooldowns
         private Dictionary<uint, Dictionary<uint, PartyCooldown>> _cooldownsMap = new Dictionary<uint, Dictionary<uint, PartyCooldown>>();
         public IReadOnlyDictionary<uint, Dictionary<uint, PartyCooldown>> CooldownsMap => _cooldownsMap;
 
+        private Dictionary<uint, double> _technicalStepMap = new Dictionary<uint, double>();
+
         public delegate void PartyCooldownsChangedEventHandler(PartyCooldownsManager sender);
         public event PartyCooldownsChangedEventHandler? CooldownsChangedEvent;
 
@@ -132,10 +134,29 @@ namespace DelvUI.Interface.PartyCooldowns
                 {
                     uint actionID = *((uint*)effect.ToPointer() + 0x2);
 
-                    // check if its an action we track
-                    if (_cooldownsMap[actorId].TryGetValue(actionID, out PartyCooldown? cooldown) && cooldown != null)
+                    // special case for technical step / finish
+                    // we detect when technical step is pressed and save the time
+                    // so we can properly calculate the cooldown once finish is pressed
+                    if (actionID == 15998)
                     {
-                        cooldown.LastTimeUsed = ImGui.GetTime() + 1;
+                        _technicalStepMap[actorId] = ImGui.GetTime();
+                    }
+                    else
+                    {
+                        // check if its an action we track
+                        if (_cooldownsMap[actorId].TryGetValue(actionID, out PartyCooldown? cooldown) && cooldown != null)
+                        {
+                            // if its technical finish, we set the cooldown start time to
+                            // the time when step was pressed
+                            if (_technicalStepMap.TryGetValue(actorId, out double stepStartTime) &&
+                                (actionID == 16004 || actionID == 16193 || actionID == 16194 || actionID == 16195 || actionID == 16196))
+                            {
+                                cooldown.OverridenCooldownStartTime = stepStartTime;
+                                _technicalStepMap.Remove(actorId);
+                            }
+
+                            cooldown.LastTimeUsed = ImGui.GetTime() + 1;
+                        }
                     }
                 }
             }
