@@ -363,6 +363,7 @@ namespace DelvUI.Interface.PartyCooldowns
             [118] = NewData(118, JobIDs.BRD, 50, 120, 15, 30, 3), // battle voice
             [7405] = NewData(7405, JobIDs.BRD, 88, 90, 15, 70, 2), // troubadour
             [7408] = NewData(7408, JobIDs.BRD, 66, 90, 15, 40, 2), // nature's minne
+            [25785] = NewData(25785, JobIDs.BRD, 90, 110, 15, 30, 3), // radiant finale
             [16012] = NewData(16012, JobIDs.DNC, 88, 90, 15, 70, 2), // shield samba
             [16889] = NewData(16889, JobIDs.MCH, 56, 90, 15, 70, 2), // tactician
 

@@ -2,6 +2,7 @@
 Features:
 - Added setting to Status Effects Lists to disable mouse interactions.
 - Added target border thickness setting to the Enemy List.
+- Added Bard's Radiant Finale as a trackable party cooldown.
 
 Fixes:
 - Fixed Party Frames border color not working.
