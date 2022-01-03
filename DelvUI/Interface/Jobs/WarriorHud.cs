@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using DelvUI.Interface.GeneralElements;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -171,28 +172,20 @@ namespace DelvUI.Interface.Jobs
             if (!Config.InnerReleaseBar.HideWhenInactive || innerReleaseStacks > 0)
             {
                 float innerReleaseMaxDuration = 15f;
+                var chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[3];
+
+                for (int i = 0; i < 3; i++)
+                {
+                    chunks[i] = new(Config.InnerReleaseBar.FillColor, i < innerReleaseStacks ? 1 : 0, i == 1 ? Config.InnerReleaseBar.Label : null);
+                }
+
+                innerReleaseDuration = !Config.InnerReleaseBar.ShowBuffTimerOnActiveChunk
+                    ? innerReleaseMaxDuration
+                    : Math.Min(innerReleaseDuration, innerReleaseMaxDuration);
+
                 Config.InnerReleaseBar.Label.SetValue(innerReleaseDuration);
 
-                if (!Config.InnerReleaseBar.ShowBuffTimerOnActiveChunk)
-                {
-                    innerReleaseDuration = innerReleaseMaxDuration;
-                }
-                else
-                {
-                    innerReleaseDuration = Math.Min(innerReleaseDuration, innerReleaseMaxDuration);
-                }
-
-                BarHud[] bars = BarUtilities.GetChunkedProgressBars(
-                    Config.InnerReleaseBar,
-                    3,
-                    (innerReleaseStacks - 1) * innerReleaseMaxDuration + innerReleaseDuration,
-                    3 * innerReleaseMaxDuration,
-                    0,
-                    player,
-                    primalRendGlow,
-                    chunksToGlow: new[] { true, true, true }
-                );
-
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.InnerReleaseBar, chunks, player, primalRendGlow, new[] { true, true, true });
                 foreach (BarHud bar in bars)
                 {
                     AddDrawActions(bar.GetDrawActions(origin, Config.InnerReleaseBar.StrataLevel));
