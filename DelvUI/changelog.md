@@ -1,6 +1,7 @@
 # 0.6.3.1
 Fixes:
 - Spearfishing window will now be drawn on top of DelvUI.
+- Fixed Party Frames not updating properly when resizing the health bars.
 
 # 0.6.3.0
 Features:
