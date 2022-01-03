@@ -1,3 +1,11 @@
+# 0.6.3.1
+Features:
+- Added option to show Total Casttime on top of Current Casttime for Castbars.
+
+Fixes:
+- Fixed positioning of the label on Dark Knight's Delirium Bar.
+- Fixed positioning of the label on Warrior's Inner Release Bar.
+
 # 0.6.3.0
 Features:
 - Added setting to Status Effects Lists to disable mouse interactions.
