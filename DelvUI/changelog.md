@@ -5,6 +5,7 @@ Features:
 Fixes:
 - Fixed positioning of the label on Dark Knight's Delirium Bar.
 - Fixed positioning of the label on Warrior's Inner Release Bar.
+- Spearfishing window will now be drawn on top of DelvUI.
 
 # 0.6.3.0
 Features:

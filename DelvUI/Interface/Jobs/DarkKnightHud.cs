@@ -181,7 +181,7 @@ namespace DelvUI.Interface.Jobs
 
                 for (int i = 0; i < 3; i++)
                 {
-                    chunks[i] = new(Config.DeliriumBar.FillColor, i < stacks ? 1 : 0, i == 2 ? Config.DeliriumBar.Label : null);
+                    chunks[i] = new(Config.DeliriumBar.FillColor, i < stacks ? 1 : 0, i == 1 ? Config.DeliriumBar.Label : null);
                 }
 
                 Config.DeliriumBar.Label.SetValue(deliriumDuration);

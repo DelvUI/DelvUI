@@ -1,8 +1,8 @@
-﻿using DelvUI.Config;
+﻿using System;
+using System.Numerics;
+using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using ImGuiNET;
-using System;
-using System.Numerics;
 
 namespace DelvUI.Helpers
 {
@@ -90,18 +90,16 @@ namespace DelvUI.Helpers
                     _currentTooltipTitle += " (ID: " + id + ")";
                 }
 
-                bool titleFontPushed = FontsManager.Instance.PushFont(_config.TitleFontID);
-
-                _titleSize = ImGui.CalcTextSize(_currentTooltipTitle, MaxWidth);
-                _titleSize.Y += Margin;
-
-                if (titleFontPushed) { ImGui.PopFont(); }
+                using (FontsManager.Instance.PushFont(_config.TitleFontID))
+                {
+                    _titleSize = ImGui.CalcTextSize(_currentTooltipTitle, MaxWidth);
+                    _titleSize.Y += Margin;
+                }
             }
 
             // calculate text size
-            bool fontPushed = FontsManager.Instance.PushFont(_config.TextFontID);
-            _textSize = ImGui.CalcTextSize(_currentTooltipText, MaxWidth);
-            if (fontPushed) { ImGui.PopFont(); }
+            using (FontsManager.Instance.PushFont(_config.TextFontID))
+                _textSize = ImGui.CalcTextSize(_currentTooltipText, MaxWidth);
 
             _size = new Vector2(Math.Max(_titleSize.X, _textSize.X) + Margin * 2, _titleSize.Y + _textSize.Y + Margin * 2);
 
@@ -159,41 +157,39 @@ namespace DelvUI.Helpers
             if (_currentTooltipTitle != null)
             {
                 // title
-                bool fontPushed = FontsManager.Instance.PushFont(_config.TitleFontID);
-
-                var cursorPos = new Vector2(windowMargin.X + _size.X / 2f - _titleSize.X / 2f, Margin);
-                ImGui.SetCursorPos(cursorPos);
-                ImGui.PushTextWrapPos(cursorPos.X + _titleSize.X);
-                ImGui.TextColored(_config.TitleColor.Vector, _currentTooltipTitle);
-                ImGui.PopTextWrapPos();
-
-                if (fontPushed) { ImGui.PopFont(); }
+                Vector2 cursorPos;
+                using (FontsManager.Instance.PushFont(_config.TitleFontID))
+                {
+                    cursorPos = new Vector2(windowMargin.X + _size.X / 2f - _titleSize.X / 2f, Margin);
+                    ImGui.SetCursorPos(cursorPos);
+                    ImGui.PushTextWrapPos(cursorPos.X + _titleSize.X);
+                    ImGui.TextColored(_config.TitleColor.Vector, _currentTooltipTitle);
+                    ImGui.PopTextWrapPos();
+                }
 
                 // text
-                fontPushed = FontsManager.Instance.PushFont(_config.TextFontID);
-
-                cursorPos = new Vector2(windowMargin.X + _size.X / 2f - _textSize.X / 2f, Margin + _titleSize.Y);
-                ImGui.SetCursorPos(cursorPos);
-                ImGui.PushTextWrapPos(cursorPos.X + _textSize.X);
-                ImGui.TextColored(_config.TextColor.Vector, _currentTooltipText);
-                ImGui.PopTextWrapPos();
-
-                if (fontPushed) { ImGui.PopFont(); }
+                using (FontsManager.Instance.PushFont(_config.TextFontID))
+                {
+                    cursorPos = new Vector2(windowMargin.X + _size.X / 2f - _textSize.X / 2f, Margin + _titleSize.Y);
+                    ImGui.SetCursorPos(cursorPos);
+                    ImGui.PushTextWrapPos(cursorPos.X + _textSize.X);
+                    ImGui.TextColored(_config.TextColor.Vector, _currentTooltipText);
+                    ImGui.PopTextWrapPos();
+                }
             }
             else
             {
                 // text
-                bool fontPushed = FontsManager.Instance.PushFont(_config.TextFontID);
+                using (FontsManager.Instance.PushFont(_config.TextFontID))
+                {
+                    var cursorPos = windowMargin + new Vector2(Margin, Margin);
+                    var textWidth = _size.X - Margin * 2;
 
-                var cursorPos = windowMargin + new Vector2(Margin, Margin);
-                var textWidth = _size.X - Margin * 2;
-
-                ImGui.SetCursorPos(cursorPos);
-                ImGui.PushTextWrapPos(cursorPos.X + textWidth);
-                ImGui.TextColored(_config.TextColor.Vector, _currentTooltipText);
-                ImGui.PopTextWrapPos();
-
-                if (fontPushed) { ImGui.PopFont(); }
+                    ImGui.SetCursorPos(cursorPos);
+                    ImGui.PushTextWrapPos(cursorPos.X + textWidth);
+                    ImGui.TextColored(_config.TextColor.Vector, _currentTooltipText);
+                    ImGui.PopTextWrapPos();
+                }
             }
 
             ImGui.End();
