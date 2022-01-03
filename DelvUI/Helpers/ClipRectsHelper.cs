@@ -148,6 +148,7 @@ namespace DelvUI.Helpers
             "RecipeNote",
             "GatheringNote",
             "ContentsNote",
+            "SpearFishing",
             "Orchestrion",
             "MountNoteBook",
             "MinionNoteBook",

@@ -1,3 +1,7 @@
+# 0.6.3.1
+Fixes:
+- Spearfishing window will now be drawn on top of DelvUI.
+
 # 0.6.3.0
 Features:
 - Added setting to Status Effects Lists to disable mouse interactions.
