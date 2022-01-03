@@ -1,5 +1,10 @@
 # 0.6.3.1
+Features:
+- Added option to show Total Casttime on top of Current Casttime for Castbars.
+
 Fixes:
+- Fixed positioning of the label on Dark Knight's Delirium Bar.
+- Fixed positioning of the label on Warrior's Inner Release Bar.
 - Spearfishing window will now be drawn on top of DelvUI.
 - Fixed Party Frames not updating properly when resizing the health bars.
 

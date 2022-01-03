@@ -176,15 +176,19 @@ namespace DelvUI.Interface.GeneralElements
         [Order(4)]
         public bool ShowIcon = true;
 
+        [Checkbox("Reverse Fill Background Color")]
+        [Order(5)]
+        public bool UseReverseFill = false;
+
+        [Checkbox("Show Current Cast Time + Max Cast Time")]
+        [Order(6)]
+        public bool ShowMaxCastTime = false;
+
         [NestedConfig("Cast Name", 500)]
         public LabelConfig CastNameLabel;
 
         [NestedConfig("Cast Time", 505)]
         public NumericLabelConfig CastTimeLabel;
-
-        [Checkbox("Reverse Fill Background Color", spacing = true)]
-        [Order(510)]
-        public bool UseReverseFill = false;
 
         [ColorEdit4("Color" + "##ReverseFill")]
         [Order(515, collapseWith = nameof(UseReverseFill))]
