@@ -1,7 +1,8 @@
 # 0.6.3.1
 Features:
 - Added option to show Total Casttime on top of Current Casttime for Castbars.
-- Added option to use Job Color as Backgroudn Color in party frames.
+- Added option to use Job and Role Color as Background Color in Party Frames.
+- Added option to use Role Color as Background Color in Unit Frames.
 
 Fixes:
 - Fixed positioning of the label on Dark Knight's Delirium Bar.
