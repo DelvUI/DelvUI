@@ -11,6 +11,7 @@ using Dalamud.Game.ClientState.Objects.Types;
 using System.Collections.Generic;
 using DelvUI.Enums;
 using DelvUI.Interface.Bars;
+using FFXIVClientStructs.FFXIV.Client.UI;
 
 namespace DelvUI.Interface.Party
 {
@@ -174,6 +175,10 @@ namespace DelvUI.Interface.Party
                 bgColor = _configs.HealthBar.RangeConfig.Enabled
                     ? GetDistanceColor(character, _configs.HealthBar.ColorsConfig.DeathIndicatorBackgroundColor)
                     : _configs.HealthBar.ColorsConfig.DeathIndicatorBackgroundColor;
+            }
+            else if (_configs.HealthBar.ColorsConfig.UseJobColorAsBackgroundColor && character is BattleChara)
+            {
+                bgColor = GlobalColors.Instance.SafeColorForJobId(character.ClassJob.Id);
             }
 
             Rect background = new Rect(Position, _configs.HealthBar.Size, bgColor);

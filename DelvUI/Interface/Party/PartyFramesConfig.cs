@@ -193,6 +193,8 @@ namespace DelvUI.Interface.Party
         [ColorEdit4("Highlight Color")]
         [Order(45, collapseWith = nameof(ShowHighlight))]
         public PluginConfigColor HighlightColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 5f / 100f));
+        
+        
         [Checkbox("Missing Health Color", spacing = true)]
         [Order(46)]
         public bool UseMissingHealthBar = false;
@@ -200,6 +202,10 @@ namespace DelvUI.Interface.Party
         [ColorEdit4("Color" + "##MissingHealth")]
         [Order(47, collapseWith = nameof(UseMissingHealthBar))]
         public PluginConfigColor HealthMissingColor = new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+
+        [Checkbox("Job Color As Background Color")]
+        [Order(48)]
+        public bool UseJobColorAsBackgroundColor = false;
 
         [Checkbox("Show Enmity Border Colors", spacing = true)]
         [Order(50)]
