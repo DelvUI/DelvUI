@@ -168,6 +168,14 @@ namespace DelvUI.Interface.GeneralElements
         [Order(55)]
         public bool UseMissingHealthBar = false;
 
+        [Checkbox("Job Color As Missing Health Color")]
+        [Order(56, collapseWith = nameof(UseMissingHealthBar))]
+        public bool UseJobColorAsMissingHealthColor = false;
+
+        [Checkbox("Role Color As Missing Health Color")]
+        [Order(57, collapseWith = nameof(UseMissingHealthBar))]
+        public bool UseRoleColorAsMissingHealthColor = false;
+
         [ColorEdit4("Color" + "##MissingHealth")]
         [Order(60, collapseWith = nameof(UseMissingHealthBar))]
         public PluginConfigColor HealthMissingColor = new PluginConfigColor(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));

@@ -139,7 +139,13 @@ namespace DelvUI.Interface.GeneralElements
                     ? Config.Position
                     : Config.Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
 
-                PluginConfigColor missingHealthColor = Config.HealthMissingColor;
+                //PluginConfigColor missingHealthColor = Config.HealthMissingColor;
+                PluginConfigColor missingHealthColor = Config.UseJobColorAsMissingHealthColor
+                    ? GlobalColors.Instance.SafeColorForJobId(character!.ClassJob.Id)
+                    : Config.UseRoleColorAsMissingHealthColor
+                        ? GlobalColors.Instance.SafeRoleColorForJobId(character!.ClassJob.Id)
+                        : Config.HealthMissingColor;
+
                 if (Config.UseCustomInvulnerabilityColor && character is BattleChara battleChara)
                 {
                     Status? tankInvuln = Utils.GetTankInvulnerabilityID(battleChara);
