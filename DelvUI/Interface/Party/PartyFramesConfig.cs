@@ -207,6 +207,10 @@ namespace DelvUI.Interface.Party
         [Order(48)]
         public bool UseJobColorAsBackgroundColor = false;
 
+        [Checkbox("Role Color As Background Color")]
+        [Order(49)]
+        public bool UseRoleColorAsBackgroundColor = false;
+
         [Checkbox("Show Enmity Border Colors", spacing = true)]
         [Order(50)]
         public bool ShowEnmityBorderColors = true;

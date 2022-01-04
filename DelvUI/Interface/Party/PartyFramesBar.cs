@@ -180,6 +180,10 @@ namespace DelvUI.Interface.Party
             {
                 bgColor = GlobalColors.Instance.SafeColorForJobId(character.ClassJob.Id);
             }
+            else if (_configs.HealthBar.ColorsConfig.UseRoleColorAsBackgroundColor && character is BattleChara)
+            {
+                bgColor = GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id);
+            }
 
             Rect background = new Rect(Position, _configs.HealthBar.Size, bgColor);
 
