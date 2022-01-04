@@ -1,3 +1,7 @@
+# 0.6.3.2
+Fixes:
+- Fixed crashes caused by setting Missing Health Color to use Job or Role Colors.
+
 # 0.6.3.1
 Features:
 - Added option to show Total Casttime on top of Current Casttime for Castbars.
