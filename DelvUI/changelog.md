@@ -1,12 +1,17 @@
 # 0.6.3.1
 Features:
 - Added option to show Total Casttime on top of Current Casttime for Castbars.
+- Added option to use Job and Role Color as Background Color in Party Frames.
+- Added option to use Job and Role Color as Missing Health Color in Party Frames.
+- Added option to use Role Color as Background Color in Unit Frames.
+- Added option to use Job and Role Color as Missing Health Color in Unit Frames.
 
 Fixes:
 - Fixed positioning of the label on Dark Knight's Delirium Bar.
 - Fixed positioning of the label on Warrior's Inner Release Bar.
 - Spearfishing window will now be drawn on top of DelvUI.
 - Fixed Party Frames not updating properly when resizing the health bars.
+- Fixed Party Frames Tank Invulnerability Background Color when using Missing Health Color.
 
 # 0.6.3.0
 Features:

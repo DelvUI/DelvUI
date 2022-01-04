@@ -9,8 +9,10 @@ using System.Globalization;
 using System.Numerics;
 using Dalamud.Game.ClientState.Objects.Types;
 using System.Collections.Generic;
+using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Enums;
 using DelvUI.Interface.Bars;
+using FFXIVClientStructs.FFXIV.Client.UI;
 
 namespace DelvUI.Interface.Party
 {
@@ -175,6 +177,14 @@ namespace DelvUI.Interface.Party
                     ? GetDistanceColor(character, _configs.HealthBar.ColorsConfig.DeathIndicatorBackgroundColor)
                     : _configs.HealthBar.ColorsConfig.DeathIndicatorBackgroundColor;
             }
+            else if (_configs.HealthBar.ColorsConfig.UseJobColorAsBackgroundColor && character is BattleChara)
+            {
+                bgColor = GlobalColors.Instance.SafeColorForJobId(character.ClassJob.Id);
+            }
+            else if (_configs.HealthBar.ColorsConfig.UseRoleColorAsBackgroundColor && character is BattleChara)
+            {
+                bgColor = GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id);
+            }
 
             Rect background = new Rect(Position, _configs.HealthBar.Size, bgColor);
 
@@ -216,9 +226,26 @@ namespace DelvUI.Interface.Party
             // missing health
             if (_configs.HealthBar.ColorsConfig.UseMissingHealthBar)
             {
+
+
                 Vector2 healthMissingSize = _configs.HealthBar.Size - BarUtilities.GetFillDirectionOffset(healthFill.Size, _configs.HealthBar.FillDirection);
                 Vector2 healthMissingPos = _configs.HealthBar.FillDirection.IsInverted() ? Position : Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, _configs.HealthBar.FillDirection);
-                PluginConfigColor? missingHealthColor = _configs.HealthBar.ColorsConfig.HealthMissingColor;
+
+                PluginConfigColor? missingHealthColor = _configs.HealthBar.ColorsConfig.UseJobColorAsMissingHealthColor
+                    ? GlobalColors.Instance.SafeColorForJobId(character!.ClassJob.Id)
+                    : _configs.HealthBar.ColorsConfig.UseRoleColorAsMissingHealthColor
+                        ? GlobalColors.Instance.SafeRoleColorForJobId(character!.ClassJob.Id)
+                        : _configs.HealthBar.ColorsConfig.HealthMissingColor;
+
+                if (_configs.Trackers.Invuln.ChangeBackgroundColorWhenInvuln && character is BattleChara battleChara)
+                {
+                    Status? tankInvuln = Utils.GetTankInvulnerabilityID(battleChara);
+                    if (tankInvuln is not null)
+                    {
+                        missingHealthColor = _configs.Trackers.Invuln.BackgroundColor;
+                    }
+                }
+
                 bar.AddForegrounds(new Rect(healthMissingPos, healthMissingSize, missingHealthColor));
             }
 
