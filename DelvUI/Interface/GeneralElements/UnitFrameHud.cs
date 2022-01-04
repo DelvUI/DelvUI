@@ -315,6 +315,10 @@ namespace DelvUI.Interface.GeneralElements
                 {
                     return GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id);
                 }
+                else if (Config.UseRoleColorAsBackgroundColor)
+                {
+                    return GlobalColors.Instance.SafeRoleColorForJobId(chara.ClassJob.Id);
+                }
                 else if (Config.UseDeathIndicatorBackgroundColor && chara.CurrentHp <= 0)
                 {
                     return Config.DeathIndicatorBackgroundColor;
