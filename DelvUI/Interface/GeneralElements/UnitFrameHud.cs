@@ -139,9 +139,9 @@ namespace DelvUI.Interface.GeneralElements
                     ? Config.Position
                     : Config.Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
 
-                PluginConfigColor missingHealthColor = Config.UseJobColorAsMissingHealthColor
+                PluginConfigColor missingHealthColor = Config.UseJobColorAsMissingHealthColor && character is BattleChara
                     ? GlobalColors.Instance.SafeColorForJobId(character!.ClassJob.Id)
-                    : Config.UseRoleColorAsMissingHealthColor
+                    : Config.UseRoleColorAsMissingHealthColor && character is BattleChara
                         ? GlobalColors.Instance.SafeRoleColorForJobId(character!.ClassJob.Id)
                         : Config.HealthMissingColor;
 
