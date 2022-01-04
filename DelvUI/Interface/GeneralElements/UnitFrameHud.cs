@@ -138,8 +138,7 @@ namespace DelvUI.Interface.GeneralElements
                 Vector2 healthMissingPos = Config.FillDirection.IsInverted()
                     ? Config.Position
                     : Config.Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
-
-                //PluginConfigColor missingHealthColor = Config.HealthMissingColor;
+                
                 PluginConfigColor missingHealthColor = Config.UseJobColorAsMissingHealthColor
                     ? GlobalColors.Instance.SafeColorForJobId(character!.ClassJob.Id)
                     : Config.UseRoleColorAsMissingHealthColor
