@@ -157,7 +157,7 @@ namespace DelvUI.Config
 
     public abstract class AnchorablePluginConfigObject : MovablePluginConfigObject
     {
-        [DragInt2("Size", min = 1, max = 4000)]
+        [DragInt2("Size", min = 1, max = 4000, isMonitored = true)]
         [Order(10)]
         public Vector2 Size;
 

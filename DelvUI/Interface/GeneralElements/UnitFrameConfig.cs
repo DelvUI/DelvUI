@@ -160,9 +160,21 @@ namespace DelvUI.Interface.GeneralElements
         [Order(50)]
         public bool UseJobColorAsBackgroundColor = false;
 
+        [Checkbox("Role Color As Background Color")]
+        [Order(51)]
+        public bool UseRoleColorAsBackgroundColor = false;
+
         [Checkbox("Missing Health Color")]
         [Order(55)]
         public bool UseMissingHealthBar = false;
+
+        [Checkbox("Job Color As Missing Health Color")]
+        [Order(56, collapseWith = nameof(UseMissingHealthBar))]
+        public bool UseJobColorAsMissingHealthColor = false;
+
+        [Checkbox("Role Color As Missing Health Color")]
+        [Order(57, collapseWith = nameof(UseMissingHealthBar))]
+        public bool UseRoleColorAsMissingHealthColor = false;
 
         [ColorEdit4("Color" + "##MissingHealth")]
         [Order(60, collapseWith = nameof(UseMissingHealthBar))]

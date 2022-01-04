@@ -1,9 +1,8 @@
-﻿using DelvUI.Helpers;
-using ImGuiNET;
-using System.Numerics;
-using Dalamud.Game.ClientState.Objects.SubKinds;
+﻿using System.Numerics;
 using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
+using DelvUI.Helpers;
+using ImGuiNET;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -42,34 +41,30 @@ namespace DelvUI.Interface.GeneralElements
 
         private void DrawLabel(string text, Vector2 parentPos, Vector2 parentSize, GameObject? actor = null)
         {
-            bool fontPushed = FontsManager.Instance.PushFont(Config.FontID);
-
-            Vector2 size = ImGui.CalcTextSize(text);
-            Vector2 pos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(parentPos + Config.Position, -parentSize, Config.FrameAnchor), size, Config.TextAnchor);
-
-            DrawHelper.DrawInWindow(ID, pos, size, false, true, (drawList) =>
+            using (FontsManager.Instance.PushFont(Config.FontID))
             {
-                PluginConfigColor? color = Color(actor);
+                Vector2 size = ImGui.CalcTextSize(text);
+                Vector2 pos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(parentPos + Config.Position, -parentSize, Config.FrameAnchor), size, Config.TextAnchor);
 
-                if (Config.ShowShadow)
+                DrawHelper.DrawInWindow(ID, pos, size, false, true, (drawList) =>
                 {
-                    DrawHelper.DrawShadowText(text, pos, color.Base, Config.ShadowColor.Base, drawList, Config.ShadowOffset);
-                }
+                    PluginConfigColor? color = Color(actor);
 
-                if (Config.ShowOutline)
-                {
-                    DrawHelper.DrawOutlinedText(text, pos, color.Base, Config.OutlineColor.Base, drawList);
-                }
+                    if (Config.ShowShadow)
+                    {
+                        DrawHelper.DrawShadowText(text, pos, color.Base, Config.ShadowColor.Base, drawList, Config.ShadowOffset);
+                    }
 
-                if (!Config.ShowOutline && !Config.ShowShadow)
-                {
-                    drawList.AddText(pos, color.Base, text);
-                }
-            });
+                    if (Config.ShowOutline)
+                    {
+                        DrawHelper.DrawOutlinedText(text, pos, color.Base, Config.OutlineColor.Base, drawList);
+                    }
 
-            if (fontPushed)
-            {
-                ImGui.PopFont();
+                    if (!Config.ShowOutline && !Config.ShowShadow)
+                    {
+                        drawList.AddText(pos, color.Base, text);
+                    }
+                });
             }
         }
 
