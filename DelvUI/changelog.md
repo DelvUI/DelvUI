@@ -1,3 +1,7 @@
+# 0.6.3.3
+Fixes:
+- GCD Indicator now works for melee classes under level 30.
+
 # 0.6.3.2
 Fixes:
 - Fixed crashes caused by setting Missing Health Color to use Job or Role Colors.
