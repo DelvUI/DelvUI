@@ -1,6 +1,7 @@
 # 0.6.3.3
 Features:
 - Added element background colors for Black Mage's custom mana bar.
+- Added element colors for Black Mage's Paradox bar.
 
 Fixes:
 - GCD Indicator now works for melee classes under level 30.
