@@ -28,7 +28,8 @@ namespace DelvUI.Interface.Bars
             float min = 0f,
             GameObject? actor = null,
             PluginConfigColor? fillColor = null,
-            BarGlowConfig? glowConfig = null
+            BarGlowConfig? glowConfig = null,
+            PluginConfigColor? backgroundColor = null
         )
         {
             BarHud bar = new(config, actor, glowConfig, current, max);
@@ -42,6 +43,12 @@ namespace DelvUI.Interface.Bars
             Rect foreground = GetFillRect(config.Position, config.Size, config.FillDirection, color, current, max, min);
             bar.AddForegrounds(foreground);
             bar.AddLabels(labelConfigs);
+
+            if (backgroundColor != null)
+            {
+                Rect bg = new Rect(config.Position, config.Size, backgroundColor);
+                bar.SetBackground(bg);
+            }
 
             AddThresholdMarker(bar, config, thresholdConfig, max, min);
 
