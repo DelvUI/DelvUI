@@ -53,8 +53,11 @@ namespace DelvUI.Helpers
 
             [JobIDs.SAM] = 7477,  // Hakaze
             [JobIDs.NIN] = 2240,  // Spinning Edge
+            [JobIDs.ROG] = 2240,  // Spinning Edge
             [JobIDs.MNK] = 53,    // Bootshine
+            [JobIDs.PGL] = 53,    // Bootshine
             [JobIDs.DRG] = 75,    // True Thrust
+            [JobIDs.LNC] = 75,    // True Thrust
             [JobIDs.RPR] = 24373, // Slice
 
             [JobIDs.BLU] = 11385  // Water Cannon

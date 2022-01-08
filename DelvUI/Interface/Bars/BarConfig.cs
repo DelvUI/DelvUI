@@ -31,7 +31,7 @@ namespace DelvUI.Interface.Bars
         [Order(37, collapseWith = nameof(DrawBorder))]
         public int BorderThickness = 1;
 
-        [Checkbox("Hide When Inactive")]
+        [Checkbox("Hide When Inactive", spacing = true)]
         [Order(40)]
         public bool HideWhenInactive = false;
 

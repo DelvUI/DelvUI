@@ -175,6 +175,14 @@ namespace DelvUI.Interface.Jobs
 
             bool drawTreshold = gauge.InAstralFire || !config.ThresholdConfig.ShowOnlyDuringAstralFire;
 
+            PluginConfigColor fillColor = config.FillColor;
+            PluginConfigColor bgColor = config.BackgroundColor;
+            if (config.UseElementColor)
+            {
+                fillColor = gauge.InAstralFire ? config.FireColor : gauge.InUmbralIce ? config.IceColor : config.FillColor;
+                bgColor = gauge.InAstralFire ? config.FireBackgroundColor : gauge.InUmbralIce ? config.IceBackgroundColor : config.BackgroundColor;
+            }
+
             BarHud bar = BarUtilities.GetProgressBar(
                 config,
                 drawTreshold ? config.ThresholdConfig : null,
@@ -183,7 +191,8 @@ namespace DelvUI.Interface.Jobs
                 player.MaxMp,
                 0,
                 player,
-                gauge.InAstralFire ? config.FireColor : gauge.InUmbralIce ? config.IceColor : config.FillColor
+                fillColor: fillColor,
+                backgroundColor: bgColor
             );
 
             AddDrawActions(bar.GetDrawActions(origin, config.StrataLevel));
@@ -291,8 +300,14 @@ namespace DelvUI.Interface.Jobs
                 return;
             };
 
+            PluginConfigColor color = Config.ParadoxBar.FillColor;
+            if (Config.ParadoxBar.UseElementColor)
+            {
+                color = gauge.InUmbralIce ? Config.ParadoxBar.IceColor : (gauge.InAstralFire ? Config.ParadoxBar.FireColor : color);
+            }
+
             BarGlowConfig? glow = gauge.IsParadoxActive && Config.ParadoxBar.GlowConfig.Enabled ? Config.ParadoxBar.GlowConfig : null;
-            BarHud bar = BarUtilities.GetBar(Config.ParadoxBar, gauge.IsParadoxActive ? 1 : 0, 1, 0, glowConfig: glow);
+            BarHud bar = BarUtilities.GetBar(Config.ParadoxBar, gauge.IsParadoxActive ? 1 : 0, 1, 0, fillColor: color, glowConfig: glow);
             AddDrawActions(bar.GetDrawActions(origin, Config.ParadoxBar.StrataLevel));
         }
 
@@ -434,25 +449,33 @@ namespace DelvUI.Interface.Jobs
     [Exportable(false)]
     public class BlackMageManaBarConfig : BarConfig
     {
-        [Checkbox("Use Element Color" + "##MP")]
-        [Order(26)]
+        [Checkbox("Use Element Color" + "##MP", spacing = true)]
+        [Order(50)]
         public bool UseElementColor = true;
 
         [ColorEdit4("Ice Color" + "##MP")]
-        [Order(27, collapseWith = nameof(UseElementColor))]
+        [Order(51, collapseWith = nameof(UseElementColor))]
         public PluginConfigColor IceColor = new PluginConfigColor(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 100f / 100f));
 
+        [ColorEdit4("Ice Background Color" + "##MP")]
+        [Order(52, collapseWith = nameof(UseElementColor))]
+        public PluginConfigColor IceBackgroundColor = new PluginConfigColor(new Vector4(50f / 255f, 80f / 255f, 130f / 255f, 50f / 100f));
+
         [ColorEdit4("Fire Color" + "##MP")]
-        [Order(28, collapseWith = nameof(UseElementColor))]
+        [Order(53, collapseWith = nameof(UseElementColor))]
         public PluginConfigColor FireColor = new PluginConfigColor(new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
 
-        [NestedConfig("Value Label", 45, separator = false, spacing = true)]
+        [ColorEdit4("Fire Background Color" + "##MP")]
+        [Order(54, collapseWith = nameof(UseElementColor))]
+        public PluginConfigColor FireBackgroundColor = new PluginConfigColor(new Vector4(120f / 255f, 30f / 255f, 30f / 255f, 50f / 100f));
+
+        [NestedConfig("Value Label", 60, separator = false, spacing = true)]
         public NumericLabelConfig ValueLabelConfig = new NumericLabelConfig(new Vector2(2, 0), "", DrawAnchor.Left, DrawAnchor.Left);
 
-        [NestedConfig("Element Timer Label", 50, separator = false, spacing = true)]
+        [NestedConfig("Element Timer Label", 65, separator = false, spacing = true)]
         public NumericLabelConfig ElementTimerLabelConfig = new NumericLabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
 
-        [NestedConfig("Threshold", 65, separator = false, spacing = true)]
+        [NestedConfig("Threshold", 70, separator = false, spacing = true)]
         public BlackMakeManaBarThresholdConfig ThresholdConfig = new BlackMakeManaBarThresholdConfig();
 
         public BlackMageManaBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
@@ -511,6 +534,18 @@ namespace DelvUI.Interface.Jobs
     [Exportable(false)]
     public class BlackMageParadoxBarConfig : BarConfig
     {
+        [Checkbox("Use Element Color" + "##Paradox", spacing = true)]
+        [Order(50)]
+        public bool UseElementColor = true;
+
+        [ColorEdit4("Ice Color" + "##Paradox")]
+        [Order(51, collapseWith = nameof(UseElementColor))]
+        public PluginConfigColor IceColor = new PluginConfigColor(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 100f / 100f));
+
+        [ColorEdit4("Fire Color" + "##Paradox")]
+        [Order(52, collapseWith = nameof(UseElementColor))]
+        public PluginConfigColor FireColor = new PluginConfigColor(new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
+
         [NestedConfig("Show Glow", 60, separator = false, spacing = true)]
         public BarGlowConfig GlowConfig = new BarGlowConfig();
 

@@ -1,3 +1,16 @@
+# 0.6.3.3
+Features:
+- Added element background colors for Black Mage's custom mana bar.
+- Added element colors for Black Mage's Paradox bar.
+
+Fixes:
+- GCD Indicator now works for melee classes under level 30.
+- Fixed Black Mage's mana bar "Use Element Color" setting not disabling properly.
+
+# 0.6.3.2
+Fixes:
+- Fixed crashes caused by setting Missing Health Color to use Job or Role Colors.
+
 # 0.6.3.1
 Features:
 - Added option to show Total Casttime on top of Current Casttime for Castbars.

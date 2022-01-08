@@ -231,9 +231,9 @@ namespace DelvUI.Interface.Party
                 Vector2 healthMissingSize = _configs.HealthBar.Size - BarUtilities.GetFillDirectionOffset(healthFill.Size, _configs.HealthBar.FillDirection);
                 Vector2 healthMissingPos = _configs.HealthBar.FillDirection.IsInverted() ? Position : Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, _configs.HealthBar.FillDirection);
 
-                PluginConfigColor? missingHealthColor = _configs.HealthBar.ColorsConfig.UseJobColorAsMissingHealthColor
+                PluginConfigColor? missingHealthColor = _configs.HealthBar.ColorsConfig.UseJobColorAsMissingHealthColor && character is BattleChara
                     ? GlobalColors.Instance.SafeColorForJobId(character!.ClassJob.Id)
-                    : _configs.HealthBar.ColorsConfig.UseRoleColorAsMissingHealthColor
+                    : _configs.HealthBar.ColorsConfig.UseRoleColorAsMissingHealthColor && character is BattleChara
                         ? GlobalColors.Instance.SafeRoleColorForJobId(character!.ClassJob.Id)
                         : _configs.HealthBar.ColorsConfig.HealthMissingColor;
 
