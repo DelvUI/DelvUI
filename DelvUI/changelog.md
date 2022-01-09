@@ -1,3 +1,6 @@
+# 0.6.3.4
+- Fixed window clipping not working.
+
 # 0.6.3.3
 Features:
 - Added element background colors for Black Mage's custom mana bar.
@@ -8,7 +11,6 @@ Fixes:
 - Fixed Black Mage's mana bar "Use Element Color" setting not disabling properly.
 
 # 0.6.3.2
-Fixes:
 - Fixed crashes caused by setting Missing Health Color to use Job or Role Colors.
 
 # 0.6.3.1
