@@ -1,3 +1,12 @@
+# 1.0.0.0
+Features:
+- Several changes made to Window Clipping:
+    + Moved from Misc > HUD Options to its own tab under Misc.
+    + Will be disabled by default since it is known to cause random crashes to a small portion of users.
+    + It can still be manually enabled through the config window.
+    + A new "Performance" mode was added which has the clipping functionallity reduced in favor of FPS.
+    + Details on all the modes can be found in Misc > Window Clipping.
+
 # 0.6.3.4
 - Fixed window clipping not working.
 
