@@ -1,4 +1,6 @@
+using Dalamud.Interface;
 using DelvUI.Config;
+using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using ImGuiScene;
 using Lumina.Excel;
@@ -238,6 +240,13 @@ namespace DelvUI.Helpers
             ImGuiWindowFlags windowFlags,
             Action<ImDrawListPtr> drawAction)
         {
+
+            if (!ClipRectsHelper.Instance.Enabled || ClipRectsHelper.Instance.Mode == WindowClippingMode.Performance)
+            {
+                drawAction(ImGui.GetWindowDrawList());
+                return;
+            }
+
             windowFlags |= ImGuiWindowFlags.NoSavedSettings;
 
             if (!needsInput)
@@ -282,7 +291,7 @@ namespace DelvUI.Helpers
             else
             {
                 // hide instead of clip?
-                if (!ClipRectsHelper.Instance.ClippingEnabled) { return; }
+                if (ClipRectsHelper.Instance.Mode == WindowClippingMode.Hide) { return; }
 
                 ImGuiWindowFlags flags = windowFlags;
                 if (needsInput && clipRect.Value.Contains(ImGui.GetMousePos()))
@@ -295,6 +304,7 @@ namespace DelvUI.Helpers
                 {
                     ImGui.SetNextWindowPos(pos);
                     ImGui.SetNextWindowSize(size);
+                    ImGuiHelpers.ForceNextWindowMainViewport();
 
                     bool begin = ImGui.Begin(name + "_" + i, flags);
                     if (!begin)

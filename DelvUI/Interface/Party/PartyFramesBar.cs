@@ -433,6 +433,7 @@ namespace DelvUI.Interface.Party
                 {
                     _manaBarHud.Actor = character;
                     _manaBarHud.PartyMember = Member;
+                    _manaBarHud.PrepareForDraw(parentPos);
                     _manaBarHud.Draw(parentPos);
                 }
                 ));
@@ -443,6 +444,7 @@ namespace DelvUI.Interface.Party
             drawActions.Add((_configs.Buffs.StrataLevel, () =>
             {
                 _buffsListHud.Actor = character;
+                _buffsListHud.PrepareForDraw(buffsPos);
                 _buffsListHud.Draw(buffsPos);
             }
             ));
@@ -451,6 +453,7 @@ namespace DelvUI.Interface.Party
             drawActions.Add((_configs.Debuffs.StrataLevel, () =>
             {
                 _debuffsListHud.Actor = character;
+                _debuffsListHud.PrepareForDraw(debuffsPos);
                 _debuffsListHud.Draw(debuffsPos);
             }
             ));
@@ -460,6 +463,7 @@ namespace DelvUI.Interface.Party
             drawActions.Add((_configs.CastBar.StrataLevel, () =>
             {
                 _castbarHud.Actor = character;
+                _castbarHud.PrepareForDraw(castbarPos);
                 _castbarHud.Draw(castbarPos);
             }
             ));
