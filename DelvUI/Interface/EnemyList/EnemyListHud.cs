@@ -244,6 +244,7 @@ namespace DelvUI.Interface.EnemyList
                 AddDrawAction(Configs.Buffs.StrataLevel, () =>
                 {
                     _buffsListHud.Actor = character;
+                    _buffsListHud.PrepareForDraw(buffsPos);
                     _buffsListHud.Draw(buffsPos);
                 });
 
@@ -251,6 +252,7 @@ namespace DelvUI.Interface.EnemyList
                 AddDrawAction(Configs.Debuffs.StrataLevel, () =>
                 {
                     _debuffsListHud.Actor = character;
+                    _debuffsListHud.PrepareForDraw(debuffsPos);
                     _debuffsListHud.Draw(debuffsPos);
                 });
 
@@ -259,6 +261,7 @@ namespace DelvUI.Interface.EnemyList
                 AddDrawAction(Configs.CastBar.StrataLevel, () =>
                 {
                     _castbarHud.Actor = character;
+                    _castbarHud.PrepareForDraw(castbarPos);
                     _castbarHud.Draw(castbarPos);
                 });
             }
