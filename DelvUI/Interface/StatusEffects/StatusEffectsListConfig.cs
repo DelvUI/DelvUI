@@ -846,4 +846,33 @@ namespace DelvUI.Interface.StatusEffects
         {
         }
     }
+
+    [Section("Buffs and Debuffs")]
+    [SubSection("More Custom Effects", 0)]
+    public class ExtraCustomEffectsListConfig : StatusEffectsListConfig
+    {
+        public new static ExtraCustomEffectsListConfig DefaultConfig()
+        {
+            var iconConfig = new StatusEffectIconConfig();
+            iconConfig.DispellableBorderConfig.Enabled = false;
+            iconConfig.Size = new Vector2(30, 30);
+
+            var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY);
+            var size = new Vector2(250, iconConfig.Size.Y * 3 + 10);
+
+            var config = new ExtraCustomEffectsListConfig(pos, size, true, true, false, GrowthDirections.Centered | GrowthDirections.Up, iconConfig);
+            config.Enabled = false;
+            config.Directions = 5;
+
+            config.BlacklistConfig.FilterType = FilterType.Whitelist;
+
+            return config;
+        }
+
+        public ExtraCustomEffectsListConfig(Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
+                                            GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
+            : base(position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)
+        {
+        }
+    }
 }

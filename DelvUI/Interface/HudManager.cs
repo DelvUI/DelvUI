@@ -37,6 +37,7 @@ namespace DelvUI.Interface
 
         private PlayerCastbarHud _playerCastbarHud = null!;
         private CustomEffectsListHud _customEffectsHud = null!;
+        private CustomEffectsListHud _extraCustomEffectsHud = null!;
         private PrimaryResourceHud _playerManaBarHud = null!;
         private JobHud? _jobHud = null;
 
@@ -323,6 +324,12 @@ namespace DelvUI.Interface
             _hudElements.Add(custonEffectsConfig, _customEffectsHud);
             _hudElementsUsingPlayer.Add(_customEffectsHud);
             _hudElementsWithPreview.Add(_customEffectsHud);
+
+            var extraCustonEffectsConfig = ConfigurationManager.Instance.GetConfigObject<ExtraCustomEffectsListConfig>();
+            _extraCustomEffectsHud = new CustomEffectsListHud(extraCustonEffectsConfig, "More Custom Effects");
+            _hudElements.Add(extraCustonEffectsConfig, _extraCustomEffectsHud);
+            _hudElementsUsingPlayer.Add(_extraCustomEffectsHud);
+            _hudElementsWithPreview.Add(_extraCustomEffectsHud);
         }
 
         private void CreateMiscElements()

@@ -471,6 +471,7 @@ namespace DelvUI.Config
             typeof(FocusTargetBuffsListConfig),
             typeof(FocusTargetDebuffsListConfig),
             typeof(CustomEffectsListConfig),
+            typeof(ExtraCustomEffectsListConfig),
 
             typeof(PartyFramesConfig),
             typeof(PartyFramesHealthBarsConfig),
