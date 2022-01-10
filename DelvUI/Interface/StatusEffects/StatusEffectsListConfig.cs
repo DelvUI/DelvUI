@@ -791,6 +791,27 @@ namespace DelvUI.Interface.StatusEffects
                 // Devotion
                 config.BlacklistConfig.AddNewEntry(sheet.GetRow(1213));
 
+                // Divination
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1878));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2034));
+
+                // Chain Stratagem
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1221));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1406));
+
+                // Radiant Finale
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2722));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2964));
+
+                // Arcane Circle
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2599));
+
+                // Searing Light
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2703));
+
+                // Trick Attack
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(638));
+
                 // ------ AST Card Buffs -------
                 // The Balance
                 config.BlacklistConfig.AddNewEntry(sheet.GetRow(829));
@@ -819,22 +840,6 @@ namespace DelvUI.Interface.StatusEffects
                 config.BlacklistConfig.AddNewEntry(sheet.GetRow(834));
                 config.BlacklistConfig.AddNewEntry(sheet.GetRow(1341));
                 config.BlacklistConfig.AddNewEntry(sheet.GetRow(1887));
-
-                // Lord of Crowns
-                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1451));
-                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1876));
-
-                // Lady of Crowns
-                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1452));
-                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1877));
-
-                // Divination
-                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1878));
-                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2034));
-
-                // Chain Stratagem
-                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1221));
-                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1406));
             }
 
             return config;
