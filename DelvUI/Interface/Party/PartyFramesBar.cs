@@ -237,6 +237,11 @@ namespace DelvUI.Interface.Party
                         ? GlobalColors.Instance.SafeRoleColorForJobId(character!.ClassJob.Id)
                         : _configs.HealthBar.ColorsConfig.HealthMissingColor;
 
+                if (_configs.HealthBar.RangeConfig.Enabled)
+                {
+                    missingHealthColor = GetDistanceColor(character, missingHealthColor);
+                }
+
                 if (_configs.Trackers.Invuln.ChangeBackgroundColorWhenInvuln && character is BattleChara battleChara)
                 {
                     Status? tankInvuln = Utils.GetTankInvulnerabilityID(battleChara);
