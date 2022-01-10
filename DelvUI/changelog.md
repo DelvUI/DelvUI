@@ -6,6 +6,7 @@ Features:
     + It can still be manually enabled through the config window.
     + A new "Performance" mode was added which has the clipping functionallity reduced in favor of FPS.
     + Details on all the modes can be found in Misc > Window Clipping.
+- Added an extra Custom Effects list. Disabled by default.
 
 # 0.6.3.4
 - Fixed window clipping not working.
