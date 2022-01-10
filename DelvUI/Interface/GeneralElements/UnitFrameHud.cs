@@ -125,6 +125,11 @@ namespace DelvUI.Interface.GeneralElements
 
             PluginConfigColor fillColor = GetColor(character, currentHp, maxHp);
             Rect background = new Rect(Config.Position, Config.Size, BackgroundColor(character));
+            if (Config.RangeConfig.Enabled)
+            {
+                fillColor = GetDistanceColor(character, fillColor);
+                background.Color = GetDistanceColor(character, background.Color);
+            }
             Rect healthFill = BarUtilities.GetFillRect(Config.Position, Config.Size, Config.FillDirection, fillColor, currentHp, maxHp);
 
             BarHud bar = new BarHud(Config, character);
@@ -144,6 +149,11 @@ namespace DelvUI.Interface.GeneralElements
                     : Config.UseRoleColorAsMissingHealthColor && character is BattleChara
                         ? GlobalColors.Instance.SafeRoleColorForJobId(character!.ClassJob.Id)
                         : Config.HealthMissingColor;
+
+                if (Config.RangeConfig.Enabled)
+                {
+                    missingHealthColor = GetDistanceColor(character, missingHealthColor);
+                }
 
                 if (Config.UseCustomInvulnerabilityColor && character is BattleChara battleChara)
                 {
@@ -276,6 +286,15 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             return Config.FillColor;
+        }
+
+        private PluginConfigColor GetDistanceColor(Character? character, PluginConfigColor color)
+        {
+            byte distance = character != null ? character.YalmDistanceX : byte.MaxValue;
+            float currentAlpha = color.Vector.W * 100f;
+            float alpha = Config.RangeConfig.AlphaForDistance(distance, currentAlpha) / 100f;
+
+            return new PluginConfigColor(color.Vector.WithNewAlpha(alpha));
         }
 
         private void DrawFriendlyNPC(Vector2 pos, GameObject? actor)
