@@ -1,3 +1,7 @@
+# 1.0.0.1
+Fixes:
+- Fixed GCD Indicator and MP Ticker strata levels not working properly.
+
 # 1.0.0.0
 Features:
 - Several changes made to Window Clipping:
