@@ -1,3 +1,7 @@
+# 1.0.0.1
+Fixes:
+- Fixed Death Indicator Color when using Missing Health Color for unit and party frames.
+
 # 1.0.0.0
 Features:
 - Several changes made to Window Clipping:

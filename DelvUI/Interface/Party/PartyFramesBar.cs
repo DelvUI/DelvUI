@@ -235,9 +235,9 @@ namespace DelvUI.Interface.Party
                         ? GlobalColors.Instance.SafeRoleColorForJobId(character!.ClassJob.Id)
                         : _configs.HealthBar.ColorsConfig.HealthMissingColor;
 
-                if (_configs.HealthBar.RangeConfig.Enabled)
+                if (_configs.HealthBar.ColorsConfig.UseDeathIndicatorBackgroundColor && Member.HP <= 0 && character != null)
                 {
-                    missingHealthColor = GetDistanceColor(character, missingHealthColor);
+                    missingHealthColor = _configs.HealthBar.ColorsConfig.DeathIndicatorBackgroundColor;
                 }
 
                 if (_configs.Trackers.Invuln.ChangeBackgroundColorWhenInvuln && character is BattleChara battleChara)
@@ -247,6 +247,11 @@ namespace DelvUI.Interface.Party
                     {
                         missingHealthColor = _configs.Trackers.Invuln.BackgroundColor;
                     }
+                }
+
+                if (_configs.HealthBar.RangeConfig.Enabled)
+                {
+                    missingHealthColor = GetDistanceColor(character, missingHealthColor);
                 }
 
                 bar.AddForegrounds(new Rect(healthMissingPos, healthMissingSize, missingHealthColor));
