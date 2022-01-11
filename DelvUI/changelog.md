@@ -6,6 +6,7 @@ Features:
     + It can still be manually enabled through the config window.
     + A new "Performance" mode was added which has the clipping functionallity reduced in favor of FPS.
     + Details on all the modes can be found in Misc > Window Clipping.
+- Added "Change Alpha Based on Range" options for Target, Target of Target and Focus Frames separated into Friendly and Enemy settings.
 
 Fixes:
 - Fixed "Change Alpha Based on Range" for Missing Health Color and Background Color on party frames.

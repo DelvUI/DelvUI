@@ -7,7 +7,7 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [DisableParentSettings("HideWhenInactive", "HideHealthIfPossible")]
+    [DisableParentSettings("HideWhenInactive", "HideHealthIfPossible", "RangeConfig")]
     [Section("Unit Frames")]
     [SubSection("Player", 0)]
     public class PlayerUnitFrameConfig : UnitFrameConfig
@@ -235,6 +235,12 @@ namespace DelvUI.Interface.GeneralElements
         [NestedConfig("Shields", 140)]
         public ShieldConfig ShieldConfig = new ShieldConfig();
 
+        [NestedConfig("Change Friendly Alpha Based on Range", 145)]
+        public UnitFramesRangeConfig RangeConfig = new();
+
+        [NestedConfig("Change Enemy Alpha Based on Range", 146)]
+        public UnitFramesRangeConfig EnemyRangeConfig = new();
+
         [NestedConfig("Custom Mouseover Area", 150)]
         public MouseoverAreaConfig MouseoverAreaConfig = new MouseoverAreaConfig();
 
@@ -330,6 +336,50 @@ namespace DelvUI.Interface.GeneralElements
             bar.SetBackground(background);
 
             return bar;
+        }
+    }
+
+    [Exportable(false)]
+    public class UnitFramesRangeConfig : PluginConfigObject
+    {
+        [DragInt("Range (yalms)", min = 1, max = 500)]
+        [Order(5)]
+        public int Range = 30;
+
+        [DragFloat("Alpha", min = 1, max = 100)]
+        [Order(10)]
+        public float Alpha = 24;
+
+        [Checkbox("Use Additional Range Check")]
+        [Order(15)]
+        public bool UseAdditionalRangeCheck = false;
+
+        [DragInt("Additional Range (yalms)", min = 1, max = 500)]
+        [Order(20, collapseWith = nameof(UseAdditionalRangeCheck))]
+        public int AdditionalRange = 15;
+
+        [DragFloat("Additional Alpha", min = 1, max = 100)]
+        [Order(25, collapseWith = nameof(UseAdditionalRangeCheck))]
+        public float AdditionalAlpha = 60;
+
+        public float AlphaForDistance(int distance, float alpha = 100f)
+        {
+            if (!Enabled)
+            {
+                return 100f;
+            }
+
+            if (!UseAdditionalRangeCheck)
+            {
+                return distance > Range ? Alpha : alpha;
+            }
+
+            if (Range > AdditionalRange)
+            {
+                return distance > Range ? Alpha : (distance > AdditionalRange ? AdditionalAlpha : alpha);
+            }
+
+            return distance > AdditionalRange ? AdditionalAlpha : (distance > Range ? Alpha : alpha);
         }
     }
 }
