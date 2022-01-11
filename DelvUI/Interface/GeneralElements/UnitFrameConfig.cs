@@ -235,8 +235,11 @@ namespace DelvUI.Interface.GeneralElements
         [NestedConfig("Shields", 140)]
         public ShieldConfig ShieldConfig = new ShieldConfig();
 
-        [NestedConfig("Change Alpha Based on Range", 145)]
+        [NestedConfig("Change Friendly Alpha Based on Range", 145)]
         public UnitFramesRangeConfig RangeConfig = new();
+
+        [NestedConfig("Change Enemy Alpha Based on Range", 146)]
+        public UnitFramesRangeConfig EnemyRangeConfig = new();
 
         [NestedConfig("Custom Mouseover Area", 150)]
         public MouseoverAreaConfig MouseoverAreaConfig = new MouseoverAreaConfig();
