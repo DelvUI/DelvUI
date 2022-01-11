@@ -152,7 +152,7 @@ namespace DelvUI.Interface.GeneralElements
                         ? GlobalColors.Instance.SafeRoleColorForJobId(character!.ClassJob.Id)
                         : Config.HealthMissingColor;
 
-                if (Config.UseDeathIndicatorBackgroundColor && character.CurrentHp <= 0)
+                if (Config.UseDeathIndicatorBackgroundColor && character is BattleChara { CurrentHp: <= 0 })
                 {
                     missingHealthColor = Config.DeathIndicatorBackgroundColor;
                 }
