@@ -12,6 +12,7 @@ Fixes:
 - Fixed "Change Alpha Based on Range" for Missing Health Color and Background Color on party frames.
 - Updated the pre-populated white list for the Custom Effects. Note that this will not update existing profiles.
 - Fixed Bard's Troubadour and Dancer's Shield Samba not being tracked correctly in some situations.
+- Fixed Dancer's Technical Finish not being tracked properly.
 
 # 0.6.3.4
 - Fixed window clipping not working.
