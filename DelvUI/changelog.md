@@ -10,6 +10,7 @@ Features:
 Fixes:
 - Fixed "Change Alpha Based on Range" for Missing Health Color.
 - Updated the pre-populated white list for the Custom Effects. Note that this will not update existing profiles.
+- Fixed Bard's Troubadour and Dancer's Shield Samba not being tracked correctly in some situations.
 
 # 0.6.3.4
 - Fixed window clipping not working.
