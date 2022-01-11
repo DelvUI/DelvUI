@@ -1,3 +1,19 @@
+# 1.0.0.0
+Features:
+- Several changes made to Window Clipping:
+    + Moved from Misc > HUD Options to its own tab under Misc.
+    + Will be disabled by default since it is known to cause random crashes to a small portion of users.
+    + It can still be manually enabled through the config window.
+    + A new "Performance" mode was added which has the clipping functionallity reduced in favor of FPS.
+    + Details on all the modes can be found in Misc > Window Clipping.
+- Added "Change Alpha Based on Range" options for Target, Target of Target and Focus Frames separated into Friendly and Enemy settings.
+
+Fixes:
+- Fixed "Change Alpha Based on Range" for Missing Health Color and Background Color on party frames.
+- Updated the pre-populated white list for the Custom Effects. Note that this will not update existing profiles.
+- Fixed Bard's Troubadour and Dancer's Shield Samba not being tracked correctly in some situations.
+- Fixed Dancer's Technical Finish not being tracked properly.
+
 # 0.6.3.4
 - Fixed window clipping not working.
 

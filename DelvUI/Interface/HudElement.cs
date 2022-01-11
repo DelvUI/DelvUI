@@ -21,11 +21,14 @@ namespace DelvUI.Interface
             _config = config;
         }
 
-        public virtual void Draw(Vector2 origin)
+        public void PrepareForDraw(Vector2 origin)
         {
             _drawActions.Clear();
             CreateDrawActions(origin);
+        }
 
+        public virtual void Draw(Vector2 origin)
+        {
             // iterate like this so it goes in order
             StrataLevel[] levels = (StrataLevel[])Enum.GetValues(typeof(StrataLevel));
             foreach (StrataLevel key in levels)

@@ -1,11 +1,13 @@
 using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace DelvUI.Helpers
 {
@@ -41,39 +43,24 @@ namespace DelvUI.Helpers
             }
 
             ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
-            _config.ValueChangeEvent -= OnConfigPropertyChanged;
 
             Instance = null!;
         }
         #endregion
 
-        private HUDOptionsConfig _config = null!;
+        private WindowClippingConfig _config = null!;
 
         private void OnConfigReset(ConfigurationManager sender)
         {
-            if (_config != null)
-            {
-                _config.ValueChangeEvent -= OnConfigPropertyChanged;
-            }
-
-            _config = sender.GetConfigObject<HUDOptionsConfig>();
-            _config.ValueChangeEvent += OnConfigPropertyChanged;
+            _config = sender.GetConfigObject<WindowClippingConfig>();
         }
 
-        private void OnConfigPropertyChanged(object sender, OnChangeBaseArgs args)
-        {
-            if (args.PropertyName == "EnableClipRects" && !_config.EnableClipRects)
-            {
-                _clipRects.Clear();
-            }
-        }
-
-        public bool Enabled => _config.EnableClipRects;
-        public bool ClippingEnabled => _config.EnableClipRects && !_config.HideInsteadOfClip;
+        public bool Enabled => _config.Enabled;
+        public WindowClippingMode? Mode => _config.Enabled ? _config.Mode : null;
 
         // these are ordered by priority, if 2 game windows are on top of a DelvUI element
         // the one that comes first in this list is the one that will be clipped around
-        internal static string[] AddonNames = new string[]
+        internal static List<string> AddonNames = new List<string>()
         {
             "ContextMenu",
             "ItemDetail", // tooltip
@@ -117,10 +104,10 @@ namespace DelvUI.Helpers
             "Social",
             "SocialDetailA",
             "SocialDetailB",
-            "LookingForGroup",
             "LookingForGroupSearch",
             "LookingForGroupCondition",
             "LookingForGroupDetail",
+            "LookingForGroup",
             "ReadyCheck",
             "Marker",
             "FieldMarker",
@@ -131,9 +118,9 @@ namespace DelvUI.Helpers
             "Emote",
             "FreeCompany",
             "FreeCompanyProfile",
-            "HousingMenu",
             "HousingSubmenu",
             "HousingSignBoard",
+            "HousingMenu",
             "CrossWorldLinkshell",
             "ContactList",
             "CircleBookInputString",
@@ -187,41 +174,65 @@ namespace DelvUI.Helpers
 
         public unsafe void Update()
         {
-            if (!_config.EnableClipRects) { return; }
+            if (!_config.Enabled) { return; }
 
             _clipRects.Clear();
 
-            foreach (string addonName in AddonNames)
+            AtkStage* stage = AtkStage.GetSingleton();
+            if (stage == null) { return; }
+
+            RaptureAtkUnitManager* manager = stage->RaptureAtkUnitManager;
+            if (manager == null) { return; }
+
+            AtkUnitList* loadedUnitsList = &manager->AtkUnitManager.AllLoadedUnitsList;
+            if (loadedUnitsList == null) { return; }
+
+            AtkUnitBase** addonList = &loadedUnitsList->AtkUnitEntries;
+            if (addonList == null) { return; }
+
+            for (var i = 0; i < loadedUnitsList->Count; i++)
             {
-                var addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName(addonName, 1);
-                if (addon == null || !addon->IsVisible || addon->WindowNode == null || addon->Scale == 0)
+                try
                 {
-                    continue;
+                    AtkUnitBase* addon = addonList[i];
+                    if (addon == null || !addon->IsVisible || addon->WindowNode == null || addon->Scale == 0)
+                    {
+                        continue;
+                    }
+
+                    string? name = Marshal.PtrToStringAnsi(new IntPtr(addon->Name));
+                    if (name == null || !AddonNames.Contains(name))
+                    {
+                        continue;
+                    }
+
+                    var margin = 5 * addon->Scale;
+                    var bottomMargin = 13 * addon->Scale;
+
+                    var clipRect = new ClipRect(
+                        new Vector2(addon->X + margin, addon->Y + margin),
+                        new Vector2(
+                            addon->X + addon->WindowNode->AtkResNode.Width * addon->Scale - margin,
+                            addon->Y + addon->WindowNode->AtkResNode.Height * addon->Scale - bottomMargin
+                        )
+                    );
+
+                    // just in case this causes weird issues / crashes (doubt it though...)
+                    if (clipRect.Max.X < clipRect.Min.X || clipRect.Max.Y < clipRect.Min.Y)
+                    {
+                        continue;
+                    }
+
+                    _clipRects.Add(clipRect);
                 }
-
-                var margin = 5 * addon->Scale;
-                var bottomMargin = 13 * addon->Scale;
-
-                var clipRect = new ClipRect(
-                    new Vector2(addon->X + margin, addon->Y + margin),
-                    new Vector2(
-                        addon->X + addon->WindowNode->AtkResNode.Width * addon->Scale - margin,
-                        addon->Y + addon->WindowNode->AtkResNode.Height * addon->Scale - bottomMargin
-                    )
-                );
-
-                // just in case this causes weird issues / crashes (doubt it though...)
-                if (clipRect.Max.X < clipRect.Min.X || clipRect.Max.Y < clipRect.Min.Y)
-                {
-                    continue;
-                }
-
-                _clipRects.Add(clipRect);
+                catch { }
             }
         }
 
         public ClipRect? GetClipRectForArea(Vector2 pos, Vector2 size)
         {
+            if (!_config.Enabled) { return null; }
+
             foreach (ClipRect clipRect in _clipRects)
             {
                 var area = new ClipRect(pos, pos + size);
@@ -260,6 +271,8 @@ namespace DelvUI.Helpers
 
         public bool IsPointClipped(Vector2 point)
         {
+            if (!_config.Enabled) { return false; }
+
             foreach (ClipRect clipRect in _clipRects)
             {
                 if (clipRect.Contains(point))

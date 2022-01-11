@@ -93,6 +93,49 @@ namespace DelvUI.Helpers
             JobHud? jobHud,
             DraggableHudElement? selectedElement)
         {
+            foreach (DraggableHudElement element in elements)
+            {
+                element.PrepareForDraw(origin);
+            }
+
+            jobHud?.PrepareForDraw(origin);
+
+            bool clip = ConfigurationManager.Instance?.LockHUD == true &&
+                ClipRectsHelper.Instance?.Enabled == true &&
+                ClipRectsHelper.Instance?.Mode == WindowClippingMode.Performance;
+
+            bool needsDraw = true;
+
+            if (clip)
+            {
+                ClipRect? clipRect = ClipRectsHelper.Instance?.GetClipRectForArea(Vector2.Zero, ImGui.GetMainViewport().Size);
+                if (clipRect.HasValue)
+                {
+                    needsDraw = false;
+
+                    ClipRect[] invertedClipRects = ClipRectsHelper.GetInvertedClipRects(clipRect.Value);
+                    for (int i = 0; i < invertedClipRects.Length; i++)
+                    {
+                        ImGui.PushClipRect(invertedClipRects[i].Min, invertedClipRects[i].Max, false);
+                        Draw(origin, hudHelper, elements, jobHud, selectedElement);
+                        ImGui.PopClipRect();
+                    }
+                }
+            }
+
+            if (needsDraw)
+            {
+                Draw(origin, hudHelper, elements, jobHud, selectedElement);
+            }
+        }
+
+        private static void Draw(
+            Vector2 origin,
+            HudHelper hudHelper,
+            IList<DraggableHudElement> elements,
+            JobHud? jobHud,
+            DraggableHudElement? selectedElement)
+        {
             bool canTakeInput = true;
 
             // selected

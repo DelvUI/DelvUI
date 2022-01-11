@@ -2,6 +2,7 @@
 using DelvUI.Interface.Party;
 using ImGuiNET;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace DelvUI.Interface.PartyCooldowns
@@ -47,7 +48,7 @@ namespace DelvUI.Interface.PartyCooldowns
         }
     }
 
-    public class PartyCooldownData
+    public class PartyCooldownData : IEquatable<PartyCooldownData>
     {
         public bool Enabled = true;
 
@@ -138,6 +139,21 @@ namespace DelvUI.Interface.PartyCooldowns
             }
 
             return JobsHelper.RoleForJob(JobId) == role;
+        }
+
+        public bool Equals(PartyCooldownData? other)
+        {
+            if (other == null) { return false; }
+
+            return
+                ActionId == other.ActionId &&
+                RequiredLevel == other.RequiredLevel &&
+                JobId == other.JobId &&
+                (JobIds == null && other.JobIds == null || (JobIds != null && other.JobIds != null && JobIds.Equals(other.JobIds))) &&
+                Role == other.Role &&
+                (Roles == null && other.Roles == null || (Roles != null && other.Roles != null && Roles.Equals(other.Roles))) &&
+                CooldownDuration == other.CooldownDuration &&
+                EffectDuration == other.EffectDuration;
         }
     }
 }
