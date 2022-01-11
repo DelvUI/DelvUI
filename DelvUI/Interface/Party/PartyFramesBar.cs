@@ -183,7 +183,9 @@ namespace DelvUI.Interface.Party
             }
             else if (_configs.HealthBar.ColorsConfig.UseRoleColorAsBackgroundColor && character is BattleChara)
             {
-                bgColor = GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id);
+                bgColor = _configs.HealthBar.RangeConfig.Enabled
+                    ? GetDistanceColor(character, GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id))
+                    : GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id);
             }
 
             Rect background = new Rect(Position, _configs.HealthBar.Size, bgColor);
@@ -198,11 +200,9 @@ namespace DelvUI.Interface.Party
             }
 
             float hpScale = maxHp > 0 ? (float)currentHp / (float)maxHp : 1;
-            PluginConfigColor? hpColor = GetColor(hpScale);
-            if (_configs.HealthBar.RangeConfig.Enabled)
-            {
-                hpColor = GetDistanceColor(character, hpColor);
-            }
+            PluginConfigColor? hpColor = _configs.HealthBar.RangeConfig.Enabled
+            ? GetDistanceColor(character, GetColor(hpScale))
+            : GetColor(hpScale);
 
             Rect healthFill = BarUtilities.GetFillRect(Position, _configs.HealthBar.Size, _configs.HealthBar.FillDirection, hpColor, currentHp, maxHp);
 
@@ -226,8 +226,6 @@ namespace DelvUI.Interface.Party
             // missing health
             if (_configs.HealthBar.ColorsConfig.UseMissingHealthBar)
             {
-
-
                 Vector2 healthMissingSize = _configs.HealthBar.Size - BarUtilities.GetFillDirectionOffset(healthFill.Size, _configs.HealthBar.FillDirection);
                 Vector2 healthMissingPos = _configs.HealthBar.FillDirection.IsInverted() ? Position : Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, _configs.HealthBar.FillDirection);
 

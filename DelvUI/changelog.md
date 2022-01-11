@@ -8,7 +8,7 @@ Features:
     + Details on all the modes can be found in Misc > Window Clipping.
 
 Fixes:
-- Fixed "Change Alpha Based on Range" for Missing Health Color.
+- Fixed "Change Alpha Based on Range" for Missing Health Color and Background Color on party frames.
 - Updated the pre-populated white list for the Custom Effects. Note that this will not update existing profiles.
 - Fixed Bard's Troubadour and Dancer's Shield Samba not being tracked correctly in some situations.
 
