@@ -137,6 +137,11 @@ namespace DelvUI.Interface.PartyCooldowns
                     // special case for technical step / finish
                     // we detect when technical step is pressed and save the time
                     // so we can properly calculate the cooldown once finish is pressed
+                    if (actionID == 16193 || actionID == 16194 || actionID == 16195 || actionID == 16196)
+                    {
+                        actionID = 16004;
+                    }
+
                     if (actionID == 15998)
                     {
                         _technicalStepMap[actorId] = ImGui.GetTime();
@@ -148,8 +153,7 @@ namespace DelvUI.Interface.PartyCooldowns
                         {
                             // if its technical finish, we set the cooldown start time to
                             // the time when step was pressed
-                            if (_technicalStepMap.TryGetValue(actorId, out double stepStartTime) &&
-                                (actionID == 16004 || actionID == 16193 || actionID == 16194 || actionID == 16195 || actionID == 16196))
+                            if (_technicalStepMap.TryGetValue(actorId, out double stepStartTime) && actionID == 16004)
                             {
                                 cooldown.OverridenCooldownStartTime = stepStartTime;
                                 _technicalStepMap.Remove(actorId);
