@@ -416,6 +416,7 @@ namespace DelvUI.Interface
             // show only castbar during quest events
             if (ShouldOnlyShowCastbar())
             {
+                _playerCastbarHud?.PrepareForDraw(origin);
                 _playerCastbarHud?.Draw(origin);
 
                 ImGui.End();

@@ -3,6 +3,7 @@ Fixes:
 - Fixed GCD Indicator and MP Ticker strata levels not working properly.
 - Fixed strata levels not saving properly for some elements.
 - Fixed Death Indicator Color when using Missing Health Color for unit and party frames.
+- Fixed player castbar freezing when interacting with some objects.
 
 # 1.0.0.0
 Features:
