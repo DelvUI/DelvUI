@@ -100,9 +100,13 @@ namespace DelvUI.Config
                         FieldInfo? field = currentObject?.GetType().GetField(fields[i]);
                         if (field == null) { break; }
 
-                        if (i == fields.Length - 1 && value.GetType() == field.FieldType)
+                        if (i == fields.Length - 1)
                         {
-                            field.SetValue(currentObject, value);
+                            try
+                            {
+                                field.SetValue(currentObject, value);
+                            }
+                            catch { }
                         }
                         else
                         {
