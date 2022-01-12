@@ -177,10 +177,13 @@ namespace DelvUI.Interface.EnemyList
                 // highlight
                 var (areaStart, areaEnd) = Configs.HealthBar.MouseoverAreaConfig.GetArea(origin + pos, Configs.HealthBar.Size);
                 bool isHovering = ImGui.IsMouseHoveringRect(areaStart, areaEnd);
-                if (isHovering && Configs.HealthBar.Colors.ShowHighlight)
+                if (isHovering)
                 {
-                    Rect highlight = new Rect(pos, Configs.HealthBar.Size, Configs.HealthBar.Colors.HighlightColor);
-                    bar.AddForegrounds(highlight);
+                    if (Configs.HealthBar.Colors.ShowHighlight)
+                    {
+                        Rect highlight = new Rect(pos, Configs.HealthBar.Size, Configs.HealthBar.Colors.HighlightColor);
+                        bar.AddForegrounds(highlight);
+                    }
 
                     mouseoverTarget = character;
                     hovered = true;
