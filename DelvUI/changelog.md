@@ -5,6 +5,7 @@ Fixes:
 - Fixed strata levels not saving properly for some elements.
 - Fixed Death Indicator Color when using Missing Health Color for unit and party frames.
 - Fixed Player Castbar freezing when interacting with some objects.
+- Fixed targets in the Enemy List not being targetable when "Highlight When Hovering With Cursor" was disabled.
 
 # 1.0.0.0
 Features:
