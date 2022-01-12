@@ -165,6 +165,16 @@ namespace DelvUI.Helpers
             SetGameMouseoverTarget(0);
         }
 
+        public void StartHandlingInputs()
+        {
+            HandlingMouseInputs = true;
+        }
+
+        public void StopHandlingInputs()
+        {
+            HandlingMouseInputs = false;
+        }
+
         private unsafe void SetGameMouseoverTarget(long address)
         {
             // set mouseover target in-game

@@ -15,7 +15,7 @@ using StatusStruct = FFXIVClientStructs.FFXIV.Client.Game.Status;
 
 namespace DelvUI.Interface.StatusEffects
 {
-    public class StatusEffectsListHud : ParentAnchoredDraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent, IHudElementWithPreview
+    public class StatusEffectsListHud : ParentAnchoredDraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent, IHudElementWithPreview, IHudElementWithMouseOver
     {
         protected StatusEffectsListConfig Config => (StatusEffectsListConfig)_config;
 
@@ -27,6 +27,9 @@ namespace DelvUI.Interface.StatusEffects
         private LabelHud _durationLabel;
         private LabelHud _stacksLabel;
         public GameObject? Actor { get; set; } = null;
+
+        private bool _wasHovering = false;
+        private bool NeedsSpecialInput => !ClipRectsHelper.Instance.Enabled || ClipRectsHelper.Instance.Mode == WindowClippingMode.Performance;
 
         protected override bool AnchorToParent => Config is UnitFrameStatusEffectsListConfig config ? config.AnchorToUnitFrame : false;
         protected override DrawAnchor ParentAnchor => Config is UnitFrameStatusEffectsListConfig config ? config.UnitFrameAnchor : DrawAnchor.Center;
@@ -56,6 +59,15 @@ namespace DelvUI.Interface.StatusEffects
         {
             var pos = CalculateStartPosition(Config.Position, Config.Size, Config.GetGrowthDirections());
             return (new List<Vector2>() { pos + Config.Size / 2f }, new List<Vector2>() { Config.Size });
+        }
+
+        public void StopMouseover()
+        {
+            if (_wasHovering && NeedsSpecialInput)
+            {
+                InputsHelper.Instance.StopHandlingInputs();
+                _wasHovering = false;
+            }
         }
 
         private uint CalculateLayout(List<StatusEffectData> list)
@@ -417,6 +429,12 @@ namespace DelvUI.Interface.StatusEffects
                 // tooltips / interaction
                 if (ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
                 {
+                    if (NeedsSpecialInput)
+                    {
+                        _wasHovering = true;
+                        InputsHelper.Instance.StartHandlingInputs();
+                    }
+
                     // tooltip
                     if (Config.ShowTooltips)
                     {
@@ -437,6 +455,12 @@ namespace DelvUI.Interface.StatusEffects
                     if (statusEffectData.Data.Category == 1 && isFromPlayer && rightClick)
                     {
                         ChatHelper.SendChatMessage("/statusoff \"" + statusEffectData.Data.Name + "\"");
+
+                        if (NeedsSpecialInput)
+                        {
+                            _wasHovering = false;
+                            InputsHelper.Instance.StopHandlingInputs();
+                        }
                     }
 
                     // automatic add to black list with ctrl+alt+shift click
@@ -445,7 +469,18 @@ namespace DelvUI.Interface.StatusEffects
                     {
                         Config.BlacklistConfig.AddNewEntry(statusEffectData.Data);
                         ConfigurationManager.Instance.ForceNeedsSave();
+
+                        if (NeedsSpecialInput)
+                        {
+                            _wasHovering = false;
+                            InputsHelper.Instance.StopHandlingInputs();
+                        }
                     }
+                }
+                else if (_wasHovering && NeedsSpecialInput)
+                {
+                    _wasHovering = false;
+                    InputsHelper.Instance.StopHandlingInputs();
                 }
             }
         }
