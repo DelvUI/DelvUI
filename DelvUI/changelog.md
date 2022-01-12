@@ -1,6 +1,7 @@
 # 1.0.0.1
 Fixes:
 - Fixed GCD Indicator and MP Ticker strata levels not working properly.
+- Fixed Death Indicator Color when using Missing Health Color for unit and party frames.
 
 # 1.0.0.0
 Features:
