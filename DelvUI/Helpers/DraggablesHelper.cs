@@ -179,13 +179,6 @@ namespace DelvUI.Helpers
                     elementWithMouseOver.StopMouseover();
                 }
             }
-
-            // job hud
-            //if (jobHud != null && jobHud != selectedElement && !hudHelper.IsElementHidden(jobHud))
-            //{
-            //    jobHud.CanTakeInputForDrag = canTakeInput;
-            //    jobHud.Draw(origin);
-            //}
         }
 
         public static bool DrawArrows(Vector2 position, Vector2 size, string tooltipText, out Vector2 offset)

@@ -1,3 +1,7 @@
+# 1.0.0.2
+Fixes:
+- Fixed Job Huds strata level not working properly.
+
 # 1.0.0.1
 Fixes:
 - Fixed Status Effect Lists interactions not working with Window Clipping disabled or in Performance Mode.
