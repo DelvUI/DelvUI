@@ -139,7 +139,6 @@ namespace DelvUI.Helpers
         {
             bool canTakeInput = true;
             bool jobHudNeedsDraw = jobHud != null && jobHud != selectedElement && !hudHelper.IsElementHidden(jobHud);
-            StrataLevel jobHudStrataLevel = jobHud?.GetConfig().StrataLevel ?? StrataLevel.LOWEST;
 
             // selected
             if (selectedElement != null)
