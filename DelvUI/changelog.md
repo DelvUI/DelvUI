@@ -1,3 +1,7 @@
+# 1.0.0.2
+Fixes:
+- Fixed "Change Alpha Based on Range" for Missing Health Color and Background Color on Enemy List frames.
+
 # 1.0.0.1
 Fixes:
 - Fixed Status Effect Lists interactions not working with Window Clipping disabled or in Performance Mode.
