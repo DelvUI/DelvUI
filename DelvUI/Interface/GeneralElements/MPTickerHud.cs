@@ -78,8 +78,9 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             MPTickerFire3ThresholdConfig? thresholdConfig = GetFire3ThresholdConfig();
-            BarUtilities.GetProgressBar(Config.Bar, thresholdConfig, null, scale, 1, 0, fillColor: Config.Bar.FillColor)
-                .Draw(origin + Config.Position);
+            BarHud bar = BarUtilities.GetProgressBar(Config.Bar, thresholdConfig, null, scale, 1, 0, fillColor: Config.Bar.FillColor);
+
+            AddDrawActions(bar.GetDrawActions(origin + Config.Position, _config.StrataLevel));
         }
 
         private MPTickerFire3ThresholdConfig? GetFire3ThresholdConfig()

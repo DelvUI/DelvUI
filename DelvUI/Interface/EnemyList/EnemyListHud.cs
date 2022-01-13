@@ -142,13 +142,15 @@ namespace DelvUI.Interface.EnemyList
                 int direction = Config.GrowthDirection == EnemyListGrowthDirection.Down ? 1 : -1;
                 float y = Config.Position.Y + i * direction * Configs.HealthBar.Size.Y + i * direction * Config.VerticalPadding;
                 Vector2 pos = new Vector2(Config.Position.X, y);
-                Rect background = new Rect(pos, Configs.HealthBar.Size, Configs.HealthBar.BackgroundColor);
 
                 PluginConfigColor fillColor = GetColor(character, currentHp, maxHp);
+                PluginConfigColor bgColor = Configs.HealthBar.BackgroundColor;
                 if (Configs.HealthBar.RangeConfig.Enabled)
                 {
                     fillColor = GetDistanceColor(character, fillColor);
+                    bgColor = GetDistanceColor(character, bgColor);
                 }
+                Rect background = new Rect(pos, Configs.HealthBar.Size, bgColor);
 
                 PluginConfigColor borderColor = GetBorderColor(character, enmityLevel);
                 Rect healthFill = BarUtilities.GetFillRect(pos, Configs.HealthBar.Size, Configs.HealthBar.FillDirection, fillColor, currentHp, maxHp);
@@ -170,17 +172,20 @@ namespace DelvUI.Interface.EnemyList
                 {
                     Vector2 healthMissingSize = Configs.HealthBar.Size - BarUtilities.GetFillDirectionOffset(healthFill.Size, Configs.HealthBar.FillDirection);
                     Vector2 healthMissingPos = Configs.HealthBar.FillDirection.IsInverted() ? pos : pos + BarUtilities.GetFillDirectionOffset(healthFill.Size, Configs.HealthBar.FillDirection);
-                    PluginConfigColor? color = Configs.HealthBar.Colors.HealthMissingColor;
+                    PluginConfigColor? color = Configs.HealthBar.RangeConfig.Enabled ? GetDistanceColor(character, Configs.HealthBar.Colors.HealthMissingColor) : Configs.HealthBar.Colors.HealthMissingColor;
                     bar.AddForegrounds(new Rect(healthMissingPos, healthMissingSize, color));
                 }
 
                 // highlight
                 var (areaStart, areaEnd) = Configs.HealthBar.MouseoverAreaConfig.GetArea(origin + pos, Configs.HealthBar.Size);
                 bool isHovering = ImGui.IsMouseHoveringRect(areaStart, areaEnd);
-                if (isHovering && Configs.HealthBar.Colors.ShowHighlight)
+                if (isHovering)
                 {
-                    Rect highlight = new Rect(pos, Configs.HealthBar.Size, Configs.HealthBar.Colors.HighlightColor);
-                    bar.AddForegrounds(highlight);
+                    if (Configs.HealthBar.Colors.ShowHighlight)
+                    {
+                        Rect highlight = new Rect(pos, Configs.HealthBar.Size, Configs.HealthBar.Colors.HighlightColor);
+                        bar.AddForegrounds(highlight);
+                    }
 
                     mouseoverTarget = character;
                     hovered = true;

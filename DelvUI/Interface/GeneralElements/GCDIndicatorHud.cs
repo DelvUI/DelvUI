@@ -117,9 +117,12 @@ namespace DelvUI.Interface.GeneralElements
             {
                 var (pos, size) = GetPositionAndSize(origin);
                 pos = Utils.GetAnchoredPosition(pos, size, Config.Anchor);
-                DrawCircularIndicator(pos, Config.CircleRadius, elapsed, total);
-            }
 
+                AddDrawAction(_config.StrataLevel, () =>
+                {
+                    DrawCircularIndicator(pos, Config.CircleRadius, elapsed, total);
+                });
+            }
         }
 
         private void CheckToggles()
@@ -236,7 +239,7 @@ namespace DelvUI.Interface.GeneralElements
                 bar.AddForegrounds(foreground);
             }
 
-            bar.Draw(origin);
+            AddDrawActions(bar.GetDrawActions(origin, _config.StrataLevel));
         }
     }
 }

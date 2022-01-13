@@ -152,9 +152,9 @@ namespace DelvUI.Interface.GeneralElements
                         ? GlobalColors.Instance.SafeRoleColorForJobId(character!.ClassJob.Id)
                         : Config.HealthMissingColor;
 
-                if (Config.RangeConfig.Enabled || Config.EnemyRangeConfig.Enabled)
+                if (Config.UseDeathIndicatorBackgroundColor && character is BattleChara { CurrentHp: <= 0 })
                 {
-                    missingHealthColor = GetDistanceColor(character, missingHealthColor);
+                    missingHealthColor = Config.DeathIndicatorBackgroundColor;
                 }
 
                 if (Config.UseCustomInvulnerabilityColor && character is BattleChara battleChara)
@@ -164,6 +164,11 @@ namespace DelvUI.Interface.GeneralElements
                     {
                         missingHealthColor = Config.CustomInvulnerabilityColor;
                     }
+                }
+
+                if (Config.RangeConfig.Enabled || Config.EnemyRangeConfig.Enabled)
+                {
+                    missingHealthColor = GetDistanceColor(character, missingHealthColor);
                 }
 
                 bar.AddForegrounds(new Rect(healthMissingPos, healthMissingSize, missingHealthColor));
