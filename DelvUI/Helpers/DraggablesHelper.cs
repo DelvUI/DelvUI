@@ -1,4 +1,5 @@
 ﻿using DelvUI.Config;
+using DelvUI.Enums;
 using DelvUI.Interface;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Jobs;
@@ -137,6 +138,8 @@ namespace DelvUI.Helpers
             DraggableHudElement? selectedElement)
         {
             bool canTakeInput = true;
+            bool jobHudNeedsDraw = jobHud != null && jobHud != selectedElement && !hudHelper.IsElementHidden(jobHud);
+            StrataLevel jobHudStrataLevel = jobHud?.GetConfig().StrataLevel ?? StrataLevel.LOWEST;
 
             // selected
             if (selectedElement != null)
@@ -158,6 +161,13 @@ namespace DelvUI.Helpers
             {
                 if (element == selectedElement) { continue; }
 
+                if (jobHudNeedsDraw && jobHud != null && element.GetConfig().StrataLevel > jobHud.GetConfig().StrataLevel)
+                {
+                    jobHud.CanTakeInputForDrag = canTakeInput;
+                    jobHud.Draw(origin);
+                    jobHudNeedsDraw = false;
+                }
+
                 if (!hudHelper.IsElementHidden(element))
                 {
                     element.CanTakeInputForDrag = canTakeInput;
@@ -171,11 +181,11 @@ namespace DelvUI.Helpers
             }
 
             // job hud
-            if (jobHud != null && jobHud != selectedElement && !hudHelper.IsElementHidden(jobHud))
-            {
-                jobHud.CanTakeInputForDrag = canTakeInput;
-                jobHud.Draw(origin);
-            }
+            //if (jobHud != null && jobHud != selectedElement && !hudHelper.IsElementHidden(jobHud))
+            //{
+            //    jobHud.CanTakeInputForDrag = canTakeInput;
+            //    jobHud.Draw(origin);
+            //}
         }
 
         public static bool DrawArrows(Vector2 position, Vector2 size, string tooltipText, out Vector2 offset)
