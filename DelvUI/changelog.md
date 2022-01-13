@@ -6,6 +6,7 @@ Fixes:
 - Fixed Death Indicator Color when using Missing Health Color for unit and party frames.
 - Fixed Player Castbar freezing when interacting with some objects.
 - Fixed targets in the Enemy List not being targetable when "Highlight When Hovering With Cursor" was disabled.
+- Fixed "Change Alpha Based on Range" for Missing Health Color and Background Color on Enemy List frames.
 
 # 1.0.0.0
 Features:
