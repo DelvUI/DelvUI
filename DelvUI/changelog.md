@@ -1,4 +1,9 @@
 # 1.0.0.2
+Features:
+- Added "Right" and "Left" growth directions for Party Cooldowns:
+    + "Columns" renamed to "Sections". When using a vertical growth direction the Section of a cooldown would be the column. On horizontal directions, it would be the row.
+    + Due to adjustments in the positioning logic, the list might be silightly moved when updating.
+
 Fixes:
 - Fixed "Use Job Color" and "Use Role Color" for status effects duration and stacks labels.
 - Fixed Job Huds strata level not working properly.
