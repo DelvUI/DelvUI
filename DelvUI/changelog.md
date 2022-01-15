@@ -1,6 +1,7 @@
 # 1.0.0.2
 Fixes:
 - Fixed Job Huds strata level not working properly.
+- Fixed status effects durations when they are 1 hour or longer.
 
 # 1.0.0.1
 Fixes:
