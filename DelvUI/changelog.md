@@ -1,4 +1,7 @@
 # 1.0.0.2
+Features:
+- Separated the Automaton Queen/Rook Autoturret duration tracker from the Battery Gauge into its own bar.
+
 Fixes:
 - Fixed "Use Job Color" and "Use Role Color" for status effects duration and stacks labels.
 - Fixed Job Huds strata level not working properly.
