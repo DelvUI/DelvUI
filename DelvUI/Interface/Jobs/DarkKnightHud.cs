@@ -116,7 +116,7 @@ namespace DelvUI.Interface.Jobs
                 Config.ManaBar,
                 gauge.HasDarkArts ? 1 : 3,
                 player.CurrentMp,
-                9000,
+                Config.ManaBar.ShowFullMana ? player.MaxMp : 9000,
                 0f,
                 player,
                 null,
@@ -283,6 +283,10 @@ namespace DelvUI.Interface.Jobs
         [ColorEdit4("Dark Arts Color" + "##MP")]
         [Order(26)]
         public PluginConfigColor DarkArtsColor = new PluginConfigColor(new Vector4(210f / 255f, 33f / 255f, 33f / 255f, 100f / 100f));
+
+        [Checkbox("Show mana values up to 10k (will break thresholds)", spacing = true)]
+        [Order(27)]
+        public bool ShowFullMana = false;
 
         public DarkKnightManaBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
              : base(position, size, fillColor)
