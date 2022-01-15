@@ -222,10 +222,6 @@ namespace DelvUI.Interface.Jobs
         [Order(55)]
         public PluginConfigColor BatteryColor = new(new Vector4(106f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
-        //[ColorEdit4("Robot Color")]
-        //[Order(60)]
-        //public PluginConfigColor RobotColor = new(new Vector4(153f / 255f, 0f / 255f, 255f / 255f, 100f / 100f));
-
         public MachinistBatteryGaugeConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
         {
         }
