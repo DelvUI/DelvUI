@@ -1,4 +1,7 @@
 # 1.0.0.2
+Features:
+- Added an option to show mana up to 10k on Dark Knight's mana bar. Note that this will break thresholds.
+
 Fixes:
 - Fixed "Use Job Color" and "Use Role Color" for status effects duration and stacks labels.
 - Fixed Job Huds strata level not working properly.
