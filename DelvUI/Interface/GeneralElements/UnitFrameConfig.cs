@@ -7,7 +7,7 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [DisableParentSettings("HideWhenInactive", "HideHealthIfPossible", "RangeConfig")]
+    [DisableParentSettings("HideWhenInactive", "HideHealthIfPossible", "RangeConfig", "EnemyRangeConfig")]
     [Section("Unit Frames")]
     [SubSection("Player", 0)]
     public class PlayerUnitFrameConfig : UnitFrameConfig
