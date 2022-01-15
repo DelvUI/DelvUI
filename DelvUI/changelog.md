@@ -1,5 +1,6 @@
 # 1.0.0.2
 Fixes:
+- Fixed "Use Job Color" and "Use Role Color" for status effects duration and stacks labels.
 - Fixed Job Huds strata level not working properly.
 - Fixed status effects durations when they are 1 hour or longer.
 

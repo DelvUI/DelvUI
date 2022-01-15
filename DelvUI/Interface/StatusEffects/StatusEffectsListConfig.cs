@@ -383,7 +383,7 @@ namespace DelvUI.Interface.StatusEffects
 
         public bool StatusAllowed(Status status)
         {
-            var inList = List.Any(pair => pair.Key.EndsWith($"[{status.RowId}]"));
+            bool inList = List.Any(pair => pair.Value == status.RowId);
             if ((inList && FilterType == FilterType.Blacklist) || (!inList && FilterType == FilterType.Whitelist))
             {
                 return false;
