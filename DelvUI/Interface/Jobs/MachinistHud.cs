@@ -67,6 +67,11 @@ namespace DelvUI.Interface.Jobs
                 DrawBatteryGauge(pos, player);
             }
 
+            if (Config.AutomatonBar.Enabled)
+            {
+                DrawAutomatonBar(pos, player);
+            }
+
             if (Config.WildfireBar.Enabled)
             {
                 DrawWildfireBar(pos, player);
@@ -93,20 +98,25 @@ namespace DelvUI.Interface.Jobs
         {
             MCHGauge gauge = Plugin.JobGauges.Get<MCHGauge>();
 
-            if ((!Config.BatteryGauge.HideWhenInactive || gauge.Battery > 0) && !gauge.IsRobotActive)
+            if (!Config.BatteryGauge.HideWhenInactive || gauge.Battery > 0)
             {
                 Config.BatteryGauge.Label.SetValue(gauge.Battery);
 
                 BarHud bar = BarUtilities.GetProgressBar(Config.BatteryGauge, gauge.Battery, 100f, 0f, player, Config.BatteryGauge.BatteryColor);
                 AddDrawActions(bar.GetDrawActions(origin, Config.BatteryGauge.StrataLevel));
             }
+        }
+
+        private void DrawAutomatonBar(Vector2 origin, PlayerCharacter player)
+        {
+            MCHGauge gauge = Plugin.JobGauges.Get<MCHGauge>();
 
             if (!gauge.IsRobotActive && _robotMaxDurationSet)
             {
                 _robotMaxDurationSet = false;
             }
 
-            if (gauge.IsRobotActive)
+            if (!Config.AutomatonBar.HideWhenInactive || gauge.IsRobotActive)
             {
                 if (!_robotMaxDurationSet)
                 {
@@ -114,10 +124,10 @@ namespace DelvUI.Interface.Jobs
                     _robotMaxDurationSet = true;
                 }
 
-                Config.BatteryGauge.Label.SetValue(gauge.SummonTimeRemaining / 1000f);
+                Config.AutomatonBar.Label.SetValue(gauge.SummonTimeRemaining / 1000f);
 
-                BarHud bar = BarUtilities.GetProgressBar(Config.BatteryGauge, gauge.SummonTimeRemaining / 1000, _robotMaxDuration / 1000, 0f, player, Config.BatteryGauge.RobotColor);
-                AddDrawActions(bar.GetDrawActions(origin, Config.BatteryGauge.StrataLevel));
+                BarHud bar = BarUtilities.GetProgressBar(Config.AutomatonBar, gauge.SummonTimeRemaining / 1000, _robotMaxDuration > 0 ? _robotMaxDuration / 1000 : 1, 0f, player);
+                AddDrawActions(bar.GetDrawActions(origin, Config.AutomatonBar.StrataLevel));
             }
         }
 
@@ -181,9 +191,16 @@ namespace DelvUI.Interface.Jobs
 
         [NestedConfig("Battery Gauge", 40)]
         public MachinistBatteryGaugeConfig BatteryGauge = new MachinistBatteryGaugeConfig(
-            new Vector2(0, -10),
-            new Vector2(254, 20),
+            new Vector2(-31, -10),
+            new Vector2(192, 20),
             new PluginConfigColor(new Vector4(0, 0, 0, 0))
+        );
+
+        [NestedConfig("Automaton Queen Bar", 45)]
+        public ProgressBarConfig AutomatonBar = new ProgressBarConfig(
+            new Vector2(97, -10),
+            new Vector2(60, 20),
+            new PluginConfigColor(new Vector4(153f / 255f, 0f / 255f, 255f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Wildfire Bar", 50)]
@@ -204,10 +221,6 @@ namespace DelvUI.Interface.Jobs
         [ColorEdit4("Battery Color", spacing = true)]
         [Order(55)]
         public PluginConfigColor BatteryColor = new(new Vector4(106f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
-
-        [ColorEdit4("Robot Color")]
-        [Order(60)]
-        public PluginConfigColor RobotColor = new(new Vector4(153f / 255f, 0f / 255f, 255f / 255f, 100f / 100f));
 
         public MachinistBatteryGaugeConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
         {
