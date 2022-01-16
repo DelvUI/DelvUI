@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Utility;
 using DelvUI.Config;
@@ -9,7 +10,6 @@ using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using Dalamud.Game.ClientState.Buddy;
 using LuminaStatus = Lumina.Excel.GeneratedSheets.Status;
 using StatusStruct = FFXIVClientStructs.FFXIV.Client.Game.Status;
 
@@ -112,9 +112,10 @@ namespace DelvUI.Interface.StatusEffects
 
         protected unsafe List<StatusEffectData> StatusEffectDataList(GameObject? actor)
         {
-            var list = new List<StatusEffectData>();
-
+            List<StatusEffectData> list = new List<StatusEffectData>();
+            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             BattleChara? character = null;
+            int count = StatusEffectListsSize;
 
             if (_fakeEffects == null)
             {
@@ -125,10 +126,7 @@ namespace DelvUI.Interface.StatusEffects
 
                 character = (BattleChara)actor;
             }
-
-            var player = Plugin.ClientState.LocalPlayer;
-            var count = StatusEffectListsSize;
-            if (_fakeEffects != null)
+            else
             {
                 count = Config.Limit == -1 ? _fakeEffects.Length : Math.Min(Config.Limit, _fakeEffects.Length);
             }
@@ -170,7 +168,7 @@ namespace DelvUI.Interface.StatusEffects
                 }
 
                 // filter "invisible" status effects
-                if (data.Name.ToString().Length == 0 || data.Icon == 0)
+                if (data.Icon == 0 || data.Name.ToString().Length == 0)
                 {
                     continue;
                 }
@@ -395,6 +393,7 @@ namespace DelvUI.Interface.StatusEffects
             });
 
             StatusEffectData? hoveringData = null;
+            GameObject? character = Actor;
 
             // labels need to be drawn separated since they have their own window for clipping
             for (var i = 0; i < count; i++)
@@ -411,7 +410,7 @@ namespace DelvUI.Interface.StatusEffects
                     {
                         double duration = Math.Round(Math.Abs(statusEffectData.Status.RemainingTime));
                         Config.IconConfig.DurationLabelConfig.SetText(Utils.DurationToString(duration));
-                        _durationLabel.Draw(iconPos, Config.IconConfig.Size);
+                        _durationLabel.Draw(iconPos, Config.IconConfig.Size, character);
                     });
                 }
 
@@ -424,7 +423,7 @@ namespace DelvUI.Interface.StatusEffects
                     AddDrawAction(Config.IconConfig.StacksLabelConfig.StrataLevel, () =>
                     {
                         Config.IconConfig.StacksLabelConfig.SetText($"{statusEffectData.Status.StackCount}");
-                        _stacksLabel.Draw(iconPos, Config.IconConfig.Size);
+                        _stacksLabel.Draw(iconPos, Config.IconConfig.Size, character);
                     });
                 }
 

@@ -126,8 +126,9 @@ namespace DelvUI.Interface.PartyCooldowns
             PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (player == null) { return; }
 
-            float offsetX = 0;
+            float offset = 0;
             bool addedOffset = true;
+            bool isVertical = Config.GrowthDirection == PartyCooldownsGrowthDirection.Up || Config.GrowthDirection == PartyCooldownsGrowthDirection.Down;
 
             foreach (List<PartyCooldown> list in _cooldowns)
             {
@@ -139,11 +140,11 @@ namespace DelvUI.Interface.PartyCooldowns
                 {
                     if (!addedOffset)
                     {
-                        offsetX += Config.Padding.X + _barConfig.Size.X;
+                        offset += isVertical ? Config.Padding.X + _barConfig.Size.X : Config.Padding.Y + _barConfig.Size.Y;
                         addedOffset = true;
                     }
 
-                    string barId = _barConfig.ID + $"_{offsetX + i}";
+                    string barId = _barConfig.ID + $"_{offset + i}";
 
                     // cooldown bar
                     float cooldownTime = cooldown.CooldownTimeRemaining();
@@ -155,9 +156,24 @@ namespace DelvUI.Interface.PartyCooldowns
                     float sizeX = Math.Max(1, _barConfig.Size.X - _barConfig.Size.Y);
                     Vector2 size = new Vector2(sizeX, _barConfig.Size.Y);
 
-                    int direction = Config.GrowthDirection == PartyCooldownsGrowthDirection.Down ? 1 : -1;
-                    float y = Config.Position.Y + i * direction * size.Y + i * direction * Config.Padding.Y;
-                    Vector2 pos = new Vector2(Config.Position.X + size.Y + offsetX - 1, y);
+                    Vector2 pos;
+
+                    if (isVertical)
+                    {
+                        int direction = Config.GrowthDirection == PartyCooldownsGrowthDirection.Down ? 1 : -1;
+                        pos = new Vector2(
+                            Config.Position.X + size.Y + offset - 1,
+                            Config.Position.Y + i * direction * size.Y + i * direction * Config.Padding.Y
+                        );
+                    }
+                    else
+                    {
+                        int direction = Config.GrowthDirection == PartyCooldownsGrowthDirection.Right ? 1 : -1;
+                        pos = new Vector2(
+                            size.Y + Config.Position.X + i * direction * size.X + i * direction * size.Y + i * direction * Config.Padding.X,
+                            Config.Position.Y + offset - 1
+                        );
+                    }
 
                     if (_barConfig.ShowBar)
                     {
@@ -186,7 +202,7 @@ namespace DelvUI.Interface.PartyCooldowns
                     // icon
                     if (_barConfig.ShowIcon)
                     {
-                        Vector2 iconPos = origin + new Vector2(Config.Position.X + offsetX, y);
+                        Vector2 iconPos = origin + new Vector2(pos.X - size.Y + 1, pos.Y);
                         Vector2 iconSize = new Vector2(size.Y);
                         bool recharging = effectTime == 0 && cooldownTime > 0;
 
@@ -247,7 +263,7 @@ namespace DelvUI.Interface.PartyCooldowns
                     });
 
                     // tooltip
-                    pos = origin + new Vector2(Config.Position.X + offsetX, y);
+                    pos = origin + new Vector2(pos.X - size.Y + 1, pos.Y);
                     if (Config.ShowTooltips && ImGui.IsMouseHoveringRect(pos, pos + _barConfig.Size))
                     {
                         TooltipsHelper.Instance.ShowTooltipOnCursor(

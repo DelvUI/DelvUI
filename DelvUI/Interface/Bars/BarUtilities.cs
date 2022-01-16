@@ -188,7 +188,7 @@ namespace DelvUI.Interface.Bars
                 Rect foreground = GetFillRect(chunkPos, chunkSize, config.FillDirection, chunks[i].Item1, chunks[i].Item2, 1f, 0f);
                 BarGlowConfig? glow = chunksToGlow?[i] == true ? glowConfig : null;
 
-                bars[i] = new BarHud(config.ID + i, config.DrawBorder, borderColor: config.BorderColor, actor: actor, glowColor: glow?.Color, glowSize: glow?.Size)
+                bars[i] = new BarHud(config.ID + i, config.DrawBorder, config.BorderColor, config.BorderThickness, actor: actor, glowColor: glow?.Color, glowSize: glow?.Size)
                           .SetBackground(background)
                           .AddForegrounds(foreground);
 

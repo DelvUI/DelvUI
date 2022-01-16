@@ -1,3 +1,17 @@
+# 1.0.0.2
+Features:
+- Added "Right" and "Left" growth directions for Party Cooldowns:
+    + "Columns" renamed to "Sections". When using a vertical growth direction the Section of a cooldown would be the column. On horizontal directions, it would be the row.
+    + Due to adjustments in the positioning logic, the list might be silightly moved when updating.
+- Added an option to show mana up to 10k on Dark Knight's mana bar. Note that this will break thresholds.
+- Separated the Automaton Queen/Rook Autoturret duration tracker from the Battery Gauge into its own bar.
+
+Fixes:
+- Fixed "Use Job Color" and "Use Role Color" for status effects duration and stacks labels.
+- Fixed Job Huds strata level not working properly.
+- Fixed status effects durations when they are 1 hour or longer.
+- Fixed border thickness not working on some chunked bars.
+
 # 1.0.0.1
 Fixes:
 - Fixed Status Effect Lists interactions not working with Window Clipping disabled or in Performance Mode.
