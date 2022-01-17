@@ -118,15 +118,15 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.AutomatonBar.HideWhenInactive || gauge.IsRobotActive)
             {
-                if (!_robotMaxDurationSet)
+                if (!_robotMaxDurationSet && gauge.IsRobotActive)
                 {
-                    _robotMaxDuration = gauge.SummonTimeRemaining;
+                    _robotMaxDuration = gauge.SummonTimeRemaining / 1000f;
                     _robotMaxDurationSet = true;
                 }
 
                 Config.AutomatonBar.Label.SetValue(gauge.SummonTimeRemaining / 1000f);
 
-                BarHud bar = BarUtilities.GetProgressBar(Config.AutomatonBar, gauge.SummonTimeRemaining / 1000, _robotMaxDuration > 0 ? _robotMaxDuration / 1000 : 1, 0f, player);
+                BarHud bar = BarUtilities.GetProgressBar(Config.AutomatonBar, gauge.SummonTimeRemaining / 1000, _robotMaxDuration > 0 ? _robotMaxDuration : 1f, 0f, player);
                 AddDrawActions(bar.GetDrawActions(origin, Config.AutomatonBar.StrataLevel));
             }
         }

@@ -1,3 +1,7 @@
+# 1.0.0.3
+Fixes:
+- Fixed Machinist's Automaton Queen/Rook Autoturret bar not showing progress. 
+
 # 1.0.0.2
 Features:
 - Added "Right" and "Left" growth directions for Party Cooldowns:
