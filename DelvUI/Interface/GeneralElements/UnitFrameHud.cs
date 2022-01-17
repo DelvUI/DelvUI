@@ -289,9 +289,16 @@ namespace DelvUI.Interface.GeneralElements
             else if (Config.ColorByHealth.Enabled && character != null)
             {
                 var scale = (float)currentHp / Math.Max(1, maxHp);
+                if (Config.ColorByHealth.UseJobColorAsMaxHealth)
+                {
+                    return Utils.GetColorByScale(scale, Config.ColorByHealth.LowHealthColorThreshold / 100f, Config.ColorByHealth.FullHealthColorThreshold / 100f, Config.ColorByHealth.LowHealthColor, Config.ColorByHealth.FullHealthColor, Utils.ColorForActor(character), Config.ColorByHealth.UseMaxHealthColor, Config.ColorByHealth.BlendMode);
+                }
+                else if (Config.ColorByHealth.UseRoleColorAsMaxHealth)
+                {
+                    return Utils.GetColorByScale(scale, Config.ColorByHealth.LowHealthColorThreshold / 100f, Config.ColorByHealth.FullHealthColorThreshold / 100f, Config.ColorByHealth.LowHealthColor, Config.ColorByHealth.FullHealthColor, character is PlayerCharacter ? GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id) : Utils.ColorForActor(character), Config.ColorByHealth.UseMaxHealthColor, Config.ColorByHealth.BlendMode);
+                }
                 return Utils.GetColorByScale(scale, Config.ColorByHealth);
             }
-
             return Config.FillColor;
         }
 
