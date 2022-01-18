@@ -287,7 +287,7 @@ namespace DelvUI.Interface.Party
             }
 
             // area bg
-            if (!Locked)
+            if (Config.Preview)
             {
                 AddDrawAction(Config.StrataLevel, () =>
                 {
