@@ -111,8 +111,8 @@ namespace DelvUI.Interface.Jobs
 
             if (!showingStepBar || !Config.StepsBar.HideProcs)
             {
-                if (Config.SymmetryBar.Enabled) { DrawProcBar(pos, player, Config.SymmetryBar, 2693); }
-                if (Config.FlowBar.Enabled) { DrawProcBar(pos, player, Config.FlowBar, 2694); }
+                if (Config.CascadeBar.Enabled) { DrawProcBar(pos, player, Config.CascadeBar, 2693); }
+                if (Config.FountainBar.Enabled) { DrawProcBar(pos, player, Config.FountainBar, 2694); }
             }
         }
 
@@ -293,8 +293,8 @@ namespace DelvUI.Interface.Jobs
             config.EspritGauge.UseChunks = false;
             config.EspritGauge.Label.Enabled = true;
 
-            config.SymmetryBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
-            config.FlowBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.CascadeBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.FountainBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
 
             return config;
         }
@@ -336,14 +336,14 @@ namespace DelvUI.Interface.Jobs
         );
 
         [NestedConfig("Flourishing Symmetry Bar", 60)]
-        public DancerProcBarConfig SymmetryBar = new DancerProcBarConfig(
+        public DancerProcBarConfig CascadeBar = new DancerProcBarConfig(
             new(-96, -83),
             new(62, 10),
             new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Flourishing Flow Bar", 65)]
-        public DancerProcBarConfig FlowBar = new DancerProcBarConfig(
+        public DancerProcBarConfig FountainBar = new DancerProcBarConfig(
             new(-32, -83),
             new(62, 10),
             new(new Vector4(255f / 255f, 215f / 255f, 0f / 255f, 100f / 100f))
