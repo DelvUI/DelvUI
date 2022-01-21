@@ -1,7 +1,8 @@
 # 1.0.0.3
 Fixes:
 - Fixed Machinist's Automaton Queen/Rook Autoturret bar not showing progress. 
-- Added "Use Job Color" and "Use Role Color" options when using "Use Max Health Color" 
+- Added "Use Job Color" and "Use Role Color" options when using "Use Max Health Color"
+- Removed duplicate proc bars for Dancer and renamed them as appropriate.
 
 # 1.0.0.2
 Features:
