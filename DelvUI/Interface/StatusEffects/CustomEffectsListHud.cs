@@ -28,6 +28,12 @@ namespace DelvUI.Interface.StatusEffects
                 OrderByMineFirst(list);
             }
 
+            // show permanent first
+            if (Config.ShowPermanentFirst)
+            {
+                OrderByPermanentFirst(list);
+            }
+
             return list;
         }
     }

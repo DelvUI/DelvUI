@@ -100,11 +100,17 @@ namespace DelvUI.Interface.StatusEffects
         protected virtual List<StatusEffectData> StatusEffectsData()
         {
             var list = StatusEffectDataList(Actor);
-
+                      
             // show mine first
             if (Config.ShowMineFirst)
             {
                 OrderByMineFirst(list);
+            }
+
+            // show permanent first
+            if (Config.ShowPermanentFirst)
+            {
+                OrderByPermanentFirst(list);
             }
 
             return list;
@@ -260,6 +266,33 @@ namespace DelvUI.Interface.StatusEffects
                 }
 
                 if (!isAFromPlayer && isBFromPlayer)
+                {
+                    return 1;
+                }
+
+                return 0;
+            });
+        }
+
+        protected void OrderByPermanentFirst(List<StatusEffectData> list)
+        {
+            list.Sort((a, b) =>
+            {
+                bool isAPermanent = a.Data.IsPermanent;
+                bool isBPermanent = b.Data.IsPermanent;                
+
+                if (Config.IncludePetAsOwn)
+                {
+                    isAPermanent |= IsStatusFromPlayerPet(a.Status);
+                    isBPermanent |= IsStatusFromPlayerPet(b.Status);
+                }
+
+                if (isAPermanent && !isBPermanent)
+                {
+                    return -1;
+                }
+
+                if (!isAPermanent && isBPermanent)
                 {
                     return 1;
                 }
