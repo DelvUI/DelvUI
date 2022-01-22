@@ -9,6 +9,7 @@ using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using LuminaStatus = Lumina.Excel.GeneratedSheets.Status;
 using StatusStruct = FFXIVClientStructs.FFXIV.Client.Game.Status;
@@ -100,17 +101,11 @@ namespace DelvUI.Interface.StatusEffects
         protected virtual List<StatusEffectData> StatusEffectsData()
         {
             var list = StatusEffectDataList(Actor);
-                      
-            // show mine first
-            if (Config.ShowMineFirst)
-            {
-                OrderByMineFirst(list);
-            }
 
-            // show permanent first
-            if (Config.ShowPermanentFirst)
+            // show mine or permanent first
+            if (Config.ShowMineFirst || Config.ShowPermanentFirst)
             {
-                OrderByPermanentFirst(list);
+                return OrderByMineOrPermanentFirst(list);
             }
 
             return list;
@@ -241,64 +236,35 @@ namespace DelvUI.Interface.StatusEffects
             return buddy.ObjectId == status.SourceID;
         }
 
-        protected void OrderByMineFirst(List<StatusEffectData> list)
+        protected List<StatusEffectData> OrderByMineOrPermanentFirst(List<StatusEffectData> list)
         {
             var player = Plugin.ClientState.LocalPlayer;
             if (player == null)
             {
-                return;
+                return list;
             }
 
-            list.Sort((a, b) =>
+            if (Config.ShowMineFirst && Config.ShowPermanentFirst)
             {
-                bool isAFromPlayer = a.Status.SourceID == player.ObjectId;
-                bool isBFromPlayer = b.Status.SourceID == player.ObjectId;
-
-                if (Config.IncludePetAsOwn)
-                {
-                    isAFromPlayer |= IsStatusFromPlayerPet(a.Status);
-                    isBFromPlayer |= IsStatusFromPlayerPet(b.Status);
-                }
-
-                if (isAFromPlayer && !isBFromPlayer)
-                {
-                    return -1;
-                }
-
-                if (!isAFromPlayer && isBFromPlayer)
-                {
-                    return 1;
-                }
-
-                return 0;
-            });
-        }
-
-        protected void OrderByPermanentFirst(List<StatusEffectData> list)
-        {
-            list.Sort((a, b) =>
+                return list.OrderByDescending(x => x.Status.StatusID == player.ObjectId && x.Data.IsPermanent || x.Data.IsFcBuff)
+                    .ThenByDescending(x => x.Status.StatusID == player.ObjectId)
+                    .ThenByDescending(x => x.Data.IsPermanent)
+                    .ThenByDescending(x => x.Data.IsFcBuff)
+                    .ToList();
+            }
+            else if (Config.ShowMineFirst && !Config.ShowPermanentFirst)
             {
-                bool isAPermanent = a.Data.IsPermanent;
-                bool isBPermanent = b.Data.IsPermanent;                
+                return list.OrderByDescending(x => x.Status.StatusID == player.ObjectId)
+                    .ToList();
+            }
+            else if (!Config.ShowMineFirst && Config.ShowPermanentFirst)
+            {
+                return list.OrderByDescending(x => x.Data.IsPermanent)
+                    .ThenByDescending(x => x.Data.IsFcBuff)
+                    .ToList();
+            }
 
-                if (Config.IncludePetAsOwn)
-                {
-                    isAPermanent |= IsStatusFromPlayerPet(a.Status);
-                    isBPermanent |= IsStatusFromPlayerPet(b.Status);
-                }
-
-                if (isAPermanent && !isBPermanent)
-                {
-                    return -1;
-                }
-
-                if (!isAPermanent && isBPermanent)
-                {
-                    return 1;
-                }
-
-                return 0;
-            });
+            return list;
         }
 
         public override void DrawChildren(Vector2 origin)
