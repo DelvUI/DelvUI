@@ -209,6 +209,10 @@ namespace DelvUI.Interface.StatusEffects
         [Order(40)]
         public bool ShowPermanentEffects;
 
+        [Checkbox("Permanent Effects First")]
+        [Order(41)]
+        public bool ShowPermanentFirst;
+
         [Checkbox("Only My Effects")]
         [Order(45)]
         public bool ShowOnlyMine = false;
