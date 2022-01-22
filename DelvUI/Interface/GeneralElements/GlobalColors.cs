@@ -36,7 +36,7 @@ namespace DelvUI.Interface.GeneralElements
             ColorMap = new Dictionary<uint, PluginConfigColor>()
             {
                 // tanks
-                [JobIDs.GLD] = tanksColorConfig.GLDColor,
+                [JobIDs.GLA] = tanksColorConfig.GLAColor,
                 [JobIDs.MRD] = tanksColorConfig.MRDColor,
                 [JobIDs.PLD] = tanksColorConfig.PLDColor,
                 [JobIDs.WAR] = tanksColorConfig.WARColor,
@@ -177,7 +177,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Gladiator", spacing = true)]
         [Order(25)]
-        public PluginConfigColor GLDColor = new PluginConfigColor(new(168f / 255f, 210f / 255f, 230f / 255f, 100f / 100f));
+        public PluginConfigColor GLAColor = new PluginConfigColor(new(168f / 255f, 210f / 255f, 230f / 255f, 100f / 100f));
 
         [ColorEdit4("Marauder")]
         [Order(30)]

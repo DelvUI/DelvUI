@@ -15,7 +15,7 @@ namespace DelvUI.Interface.Jobs
 
     public class GladiatorConfig : BaseJobsConfig
     {
-        [JsonIgnore] public override uint JobId => JobIDs.GLD;
+        [JsonIgnore] public override uint JobId => JobIDs.GLA;
     }
 
     public class MarauderConfig : BaseJobsConfig
