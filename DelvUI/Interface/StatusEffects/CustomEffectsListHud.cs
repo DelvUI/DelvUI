@@ -22,10 +22,10 @@ namespace DelvUI.Interface.StatusEffects
                 .Select(status => status.First())
                 .ToList();
 
-            // show mine first
-            if (Config.ShowMineFirst)
+            // show mine or permanent first
+            if (Config.ShowMineFirst || Config.ShowPermanentFirst)
             {
-                OrderByMineFirst(list);
+                return OrderByMineOrPermanentFirst(list);
             }
 
             return list;

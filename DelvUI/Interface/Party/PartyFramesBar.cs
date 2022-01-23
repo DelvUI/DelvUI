@@ -80,6 +80,16 @@ namespace DelvUI.Interface.Party
             }
             else if (_configs.HealthBar.ColorsConfig.ColorByHealth.Enabled)
             {
+                if (_configs.HealthBar.ColorsConfig.ColorByHealth.UseJobColorAsMaxHealth)
+                {
+                    return Utils.GetColorByScale(scale, _configs.HealthBar.ColorsConfig.ColorByHealth.LowHealthColorThreshold / 100f, _configs.HealthBar.ColorsConfig.ColorByHealth.FullHealthColorThreshold / 100f, _configs.HealthBar.ColorsConfig.ColorByHealth.LowHealthColor, _configs.HealthBar.ColorsConfig.ColorByHealth.FullHealthColor, 
+                        GlobalColors.Instance.SafeColorForJobId(Member.JobId), _configs.HealthBar.ColorsConfig.ColorByHealth.UseMaxHealthColor, _configs.HealthBar.ColorsConfig.ColorByHealth.BlendMode);
+                }
+                else if (_configs.HealthBar.ColorsConfig.ColorByHealth.UseRoleColorAsMaxHealth)
+                {
+                    return Utils.GetColorByScale(scale, _configs.HealthBar.ColorsConfig.ColorByHealth.LowHealthColorThreshold / 100f, _configs.HealthBar.ColorsConfig.ColorByHealth.FullHealthColorThreshold / 100f, _configs.HealthBar.ColorsConfig.ColorByHealth.LowHealthColor, _configs.HealthBar.ColorsConfig.ColorByHealth.FullHealthColor,
+                        GlobalColors.Instance.SafeRoleColorForJobId(Member.JobId), _configs.HealthBar.ColorsConfig.ColorByHealth.UseMaxHealthColor, _configs.HealthBar.ColorsConfig.ColorByHealth.BlendMode);
+                }
                 return Utils.GetColorByScale(scale, _configs.HealthBar.ColorsConfig.ColorByHealth);
             }
             else if (Member.JobId > 0)

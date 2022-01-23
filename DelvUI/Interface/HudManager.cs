@@ -598,7 +598,7 @@ namespace DelvUI.Interface
             _unsupportedJobsMap = new Dictionary<uint, Type>()
             {
                 // base jobs
-                [JobIDs.GLD] = typeof(GladiatorConfig),
+                [JobIDs.GLA] = typeof(GladiatorConfig),
                 [JobIDs.MRD] = typeof(MarauderConfig),
                 [JobIDs.PGL] = typeof(PugilistConfig),
                 [JobIDs.LNC] = typeof(LancerConfig),

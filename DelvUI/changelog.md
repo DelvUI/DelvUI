@@ -1,3 +1,12 @@
+# 1.0.0.3
+Features:
+- Added "Use Job Color" and "Use Role Color" options when using "Use Max Health Color".
+- Added option to sort permanent buffs/debuffs first.
+
+Fixes:
+- Fixed Machinist's Automaton Queen/Rook Autoturret bar not showing progress. 
+- Removed duplicate proc bars for Dancer and renamed them as appropriate.
+
 # 1.0.0.2
 Features:
 - Added "Right" and "Left" growth directions for Party Cooldowns:

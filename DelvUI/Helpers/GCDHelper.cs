@@ -32,7 +32,7 @@ namespace DelvUI.Helpers
             [JobIDs.MRD] = 31,    // Heavy Swing
             [JobIDs.DRK] = 3617,  // Hard Slash
             [JobIDs.PLD] = 9,     // Fast Blade
-            [JobIDs.GLD] = 9,     // Fast Blade
+            [JobIDs.GLA] = 9,     // Fast Blade
 
             [JobIDs.SCH] = 163,   // Ruin
             [JobIDs.AST] = 3596,  // Malefic

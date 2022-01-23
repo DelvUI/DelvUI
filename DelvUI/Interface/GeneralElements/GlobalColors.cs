@@ -36,7 +36,7 @@ namespace DelvUI.Interface.GeneralElements
             ColorMap = new Dictionary<uint, PluginConfigColor>()
             {
                 // tanks
-                [JobIDs.GLD] = tanksColorConfig.GLDColor,
+                [JobIDs.GLA] = tanksColorConfig.GLAColor,
                 [JobIDs.MRD] = tanksColorConfig.MRDColor,
                 [JobIDs.PLD] = tanksColorConfig.PLDColor,
                 [JobIDs.WAR] = tanksColorConfig.WARColor,
@@ -177,7 +177,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Gladiator", spacing = true)]
         [Order(25)]
-        public PluginConfigColor GLDColor = new PluginConfigColor(new(168f / 255f, 210f / 255f, 230f / 255f, 100f / 100f));
+        public PluginConfigColor GLAColor = new PluginConfigColor(new(168f / 255f, 210f / 255f, 230f / 255f, 100f / 100f));
 
         [ColorEdit4("Marauder")]
         [Order(30)]
@@ -400,24 +400,32 @@ namespace DelvUI.Interface.GeneralElements
         [Order(10, collapseWith = nameof(UseMaxHealthColor))]
         public PluginConfigColor MaxHealthColor = new PluginConfigColor(new(18f / 255f, 18f / 255f, 18f / 255f, 100f / 100f));
 
+        [Checkbox("Job Color as Max Health Color")]
+        [Order(15, collapseWith = nameof(UseMaxHealthColor))]
+        public bool UseJobColorAsMaxHealth = false;
+
+        [Checkbox("Job Role as Max Health Color")]
+        [Order(20, collapseWith = nameof(UseMaxHealthColor))]
+        public bool UseRoleColorAsMaxHealth = false;
+
         [ColorEdit4("High Health Color")]
-        [Order(15)]
+        [Order(25)]
         public PluginConfigColor FullHealthColor = new PluginConfigColor(new(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Low Health Color")]
-        [Order(20)]
+        [Order(30)]
         public PluginConfigColor LowHealthColor = new PluginConfigColor(new(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
         [DragFloat("Max Health Color Above Health %", min = 50f, max = 100f, velocity = 1f)]
-        [Order(25)]
+        [Order(35)]
         public float FullHealthColorThreshold = 75f;
 
         [DragFloat("Low Health Color Below Health %", min = 0f, max = 50f, velocity = 1f)]
-        [Order(30)]
+        [Order(40)]
         public float LowHealthColorThreshold = 25f;
 
         [Combo("Blend Mode", "LAB", "LChab", "XYZ", "RGB", "LChuv", "Luv", "Jzazbz", "JzCzhz")]
-        [Order(35)]
+        [Order(45)]
         public BlendMode BlendMode = BlendMode.LAB;
     }
 

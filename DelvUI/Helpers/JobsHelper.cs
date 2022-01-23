@@ -277,7 +277,7 @@ namespace DelvUI.Helpers
         public static Dictionary<uint, JobRoles> JobRolesMap = new Dictionary<uint, JobRoles>()
         {
             // tanks
-            [JobIDs.GLD] = JobRoles.Tank,
+            [JobIDs.GLA] = JobRoles.Tank,
             [JobIDs.MRD] = JobRoles.Tank,
             [JobIDs.PLD] = JobRoles.Tank,
             [JobIDs.WAR] = JobRoles.Tank,
@@ -335,7 +335,7 @@ namespace DelvUI.Helpers
         {
             // tanks
             [JobRoles.Tank] = new List<uint>() {
-                JobIDs.GLD,
+                JobIDs.GLA,
                 JobIDs.MRD,
                 JobIDs.PLD,
                 JobIDs.WAR,
@@ -413,7 +413,7 @@ namespace DelvUI.Helpers
         public static Dictionary<uint, string> JobNames = new Dictionary<uint, string>()
         {
             // tanks
-            [JobIDs.GLD] = "GLD",
+            [JobIDs.GLA] = "GLA",
             [JobIDs.MRD] = "MRD",
             [JobIDs.PLD] = "PLD",
             [JobIDs.WAR] = "WAR",
@@ -521,7 +521,7 @@ namespace DelvUI.Helpers
 
     public static class JobIDs
     {
-        public const uint GLD = 1;
+        public const uint GLA = 1;
         public const uint MRD = 3;
         public const uint PLD = 19;
         public const uint WAR = 21;
