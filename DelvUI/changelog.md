@@ -1,4 +1,7 @@
 # 1.0.0.4
+Features:
+- Added Rounding Mode, an option to choose in what way labels are handled (truncate, floor, ceil, round).
+
 Fixes:
 - Fixed "My Effects First" for Buffs and Debuffs that was broken in the latest patch.
 
