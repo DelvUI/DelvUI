@@ -1,6 +1,6 @@
 # 1.0.0.4
 Features:
-- Added a option to choose in what way labels are handled (truncate, floor, ceil, round).
+- Added Rounding Mode, an option to choose in what way labels are handled (truncate, floor, ceil, round).
 
 # 1.0.0.3
 Features:

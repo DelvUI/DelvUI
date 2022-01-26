@@ -36,7 +36,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(10)]
         public int NumberFormat;
         
-        [Combo("Number Handling", "Truncate", "Floor", "Ceil", "Round")]
+        [Combo("Rounding Mode", "Truncate", "Floor", "Ceil", "Round")]
         [Order(15)]
         public int NumberFunction;
 
