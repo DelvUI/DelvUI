@@ -246,15 +246,15 @@ namespace DelvUI.Interface.StatusEffects
 
             if (Config.ShowMineFirst && Config.ShowPermanentFirst)
             {
-                return list.OrderByDescending(x => x.Status.StatusID == player.ObjectId && x.Data.IsPermanent || x.Data.IsFcBuff)
-                    .ThenByDescending(x => x.Status.StatusID == player.ObjectId)
+                return list.OrderByDescending(x => x.Status.SourceID == player.ObjectId && x.Data.IsPermanent || x.Data.IsFcBuff)
+                    .ThenByDescending(x => x.Status.SourceID == player.ObjectId)
                     .ThenByDescending(x => x.Data.IsPermanent)
                     .ThenByDescending(x => x.Data.IsFcBuff)
                     .ToList();
             }
             else if (Config.ShowMineFirst && !Config.ShowPermanentFirst)
             {
-                return list.OrderByDescending(x => x.Status.StatusID == player.ObjectId)
+                return list.OrderByDescending(x => x.Status.SourceID == player.ObjectId)
                     .ToList();
             }
             else if (!Config.ShowMineFirst && Config.ShowPermanentFirst)
