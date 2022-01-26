@@ -254,7 +254,7 @@ namespace DelvUI.Interface.StatusEffects
             }
             else if (Config.ShowMineFirst && !Config.ShowPermanentFirst)
             {
-                return list.OrderByDescending(x => x.Status.StatusID == player.ObjectId)
+                return list.OrderByDescending(x => x.Status.SourceID == player.ObjectId)
                     .ToList();
             }
             else if (!Config.ShowMineFirst && Config.ShowPermanentFirst)
