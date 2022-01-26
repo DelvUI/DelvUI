@@ -1,3 +1,7 @@
+# 1.0.0.4
+Fixes:
+- Fixed "My Effects First" for Buffs and Debuffs that was broken in the latest patch.
+
 # 1.0.0.3
 Features:
 - Added "Use Job Color" and "Use Role Color" options when using "Use Max Health Color".
