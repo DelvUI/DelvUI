@@ -1,3 +1,7 @@
+# 1.0.0.4
+Features:
+- Added Rounding Mode, an option to choose in what way labels are handled (truncate, floor, ceil, round).
+
 # 1.0.0.3
 Features:
 - Added "Use Job Color" and "Use Role Color" options when using "Use Max Health Color".
