@@ -192,6 +192,11 @@ namespace DelvUI
                     case "toggle":
                         ConfigurationManager.Instance.ShowHUD = !ConfigurationManager.Instance.ShowHUD;
                         break;
+                    
+                    case "toggledefaulthud":
+                        ConfigurationManager.Instance.GetConfigObject<HUDOptionsConfig>().HideDefaultJobGauges =
+                            !ConfigurationManager.Instance.GetConfigObject<HUDOptionsConfig>().HideDefaultJobGauges;
+                        break;
 
                     case "show":
                         ConfigurationManager.Instance.ShowHUD = true;
