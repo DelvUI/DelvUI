@@ -4,6 +4,7 @@ Features:
 - Added a command to toggle the default job gauges `/delvui toggledefaulthud`.
 
 Fixes:
+- Fixed cast names on P4S (English only for now).
 - Fixed "My Effects First" for Buffs and Debuffs that was broken in the latest patch.
 - Fixed weird crashes when the plugin is unloading.
 - Fixed crash when manually setting a Party Cooldown section to an invalid value.
