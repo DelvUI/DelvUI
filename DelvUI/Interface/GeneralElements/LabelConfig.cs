@@ -35,6 +35,10 @@ namespace DelvUI.Interface.GeneralElements
         [Combo("Number Format", "No Decimals (i.e. \"12\")", "One Decimal (i.e. \"12.3\")", "Two Decimals (i.e. \"12.34\")")]
         [Order(10)]
         public int NumberFormat;
+        
+        [Combo("Rounding Mode", "Truncate", "Floor", "Ceil", "Round")]
+        [Order(15)]
+        public int NumberFunction;
 
         [Checkbox("Hide Text When Zero")]
         [Order(65)]
@@ -54,7 +58,18 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             int aux = (int)Math.Pow(10, NumberFormat);
-            double v = Math.Truncate(value * aux) / aux;
+            double textValue = value * aux;
+
+            textValue = NumberFunction switch
+            {
+                0 => Math.Truncate(textValue),
+                1 => Math.Floor(textValue),
+                2 => Math.Ceiling(textValue),
+                3 => Math.Round(textValue),
+                var _ => Math.Truncate(textValue)
+            };
+
+            double v = textValue / aux;
             _text = v.ToString($"F{NumberFormat}", CultureInfo.InvariantCulture);
         }
 

@@ -112,7 +112,7 @@ namespace DelvUI.Interface.GeneralElements
             // cast name
             bool isNameLeftAnchored = Config.CastNameLabel.TextAnchor is DrawAnchor.Left or DrawAnchor.TopLeft or DrawAnchor.BottomLeft;
             Vector2 namePos = Config.ShowIcon && isNameLeftAnchored ? startPos + new Vector2(iconSize.X, 0) : startPos;
-            string? castName = LastUsedCast?.ActionText.CheckForUpperCase();
+            string? castName = MappedCastName(LastUsedCast?.ActionText.CheckForUpperCase());
             Config.CastNameLabel.SetText(Config.Preview ? "Cast Name" : castName ?? "");
 
             AddDrawAction(Config.CastNameLabel.StrataLevel, () =>
@@ -175,6 +175,22 @@ namespace DelvUI.Interface.GeneralElements
         }
 
         public virtual PluginConfigColor GetColor() => Config.FillColor;
+
+        private string? MappedCastName(string? castName)
+        {
+            if (castName == null) { return null; }
+
+            return castName switch
+            {
+                "_rsv_27174_-1_1_C0_0Action" => "Nearsight",
+                "_rsv_27175_-1_1_C0_0Action" => "Farsight",
+                //"_rsv_27176_-1_1_C0_0Action" => "???",
+                //"_rsv_28123_-1_1_C0_0Action" => "???",
+                "_rsv_28280_-1_1_C0_0Action" => "Demigod Double",
+
+                _ => castName
+            };
+        }
     }
 
     public class PlayerCastbarHud : CastbarHud
