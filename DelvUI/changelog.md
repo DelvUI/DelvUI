@@ -1,3 +1,7 @@
+# 1.0.1.1
+Fixes:
+- Fixed status effects names and descriptions on P4S (English only for now).
+
 # 1.0.1.0
 Features:
 - Added Rounding Mode, an option to choose in what way labels are handled (truncate, floor, ceil, round).
