@@ -206,9 +206,14 @@ namespace DelvUI.Interface
                             : Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat();
                 }
 
+                // hide player frame when at full health
+                if (Config.HidePlayerFrameAtFullHP && element.GetConfig().GetType() == typeof(PlayerUnitFrameConfig) && !Config.HideOutsideOfCombat)
+                {
+                    isHidden = !isHidden && player.CurrentHp == player.MaxHp;
+                }
                 else if (element.GetConfig().GetType() == typeof(PlayerUnitFrameConfig))
                 {
-                    isHidden = isHidden && player.CurrentHp == player.MaxHp;
+                    isHidden = Config.AlwaysHidePlayerFrameWhenDelvUIHidden ? isHidden : isHidden && player.CurrentHp == player.MaxHp;
                 }
             }
 
