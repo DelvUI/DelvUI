@@ -44,6 +44,14 @@ namespace DelvUI.Interface
                 _importing = _importString.Length > 0;
             }
 
+            ImGuiHelper.DrawSeparator(1, 1);
+            ImGui.Text("To browse presets made by users of the DelvUI community, click the button below.");
+
+            if (ImGui.Button("DelvUI on wago.io", new Vector2(560, 24)))
+            {
+                Utils.OpenUrl("https://wago.io/delvui");
+            }
+
             // error modal
             if (_errorMessage != null)
             {
