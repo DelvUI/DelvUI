@@ -36,8 +36,12 @@ namespace DelvUI.Interface.GeneralElements
         public bool MouseoverAutomaticMode = true;
 
         [Checkbox("Hide DelvUI outside of combat", isMonitored = true, separator = true, help = "Show in Duty and Show on Weapon Drawn-options available once enabled.")]
-        [Order(20)]
+        [Order(17)]
         public bool HideOutsideOfCombat = false;
+
+        [Checkbox("Hide Player Frame even when not at full HP outside of combat.")]
+        [Order(18, collapseWith = nameof(HideOutsideOfCombat))]
+        public bool AlwaysHidePlayerFrameWhenDelvUIHidden = false;               
 
         [Checkbox("Show in duty" + "##HideOutsideCombat")]
         [Order(21, collapseWith = nameof(HideOutsideOfCombat))]
@@ -50,6 +54,10 @@ namespace DelvUI.Interface.GeneralElements
         [Checkbox("Hide DelvUI in Gold Saucer")]
         [Order(25)]
         public bool HideInGoldSaucer = false;
+
+        [Checkbox("Hide Player Frame at full HP")]
+        [Order(26)]
+        public bool HidePlayerFrameAtFullHP = false;
 
         [Checkbox("Hide only JobPack HUD outside of combat")]
         [Order(30)]
