@@ -41,7 +41,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [Checkbox("Hide Player Frame even when not at full HP outside of combat.")]
         [Order(18, collapseWith = nameof(HideOutsideOfCombat))]
-        public bool AlwaysHidePlayerFrameWhenDelvUIHidden = false;               
+        public bool AlwaysHidePlayerFrameWhenDelvUIHidden = false;
 
         [Checkbox("Show in duty" + "##HideOutsideCombat")]
         [Order(21, collapseWith = nameof(HideOutsideOfCombat))]
@@ -107,11 +107,6 @@ namespace DelvUI.Interface.GeneralElements
         [DynamicList("Hotbars Shown Only In Combat", "Hotbar 1", "Hotbar 2", "Hotbar 3", "Hotbar 4", "Hotbar 5", "Hotbar 6", "Hotbar 7", "Hotbar 8", "Hotbar 9", "Hotbar 10", isMonitored = true)]
         [Order(204, collapseWith = nameof(EnableCombatActionBars))]
         public List<string> CombatActionBars = new();
-
-        // saves original positions for all 4 layouts
-        public Vector2[] CastBarOriginalPositions = new Vector2[] { Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero };
-        public Vector2[] PulltimerOriginalPositions = new Vector2[] { Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero };
-        public Dictionary<string, Vector2>[] JobGaugeOriginalPositions = new Dictionary<string, Vector2>[] { new(), new(), new(), new() };
 
         public new static HUDOptionsConfig DefaultConfig() => new();
     }

@@ -1,3 +1,7 @@
+# 1.0.2.0
+Fixes:
+- Fixed default cast bar and job gauges sometimes jumping to the corner of the screen when they were not being hidden.
+
 # 1.0.1.1
 Features:
 - Added a sub-option to keep hiding Player Unitframe outside of combat when not full health if "Hide DelvUI outside of combat" is enabled.
