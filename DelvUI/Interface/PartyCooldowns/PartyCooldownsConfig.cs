@@ -366,9 +366,10 @@ namespace DelvUI.Interface.PartyCooldowns
             [25868] = NewData(25868, JobIDs.SCH, 90, 120, 20, 80, 2), // expedient
             [16536] = NewData(16536, JobIDs.WHM, 80, 120, 20, 80, 2), // temperance
             [3569] = NewData(3569, JobIDs.WHM, 52, 90, 24, 50, 2), // asylum
+            [25862] = NewData(25862, JobIDs.WHM, 90, 180, 15, 80, 2), // liturgy of the bell)
             [24298] = NewData(24298, JobIDs.SGE, 50, 30, 15, 80, 2), // kerachole
             [24310] = NewData(24310, JobIDs.SGE, 76, 120, 20, 80, 2), // holos
-            [24311] = NewData(24311, JobIDs.SGE, 80, 120, 15, 80, 2), // panhaima
+            [24311] = NewData(24311, JobIDs.SGE, 80, 120, 15, 80, 2), // panhaima            
 
             // MELEE
             [7549] = NewData(7549, JobRoles.DPSMelee, 22, 90, 10, 100, 1), // feint
