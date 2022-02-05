@@ -1,6 +1,7 @@
 # 1.0.1.2
 Features:
 - Added Partial Fill Color options for Sage's Addersgall Bar and White Mage's Lily Bar.
+- Added options for Glow to White Mage's Blood Lily bar when filled.
 
 # 1.0.1.1
 Features:
