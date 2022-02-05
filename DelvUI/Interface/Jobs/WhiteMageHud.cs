@@ -124,7 +124,7 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.LilyBar.HideWhenInactive || lilyScale > 0)
             {
-                BarHud[] bars = BarUtilities.GetChunkedBars(Config.LilyBar, 3, lilyScale, 3, 0, player);
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.LilyBar, 3, lilyScale, 3, 0, player, partialFillColor: Config.LilyBar.PartialFillColor);
                 foreach (BarHud bar in bars)
                 {
                     AddDrawActions(bar.GetDrawActions(origin, Config.LilyBar.StrataLevel));
@@ -133,7 +133,8 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.BloodLilyBar.HideWhenInactive && Config.BloodLilyBar.Enabled || gauge.BloodLily > 0)
             {
-                BarHud[] bars = BarUtilities.GetChunkedBars(Config.BloodLilyBar, 3, gauge.BloodLily, 3, 0, player);
+                BarGlowConfig? glow = gauge.BloodLily == 3 ? Config.BloodLilyBar.GlowConfig : null;
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.BloodLilyBar, 3, gauge.BloodLily, 3, 0, player, glowConfig: glow, chunksToGlow: new[] { true, true, true });
                 foreach (BarHud bar in bars)
                 {
                     AddDrawActions(bar.GetDrawActions(origin, Config.BloodLilyBar.StrataLevel));
@@ -215,14 +216,14 @@ namespace DelvUI.Interface.Jobs
         }
 
         [NestedConfig("Lily Bar", 30)]
-        public ChunkedBarConfig LilyBar = new ChunkedBarConfig(
+        public LilyBarConfig LilyBar = new LilyBarConfig(
             new(-64, -32),
             new(126, 20),
             new PluginConfigColor(new(0f / 255f, 64f / 255f, 255f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Blood Lily Bar", 35)]
-        public ChunkedBarConfig BloodLilyBar = new ChunkedBarConfig(
+        public BloodLilyBarConfig BloodLilyBar = new BloodLilyBarConfig(
             new(64, -32),
             new(126, 20),
             new PluginConfigColor(new(199f / 255f, 40f / 255f, 9f / 255f, 100f / 100f))
@@ -262,5 +263,36 @@ namespace DelvUI.Interface.Jobs
             new(62, 15),
             new PluginConfigColor(new(100f / 255f, 207f / 255f, 211f / 255f, 100f / 100f))
         );
+    }
+
+    [Exportable(false)]
+    public class LilyBarConfig : ChunkedBarConfig
+    {
+        [Checkbox("Use Partial Fill Color", spacing = true)]
+        [Order(65)]
+        public bool UsePartialFillColor = false;
+
+        [ColorEdit4("Partial Fill Color")]
+        [Order(66, collapseWith = nameof(UsePartialFillColor))]
+        public PluginConfigColor PartialFillColor;
+
+        public LilyBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+             : base(position, size, fillColor)
+        {
+            PartialFillColor = new PluginConfigColor(new(0f / 255f, 64f / 255f, 255f / 255f, 50f / 100f));
+        }
+    }
+
+    [Exportable(false)]
+    public class BloodLilyBarConfig : ChunkedBarConfig
+    {
+        [NestedConfig("Glow Color (when Misery ready)", 60, separator = false, spacing = true)]
+        public BarGlowConfig GlowConfig = new();
+
+        public BloodLilyBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+             : base(position, size, fillColor)
+        {
+            GlowConfig.Color = new PluginConfigColor(new(247f / 255f, 177f / 255f, 67f / 255f, 100f / 100f));
+        }
     }
 }
