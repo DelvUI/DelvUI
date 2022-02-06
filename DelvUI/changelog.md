@@ -1,5 +1,6 @@
 # 1.0.1.2
 Features:
+- Added White Mage's "Liturgy of the Bell" to the Party Cooldowns tracker.
 - Added a sub-option to the Experience Bars' "Hide When Inactive" to hide the experience bar in downsynced content when on a max level job.
 
 # 1.0.1.1
