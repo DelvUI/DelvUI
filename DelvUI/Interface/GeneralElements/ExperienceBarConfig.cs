@@ -11,6 +11,10 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("Experience Bar", 0)]
     public class ExperienceBarConfig : BarConfig
     {
+        [Checkbox("Hide When Downsynced")]
+        [Order(44, collapseWith = nameof(HideWhenInactive))]
+        public bool HideWhenDownsynced = false;
+
         [Checkbox("Use Job Color")]
         [Order(45)]
         public bool UseJobColor = false;

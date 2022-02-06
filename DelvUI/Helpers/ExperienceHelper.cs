@@ -1,6 +1,10 @@
-﻿using FFXIVClientStructs.FFXIV.Component.GUI;
+﻿using Dalamud.Logging;
+using Dalamud.Memory;
+using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
 using System.Runtime.InteropServices;
+using StructsFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework;
 
 namespace DelvUI.Helpers
 {
@@ -8,6 +12,8 @@ namespace DelvUI.Helpers
     {
         #region singleton
         private static Lazy<ExperienceHelper> _lazyInstance = new Lazy<ExperienceHelper>(() => new ExperienceHelper());
+        private RaptureAtkModule* _raptureAtkModule = null;
+        private const int ExperienceIndex = 2;
 
         public static ExperienceHelper Instance => _lazyInstance.Value;
 
@@ -75,6 +81,34 @@ namespace DelvUI.Helpers
             {
                 AddonExp* addon = GetExpAddon();
                 return addon != null ? addon->CurrentExpPercent : 0;
+            }
+        }
+
+        public unsafe bool IsMaxLevel()
+        {
+            UIModule* uiModule = StructsFramework.Instance()->GetUiModule();
+            if (uiModule != null)
+            {
+                _raptureAtkModule = uiModule->GetRaptureAtkModule();
+            }
+
+            if (_raptureAtkModule == null || _raptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrayCount <= ExperienceIndex)
+            {
+                return false;
+            }
+
+            try
+            {
+                var stringArrayData = _raptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrays[ExperienceIndex];
+                var expStringArray = stringArrayData->StringArray[69];
+                var expInfoString = MemoryHelper.ReadSeStringNullTerminated(new IntPtr(expStringArray));
+                return expInfoString.TextValue.Contains("-/-");
+
+            }
+            catch (Exception e)
+            {
+                PluginLog.Error("Error when receiving experience information: " + e.Message);
+                return false;
             }
         }
     }
