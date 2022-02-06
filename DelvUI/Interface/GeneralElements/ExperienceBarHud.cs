@@ -13,6 +13,8 @@ namespace DelvUI.Interface.GeneralElements
 
         public GameObject? Actor { get; set; } = null;
 
+        private ExperienceHelper _helper = new ExperienceHelper();
+
         public ExperienceBarHud(ExperienceBarConfig config, string displayName) : base(config, displayName) { }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
@@ -22,7 +24,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public override void DrawChildren(Vector2 origin)
         {
-            if (!Config.Enabled || Actor is null || Config.HideWhenInactive && (Plugin.ClientState.LocalPlayer?.Level ?? 0) >= 90)
+            if (!Config.Enabled || Actor is null || Config.HideWhenInactive && (Plugin.ClientState.LocalPlayer?.Level ?? 0) >= 90 || (Config.HideWhenInactive && Config.HideWhenDownsynced && _helper.IsMaxLevel()))
             {
                 return;
             }
