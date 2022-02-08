@@ -119,7 +119,7 @@ namespace DelvUI.Helpers
 
             ["[health:percent]"] = (currentHp, maxHp) => (100f * currentHp / Math.Max(1, maxHp)).ToString("N0"),
 
-            ["[health:percent-decimal]"] = (currentHp, maxHp) => FormattableString.Invariant($"{100f * currentHp / Math.Max(1f, maxHp):##0.#}"),
+            ["[health:percent-decimal]"] = (currentHp, maxHp) => FormattableString.Invariant($"{100f * currentHp / Math.Max(1f, maxHp):0.0}"),
 
             ["[health:deficit]"] = (currentHp, maxHp) => currentHp == maxHp ? "0" : $"-{maxHp - currentHp}",
 
