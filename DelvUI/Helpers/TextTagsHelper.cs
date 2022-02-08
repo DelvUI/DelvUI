@@ -119,9 +119,9 @@ namespace DelvUI.Helpers
 
             ["[health:percent]"] = (currentHp, maxHp) => (100f * currentHp / Math.Max(1, maxHp)).ToString("N0"),
 
-            ["[health:percent-decimal]"] = (currentHp, maxHp) => 100f * currentHp / Math.Max(1f, maxHp) >= 100.0 || 100f * currentHp / Math.Max(1f, maxHp) <= 0.0
-                                                                ? FormattableString.Invariant($"{100f * currentHp / Math.Max(1f, maxHp):##0.#}")
-                                                                : FormattableString.Invariant($"{100f * currentHp / Math.Max(1f, maxHp):0.0}"),
+            ["[health:percent-decimal]"] = (currentHp, maxHp) => FormattableString.Invariant($"{100f * currentHp / Math.Max(1f, maxHp):##0.#}"),
+
+            ["[health:percent-decimal-consistent]"] = (currentHp, maxHp) => ConsistentDigitPercentage(currentHp, maxHp),
 
             ["[health:deficit]"] = (currentHp, maxHp) => currentHp == maxHp ? "0" : $"-{maxHp - currentHp}",
 
@@ -218,6 +218,11 @@ namespace DelvUI.Helpers
         private static string ValidateName(GameObject? actor, string? name)
         {
             return actor != null ? actor.Name.ToString() : (name ?? "");
+        }
+
+        private static string ConsistentDigitPercentage(float currentHp, float maxHp){
+            var rawPercentage = 100f * currentHp / Math.Max(1f, maxHp);
+            return rawPercentage >= 100 || rawPercentage <= 0 ? rawPercentage.ToString("N0") : rawPercentage.ToString("N1");
         }
     }
 }
