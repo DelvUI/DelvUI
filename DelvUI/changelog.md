@@ -4,6 +4,7 @@ Features:
 - Added options for Glow to White Mages' "Blood Lily" bar when filled.
 - Added White Mages' "Liturgy of the Bell" to the Party Cooldowns tracker.
 - Added a sub-option to the Experience Bars' "Hide When Inactive" to hide the experience bar in downsynced content when on a max level job.
+- Added new texttags for Health and Mana percentages to also show for whole numbers (ie 78.0% instead of 78%).
 
 Fixes:
 - Reaper "Death Gauge" bar now has Fill Direction options.
