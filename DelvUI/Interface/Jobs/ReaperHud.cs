@@ -224,7 +224,7 @@ namespace DelvUI.Interface.Jobs
         );
     }
 
-    [DisableParentSettings("FillColor", "FillDirection")]
+    [DisableParentSettings("FillColor")]
     public class DeathGauge : ChunkedBarConfig
     {
         [ColorEdit4("Lemure Shroud Color")]

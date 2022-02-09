@@ -1,9 +1,12 @@
 # 1.0.1.2
 Features:
-- Added Partial Fill Color options for Sage's Addersgall Bar and White Mage's Lily Bar.
-- Added options for Glow to White Mage's Blood Lily bar when filled.
-- Added White Mage's "Liturgy of the Bell" to the Party Cooldowns tracker.
+- Added Partial Fill Color options for Sages' "Addersgall" bar and White Mages' "Lily" bar.
+- Added options for Glow to White Mages' "Blood Lily" bar when filled.
+- Added White Mages' "Liturgy of the Bell" to the Party Cooldowns tracker.
 - Added a sub-option to the Experience Bars' "Hide When Inactive" to hide the experience bar in downsynced content when on a max level job.
+
+Fixes:
+- Reaper "Death Gauge" bar now has Fill Direction options.
 
 # 1.0.1.1
 Features:
