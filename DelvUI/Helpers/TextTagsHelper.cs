@@ -152,6 +152,8 @@ namespace DelvUI.Helpers
 
             ["[mana:percent-decimal]"] = (currentMp, maxMp) => FormattableString.Invariant($"{100f * currentMp / Math.Max(1, maxMp):##0.#}"),
 
+            ["[mana:percent-decimal-uniform]"] = (currentMp, maxMp) => ConsistentDigitPercentage(currentMp, maxMp),
+
             ["[mana:deficit]"] = (currentMp, maxMp) => currentMp == maxMp ? "0" : $"-{currentMp - maxMp}",
 
             ["[mana:deficit-short]"] = (currentMp, maxMp) => currentMp == maxMp ? "0" : $"-{(currentMp - maxMp).KiloFormat()}",
@@ -220,8 +222,8 @@ namespace DelvUI.Helpers
             return actor != null ? actor.Name.ToString() : (name ?? "");
         }
 
-        private static string ConsistentDigitPercentage(float currentHp, float maxHp){
-            var rawPercentage = 100f * currentHp / Math.Max(1f, maxHp);
+        private static string ConsistentDigitPercentage(float currentVal, float maxVal){
+            var rawPercentage = 100f * currentVal / Math.Max(1f, maxVal);
             return rawPercentage >= 100 || rawPercentage <= 0 ? rawPercentage.ToString("N0") : rawPercentage.ToString("N1");
         }
     }
