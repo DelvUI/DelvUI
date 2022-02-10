@@ -1,3 +1,14 @@
+# 1.0.1.2
+Features:
+- Added Partial Fill Color options for Sages' "Addersgall" bar and White Mages' "Lily" bar.
+- Added options for Glow to White Mages' "Blood Lily" bar when filled.
+- Added White Mages' "Liturgy of the Bell" to the Party Cooldowns tracker.
+- Added a sub-option to the Experience Bars' "Hide When Inactive" to hide the experience bar in downsynced content when on a max level job.
+- Added new texttags for Health and Mana percentages to also show for whole numbers (ie 78.0% instead of 78%).
+
+Fixes:
+- Reaper "Death Gauge" bar now has Fill Direction options.
+
 # 1.0.1.1
 Features:
 - Added a sub-option to keep hiding Player Unitframe outside of combat when not full health if "Hide DelvUI outside of combat" is enabled.

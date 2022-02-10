@@ -104,7 +104,7 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.AddersgallBar.HideWhenInactive || adderScale > 0)
             {
-                BarHud[] bars = BarUtilities.GetChunkedBars(Config.AddersgallBar, 3, adderScale, 3, 0, player, glowConfig: glow, chunksToGlow: new[] { true, true, true });
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.AddersgallBar, 3, adderScale, 3, 0, player, partialFillColor: Config.AddersgallBar.PartialFillColor, glowConfig: glow, chunksToGlow: new[] { true, true, true });
                 foreach (BarHud bar in bars)
                 {
                     AddDrawActions(bar.GetDrawActions(origin, Config.AddersgallBar.StrataLevel));
@@ -179,7 +179,7 @@ namespace DelvUI.Interface.Jobs
         );
 
         [NestedConfig("Addersting Bar", 40)]
-        public AddersgallBarConfig AdderstingBar = new AddersgallBarConfig(
+        public AdderstingBarConfig AdderstingBar = new AdderstingBarConfig(
             new(64, -32),
             new(126, 20),
             new PluginConfigColor(new(255f / 255f, 232f / 255f, 255f / 255f, 100f / 100f))
@@ -213,7 +213,29 @@ namespace DelvUI.Interface.Jobs
         [NestedConfig("Glow Color (when Eukrasia active)", 60, separator = false, spacing = true)]
         public BarGlowConfig GlowConfig = new();
 
+        [Checkbox("Use Partial Fill Color", spacing = true)]
+        [Order(65)]
+        public bool UsePartialFillColor = false;
+
+        [ColorEdit4("Partial Fill Color")]
+        [Order(66, collapseWith = nameof(UsePartialFillColor))]
+        public PluginConfigColor PartialFillColor;
+
         public AddersgallBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+             : base(position, size, fillColor)
+        {
+            GlowConfig.Color = new PluginConfigColor(new(247f / 255f, 177f / 255f, 67f / 255f, 100f / 100f));
+            PartialFillColor = new PluginConfigColor(new(197 / 255f, 247f / 255f, 255f / 255f, 50f / 100f));
+        }
+    }
+
+    [Exportable(false)]
+    public class AdderstingBarConfig : ChunkedBarConfig
+    {
+        [NestedConfig("Glow Color (when Eukrasia active)", 60, separator = false, spacing = true)]
+        public BarGlowConfig GlowConfig = new();
+
+        public AdderstingBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
              : base(position, size, fillColor)
         {
             GlowConfig.Color = new PluginConfigColor(new(247f / 255f, 177f / 255f, 67f / 255f, 100f / 100f));
