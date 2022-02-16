@@ -1,3 +1,8 @@
+# 1.0.1.3
+Fixes:
+- Fixed the duration of Dancer Flourishing buffs.
+- Fixed Dancer "Fan Dance III" proc not showing on the Feather Gauge if "Hide When Inactive" was selected and no other feathers were available.
+
 # 1.0.1.2
 Features:
 - Added Partial Fill Color options for Sages' "Addersgall" bar and White Mages' "Lily" bar.
