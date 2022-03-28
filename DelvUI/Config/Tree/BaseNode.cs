@@ -280,7 +280,7 @@ namespace DelvUI.Config.Tree
 
                 if (ImGui.Button("Discord", new Vector2(buttonWidth, 0)))
                 {
-                    Utils.OpenUrl("https://discord.gg/delvui");
+                    Utils.OpenUrl("https://discord.gg/xzde5qQayh");
                 }
 
                 ImGui.PopStyleColor(2);
