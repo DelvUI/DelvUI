@@ -52,7 +52,6 @@ namespace DelvUI
         public static string Version { get; private set; } = "";
 
         private HudManager _hudManager = null!;
-        private SystemMenuHook _menuHook = null!;
 
         public delegate void JobChangedEventHandler(uint jobId);
         public static event JobChangedEventHandler? JobChangedEvent;
@@ -110,7 +109,6 @@ namespace DelvUI
 
             FontsManager.Instance.LoadConfig();
 
-            _menuHook = new SystemMenuHook(PluginInterface);
 
             ChatHelper.Initialize();
             ClipRectsHelper.Initialize();
@@ -310,7 +308,6 @@ namespace DelvUI
                 return;
             }
 
-            _menuHook?.Dispose();
             _hudManager?.Dispose();
 
             ConfigurationManager.Instance?.SaveConfigurations(true);
