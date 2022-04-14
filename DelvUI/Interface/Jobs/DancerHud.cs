@@ -118,7 +118,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawProcBar(Vector2 origin, PlayerCharacter player, DancerProcBarConfig config, uint statusId)
         {
-            BarHud? bar = BarUtilities.GetProcBar(config, player, statusId, 20f, !config.IgnoreBuffDuration);
+            BarHud? bar = BarUtilities.GetProcBar(config, player, statusId, 30f, !config.IgnoreBuffDuration);
             if (bar != null)
             {
                 AddDrawActions(bar.GetDrawActions(origin, config.StrataLevel));
@@ -216,17 +216,16 @@ namespace DelvUI.Interface.Jobs
         private void DrawFeathersBar(Vector2 origin, PlayerCharacter player)
         {
             DNCGauge gauge = Plugin.JobGauges.Get<DNCGauge>();
-            if (Config.FeatherGauge.HideWhenInactive && gauge.Feathers is 0)
+            bool hasFlourishingBuff = player.StatusList.FirstOrDefault(o => o.StatusId is 1820 or 2021) != null;
+            bool[]? glows = null;
+
+            if (Config.FeatherGauge.HideWhenInactive && gauge.Feathers is 0 && !hasFlourishingBuff)
             {
                 return;
             }
 
-            bool hasFlourishingBuff = false;
-            bool[]? glows = null;
-
             if (Config.FeatherGauge.GlowConfig.Enabled)
             {
-                hasFlourishingBuff = player.StatusList.FirstOrDefault(o => o.StatusId is 1820 or 2021) != null;
                 glows = new bool[] { hasFlourishingBuff, hasFlourishingBuff, hasFlourishingBuff, hasFlourishingBuff };
             }
 
