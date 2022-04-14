@@ -98,6 +98,7 @@ namespace DelvUI.Interface.Party
         private static Dictionary<uint, uint> InvulnMap = new Dictionary<uint, uint>()
         {
             { 810, 003077 },    // LIVING DEAD
+            { 3255, 003077},    // UNDEAD REBIRTH
             { 811, 003077 },    // WALKING DEAD
             { 1302, 002502 },   // HALLOWED GROUND
             { 82, 002502 },     // HALLOWED GROUND

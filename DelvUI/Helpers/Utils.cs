@@ -361,7 +361,7 @@ namespace DelvUI.Helpers
 
         public static Status? GetTankInvulnerabilityID(BattleChara actor)
         {
-            Status? tankInvulnBuff = actor.StatusList.FirstOrDefault(o => o.StatusId is 810 or 811 or 1302 or 409 or 1836 or 82);
+            Status? tankInvulnBuff = actor.StatusList.FirstOrDefault(o => o.StatusId is 810 or 811 or 3255 or 1302 or 409 or 1836 or 82);
 
             return tankInvulnBuff;
         }
