@@ -351,10 +351,10 @@ namespace DelvUI.Helpers
             return character switch
             {
                 BattleNpc { SubKind: 9 } battleNpc when battleNpc.ClassJob.Id > 0 => GlobalColors.Instance.SafeColorForJobId(character.ClassJob.Id), // Trust/Squadron NPCs
-                BattleNpc battleNpc when battleNpc.BattleNpcKind is BattleNpcSubKind.Chocobo or BattleNpcSubKind.Pet || !IsHostileMemory(battleNpc) => GlobalColors.Instance
-                    .NPCFriendlyColor,
                 BattleNpc battleNpc when battleNpc.BattleNpcKind == BattleNpcSubKind.Enemy || (battleNpc.StatusFlags & StatusFlags.InCombat) == StatusFlags.InCombat => GlobalColors
                     .Instance.NPCHostileColor, // I still don't think we should be defaulting to "in combat = hostile", but whatever
+                BattleNpc battleNpc when battleNpc.BattleNpcKind is BattleNpcSubKind.Chocobo or BattleNpcSubKind.Pet || !IsHostileMemory(battleNpc) => GlobalColors.Instance
+                    .NPCFriendlyColor,
                 _ => GlobalColors.Instance.NPCNeutralColor
             };
         }
