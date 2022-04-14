@@ -373,7 +373,7 @@ namespace DelvUI.Interface.PartyCooldowns
 
             // MELEE
             [7549] = NewData(7549, JobRoles.DPSMelee, 22, 90, 10, 100, 1), // feint
-            [2258] = NewData(2258, JobIDs.NIN, 18, 60, 15, 30, 3), // trick attack
+            [2248] = NewData(2248, JobIDs.NIN, 15, 120, 20, 30, 3), // mug
             [3557] = NewData(3557, JobIDs.DRG, 52, 120, 15, 30, 3), // battle litany
             [7396] = NewData(7396, JobIDs.MNK, 70, 120, 15, 90, 3), // brotherhood
             [65] = NewData(65, JobIDs.MNK, 42, 90, 15, 50, 2), // mantra
