@@ -1,3 +1,11 @@
+# 1.1.0.0
+Features:
+- Updated for patch 6.1 support.
+
+Fixes:
+- Fixed party sorting for Trust and Command Missisons parties.
+- Fixed party leader icon for Trust and Command Missisons parties.
+
 # 1.0.1.3
 Fixes:
 - Fixed the duration of Dancer Flourishing buffs.

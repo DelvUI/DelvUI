@@ -87,15 +87,15 @@ namespace DelvUI.Interface.Party
 
         public RaptureAtkModule* RaptureAtkModule { get; private set; } = null;
 
-        private const int PartyListInfoOffset = 0x0BE0;
+        private const int PartyListInfoOffset = 0x0CD0;
         private const int PartyListMemberRawInfoSize = 0x20;
         private const int PartyJobIconIdsOffset = 0x1320;
 
-        private const int PartyCrossWorldNameOffset = 0x0F2A;
-        private const int PartyCrossWorldDisplayNameOffset = 0x0EC2;
+        private const int PartyCrossWorldNameOffset = 0x101A;
+        private const int PartyCrossWorldDisplayNameOffset = 0x0FB2;
         private const int PartyCrossWorldEntrySize = 0xD8;
 
-        private const int PartyTrustNameOffset = 0x0C00;
+        private const int PartyTrustNameOffset = 0x0CF0;
         private const int PartyTrustEntrySize = 0x20;
 
         private const int PartyMembersInfoIndex = 11;
@@ -211,6 +211,19 @@ namespace DelvUI.Interface.Party
         {
             bool needsUpdate = _dirty || _groupMembers.Count != trustCount + 1;
 
+            List<string> names = new List<string>();
+            for (int i = 0; i < trustCount; i++)
+            {
+                long* namePtr = (long*)(HudAgent + (PartyTrustNameOffset + PartyTrustEntrySize * i));
+                string? name = Marshal.PtrToStringUTF8(new IntPtr(*namePtr));
+                names.Add(name ?? i.ToString());
+
+                if (_groupMembers.Count > i + 1 && name != _groupMembers[i + 1].Name)
+                {
+                    needsUpdate = true;
+                }
+            }
+
             if (needsUpdate)
             {
                 _groupMembers.Clear();
@@ -222,14 +235,10 @@ namespace DelvUI.Interface.Party
 
                 for (int i = 0; i < trustCount; i++)
                 {
-                    long* namePtr = (long*)(HudAgent + (PartyTrustNameOffset + PartyTrustEntrySize * i));
-                    string? name = Marshal.PtrToStringUTF8(new IntPtr(*namePtr));
-                    if (name == null) { continue; }
-
-                    Character? trustChara = Utils.GetGameObjectByName(name) as Character;
+                    Character? trustChara = Utils.GetGameObjectByName(names[i]) as Character;
                     if (trustChara != null)
                     {
-                        _groupMembers.Add(new PartyFramesMember(trustChara, order, EnmityForTrustMemberIndex(i), PartyMemberStatus.None, true));
+                        _groupMembers.Add(new PartyFramesMember(trustChara, order, EnmityForTrustMemberIndex(i), PartyMemberStatus.None, false));
                         order++;
                     }
                 }

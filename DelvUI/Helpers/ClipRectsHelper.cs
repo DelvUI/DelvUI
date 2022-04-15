@@ -158,6 +158,8 @@ namespace DelvUI.Helpers
             "ContentsFinderMenu",
             "ContentsInfo",
             "Dawn",
+            "DawnStory",
+            "DawnStoryMemberSelect",
             "BeginnersMansionProblem",
             "BeginnersMansionProblemCompList",
             "SupportDesk",

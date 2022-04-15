@@ -119,16 +119,9 @@ namespace DelvUI.Interface.Jobs
             byte[] sealsFromBytes = new byte[3];
             bool[] chucksToGlow = new bool[3];
 
-            AstrologianGauge* tmp = (AstrologianGauge*)gaugeAddress;
             for (int ix = 0; ix < 3; ++ix)
             {
-                sealsFromBytes[ix] = tmp->Seals[ix];
-            }
-
-            for (int ix = 0; ix < 3; ++ix)
-            {
-                byte seal = sealsFromBytes[ix];
-                SealType type = (SealType)seal;
+                SealType type = gauge.Seals[ix];
 
                 switch (type)
                 {
