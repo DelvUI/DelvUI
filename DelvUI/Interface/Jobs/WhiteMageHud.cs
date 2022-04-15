@@ -117,7 +117,7 @@ namespace DelvUI.Interface.Jobs
         {
             WHMGauge gauge = Plugin.JobGauges.Get<WHMGauge>();
 
-            const float lilyCooldown = 30000f;
+            const float lilyCooldown = 20000f;
 
             float GetScale(int num, float timer) => num + (timer / lilyCooldown);
             float lilyScale = GetScale(gauge.Lily, gauge.LilyTimer);
