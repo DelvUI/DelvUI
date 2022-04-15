@@ -7,7 +7,7 @@
 
 **Discord**  
 
-https://discord.gg/delvui
+https://discord.gg/xzde5qQayh
 ***
 
 **How to contribute**  

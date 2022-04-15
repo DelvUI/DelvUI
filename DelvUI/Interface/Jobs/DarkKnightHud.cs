@@ -165,7 +165,7 @@ namespace DelvUI.Interface.Jobs
 
             Config.BloodWeaponBar.Label.SetValue(bloodWeaponDuration);
 
-            BarHud bar = BarUtilities.GetProgressBar(Config.BloodWeaponBar, bloodWeaponDuration, 10, 0f, player);
+            BarHud bar = BarUtilities.GetProgressBar(Config.BloodWeaponBar, bloodWeaponDuration, 15, 0f, player);
             AddDrawActions(bar.GetDrawActions(origin, Config.BloodWeaponBar.StrataLevel));
         }
 

@@ -1,3 +1,15 @@
+# 1.1.0.0
+Features:
+- Updated for patch 6.1 support.
+- DelvUI option was removed from the in-game system menu:
+    + This feature used to conflict with Dalamud's system menu options which was not ideal.
+    + We ran into some issues with this feature and were not really comfortable with the way it was implemented so we decided to remove it.
+    + You can use "/delvui" to access the config window. We might add a shorter alias for this command in the future for convenience.
+
+Fixes:
+- Fixed party sorting for Trust and Command Missisons parties.
+- Fixed party leader icon for Trust and Command Missisons parties.
+
 # 1.0.1.3
 Fixes:
 - Fixed the duration of Dancer Flourishing buffs.

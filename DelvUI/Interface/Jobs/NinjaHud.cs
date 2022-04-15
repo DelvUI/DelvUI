@@ -206,7 +206,7 @@ namespace DelvUI.Interface.Jobs
 
             if (actor is BattleChara target)
             {
-                trickDuration = target.StatusList.FirstOrDefault(o => o.StatusId is 638 && o.SourceID == player.ObjectId && o.RemainingTime > 0)?.RemainingTime ?? 0f;
+                trickDuration = target.StatusList.FirstOrDefault(o => o.StatusId is 3254 && o.SourceID == player.ObjectId && o.RemainingTime > 0)?.RemainingTime ?? 0f;
             }
 
             if (!Config.TrickAttackBar.HideWhenInactive || trickDuration > 0)

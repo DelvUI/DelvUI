@@ -14,6 +14,7 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using StructsCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 
 namespace DelvUI.Helpers
 {
@@ -82,12 +83,13 @@ namespace DelvUI.Helpers
 
         public static unsafe float ActorShieldValue(GameObject? actor)
         {
-            if (actor == null)
+            if (actor == null || actor is not Character)
             {
                 return 0f;
             }
 
-            return Math.Min(*(byte*)(actor.Address + 0x19D9), (byte)100) / 100f;
+            StructsCharacter* chara = (StructsCharacter*)actor.Address;
+            return Math.Min((float)chara->ShieldValue, 100f) / 100f;
         }
 
         public static string DurationToString(double duration)
@@ -351,17 +353,17 @@ namespace DelvUI.Helpers
             return character switch
             {
                 BattleNpc { SubKind: 9 } battleNpc when battleNpc.ClassJob.Id > 0 => GlobalColors.Instance.SafeColorForJobId(character.ClassJob.Id), // Trust/Squadron NPCs
-                BattleNpc battleNpc when battleNpc.BattleNpcKind is BattleNpcSubKind.Chocobo or BattleNpcSubKind.Pet || !IsHostileMemory(battleNpc) => GlobalColors.Instance
-                    .NPCFriendlyColor,
                 BattleNpc battleNpc when battleNpc.BattleNpcKind == BattleNpcSubKind.Enemy || (battleNpc.StatusFlags & StatusFlags.InCombat) == StatusFlags.InCombat => GlobalColors
                     .Instance.NPCHostileColor, // I still don't think we should be defaulting to "in combat = hostile", but whatever
+                BattleNpc battleNpc when battleNpc.BattleNpcKind is BattleNpcSubKind.Chocobo or BattleNpcSubKind.Pet || !IsHostileMemory(battleNpc) => GlobalColors.Instance
+                    .NPCFriendlyColor,
                 _ => GlobalColors.Instance.NPCNeutralColor
             };
         }
 
         public static Status? GetTankInvulnerabilityID(BattleChara actor)
         {
-            Status? tankInvulnBuff = actor.StatusList.FirstOrDefault(o => o.StatusId is 810 or 811 or 1302 or 409 or 1836 or 82);
+            Status? tankInvulnBuff = actor.StatusList.FirstOrDefault(o => o.StatusId is 810 or 811 or 3255 or 1302 or 409 or 1836 or 82);
 
             return tankInvulnBuff;
         }

@@ -1,4 +1,4 @@
-﻿using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Hooking;
 using DelvUI.Config;
@@ -19,7 +19,7 @@ namespace DelvUI.Interface.PartyCooldowns
 
         private PartyCooldownsManager()
         {
-            IntPtr funcPtr = Plugin.SigScanner.ScanText("4C 89 44 24 18 53 56 57 41 54 41 57 48 81 EC ?? 00 00 00 8B F9");
+            IntPtr funcPtr = Plugin.SigScanner.ScanText("4C 89 44 24 ?? 55 56 57 41 54 41 55 41 56 48 8D 6C 24");
             OnActionUsedHook = new Hook<OnActionUsedDelegate>(funcPtr, OnActionUsed);
             OnActionUsedHook.Enable();
 
