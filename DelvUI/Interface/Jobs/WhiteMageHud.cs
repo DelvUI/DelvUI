@@ -17,7 +17,7 @@ namespace DelvUI.Interface.Jobs
         private new WhiteMageConfig Config => (WhiteMageConfig)_config;
 
         private static readonly List<uint> DiaIDs = new() { 143, 144, 1871 };
-        private static readonly List<float> DiaDurations = new() { 18, 18, 30 };
+        private static readonly List<float> DiaDurations = new() { 30, 30, 30 };
 
         public WhiteMageHud(WhiteMageConfig config, string? displayName = null) : base(config, displayName)
         {
