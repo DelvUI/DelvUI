@@ -14,6 +14,7 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using StructsCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 
 namespace DelvUI.Helpers
 {
@@ -82,12 +83,13 @@ namespace DelvUI.Helpers
 
         public static unsafe float ActorShieldValue(GameObject? actor)
         {
-            if (actor == null)
+            if (actor == null || actor is not Character)
             {
                 return 0f;
             }
 
-            return Math.Min(*(byte*)(actor.Address + 0x19D9), (byte)100) / 100f;
+            StructsCharacter* chara = (StructsCharacter*)actor.Address;
+            return Math.Min((float)chara->ShieldValue, 100f) / 100f;
         }
 
         public static string DurationToString(double duration)
