@@ -111,12 +111,10 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private unsafe void DrawAstrodyneBar(Vector2 origin, PlayerCharacter player)
+        private void DrawAstrodyneBar(Vector2 origin, PlayerCharacter player)
         {
             List<PluginConfigColor> chunkColors = new();
             ASTGauge gauge = Plugin.JobGauges.Get<ASTGauge>();
-            IntPtr gaugeAddress = gauge.Address;
-            byte[] sealsFromBytes = new byte[3];
             bool[] chucksToGlow = new bool[3];
 
             for (int ix = 0; ix < 3; ++ix)
