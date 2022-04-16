@@ -4,62 +4,83 @@ on: [push, pull_request]
 
 jobs:
   build-debug:
-    runs-on: windows-latest
+    # 2019 version has .NET 5 installed by default.
+    # Switch to windows-2022 when updating to .NET 6.
+    runs-on: windows-2019
 
     env:
+      #/ Skips dotnet's initial cache populating.
+      #\ Since this is a CI, doing this is unnecessary.
+      # (Probably not needed as we don't use actions/setup-dotnet, but it doesn't hurt.)
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
 
     steps:
-      - name: Checkout and initialise
+      - name: Checkout and Initialise
         uses: actions/checkout@v2
 
-      # - name: Install .NET 6
-      #  uses: actions/setup-dotnet@v1
-      #  with:
-      #    dotnet-version: "6.0.x"
-      #    include-prerelease: true
+      # Get Date and time
+      # (Currently unused)
+      - name: Set Date Output
+        id: date
+        shell: pwsh
+        run: |
+          echo "::set-output name=date-month::$(Get-Date -Format 'yyyy-MM')"
+          echo "::set-output name=date-time::$(Get-Date -Format 'yyyy-MM-dd_HH-mm')"
 
-      - name: Extract Dalamud version
-        id: dalamud-version
-        uses: mavrosxristoforos/get-xml-info@1.0
+      # Get Dalamud version from project file
+      - name: Extract Project Dalamud Version
+        id: project-dalamud-version
+        uses: mavrosxristoforos/get-xml-info@1.1.0
         with:
           xml-file: "./DelvUI/DelvUI.csproj"
-          xpath: "//DalamudVersion"
+          xpath: "//DalamudCIDist"
 
-      - name: CSProj Cache
-        id: cache-csproj
-        uses: actions/cache@v2
+      #/ Powershell doesn't have a ternary operator,
+      #\ so we use a conditional evaluation trick.
+      #/ If the version in the project is 'release',
+      #  then we return blank (so we get the root),
+      #\ otherwise we use the version string. ('stg', 'net5', etc.)
+      - name: Set Dalamud Version Normalised URL Env
+        id: dalamud-norm-url
+        shell: pwsh
+        run: |
+          echo "::set-output name=url::$(({}, ('${{ steps.project-dalamud-version.outputs.info }}'))[!('${{ steps.project-dalamud-version.outputs.info }}' -eq 'release')])"
+
+      #/ Request the version information from Dalamud.
+      #  Then print it to console for debug purposes.
+      #\ Finally, save it to a JSON file.
+      - name: Get Dalamud Version JSON
+        id: request-dalamud-version
+        shell: pwsh
+        run: |
+          $DALAMUD_VER_INFO = Invoke-RestMethod -Uri https://goatcorp.github.io/dalamud-distrib/${{ steps.dalamud-norm-url.outputs.url }}/version
+          echo $DALAMUD_VER_INFO
+          $DALAMUD_VER_INFO | ConvertTo-Json | Set-Content dalamud-version.json
+
+      # Use the .csproj and dalamud-version.json to generate the cache key.
+      # Cache the nuget packages and Dalamud build.
+      - name: Cache Dependencies
+        id: cache-dependencies
+        uses: actions/cache@v3.0.2
         with:
           path: |
             ./dalamud
             ~/.nuget/packages
-          key: ${{ runner.os }}-csproj-v3-${{ hashFiles('**/*.csproj') }}
+          key: ${{ runner.os }}-${{ hashFiles('**/*.csproj') }}-${{ hashFiles('dalamud-version.json') }}
 
+      # If the cache didn't hit, download and extract Dalamud.
       - name: Setup Dalamud
         if: |
-          steps.cache-csproj.outputs.cache-hit != 'true' &&
-          steps.dalamud-version.outputs.info != 'dev'
+          steps.cache-dependencies.outputs.cache-hit != 'true'
         shell: pwsh
         run: |
           mkdir ./dalamud
-          Invoke-WebRequest -Uri https://goatcorp.github.io/dalamud-distrib/latest.zip -OutFile ./dalamud/latest.zip
+          Invoke-WebRequest -Uri https://goatcorp.github.io/dalamud-distrib/${{ steps.dalamud-norm-url.outputs.url }}/latest.zip -OutFile ./dalamud/latest.zip
           Expand-Archive -Path ./dalamud/latest.zip ./dalamud
 
-      - name: Setup dev Dalamud
-        if: |
-          steps.cache-csproj.outputs.cache-hit != 'true' &&
-          steps.dalamud-version.outputs.info == 'dev'
-        shell: pwsh
-        run: |
-          mkdir ./dalamud
-          Invoke-WebRequest -Uri https://goatcorp.github.io/dalamud-distrib/stg/latest.zip -OutFile ./dalamud/latest.zip
-          Expand-Archive -Path ./dalamud/latest.zip ./dalamud
-
+      # Restore, Build and Test
       - name: Restore project dependencies
         run: dotnet restore --verbosity normal
-
-      # - name: Run dotnet-format
-      #   run: dotnet format DelvUI --no-restore --verify-no-changes --verbosity minimal
 
       - name: Build Debug
         run: dotnet build --no-restore --verbosity normal --configuration Debug
@@ -67,8 +88,9 @@ jobs:
       - name: Test Debug
         run: dotnet test --no-build --verbosity normal --configuration Debug
 
+      # Upload build artifact
       - name: Upload Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3.0.0
         with:
           name: DelvUI-debug-${{ github.sha }}
           path: |
