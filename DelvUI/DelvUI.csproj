@@ -38,6 +38,8 @@
 
     <!-- Dalamud Configuration -->
     <PropertyGroup>
+		<!-- Distribution version for GitHub CI. 'release' is currently .NET 5 -->
+		<DalamudCIDist>release</DalamudCIDist>
         <DalamudVersion>dev</DalamudVersion>
         <DalamudLocal>../dalamud/</DalamudLocal>
         <DalamudXIVLauncher>$(APPDATA)\XIVLauncher\addon\Hooks\$(DalamudVersion)</DalamudXIVLauncher>
