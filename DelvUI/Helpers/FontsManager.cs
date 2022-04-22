@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
+using System.Linq;
+using Dalamud.Interface.GameFonts;
 using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
@@ -128,11 +131,13 @@ namespace DelvUI.Helpers
 
             foreach (var fontData in config.Fonts)
             {
+                var isGameFont = config.GameFontMap.ContainsValue(fontData.Value.Name);
                 var path = DefaultFontsPath + fontData.Value.Name + ".ttf";
                 if (!File.Exists(path))
                 {
                     path = config.ValidatedFontsPath + fontData.Value.Name + ".ttf";
-                    if (!File.Exists(path))
+                    
+                    if (!File.Exists(path) && !isGameFont)
                     {
                         continue;
                     }
@@ -140,8 +145,19 @@ namespace DelvUI.Helpers
 
                 try
                 {
-                    ImFontPtr font = ranges == null ? io.Fonts.AddFontFromFileTTF(path, fontData.Value.Size)
-                        : io.Fonts.AddFontFromFileTTF(path, fontData.Value.Size, null, ranges.Value.Data);
+                    ImFontPtr font;
+                    if (isGameFont)
+                    {
+                        GameFontFamily fontFamily = (GameFontFamily)Enum.Parse(typeof(GameFontFamily), config.GameFontMap.FirstOrDefault(x => x.Value == fontData.Value.Name).Key);
+                        GameFontHandle fontHandle = Plugin.PluginInterface.UiBuilder.GetGameFontHandle(new GameFontStyle(fontFamily, fontData.Value.Size));
+                        font = fontHandle.ImFont;
+                    }
+                    else
+                    {
+                        font = ranges == null ? io.Fonts.AddFontFromFileTTF(path, fontData.Value.Size)
+                            : io.Fonts.AddFontFromFileTTF(path, fontData.Value.Size, null, ranges.Value.Data);
+                    }
+                    
                     _fonts.Add(font);
 
                     if (fontData.Key == FontsConfig.DefaultBigFontKey)
@@ -155,6 +171,7 @@ namespace DelvUI.Helpers
                     PluginLog.Log($"Font failed to load: {path}");
                     PluginLog.Log(ex.ToString());
                 }
+                
             }
         }
 
