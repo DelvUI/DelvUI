@@ -99,7 +99,7 @@ namespace DelvUI.Interface.EnemyList
         [NestedConfig("Color Based On Health Value", 30, collapsingHeader = false)]
         public ColorByHealthValueConfig ColorByHealth = new ColorByHealthValueConfig();
 
-        [Checkbox("Highlight When Hovering With Cursor", spacing = true)]
+        [Checkbox("Highlight When Hovering With Cursor Or Soft Targetting", spacing = true)]
         [Order(40)]
         public bool ShowHighlight = true;
 
