@@ -62,17 +62,31 @@ namespace DelvUI.Interface.Bars
             float maxDuration,
             bool trackDuration = true)
         {
-            float duration = Math.Abs(player.StatusList.FirstOrDefault(o => o.StatusId == statusId)?.RemainingTime ?? 0);
+            return GetProcBar(config, player, new List<uint> { statusId }, new List<float> { maxDuration }, trackDuration);
+        }
 
-            if (duration == 0 && config.HideWhenInactive)
+        public static BarHud? GetProcBar(
+            ProgressBarConfig config,
+            PlayerCharacter player,
+            List<uint> statusIDs,
+            List<float> maxDurations,
+            bool trackDuration = true)
+        {
+            if (statusIDs.Count == 0 || maxDurations.Count == 0) { return null; }
+
+            Status? status = player.StatusList.FirstOrDefault(o => statusIDs.Contains(o.StatusId));
+            if (status == null && config.HideWhenInactive)
             {
                 return null;
             }
 
+            float duration = Math.Abs(status?.RemainingTime ?? 0);
+
             if (trackDuration)
             {
+                int index = status != null ? statusIDs.IndexOf(status.StatusId) : 0;
                 config.Label.SetValue(duration);
-                return GetProgressBar(config, duration, maxDuration, 0, player);
+                return GetProgressBar(config, duration, maxDurations[index], 0, player);
             }
 
             config.Label.SetText("");

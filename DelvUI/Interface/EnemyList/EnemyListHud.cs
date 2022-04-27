@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Dalamud.Game.ClientState.Objects;
 
 namespace DelvUI.Interface.EnemyList
 {
@@ -179,7 +180,8 @@ namespace DelvUI.Interface.EnemyList
                 // highlight
                 var (areaStart, areaEnd) = Configs.HealthBar.MouseoverAreaConfig.GetArea(origin + pos, Configs.HealthBar.Size);
                 bool isHovering = ImGui.IsMouseHoveringRect(areaStart, areaEnd);
-                if (isHovering)
+                bool isSoftTarget = character != null && character == Plugin.TargetManager.SoftTarget;
+                if (isHovering || isSoftTarget)
                 {
                     if (Configs.HealthBar.Colors.ShowHighlight)
                     {
@@ -303,7 +305,7 @@ namespace DelvUI.Interface.EnemyList
 
         private PluginConfigColor GetBorderColor(Character? character, int enmityLevel)
         {
-            GameObject? target = Plugin.TargetManager.Target ?? Plugin.TargetManager.SoftTarget;
+            GameObject? target = Plugin.TargetManager.Target;
             if (character != null && character == target)
             {
                 return Configs.HealthBar.Colors.TargetBordercolor;
@@ -324,7 +326,7 @@ namespace DelvUI.Interface.EnemyList
 
         private int GetBorderThickness(Character? character)
         {
-            GameObject? target = Plugin.TargetManager.Target ?? Plugin.TargetManager.SoftTarget;
+            GameObject? target = Plugin.TargetManager.Target;
             if (character != null && character == target)
             {
                 return Configs.HealthBar.Colors.TargetBorderThickness;
