@@ -177,7 +177,7 @@ namespace DelvUI.Interface.Jobs
             BarHud[] bars = BarUtilities.GetChunkedBars(Config.BloodWeaponBar, chunks, player);
             foreach (BarHud bar in bars)
             {
-                AddDrawActions(bar.GetDrawActions(origin, Config.DeliriumBar.StrataLevel));
+                AddDrawActions(bar.GetDrawActions(origin, Config.BloodWeaponBar.StrataLevel));
             }
         }
 
