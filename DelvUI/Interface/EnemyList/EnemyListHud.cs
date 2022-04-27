@@ -180,7 +180,7 @@ namespace DelvUI.Interface.EnemyList
                 // highlight
                 var (areaStart, areaEnd) = Configs.HealthBar.MouseoverAreaConfig.GetArea(origin + pos, Configs.HealthBar.Size);
                 bool isHovering = ImGui.IsMouseHoveringRect(areaStart, areaEnd);
-                bool isSoftTarget = character == Plugin.TargetManager.SoftTarget;
+                bool isSoftTarget = character != null && character == Plugin.TargetManager.SoftTarget;
                 if (isHovering || isSoftTarget)
                 {
                     if (Configs.HealthBar.Colors.ShowHighlight)
