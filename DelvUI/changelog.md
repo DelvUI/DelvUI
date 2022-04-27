@@ -1,3 +1,11 @@
+# 1.1.1.0
+Features:
+- Added support for in-game fonts.
+- Added support for soft targeting in the Party Frames and Enemy List (units can be highlighted when soft targeting them).
+
+Fixes: 
+- Fixed several game windows not being covered by DelvUI elements with Window Clipping enabled.
+
 # 1.1.0.0
 Features:
 - Updated for patch 6.1 support.
