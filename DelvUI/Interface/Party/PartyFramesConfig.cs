@@ -186,7 +186,7 @@ namespace DelvUI.Interface.Party
         [NestedConfig("Color Based On Health Value", 30, collapsingHeader = false)]
         public ColorByHealthValueConfig ColorByHealth = new ColorByHealthValueConfig();
 
-        [Checkbox("Highlight When Hovering With Cursor", spacing = true)]
+        [Checkbox("Highlight When Hovering With Cursor Or Soft Targeting", spacing = true)]
         [Order(40)]
         public bool ShowHighlight = true;
 
