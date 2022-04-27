@@ -1,5 +1,12 @@
 # 1.1.1.0
+Features:
+- Added support for in-game fonts.
+- Added support for soft targeting in the Party Frames and Enemy List (units can be highlighted when soft targeting them).
+- Changed Dark Knight's Blood Weapon Bar to a chunked bar to reflect the changes in patch 6.1.
+
 Fixes: 
+- Fixed several game windows not being covered by DelvUI elements with Window Clipping enabled.
+- Fixed Party Cooldowns not resetting on a wipe.
 - Fixed Flourish buffs not working properly for Dancer.
 
 # 1.1.0.0

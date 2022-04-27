@@ -23,6 +23,10 @@ namespace DelvUI.Interface.PartyCooldowns
             OnActionUsedHook = new Hook<OnActionUsedDelegate>(funcPtr, OnActionUsed);
             OnActionUsedHook.Enable();
 
+            IntPtr actorControlPtr = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 0F B7 0B 83 E9 64");
+            ActorControlHook = new Hook<ActorControlDelegate>(actorControlPtr, OnActorControl);
+            ActorControlHook.Enable();
+
             PartyManager.Instance.MembersChangedEvent += OnMembersChanged;
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
             Plugin.JobChangedEvent += OnJobChanged;
@@ -60,6 +64,9 @@ namespace DelvUI.Interface.PartyCooldowns
             OnActionUsedHook.Disable();
             OnActionUsedHook.Dispose();
 
+            ActorControlHook.Disable();
+            ActorControlHook.Dispose();
+
             PartyManager.Instance.MembersChangedEvent -= OnMembersChanged;
             Plugin.JobChangedEvent -= OnJobChanged;
             _config.ValueChangeEvent -= OnConfigPropertyChanged;
@@ -94,6 +101,9 @@ namespace DelvUI.Interface.PartyCooldowns
         private delegate void OnActionUsedDelegate(int characterId, IntPtr characterAddress, IntPtr position, IntPtr effect, IntPtr unk1, IntPtr unk2);
         private Hook<OnActionUsedDelegate> OnActionUsedHook;
 
+        private delegate void ActorControlDelegate(uint entityId, uint id, uint unk1, uint type, uint unk2, uint unk3, uint unk4, uint unk5, UInt64 targetId, byte unk6);
+        private Hook<ActorControlDelegate> ActorControlHook;
+
         private Dictionary<uint, Dictionary<uint, PartyCooldown>>? _oldMap;
         private Dictionary<uint, Dictionary<uint, PartyCooldown>> _cooldownsMap = new Dictionary<uint, Dictionary<uint, PartyCooldown>>();
         public IReadOnlyDictionary<uint, Dictionary<uint, PartyCooldown>> CooldownsMap => _cooldownsMap;
@@ -104,6 +114,28 @@ namespace DelvUI.Interface.PartyCooldowns
         public event PartyCooldownsChangedEventHandler? CooldownsChangedEvent;
 
         private bool _wasInDuty = false;
+
+        private void OnActorControl(uint entityId, uint id, uint unk1, uint type, uint unk2, uint unk3, uint unk4, uint unk5, UInt64 targetId, byte unk6)
+        {
+            ActorControlHook.Original(entityId, id, unk1, type, unk2, unk3, unk4, unk5, targetId, unk6);
+
+            // detect wipe fadeouts (not 100% reliable but good enough)
+            if (type == 0x40000010)
+            {
+                ResetCooldowns();
+            }
+        }
+
+        private void ResetCooldowns()
+        {
+            foreach (uint actorId in _cooldownsMap.Keys)
+            {
+                foreach (PartyCooldown cooldown in _cooldownsMap[actorId].Values)
+                {
+                    cooldown.LastTimeUsed = 0;
+                }
+            }
+        }
 
         private unsafe void OnActionUsed(int characterId, IntPtr characterAddress, IntPtr position, IntPtr effect, IntPtr unk1, IntPtr unk2)
         {
