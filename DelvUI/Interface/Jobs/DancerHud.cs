@@ -121,7 +121,7 @@ namespace DelvUI.Interface.Jobs
             List<float> durations = new List<float>();
             for (int i = 0; i < statusIDs.Length; i++)
             {
-                durations.Append(30f);
+                durations.Add(30f);
             }
 
             BarHud? bar = BarUtilities.GetProcBar(config, player, statusIDs.ToList(), durations, !config.IgnoreBuffDuration);
