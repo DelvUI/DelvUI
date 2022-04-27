@@ -1,3 +1,7 @@
+# 1.1.1.0
+Features: 
+- Changed Dark Knight's Blood Weapon Bar to a chunked bar to reflect the changes in patch 6.1.
+
 # 1.1.0.0
 Features:
 - Updated for patch 6.1 support.
