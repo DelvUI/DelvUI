@@ -288,7 +288,8 @@ namespace DelvUI.Interface.Party
             }
 
             // highlight
-            if (_configs.HealthBar.ColorsConfig.ShowHighlight && isHovering)
+            bool isSoftTarget = character != null && character == Plugin.TargetManager.SoftTarget;
+            if (_configs.HealthBar.ColorsConfig.ShowHighlight && (isHovering || isSoftTarget))
             {
                 Rect highlight = new Rect(Position, _configs.HealthBar.Size, _configs.HealthBar.ColorsConfig.HighlightColor);
                 bar.AddForegrounds(highlight);
