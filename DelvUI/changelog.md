@@ -6,6 +6,7 @@ Features:
 
 Fixes: 
 - Fixed several game windows not being covered by DelvUI elements with Window Clipping enabled.
+- Fixed Party Cooldowns not resetting on a wipe.
 
 # 1.1.0.0
 Features:
