@@ -111,14 +111,20 @@ namespace DelvUI.Interface.Jobs
 
             if (!showingStepBar || !Config.StepsBar.HideProcs)
             {
-                if (Config.CascadeBar.Enabled) { DrawProcBar(pos, player, Config.CascadeBar, 2693); }
-                if (Config.FountainBar.Enabled) { DrawProcBar(pos, player, Config.FountainBar, 2694); }
+                if (Config.CascadeBar.Enabled) { DrawProcBar(pos, player, Config.CascadeBar, 2693, 3017); }
+                if (Config.FountainBar.Enabled) { DrawProcBar(pos, player, Config.FountainBar, 2694, 3018); }
             }
         }
 
-        private void DrawProcBar(Vector2 origin, PlayerCharacter player, DancerProcBarConfig config, uint statusId)
+        private void DrawProcBar(Vector2 origin, PlayerCharacter player, DancerProcBarConfig config, params uint[] statusIDs)
         {
-            BarHud? bar = BarUtilities.GetProcBar(config, player, statusId, 30f, !config.IgnoreBuffDuration);
+            List<float> durations = new List<float>();
+            for (int i = 0; i < statusIDs.Length; i++)
+            {
+                durations.Append(30f);
+            }
+
+            BarHud? bar = BarUtilities.GetProcBar(config, player, statusIDs.ToList(), durations, !config.IgnoreBuffDuration);
             if (bar != null)
             {
                 AddDrawActions(bar.GetDrawActions(origin, config.StrataLevel));

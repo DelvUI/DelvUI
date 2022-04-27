@@ -1,3 +1,7 @@
+# 1.1.1.0
+Fixes: 
+- Fixed Flourish buffs not working properly for Dancer.
+
 # 1.1.0.0
 Features:
 - Updated for patch 6.1 support.
