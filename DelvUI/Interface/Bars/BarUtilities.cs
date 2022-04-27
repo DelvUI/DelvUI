@@ -75,13 +75,12 @@ namespace DelvUI.Interface.Bars
             if (statusIDs.Count == 0 || maxDurations.Count == 0) { return null; }
 
             Status? status = player.StatusList.FirstOrDefault(o => statusIDs.Contains(o.StatusId));
-            if (status == null) { return null; }
-
-            float duration = Math.Abs(status.RemainingTime);
-            if (duration == 0 && config.HideWhenInactive)
+            if (status == null && config.HideWhenInactive)
             {
                 return null;
             }
+
+            float duration = Math.Abs(status?.RemainingTime ?? 0);
 
             if (trackDuration)
             {
