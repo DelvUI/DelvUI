@@ -159,14 +159,26 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBloodWeaponBar(Vector2 origin, PlayerCharacter player)
         {
-            float bloodWeaponDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 742)?.RemainingTime ?? 0f;
+            Status? bloodWeaponBuff = player.StatusList.FirstOrDefault(o => o.StatusId is 742);
+            float duration = bloodWeaponBuff?.RemainingTime ?? 0f;
+            int stacks = bloodWeaponBuff?.StackCount ?? 0;
 
-            if (Config.BloodWeaponBar.HideWhenInactive && bloodWeaponDuration is 0) { return; }
+            if (Config.BloodWeaponBar.HideWhenInactive && duration is 0) { return; }
 
-            Config.BloodWeaponBar.Label.SetValue(bloodWeaponDuration);
+            var chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[5];
 
-            BarHud bar = BarUtilities.GetProgressBar(Config.BloodWeaponBar, bloodWeaponDuration, 15, 0f, player);
-            AddDrawActions(bar.GetDrawActions(origin, Config.BloodWeaponBar.StrataLevel));
+            for (int i = 0; i < 5; i++)
+            {
+                chunks[i] = new(Config.BloodWeaponBar.FillColor, i < stacks ? 1 : 0, i == 2 ? Config.BloodWeaponBar.Label : null);
+            }
+
+            Config.BloodWeaponBar.Label.SetValue(duration);
+
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.BloodWeaponBar, chunks, player);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.BloodWeaponBar.StrataLevel));
+            }
         }
 
         private void DrawDeliriumBar(Vector2 origin, PlayerCharacter player)
@@ -256,14 +268,14 @@ namespace DelvUI.Interface.Jobs
         );
 
         [NestedConfig("Blood Weapon Bar", 45)]
-        public ProgressBarConfig BloodWeaponBar = new ProgressBarConfig(
+        public DarkKnightChunkedBarConfig BloodWeaponBar = new DarkKnightChunkedBarConfig(
             new Vector2(-64, -32),
             new Vector2(126, 20),
             new PluginConfigColor(new Vector4(160f / 255f, 0f / 255f, 0f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Delirium Bar", 50)]
-        public ChunkedProgressBarConfig DeliriumBar = new ChunkedProgressBarConfig(
+        public DarkKnightChunkedBarConfig DeliriumBar = new DarkKnightChunkedBarConfig(
             new Vector2(64, -32),
             new Vector2(126, 20),
             new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f))
@@ -289,6 +301,16 @@ namespace DelvUI.Interface.Jobs
         public bool ShowFullMana = false;
 
         public DarkKnightManaBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+             : base(position, size, fillColor)
+        {
+        }
+    }
+
+    [Exportable(false)]
+    [DisableParentSettings("UseChunks", "LabelMode")]
+    public class DarkKnightChunkedBarConfig : ChunkedProgressBarConfig
+    {
+        public DarkKnightChunkedBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
              : base(position, size, fillColor)
         {
         }
