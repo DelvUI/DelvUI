@@ -179,7 +179,7 @@ namespace DelvUI.Interface.EnemyList
 
                 // highlight
                 var (areaStart, areaEnd) = Configs.HealthBar.MouseoverAreaConfig.GetArea(origin + pos, Configs.HealthBar.Size);
-                bool isHovering = ImGui.IsMouseHoveringRect(areaStart, areaEnd);
+                bool isHovering = character != null && ImGui.IsMouseHoveringRect(areaStart, areaEnd);
                 bool isSoftTarget = character != null && character == Plugin.TargetManager.SoftTarget;
                 if (isHovering || isSoftTarget)
                 {
@@ -190,7 +190,7 @@ namespace DelvUI.Interface.EnemyList
                     }
 
                     mouseoverTarget = character;
-                    hovered = true;
+                    hovered = isHovering;
                 }
 
                 AddDrawActions(bar.GetDrawActions(origin, Configs.HealthBar.StrataLevel));
