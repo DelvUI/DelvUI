@@ -1,3 +1,6 @@
+# 1.1.1.1
+- Fixed mouse inputs sometimes getting stuck (bug introduced in v1.1.1.0).
+
 # 1.1.1.0
 Features:
 - Added support for in-game fonts.
