@@ -188,9 +188,11 @@ namespace DelvUI.Interface
             {
                 isHidden = isHidden && Config.ShowDelvUIFramesOnWeaponDrawn
                     ? Config.HideOutsideOfCombat && !IsInCombat() && !HasWeaponDrawn()
-                    : Config.ShowDelvUIFramesInDuty
-                        ? Config.HideOutsideOfCombat && !IsInCombat() && !IsInDuty()
-                        : Config.HideOutsideOfCombat && !IsInCombat();
+                    : isHidden;
+
+                isHidden = isHidden && Config.ShowDelvUIFramesWhenCrafting
+                    ? Config.HideOutsideOfCombat && !IsInCombat() && !IsCrafting()
+                    : isHidden;
 
                 // hide only jobpack hud outside of combat
                 if (!isHidden && element is JobHud)
@@ -439,6 +441,8 @@ namespace DelvUI.Interface
         private bool IsInCombat() => Plugin.Condition[ConditionFlag.InCombat];
 
         private bool IsInDuty() => Plugin.Condition[ConditionFlag.BoundByDuty];
+
+        private bool IsCrafting() => Plugin.Condition[ConditionFlag.Crafting];
 
         private bool HasWeaponDrawn() => (Plugin.ClientState.LocalPlayer != null && Plugin.ClientState.LocalPlayer.StatusFlags.HasFlag(StatusFlags.WeaponOut));
 
