@@ -187,12 +187,12 @@ namespace DelvUI.Config.Profiles
             }
         }
 
-        public bool LoadCurrentProfile()
+        public bool LoadCurrentProfile(string oldProfile)
         {
             try
             {
                 var importString = File.ReadAllText(CurrentProfilePath());
-                return ConfigurationManager.Instance.ImportProfile(importString);
+                return ConfigurationManager.Instance.ImportProfile(oldProfile, _currentProfileName, importString);
             }
             catch (Exception e)
             {
@@ -269,7 +269,7 @@ namespace DelvUI.Config.Profiles
                 ChatHelper.SendChatMessage("/hudlayout " + currentProfile.HudLayout);
             }
 
-            if (!LoadCurrentProfile())
+            if (!LoadCurrentProfile(oldProfile))
             {
                 _currentProfileName = oldProfile;
                 return "Couldn't load profile \"" + profile + "\"!";
