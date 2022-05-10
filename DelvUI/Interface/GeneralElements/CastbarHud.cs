@@ -54,7 +54,7 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             UpdateCurrentCast(out float currentCastTime, out float totalCastTime);
-            if (totalCastTime == 0)
+            if (totalCastTime == 0 || currentCastTime >= totalCastTime)
             {
                 return;
             }
