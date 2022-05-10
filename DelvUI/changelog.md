@@ -1,3 +1,12 @@
+# 1.1.2.0
+Features:
+- Improved performance when switching profiles in some situations.
+- Added sub-setting to show when crafting when DelvUI is hidden out of combat.
+
+Fixes:
+- Fixed Addersting Bar stacks appearing full when below level 66.
+- Fixed unintentonial delay when hiding the target castbar after a successful cast.
+
 # 1.1.1.1
 - Fixed mouse inputs sometimes getting stuck (bug introduced in v1.1.1.0).
 
