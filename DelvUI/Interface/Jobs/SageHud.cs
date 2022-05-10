@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Dalamud.Logging;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -113,7 +114,8 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.AdderstingBar.HideWhenInactive && Config.AdderstingBar.Enabled || gauge.Addersting > 0)
             {
-                BarHud[] bars = BarUtilities.GetChunkedBars(Config.AdderstingBar, 3, gauge.Addersting, 3, 0, player, glowConfig: glow, chunksToGlow: new[] { true, true, true });
+                int adderstingStacks = player.Level > 65 ? gauge.Addersting : 0;
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.AdderstingBar, 3, adderstingStacks, 3, 0, player, glowConfig: glow, chunksToGlow: new[] { true, true, true });
                 foreach (BarHud bar in bars)
                 {
                     AddDrawActions(bar.GetDrawActions(origin, Config.AdderstingBar.StrataLevel));
