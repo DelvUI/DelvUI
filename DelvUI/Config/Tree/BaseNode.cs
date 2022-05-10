@@ -142,6 +142,19 @@ namespace DelvUI.Config.Tree
             _nodes.AddRange(_extraNodes);
         }
 
+        public void RefreshSelectedNode()
+        {
+            if (_nodes == null)
+            {
+                return;
+            }
+
+            foreach (SectionNode node in _nodes.FindAll(x => x is SectionNode))
+            {
+                node.Selected = node.Name == SelectedOptionName;
+            }
+        }
+
         public void Draw(float alpha)
         {
             CreateNodesIfNeeded();
