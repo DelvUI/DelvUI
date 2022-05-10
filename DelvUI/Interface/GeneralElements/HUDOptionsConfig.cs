@@ -51,6 +51,10 @@ namespace DelvUI.Interface.GeneralElements
         [Order(22, collapseWith = nameof(HideOutsideOfCombat))]
         public bool ShowDelvUIFramesOnWeaponDrawn = false;
 
+        [Checkbox("Show when Crafting" + "##HideOutsideCombat")]
+        [Order(23, collapseWith = nameof(HideOutsideOfCombat))]
+        public bool ShowDelvUIFramesWhenCrafting = false;
+
         [Checkbox("Hide DelvUI in Gold Saucer")]
         [Order(25)]
         public bool HideInGoldSaucer = false;
