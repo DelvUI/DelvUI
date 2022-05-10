@@ -368,7 +368,7 @@ namespace DelvUI.Interface.GeneralElements
                 }
 
                 PluginConfigColor fillColor = GetColor(actor);
-                Rect background = new Rect(Config.Position, Config.Size, GlobalColors.Instance.EmptyUnitFrameColor);
+                Rect background = new Rect(Config.Position, Config.Size, Config.BackgroundColor);
                 Rect healthFill = BarUtilities.GetFillRect(Config.Position, Config.Size, Config.FillDirection, fillColor, currentHp, maxHp);
 
                 bar.SetBackground(background);
