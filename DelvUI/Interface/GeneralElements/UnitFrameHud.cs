@@ -13,6 +13,7 @@ using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using Dalamud.Game.ClientState.Objects.Enums;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -316,14 +317,65 @@ namespace DelvUI.Interface.GeneralElements
             return new PluginConfigColor(color.Vector.WithNewAlpha(alpha));
         }
 
+        private unsafe void GetNPCHpValues(GameObject? actor, out uint currentHp, out uint maxHp)
+        {
+            currentHp = 0;
+            maxHp = 0;
 
+            var player = Plugin.ClientState.LocalPlayer;
+            if (player == null || actor == null || player.TargetObject == null || actor.ObjectId != player.TargetObject.ObjectId)
+            {
+                return;
+            }
+
+            AtkUnitBase* TargetWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_TargetInfoMainTarget", 1);
+            if (TargetWidget != null)
+            {
+                AtkTextNode* textNode = TargetWidget->GetTextNodeById(11);
+                string integrityText = textNode->NodeText.ToString();
+
+                // not a gathering node or node at 100%, nothing to do
+                if (!integrityText.Contains("%"))
+                {
+                    return;
+                }
+
+                try
+                {
+                    currentHp = Convert.ToUInt32((integrityText.Replace("%", "")));
+                    maxHp = 100;
+                }
+                catch { }
+            }
+        }
 
         private void DrawFriendlyNPC(Vector2 pos, GameObject? actor)
         {
-            var bar = new BarHud(Config, actor);
-            bar.AddForegrounds(new Rect(Config.Position, Config.Size, GetColor(actor)));
+            GetNPCHpValues(actor, out uint currentHp, out uint maxHp);
+
+            BarHud bar = new BarHud(Config, actor);
             bar.AddLabels(GetLabels(0));
-            bar.Draw(pos);
+
+            if (maxHp == 0)
+            {
+                bar.AddForegrounds(new Rect(Config.Position, Config.Size, GetColor(actor)));
+            }
+            else
+            {
+                if (Config.SmoothHealthConfig.Enabled)
+                {
+                    currentHp = _smoothHPHelper.GetNextHp((int)currentHp, (int)maxHp, Config.SmoothHealthConfig.Velocity);
+                }
+
+                PluginConfigColor fillColor = GetColor(actor);
+                Rect background = new Rect(Config.Position, Config.Size, Config.BackgroundColor);
+                Rect healthFill = BarUtilities.GetFillRect(Config.Position, Config.Size, Config.FillDirection, fillColor, currentHp, maxHp);
+
+                bar.SetBackground(background);
+                bar.AddForegrounds(healthFill);
+            }
+
+            AddDrawActions(bar.GetDrawActions(pos, Config.StrataLevel));
         }
 
         private PluginConfigColor BackgroundColor(Character? chara)

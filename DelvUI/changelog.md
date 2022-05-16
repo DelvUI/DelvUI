@@ -1,3 +1,15 @@
+# 1.1.2.0
+Features:
+- Improved performance when switching profiles in some situations.
+- Added sub-setting to show when crafting when DelvUI is hidden out of combat.
+- Gathering nodes integrity will be shown as health in the target unit frame:
+    + This DOES NOT include text tags support.
+    + Only the health bar will reflect the integrity, no health values will be visible in the labels.
+
+Fixes:
+- Fixed Addersting Bar stacks appearing full when below level 66.
+- Fixed unintentonial delay when hiding the target castbar after a successful cast.
+
 # 1.1.1.1
 - Fixed mouse inputs sometimes getting stuck (bug introduced in v1.1.1.0).
 
