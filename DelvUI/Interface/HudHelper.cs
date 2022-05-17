@@ -193,6 +193,10 @@ namespace DelvUI.Interface
                 isHidden = isHidden && Config.ShowDelvUIFramesWhenCrafting
                     ? Config.HideOutsideOfCombat && !IsInCombat() && !IsCrafting()
                     : isHidden;
+                
+                isHidden = isHidden && Config.ShowDelvUIFramesWhenGathering
+                    ? Config.HideOutsideOfCombat && !IsInCombat() && !IsGathering()
+                    : isHidden;
 
                 // hide only jobpack hud outside of combat
                 if (!isHidden && element is JobHud)
@@ -271,9 +275,15 @@ namespace DelvUI.Interface
             {
                 currentCombatState = !currentCombatState && Config.ShowCombatActionBarsOnWeaponDrawn
                     ? HasWeaponDrawn() || IsInCombat()
-                    : Config.ShowCombatActionBarsInDuty
-                        ? IsInDuty() || IsInCombat()
-                        : IsInCombat();
+                    : currentCombatState;
+                
+                currentCombatState = !currentCombatState && Config.ShowCombatActionBarsWhenCrafting
+                    ? IsCrafting() || IsInCombat()
+                    : currentCombatState;
+                
+                currentCombatState = !currentCombatState && Config.ShowCombatActionBarsWhenGathering
+                    ? IsGathering() || IsInCombat()
+                    : currentCombatState;
 
                 if (_previousCombatState != currentCombatState && Config.CombatActionBars.Count > 0 || forceUpdate)
                 {
@@ -443,6 +453,7 @@ namespace DelvUI.Interface
         private bool IsInDuty() => Plugin.Condition[ConditionFlag.BoundByDuty];
 
         private bool IsCrafting() => Plugin.Condition[ConditionFlag.Crafting];
+        private bool IsGathering() => Plugin.Condition[ConditionFlag.Gathering];
 
         private bool HasWeaponDrawn() => (Plugin.ClientState.LocalPlayer != null && Plugin.ClientState.LocalPlayer.StatusFlags.HasFlag(StatusFlags.WeaponOut));
 

@@ -54,6 +54,10 @@ namespace DelvUI.Interface.GeneralElements
         [Checkbox("Show when Crafting" + "##HideOutsideCombat")]
         [Order(23, collapseWith = nameof(HideOutsideOfCombat))]
         public bool ShowDelvUIFramesWhenCrafting = false;
+        
+        [Checkbox("Show when Gathering" + "##HideOutsideCombat")]
+        [Order(23, collapseWith = nameof(HideOutsideOfCombat))]
+        public bool ShowDelvUIFramesWhenGathering = false;
 
         [Checkbox("Hide DelvUI in Gold Saucer")]
         [Order(25)]
@@ -103,6 +107,14 @@ namespace DelvUI.Interface.GeneralElements
         [Checkbox("Show on Weapon Drawn" + "##CombatActionBars")]
         [Order(202, collapseWith = nameof(EnableCombatActionBars))]
         public bool ShowCombatActionBarsOnWeaponDrawn = false;
+        
+        [Checkbox("Show when Crafting" + "##CombatActionBars")]
+        [Order(202, collapseWith = nameof(EnableCombatActionBars))]
+        public bool ShowCombatActionBarsWhenCrafting = false;
+        
+        [Checkbox("Show when Gathering" + "##CombatActionBars")]
+        [Order(202, collapseWith = nameof(EnableCombatActionBars))]
+        public bool ShowCombatActionBarsWhenGathering = false;
 
         [Checkbox("Use with Cross Hotbar", isMonitored = true, help = "Show in Duty and Show on Weapon Drawn will apply to Cross Hotbar instead when enabled.")]
         [Order(203, collapseWith = nameof(EnableCombatActionBars))]
