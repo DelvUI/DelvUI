@@ -1,3 +1,7 @@
+# 1.1.3.0
+Fixes:
+- Fixed actions and status effects names in Dragonsong's Reprise.
+
 # 1.1.2.0
 Features:
 - Improved performance when switching profiles in some situations.
@@ -8,7 +12,7 @@ Features:
 
 Fixes:
 - Fixed Addersting Bar stacks appearing full when below level 66.
-- Fixed unintentonial delay when hiding the target castbar after a successful cast.
+- Fixed unintentional delay when hiding the target castbar after a successful cast.
 
 # 1.1.1.1
 - Fixed mouse inputs sometimes getting stuck (bug introduced in v1.1.1.0).
