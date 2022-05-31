@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
@@ -10,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace DelvUI.Interface.GeneralElements
@@ -142,7 +144,7 @@ namespace DelvUI.Interface.GeneralElements
             });
         }
 
-        private void UpdateCurrentCast(out float currentCastTime, out float totalCastTime)
+        private unsafe void UpdateCurrentCast(out float currentCastTime, out float totalCastTime)
         {
             currentCastTime = Config.Preview ? 0.5f : 0f;
             totalCastTime = 1f;
@@ -161,7 +163,11 @@ namespace DelvUI.Interface.GeneralElements
             uint currentCastId = battleChara.CastActionId;
             ActionType currentCastType = (ActionType)battleChara.CastActionType;
             currentCastTime = battleChara.CurrentCastTime;
-            totalCastTime = battleChara.TotalCastTime;
+
+            //totalCastTime = battleChara.TotalCastTime;
+            float[] castTime = new float[1];
+            Marshal.Copy(battleChara.Address + 0x1CB0 + 0x3C, castTime, 0, 1);
+            totalCastTime = castTime[0];
 
             if (LastUsedCast == null || LastUsedCast.CastId != currentCastId || LastUsedCast.ActionType != currentCastType)
             {

@@ -1,6 +1,7 @@
 # 1.1.3.0
 Fixes:
 - Fixed actions and status effects names in Dragonsong's Reprise.
+- Fixed cast times being inaccurate for some abilities in Dragonsong's Reprise and other encounters.
 
 # 1.1.2.0
 Features:
