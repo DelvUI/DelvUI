@@ -1,3 +1,7 @@
+# 1.1.4.0
+Fixes:
+- Fixed mouse cursor sometimes becoming unresponsive on certain Window Clipping settings.
+
 # 1.1.3.0
 Fixes:
 - Fixed actions and status effects names in Dragonsong's Reprise.
