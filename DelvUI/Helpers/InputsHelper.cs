@@ -55,9 +55,11 @@ namespace DelvUI.Helpers
             .text:00007FF64830FD70 00
             */
             _setUIMouseOverActor = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 48 8B 6C 24 ?? 48 8B 5C 24 ?? 4C 8B 7C 24 ?? 41 83 FC 02");
-            _uiMouseOverActorHook = Hook<OnSetUIMouseoverActor>.FromAddress(_setUIMouseOverActor, new OnSetUIMouseoverActor(HandleUIMouseOverActorId));
+            //_uiMouseOverActorHook = Hook<OnSetUIMouseoverActor>.FromAddress(_setUIMouseOverActor, new OnSetUIMouseoverActor(HandleUIMouseOverActorId));
+            _uiMouseOverActorHook = new Hook<OnSetUIMouseoverActor>(_setUIMouseOverActor, new OnSetUIMouseoverActor(HandleUIMouseOverActorId));
 
-            _requestActionHook = Hook<UseActionDelegate>.FromAddress((IntPtr)ActionManager.fpUseAction, HandleRequestAction);
+            //_requestActionHook = Hook<UseActionDelegate>.FromAddress((IntPtr)ActionManager.fpUseAction, HandleRequestAction);
+            _requestActionHook = new Hook<UseActionDelegate>((IntPtr)ActionManager.fpUseAction, HandleRequestAction);
             _requestActionHook.Enable();
 
             // mouseover setting
@@ -109,7 +111,7 @@ namespace DelvUI.Helpers
 
         private IntPtr _setUIMouseOverActor;
         private Hook<OnSetUIMouseoverActor>? _uiMouseOverActorHook;
-        
+
         private Hook<UseActionDelegate> _requestActionHook;
 
         private ExcelSheet<Action>? _sheet;
