@@ -130,6 +130,19 @@ namespace DelvUI.Interface.Party
             PartyListAddon = (AddonPartyList*)Plugin.GameGui.GetAddonByName("_PartyList", 1);
             HudAgent = Plugin.GameGui.FindAgentInterface(PartyListAddon);
 
+            if (PartyListAddon == null || HudAgent == IntPtr.Zero)
+            {
+                if (_groupMembers.Count > 0)
+                {
+                    _groupMembers.Clear();
+                    _dirty = false;
+
+                    MembersChangedEvent?.Invoke(this);
+                }
+
+                return;
+            }
+
             UIModule* uiModule = StructsFramework.Instance()->GetUiModule();
             RaptureAtkModule = uiModule != null ? uiModule->GetRaptureAtkModule() : null;
 
