@@ -293,7 +293,7 @@ namespace DelvUI.Interface.StatusEffects
             // no need to do anything else if there are no effects
             if (list.Count == 0)
             {
-                if (NeedsSpecialInput)
+                if (_wasHovering && NeedsSpecialInput)
                 {
                     _wasHovering = false;
                     InputsHelper.Instance.StopHandlingInputs();
