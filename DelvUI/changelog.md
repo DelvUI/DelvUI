@@ -1,3 +1,7 @@
+# 1.1.5.0
+Fixes:
+- Fixed tooltips not working properly with high Dalamud Global Font Scales.
+
 # 1.1.4.1
 Fixes:
 - Fixed DelvUI not loading.

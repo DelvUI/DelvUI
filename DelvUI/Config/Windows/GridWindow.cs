@@ -39,7 +39,7 @@ namespace DelvUI.Config.Windows
             node.Draw(ref changed);
 
             ImGui.SetCursorPos(new Vector2(8, 260));
-            if (ImGui.Button("Lock HUD", new Vector2(ImGui.GetWindowContentRegionWidth(), 30)))
+            if (ImGui.Button("Lock HUD", new Vector2(284, 30)))
             {
                 configManager.LockHUD = true;
             }
