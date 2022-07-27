@@ -151,6 +151,11 @@ namespace DelvUI.Interface
                     e.VisibilityConfig?.CopyFrom(config);
                 }
             }
+
+            if (_jobHud != null && _jobHud is IHudElementWithVisibilityConfig jobHud)
+            {
+                jobHud.VisibilityConfig?.CopyFrom(config);
+            }
         }
 
         private void OnDraggableElementSelected(DraggableHudElement sender)
