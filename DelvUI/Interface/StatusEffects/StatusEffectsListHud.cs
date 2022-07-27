@@ -16,9 +16,10 @@ using StatusStruct = FFXIVClientStructs.FFXIV.Client.Game.Status;
 
 namespace DelvUI.Interface.StatusEffects
 {
-    public class StatusEffectsListHud : ParentAnchoredDraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent, IHudElementWithPreview, IHudElementWithMouseOver
+    public class StatusEffectsListHud : ParentAnchoredDraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent, IHudElementWithPreview, IHudElementWithMouseOver, IHudElementWithVisibilityConfig
     {
         protected StatusEffectsListConfig Config => (StatusEffectsListConfig)_config;
+        public VisibilityConfig? VisibilityConfig => Config is UnitFrameStatusEffectsListConfig config ? config.VisibilityConfig : null;
 
         private LayoutInfo _layoutInfo;
 

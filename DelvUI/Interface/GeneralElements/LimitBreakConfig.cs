@@ -11,6 +11,9 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("Limit Break", 0)]
     public class LimitBreakConfig : ChunkedProgressBarConfig
     {
+        [NestedConfig("Visibility", 70)]
+        public VisibilityConfig VisibilityConfig = new VisibilityConfig();
+
         public LimitBreakConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
         {
         }

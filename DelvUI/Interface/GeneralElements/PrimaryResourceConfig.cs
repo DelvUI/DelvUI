@@ -107,6 +107,9 @@ namespace DelvUI.Interface.GeneralElements
         [Order(17, collapseWith = nameof(AnchorToUnitFrame))]
         public DrawAnchor UnitFrameAnchor = DrawAnchor.Bottom;
 
+        [NestedConfig("Visibility", 1200)]
+        public VisibilityConfig VisibilityConfig = new VisibilityConfig();
+
         public UnitFramePrimaryResourceConfig(Vector2 position, Vector2 size)
             : base(position, size)
         {

@@ -7,9 +7,10 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class ExperienceBarHud : DraggableHudElement, IHudElementWithActor
+    public class ExperienceBarHud : DraggableHudElement, IHudElementWithActor, IHudElementWithVisibilityConfig
     {
         private ExperienceBarConfig Config => (ExperienceBarConfig)_config;
+        public VisibilityConfig VisibilityConfig => Config.VisibilityConfig;
 
         public GameObject? Actor { get; set; } = null;
 

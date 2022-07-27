@@ -12,9 +12,10 @@ using DelvUI.Interface.Party;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class PrimaryResourceHud : ParentAnchoredDraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent
+    public class PrimaryResourceHud : ParentAnchoredDraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent, IHudElementWithVisibilityConfig
     {
         private PrimaryResourceConfig Config => (PrimaryResourceConfig)_config;
+        public VisibilityConfig? VisibilityConfig => Config is UnitFramePrimaryResourceConfig config ? config.VisibilityConfig : null;
 
         public PrimaryResourceTypes ResourceType = PrimaryResourceTypes.MP;
 

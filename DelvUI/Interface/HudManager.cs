@@ -55,6 +55,7 @@ namespace DelvUI.Interface
             ConfigurationManager.Instance.LockEvent += OnHUDLockChanged;
             ConfigurationManager.Instance.ConfigClosedEvent += OnConfingWindowClosed;
             ConfigurationManager.Instance.StrataLevelsChangedEvent += OnStrataLevelsChanged;
+            ConfigurationManager.Instance.GlobalVisibilityEvent += OnGlobalVisibilityChanged;
 
             CreateHudElements();
         }
@@ -89,6 +90,7 @@ namespace DelvUI.Interface
             ConfigurationManager.Instance.LockEvent -= OnHUDLockChanged;
             ConfigurationManager.Instance.ConfigClosedEvent -= OnConfingWindowClosed;
             ConfigurationManager.Instance.StrataLevelsChangedEvent -= OnStrataLevelsChanged;
+            ConfigurationManager.Instance.GlobalVisibilityEvent -= OnGlobalVisibilityChanged;
         }
 
         private void OnConfigReset(ConfigurationManager sender)
@@ -138,6 +140,17 @@ namespace DelvUI.Interface
             }
 
             _hudElements = tmp;
+        }
+
+        private void OnGlobalVisibilityChanged(ConfigurationManager sender, VisibilityConfig config)
+        {
+            foreach (DraggableHudElement element in _hudElements.Values)
+            {
+                if (element is IHudElementWithVisibilityConfig e)
+                {
+                    e.VisibilityConfig?.CopyFrom(config);
+                }
+            }
         }
 
         private void OnDraggableElementSelected(DraggableHudElement sender)

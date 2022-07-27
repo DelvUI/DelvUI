@@ -112,4 +112,9 @@ namespace DelvUI.Interface
     {
         public void StopPreview();
     }
+
+    public interface IHudElementWithVisibilityConfig
+    {
+        public VisibilityConfig? VisibilityConfig { get; }
+    }
 }

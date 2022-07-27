@@ -7,9 +7,10 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class LimitBreakHud : DraggableHudElement, IHudElementWithActor
+    public class LimitBreakHud : DraggableHudElement, IHudElementWithActor, IHudElementWithVisibilityConfig
     {
         private LimitBreakConfig Config => (LimitBreakConfig)_config;
+        public VisibilityConfig VisibilityConfig => Config.VisibilityConfig;
 
         public GameObject? Actor { get; set; } = null;
 

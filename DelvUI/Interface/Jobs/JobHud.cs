@@ -5,11 +5,12 @@ using System.Numerics;
 
 namespace DelvUI.Interface.Jobs
 {
-    public class JobHud : DraggableHudElement, IHudElementWithActor
+    public class JobHud : DraggableHudElement, IHudElementWithActor, IHudElementWithVisibilityConfig
     {
         protected DalamudPluginInterface PluginInterface => Plugin.PluginInterface;
 
         public JobConfig Config => (JobConfig)_config;
+        public VisibilityConfig VisibilityConfig => Config.VisibilityConfig;
 
         public GameObject? Actor { get; set; } = null;
         protected PlayerCharacter? Player => Actor is PlayerCharacter ? (PlayerCharacter)Actor : null;
