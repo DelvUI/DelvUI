@@ -162,6 +162,9 @@ namespace DelvUI.Interface.StatusEffects
         [Order(17, collapseWith = nameof(AnchorToUnitFrame))]
         public DrawAnchor UnitFrameAnchor = DrawAnchor.TopLeft;
 
+        [NestedConfig("Visibility", 200)]
+        public VisibilityConfig VisibilityConfig = new VisibilityConfig();
+
         public UnitFrameStatusEffectsListConfig(Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
             GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
             : base(position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)

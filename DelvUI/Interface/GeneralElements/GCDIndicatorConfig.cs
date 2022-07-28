@@ -78,6 +78,9 @@ namespace DelvUI.Interface.GeneralElements
             new PluginConfigColor(Vector4.Zero)
         );
 
+        [NestedConfig("Visibility", 70)]
+        public VisibilityConfig VisibilityConfig = new VisibilityConfig();
+
         public new static GCDIndicatorConfig DefaultConfig() { return new GCDIndicatorConfig() { Enabled = false, Strata = StrataLevel.MID_HIGH }; }
     }
 

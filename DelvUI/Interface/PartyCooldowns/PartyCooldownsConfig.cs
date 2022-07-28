@@ -58,6 +58,9 @@ namespace DelvUI.Interface.PartyCooldowns
         [Checkbox("Show When Solo", isMonitored = true)]
         [Order(21)]
         public bool ShowWhenSolo = false;
+
+        [NestedConfig("Visibility", 200)]
+        public VisibilityConfig VisibilityConfig = new VisibilityConfig();
     }
 
     [Disableable(false)]

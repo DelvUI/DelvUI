@@ -153,7 +153,7 @@ namespace DelvUI.Interface
 
             Config.ValueChangeEvent -= ConfigValueChanged;
 
-            UpdateCombatActionBars(true);
+            UpdateCombatActionBars();
             UpdateDefaultCastBar(true);
             UpdateDefaultPulltimer(true);
             UpdateJobGauges(true);
@@ -161,7 +161,7 @@ namespace DelvUI.Interface
 
         public void Update()
         {
-            UpdateCombatActionBars(_isInitial);
+            UpdateCombatActionBars();
             UpdateJobGauges();
             UpdateDefaultCastBar();
             UpdateDefaultPulltimer();
@@ -171,55 +171,10 @@ namespace DelvUI.Interface
 
         public bool IsElementHidden(HudElement element)
         {
-            if (!ConfigurationManager.Instance.LockHUD) { return false; }
-            if (element.GetType() == typeof(PlayerCastbarHud)) { return false; }
-            if (!element.GetConfig().Enabled) { return true; }
+            IHudElementWithVisibilityConfig? e = element as IHudElementWithVisibilityConfig;
+            if (e == null || e.VisibilityConfig == null) { return false; }
 
-            // hide in gold saucer
-            if (Config.HideInGoldSaucer && _goldSaucerIDs.Count(id => id == Plugin.ClientState.TerritoryType) > 0) { return true; }
-
-            bool isHidden = Config.ShowDelvUIFramesInDuty
-                ? Config.HideOutsideOfCombat && !IsInCombat() && !IsInDuty()
-                : Config.HideOutsideOfCombat && !IsInCombat();
-
-            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
-
-            if (player is not null)
-            {
-                isHidden = isHidden && Config.ShowDelvUIFramesOnWeaponDrawn
-                    ? Config.HideOutsideOfCombat && !IsInCombat() && !HasWeaponDrawn()
-                    : isHidden;
-
-                isHidden = isHidden && Config.ShowDelvUIFramesWhenCrafting
-                    ? Config.HideOutsideOfCombat && !IsInCombat() && !IsCrafting()
-                    : isHidden;
-
-                // hide only jobpack hud outside of combat
-                if (!isHidden && element is JobHud)
-                {
-                    isHidden = Config.ShowJobPackInDuty
-                        ? Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat() && !IsInDuty()
-                        : Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat();
-
-                    isHidden = isHidden && Config.ShowJobPackOnWeaponDrawn
-                        ? Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat() && !HasWeaponDrawn()
-                        : Config.ShowJobPackInDuty
-                            ? Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat() && !IsInDuty()
-                            : Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat();
-                }
-
-                // hide player frame when at full health
-                if (Config.HidePlayerFrameAtFullHP && element.GetConfig().GetType() == typeof(PlayerUnitFrameConfig) && !Config.HideOutsideOfCombat)
-                {
-                    isHidden = !isHidden && player.CurrentHp == player.MaxHp;
-                }
-                else if (element.GetConfig().GetType() == typeof(PlayerUnitFrameConfig))
-                {
-                    isHidden = Config.AlwaysHidePlayerFrameWhenDelvUIHidden ? isHidden : isHidden && player.CurrentHp == player.MaxHp;
-                }
-            }
-
-            return isHidden;
+            return !e.VisibilityConfig.IsElementVisible(element);
         }
 
         private void ConfigValueChanged(object sender, OnChangeBaseArgs e)
@@ -236,72 +191,41 @@ namespace DelvUI.Interface
                 case "DisableJobGaugeSounds":
                     UpdateJobGauges();
                     break;
-                case "EnableCombatActionBars":
-                    Config.CombatActionBars.ForEach(name => ToggleActionbar(name, Config.EnableCombatActionBars));
-                    break;
-                case "CombatActionBarsWithCrossHotbar":
-                    ToggleCrossActionbar(Config.CombatActionBarsWithCrossHotbar);
-                    break;
-                case "CombatActionBars" when e is OnChangeEventArgs<string> listEvent:
-                    switch (listEvent.ChangeType)
-                    {
-                        case ChangeType.ListAdd:
-                            ToggleActionbar(listEvent.Value, !IsInCombat());
-                            break;
-                        case ChangeType.ListRemove:
-                            ToggleActionbar(listEvent.Value, false);
-                            break;
-                    }
-
-                    break;
             }
         }
 
-        private void UpdateCombatActionBars(bool forceUpdate = false)
+        private void UpdateCombatActionBars()
         {
-            if (!Config.EnableCombatActionBars) { return; }
+            HotbarsVisibilityConfig? config = ConfigurationManager.Instance?.GetConfigObject<HotbarsVisibilityConfig>();
+            if (config == null) { return; }
 
-            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
-
-            bool currentCombatState = Config.ShowCombatActionBarsInDuty
-                ? IsInDuty() || IsInCombat()
-                : IsInCombat();
-
-            if (player is not null)
+            List<VisibilityConfig> hotbarConfigs = config.GetHotbarConfigs();
+            for (int i = 0; i < hotbarConfigs.Count; i++)
             {
-                currentCombatState = !currentCombatState && Config.ShowCombatActionBarsOnWeaponDrawn
-                    ? HasWeaponDrawn() || IsInCombat()
-                    : Config.ShowCombatActionBarsInDuty
-                        ? IsInDuty() || IsInCombat()
-                        : IsInCombat();
+                if (hotbarConfigs[i].Enabled)
+                {
+                    SetHotbarVisible(i, hotbarConfigs[i].IsElementVisible());
+                }
+            }
 
-                if (_previousCombatState != currentCombatState && Config.CombatActionBars.Count > 0 || forceUpdate)
-                {
-                    Config.CombatActionBars.ForEach(name => ToggleActionbar(name, !currentCombatState));
-                    _previousCombatState = currentCombatState;
-                }
-                else if (_previousCombatState != currentCombatState && Config.CombatActionBarsWithCrossHotbar)
-                {
-                    ToggleCrossActionbar(!currentCombatState);
-                    _previousCombatState = currentCombatState;
-                }
+            if (config.HotbarConfigCross.Enabled)
+            {
+                SetCrossHotbarVisible(config.HotbarConfigCross.IsElementVisible());
             }
         }
 
-        private void ToggleActionbar(string targetName, bool isHidden)
+        private void SetHotbarVisible(int index, bool visible)
         {
-            string[] splits = targetName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            string hotbarNumber = splits.Last();
-            string toggleText = isHidden ? "off" : "on";
+            string numberText = (index + 1).ToString();
+            string onOffText = visible ? "on" : "off";
 
-            ChatHelper.SendChatMessage("/hotbar display " + hotbarNumber + " " + toggleText);
+            ChatHelper.SendChatMessage("/hotbar display " + numberText + " " + onOffText);
         }
 
-        private void ToggleCrossActionbar(bool isHidden)
+        private void SetCrossHotbarVisible(bool visible)
         {
-            string toggleText = isHidden ? "off" : "on";
-
-            ChatHelper.SendChatMessage("/crosshotbardisplay" + " " + toggleText);
+            string onOffText = visible ? "on" : "off";
+            ChatHelper.SendChatMessage("/crosshotbardisplay" + " " + onOffText);
         }
 
         private void SetAddonVisible(IntPtr addon, bool visible, Vector2 originalPosition)

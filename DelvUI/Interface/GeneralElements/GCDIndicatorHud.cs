@@ -11,9 +11,11 @@ using Dalamud.Logging;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class GCDIndicatorHud : DraggableHudElement, IHudElementWithActor
+    public class GCDIndicatorHud : DraggableHudElement, IHudElementWithActor, IHudElementWithVisibilityConfig
     {
         private GCDIndicatorConfig Config => (GCDIndicatorConfig)_config;
+        public VisibilityConfig VisibilityConfig => Config.VisibilityConfig;
+
         public GameObject? Actor { get; set; } = null;
 
         private bool _wasBarEnabled = true;

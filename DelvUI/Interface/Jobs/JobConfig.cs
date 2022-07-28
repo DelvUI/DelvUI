@@ -16,6 +16,9 @@ namespace DelvUI.Interface.Jobs
         [Order(20)]
         public bool UseDefaultPrimaryResourceBar = false;
 
+        [NestedConfig("Visibility", 2000)]
+        public VisibilityConfig VisibilityConfig = new VisibilityConfig();
+
         [JsonIgnore]
         public PrimaryResourceTypes PrimaryResourceType = PrimaryResourceTypes.MP;
 

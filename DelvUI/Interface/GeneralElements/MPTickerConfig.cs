@@ -29,6 +29,9 @@ namespace DelvUI.Interface.GeneralElements
             new PluginConfigColor(new(240f / 255f, 92f / 255f, 232f / 255f, 100f / 100f))
         );
 
+        [NestedConfig("Visibility", 70)]
+        public VisibilityConfig VisibilityConfig = new VisibilityConfig();
+
         public new static MPTickerConfig DefaultConfig()
         {
             var config = new MPTickerConfig();

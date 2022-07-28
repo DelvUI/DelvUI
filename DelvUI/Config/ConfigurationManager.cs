@@ -22,6 +22,7 @@ namespace DelvUI.Config
 {
     public delegate void ConfigurationManagerEventHandler(ConfigurationManager configurationManager);
     public delegate void StrataLevelsEventHandler(ConfigurationManager configurationManager, PluginConfigObject config);
+    public delegate void GlobalVisibilityEventHandler(ConfigurationManager configurationManager, VisibilityConfig config);
 
     public class ConfigurationManager : IDisposable
     {
@@ -95,6 +96,7 @@ namespace DelvUI.Config
         public event ConfigurationManagerEventHandler? LockEvent;
         public event ConfigurationManagerEventHandler? ConfigClosedEvent;
         public event StrataLevelsEventHandler? StrataLevelsChangedEvent;
+        public event GlobalVisibilityEventHandler? GlobalVisibilityEvent;
 
         public ConfigurationManager()
         {
@@ -241,6 +243,13 @@ namespace DelvUI.Config
         }
         #endregion
 
+        #region visibility
+        public void OnGlobalVisibilityChanged(VisibilityConfig config)
+        {
+            GlobalVisibilityEvent?.Invoke(this, config);
+        }
+        #endregion
+
         #region windows
         public void ToggleConfigWindow()
         {
@@ -376,7 +385,7 @@ namespace DelvUI.Config
             }
 
             BaseNode node = maybeNode!;
-            if(IsConfigWindowOpened || string.IsNullOrEmpty(node.SelectedOptionName))
+            if (IsConfigWindowOpened || string.IsNullOrEmpty(node.SelectedOptionName))
             {
                 node.SelectedOptionName = ConfigBaseNode.SelectedOptionName;
                 node.RefreshSelectedNode();
@@ -545,6 +554,9 @@ namespace DelvUI.Config
             typeof(CastersColorConfig),
             typeof(RolesColorConfig),
             typeof(MiscColorConfig),
+
+            typeof(GlobalVisibilityConfig),
+            typeof(HotbarsVisibilityConfig),
 
             typeof(FontsConfig),
             typeof(HUDOptionsConfig),
