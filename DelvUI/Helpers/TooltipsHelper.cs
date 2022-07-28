@@ -157,6 +157,9 @@ namespace DelvUI.Helpers
                 drawList.AddRect(_position, _position + _size, _config.BorderConfig.Color.Base, 0, ImDrawFlags.None, _config.BorderConfig.Thickness);
             }
 
+            // no idea why i have to do this
+            float globalScaleCorrection = -15 + 15 * ImGuiHelpers.GlobalScale;
+
             if (_currentTooltipTitle != null)
             {
                 // title
@@ -165,7 +168,7 @@ namespace DelvUI.Helpers
                 {
                     cursorPos = new Vector2(windowMargin.X + _size.X / 2f - _titleSize.X / 2f, Margin);
                     ImGui.SetCursorPos(cursorPos);
-                    ImGui.PushTextWrapPos(cursorPos.X + _titleSize.X - 10 + 10 * ImGuiHelpers.GlobalScale);
+                    ImGui.PushTextWrapPos(cursorPos.X + _titleSize.X + globalScaleCorrection);
                     ImGui.TextColored(_config.TitleColor.Vector, _currentTooltipTitle);
                     ImGui.PopTextWrapPos();
                 }
@@ -175,7 +178,7 @@ namespace DelvUI.Helpers
                 {
                     cursorPos = new Vector2(windowMargin.X + _size.X / 2f - _textSize.X / 2f, Margin + _titleSize.Y);
                     ImGui.SetCursorPos(cursorPos);
-                    ImGui.PushTextWrapPos(cursorPos.X + _textSize.X - 10 + 10 * ImGuiHelpers.GlobalScale);
+                    ImGui.PushTextWrapPos(cursorPos.X + _textSize.X + globalScaleCorrection);
                     ImGui.TextColored(_config.TextColor.Vector, _currentTooltipText);
                     ImGui.PopTextWrapPos();
                 }
@@ -189,7 +192,7 @@ namespace DelvUI.Helpers
                     var textWidth = _size.X - Margin * 2;
 
                     ImGui.SetCursorPos(cursorPos);
-                    ImGui.PushTextWrapPos(cursorPos.X + textWidth);
+                    ImGui.PushTextWrapPos(cursorPos.X + textWidth + globalScaleCorrection);
                     ImGui.TextColored(_config.TextColor.Vector, _currentTooltipText);
                     ImGui.PopTextWrapPos();
                 }
