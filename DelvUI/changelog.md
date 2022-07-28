@@ -2,8 +2,8 @@
 Features:
 - Completely reworked visibility options for DelvUI elements and the game's hotbars:
     + Most DelvUI elements now have their own visibility settings and can be changed individually.
-    + A global setting can be applied to all elements in Visibility > Global.
-    + Hotbar visibility settings were moved from Misc > HUD options to Visibility > Hotbars.
+    + A global setting can be applied to all elements in 'Visibility > Global'.
+    + Hotbar visibility settings were moved from 'Misc > HUD Options' to 'Visibility > Hotbars'.
     + Due to the change in the structure, all visibility related settings will be reset.
 
 # 1.1.5.0

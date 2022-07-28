@@ -92,6 +92,7 @@ namespace DelvUI.Interface
 
         public void CopyFrom(VisibilityConfig config)
         {
+            Enabled = config.Enabled;
             HideOutsideOfCombat = config.HideOutsideOfCombat;
             HideInGoldSaucer = config.HideInGoldSaucer;
             HideOnFullHP = config.HideOnFullHP;

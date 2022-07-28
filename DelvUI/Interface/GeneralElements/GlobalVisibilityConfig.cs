@@ -39,6 +39,7 @@ namespace DelvUI.Interface.GeneralElements
                 if (didConfirm)
                 {
                     ConfigurationManager.Instance.OnGlobalVisibilityChanged(VisibilityConfig);
+                    changed = true;
                 }
 
                 if (didConfirm || didClose)

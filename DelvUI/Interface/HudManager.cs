@@ -42,6 +42,7 @@ namespace DelvUI.Interface
 
         private Dictionary<uint, JobHudTypes> _jobsMap = null!;
         private Dictionary<uint, Type> _unsupportedJobsMap = null!;
+        private List<Type> _jobTypes = null!;
 
         private double _occupiedInQuestStartTime = -1;
 
@@ -152,9 +153,10 @@ namespace DelvUI.Interface
                 }
             }
 
-            if (_jobHud != null && _jobHud is IHudElementWithVisibilityConfig jobHud)
+            foreach (Type jobType in _jobTypes)
             {
-                jobHud.VisibilityConfig?.CopyFrom(config);
+                JobConfig jobConfig = (JobConfig)ConfigurationManager.Instance.GetConfigObjectForType(jobType);
+                jobConfig.VisibilityConfig.CopyFrom(config);
             }
         }
 
@@ -640,6 +642,34 @@ namespace DelvUI.Interface
                 [JobIDs.MIN] = typeof(MinerConfig),
                 [JobIDs.BOT] = typeof(BotanistConfig),
                 [JobIDs.FSH] = typeof(FisherConfig),
+            };
+
+            _jobTypes = new List<Type>()
+            {
+                typeof(PaladinConfig),
+                typeof(WarriorConfig),
+                typeof(DarkKnightConfig),
+                typeof(GunbreakerConfig),
+
+                typeof(WhiteMageConfig),
+                typeof(ScholarConfig),
+                typeof(AstrologianConfig),
+                typeof(SageConfig),
+
+                typeof(MonkConfig),
+                typeof(DragoonConfig),
+                typeof(NinjaConfig),
+                typeof(SamuraiConfig),
+                typeof(ReaperConfig),
+
+                typeof(BardConfig),
+                typeof(MachinistConfig),
+                typeof(DancerConfig),
+
+                typeof(BlackMageConfig),
+                typeof(SummonerConfig),
+                typeof(RedMageConfig),
+                typeof(BlueMageConfig)
             };
         }
     }
