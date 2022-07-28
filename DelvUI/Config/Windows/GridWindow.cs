@@ -1,7 +1,6 @@
 ﻿using Dalamud.Interface.Windowing;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
-using System;
 using System.Numerics;
 
 namespace DelvUI.Config.Windows
@@ -11,7 +10,7 @@ namespace DelvUI.Config.Windows
         public GridWindow(string name) : base(name)
         {
             Flags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse;
-            Size = new Vector2(340, 300);
+            Size = new Vector2(300, 200);
         }
 
         public override void OnClose()
@@ -21,7 +20,11 @@ namespace DelvUI.Config.Windows
 
         public override void PreDraw()
         {
-            ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(10f / 255f, 10f / 255f, 10f / 255f, 0.95f));
+            if (ConfigurationManager.Instance.OverrideDalamudStyle)
+            {
+                ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(10f / 255f, 10f / 255f, 10f / 255f, 0.95f));
+            }
+
             ImGui.SetNextWindowFocus();
         }
 
@@ -37,17 +40,14 @@ namespace DelvUI.Config.Windows
             ImGui.PushItemWidth(150);
             bool changed = false;
             node.Draw(ref changed);
-
-            ImGui.SetCursorPos(new Vector2(8, 260));
-            if (ImGui.Button("Lock HUD", new Vector2(284, 30)))
-            {
-                configManager.LockHUD = true;
-            }
         }
 
         public override void PostDraw()
         {
-            ImGui.PopStyleColor();
+            if (ConfigurationManager.Instance.OverrideDalamudStyle)
+            {
+                ImGui.PopStyleColor();
+            }
         }
     }
 }

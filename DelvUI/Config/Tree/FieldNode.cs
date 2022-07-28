@@ -61,7 +61,16 @@ namespace DelvUI.Config.Tree
             // Shift cursor to the right to pad for children with depth more than 1.
             // 26 is an arbitrary value I found to be around half the width of a checkbox
             ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(26, 0) * Math.Max((depth - 1), 0));
-            ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
+
+            if (ConfigurationManager.Instance.OverrideDalamudStyle)
+            {
+                ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
+            }
+            else
+            {
+                ImGui.Text("\u2002\u2514");
+            }
+
             ImGui.SameLine();
         }
 

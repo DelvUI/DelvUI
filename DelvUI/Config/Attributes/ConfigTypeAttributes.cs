@@ -355,7 +355,8 @@ namespace DelvUI.Config.Attributes
                     ImGui.OpenPopup(popupId);
                 }
                 ImGui.PopFont();
-                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Text Tags"); }
+
+                ImGuiHelper.SetTooltip("Text Tags");
             }
 
             var selectedTag = ImGuiHelper.DrawTextTagsList(popupId, ref _searchText);

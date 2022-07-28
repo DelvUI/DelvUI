@@ -587,7 +587,7 @@ namespace DelvUI.Config.Profiles
                     _resetingProfileName = _currentProfileName;
                 }
                 ImGui.PopFont();
-                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Reset"); }
+                ImGuiHelper.SetTooltip("Reset");
 
                 if (_currentProfileName != DefaultProfileName)
                 {
@@ -599,7 +599,7 @@ namespace DelvUI.Config.Profiles
                         _renamingProfileName = _currentProfileName;
                     }
                     ImGui.PopFont();
-                    if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Rename"); }
+                    ImGuiHelper.SetTooltip("Rename");
 
                     // delete
                     ImGui.SameLine();
@@ -609,7 +609,7 @@ namespace DelvUI.Config.Profiles
                         _deletingProfileName = _currentProfileName;
                     }
                     ImGui.PopFont();
-                    if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Delete"); }
+                    ImGuiHelper.SetTooltip("Delete");
                 }
 
                 // export to string

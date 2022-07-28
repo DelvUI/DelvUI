@@ -5,13 +5,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DelvUI.Helpers
 {
     public static class ImGuiHelper
     {
+        public static void SetTooltip(string? message)
+        {
+            if (message == null) { return; }
+
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip(message);
+            }
+        }
+
         public static void DrawSeparator(int topSpacing, int bottomSpacing)
         {
             DrawSpacing(topSpacing);

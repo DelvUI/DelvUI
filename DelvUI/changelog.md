@@ -5,6 +5,11 @@ Features:
     + A global setting can be applied to all elements in 'Visibility > Global'.
     + Hotbar visibility settings were moved from 'Misc > HUD Options' to 'Visibility > Hotbars'.
     + Due to the change in the structure, all visibility related settings will be reset.
+- Updated the main config window so it adapts better to higher Dalamud Global Font Scales.
+- Added a setting to prevent DelvUI from overriding the global Dalamud style (Misc > HUD Options > Use DelvUI style).
+
+Fixes:
+- Fixed tooltips still sometimes not working properly with high Dalamud Global Font Scales.
 
 # 1.1.5.0
 Fixes:

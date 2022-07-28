@@ -23,9 +23,13 @@ namespace DelvUI.Interface.GeneralElements
         [Order(10)]
         public bool DimConfigWindow = false;
 
-        [Checkbox("Automatically disable HUD elements preview", help = "Enabling this will make it so all HUD elements preview modes are disabled when DelvUI's setting window is closed.")]
+        [Checkbox("Automatically disable HUD elements preview", help = "If enabled, all HUD elements preview modes are disabled when DelvUI's setting window is closed.")]
         [Order(11)]
         public bool AutomaticPreviewDisabling = true;
+
+        [Checkbox("Use DelvUI style", help = "If enabled, DelvUI will use its own style for the setting window instead of the general Dalamud style.")]
+        [Order(12)]
+        public bool OverrideDalamudStyle = true;
 
         [Checkbox("Mouseover", separator = true)]
         [Order(15)]

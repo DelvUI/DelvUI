@@ -59,6 +59,15 @@ namespace DelvUI.Config
             }
         }
 
+        public bool OverrideDalamudStyle
+        {
+            get
+            {
+                var config = Instance.GetConfigObject<HUDOptionsConfig>();
+                return config != null ? config.OverrideDalamudStyle : true;
+            }
+        }
+
         public string ConfigDirectory;
 
         public string CurrentVersion => Plugin.Version;
