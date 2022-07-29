@@ -1,3 +1,7 @@
+# 1.2.1.0
+Features:
+- Added an icon to the experience bar that shows when the player is in a sanctuary.
+
 # 1.2.0.1
 Fixes:
 - Fixed DelVUI sometimes crashing on startup.

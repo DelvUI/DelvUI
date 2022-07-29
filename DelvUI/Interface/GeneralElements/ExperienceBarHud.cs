@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Interface;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
@@ -15,8 +16,13 @@ namespace DelvUI.Interface.GeneralElements
         public GameObject? Actor { get; set; } = null;
 
         private ExperienceHelper _helper = new ExperienceHelper();
+        private IconLabelHud _sanctuaryLabel;
 
-        public ExperienceBarHud(ExperienceBarConfig config, string displayName) : base(config, displayName) { }
+        public ExperienceBarHud(ExperienceBarConfig config, string displayName) : base(config, displayName)
+        {
+            Config.SanctuaryLabel.IconId = FontAwesomeIcon.Moon;
+            _sanctuaryLabel = new IconLabelHud(Config.SanctuaryLabel);
+        }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
@@ -48,6 +54,13 @@ namespace DelvUI.Interface.GeneralElements
             bar.AddLabels(Config.LeftLabel, Config.RightLabel);
 
             AddDrawActions(bar.GetDrawActions(origin, Config.StrataLevel));
+
+            // sanctuary icon
+            AddDrawAction(Config.SanctuaryLabel.StrataLevel, () =>
+            {
+                var pos = Utils.GetAnchoredPosition(origin, Config.Size, Config.Anchor);
+                _sanctuaryLabel.Draw(pos + Config.Position, Config.Size, Actor);
+            });
         }
     }
 }

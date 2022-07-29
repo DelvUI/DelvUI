@@ -1,6 +1,8 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Interface;
+using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
+using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Globalization;
@@ -35,7 +37,7 @@ namespace DelvUI.Interface.GeneralElements
         [Combo("Number Format", "No Decimals (i.e. \"12\")", "One Decimal (i.e. \"12.3\")", "Two Decimals (i.e. \"12.34\")")]
         [Order(10)]
         public int NumberFormat;
-        
+
         [Combo("Rounding Mode", "Truncate", "Floor", "Ceil", "Round")]
         [Order(15)]
         public int NumberFunction;
@@ -87,6 +89,20 @@ namespace DelvUI.Interface.GeneralElements
                 Enabled = Enabled,
                 HideIfZero = HideIfZero
             };
+    }
+
+    [DisableParentSettings("FontID")]
+    [Exportable(false)]
+    public class IconLabelConfig : LabelConfig
+    {
+        public FontAwesomeIcon IconId;
+
+        public IconLabelConfig(Vector2 position, FontAwesomeIcon iconId, DrawAnchor frameAnchor, DrawAnchor textAnchor) : base(position, "", frameAnchor, textAnchor)
+        {
+            IconId = iconId;
+        }
+
+        public override string GetText() => IconId.ToIconString();
     }
 
     [Exportable(false)]
