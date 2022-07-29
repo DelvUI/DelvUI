@@ -281,9 +281,16 @@ namespace DelvUI
 
             ConfigurationManager.Instance.Draw();
 
+            var fontPushed = FontsManager.Instance.PushDefaultFont();
+
             if (!hudState)
             {
                 _hudManager?.Draw(_jobId);
+            }
+
+            if (fontPushed)
+            {
+                ImGui.PopFont();
             }
 
             InputsHelper.Instance.Update();

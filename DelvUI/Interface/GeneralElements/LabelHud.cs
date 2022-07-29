@@ -48,8 +48,10 @@ namespace DelvUI.Interface.GeneralElements
 
             if (Config.UseSystemFont())
             {
+                ImGui.PushFont(UiBuilder.DefaultFont);
                 size = ImGui.CalcTextSize(text) * Config.GetFontScale();
                 pos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(parentPos + Config.Position, -parentSize, Config.FrameAnchor), size, Config.TextAnchor);
+                ImGui.PopFont();
             }
             else
             {
@@ -85,7 +87,9 @@ namespace DelvUI.Interface.GeneralElements
                 if (Config.UseSystemFont())
                 {
                     ImGui.SetWindowFontScale(Config.GetFontScale());
+                    ImGui.PushFont(UiBuilder.DefaultFont);
                     action(drawList);
+                    ImGui.PopFont();
                     ImGui.SetWindowFontScale(1);
                 }
                 else
