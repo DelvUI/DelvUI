@@ -11,9 +11,10 @@ using Dalamud.Game.ClientState.JobGauge.Types;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class MPTickerHud : DraggableHudElement, IHudElementWithActor
+    public class MPTickerHud : DraggableHudElement, IHudElementWithActor, IHudElementWithVisibilityConfig
     {
         private MPTickerConfig Config => (MPTickerConfig)_config;
+        public VisibilityConfig VisibilityConfig => Config.VisibilityConfig;
 
         private MPTickHelper _mpTickHelper = null!;
         public GameObject? Actor { get; set; } = null;

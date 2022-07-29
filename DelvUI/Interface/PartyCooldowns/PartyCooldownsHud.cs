@@ -12,9 +12,10 @@ using System.Numerics;
 
 namespace DelvUI.Interface.PartyCooldowns
 {
-    public class PartyCooldownsHud : DraggableHudElement, IHudElementWithPreview
+    public class PartyCooldownsHud : DraggableHudElement, IHudElementWithPreview, IHudElementWithVisibilityConfig
     {
         private PartyCooldownsConfig Config => (PartyCooldownsConfig)_config;
+        public VisibilityConfig VisibilityConfig => Config.VisibilityConfig;
         private PartyCooldownsBarConfig _barConfig = null!;
         private PartyCooldownsDataConfig _dataConfig = null!;
 

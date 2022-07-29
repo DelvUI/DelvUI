@@ -61,6 +61,9 @@ namespace DelvUI.Interface.Party
         [Checkbox("Show Chocobo", isMonitored = true)]
         [Order(55)]
         public bool ShowChocobo = true;
+
+        [NestedConfig("Visibility", 200)]
+        public VisibilityConfig VisibilityConfig = new VisibilityConfig();
     }
 
     [Exportable(false)]

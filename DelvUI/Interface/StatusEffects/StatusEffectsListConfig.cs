@@ -162,6 +162,9 @@ namespace DelvUI.Interface.StatusEffects
         [Order(17, collapseWith = nameof(AnchorToUnitFrame))]
         public DrawAnchor UnitFrameAnchor = DrawAnchor.TopLeft;
 
+        [NestedConfig("Visibility", 200)]
+        public VisibilityConfig VisibilityConfig = new VisibilityConfig();
+
         public UnitFrameStatusEffectsListConfig(Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
             GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
             : base(position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)
@@ -552,7 +555,7 @@ namespace DelvUI.Interface.StatusEffects
                     ImGui.OpenPopup("export_succes_popup");
                 }
                 ImGui.PopFont();
-                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Export List to Clipboard"); }
+                ImGuiHelper.SetTooltip("Export List to Clipboard");
 
                 // export success popup
                 if (ImGui.BeginPopup("export_succes_popup"))
@@ -569,7 +572,7 @@ namespace DelvUI.Interface.StatusEffects
                     _importString = ImGui.GetClipboardText();
                 }
                 ImGui.PopFont();
-                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Import List from Clipboard"); }
+                ImGuiHelper.SetTooltip("Import List from Clipboard");
 
                 // clear
                 ImGui.SameLine();
@@ -579,7 +582,7 @@ namespace DelvUI.Interface.StatusEffects
                     _clearingList = true;
                 }
                 ImGui.PopFont();
-                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Clear List"); }
+                ImGuiHelper.SetTooltip("Clear List");
 
                 ImGui.Text("\u2002 \u2002");
                 ImGui.SameLine();

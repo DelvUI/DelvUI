@@ -11,9 +11,10 @@ using System.Runtime.InteropServices;
 
 namespace DelvUI.Interface.Party
 {
-    public class PartyFramesHud : DraggableHudElement, IHudElementWithMouseOver, IHudElementWithPreview
+    public class PartyFramesHud : DraggableHudElement, IHudElementWithMouseOver, IHudElementWithPreview, IHudElementWithVisibilityConfig
     {
         private PartyFramesConfig Config => (PartyFramesConfig)_config;
+        public VisibilityConfig VisibilityConfig => Config.VisibilityConfig;
         private PartyFramesConfigs Configs;
 
         private delegate void OpenContextMenu(IntPtr agentHud, int parentAddonId, int index);

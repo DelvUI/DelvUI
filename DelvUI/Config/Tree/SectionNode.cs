@@ -34,14 +34,17 @@ namespace DelvUI.Config.Tree
 
             ImGui.BeginChild(
                 "DelvU_Settings_Tab",
-                new Vector2(0, -ImGui.GetFrameHeightWithSpacing() - 15),
+                new Vector2(0, -10),
                 false,
                 ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse
             ); // Leave room for 1 line below us
 
             {
-                ImGui.PushStyleColor(ImGuiCol.Tab, new Vector4(45f / 255f, 45f / 255f, 45f / 255f, alpha));
-                ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(45f / 255f, 45f / 255f, 45f / 255f, alpha));
+                if (ConfigurationManager.Instance.OverrideDalamudStyle)
+                {
+                    ImGui.PushStyleColor(ImGuiCol.Tab, new Vector4(45f / 255f, 45f / 255f, 45f / 255f, alpha));
+                    ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(45f / 255f, 45f / 255f, 45f / 255f, alpha));
+                }
 
                 if (ImGui.BeginTabBar("##Tabs", ImGuiTabBarFlags.None))
                 {
@@ -64,7 +67,10 @@ namespace DelvUI.Config.Tree
                     ImGui.EndTabBar();
                 }
 
-                ImGui.PopStyleColor(2);
+                if (ConfigurationManager.Instance.OverrideDalamudStyle)
+                {
+                    ImGui.PopStyleColor(2);
+                }
 
                 didReset |= DrawResetModal();
             }

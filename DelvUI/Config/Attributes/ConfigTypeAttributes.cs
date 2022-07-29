@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Reflection;
-using Dalamud.Interface;
+﻿using Dalamud.Interface;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
+using System;
+using System.Linq;
+using System.Numerics;
+using System.Reflection;
 
 namespace DelvUI.Config.Attributes
 {
@@ -356,7 +355,8 @@ namespace DelvUI.Config.Attributes
                     ImGui.OpenPopup(popupId);
                 }
                 ImGui.PopFont();
-                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Text Tags"); }
+
+                ImGuiHelper.SetTooltip("Text Tags");
             }
 
             var selectedTag = ImGuiHelper.DrawTextTagsList(popupId, ref _searchText);
@@ -488,112 +488,6 @@ namespace DelvUI.Config.Attributes
             }
 
             return false;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Field)]
-    public class DynamicListAttribute : ConfigAttribute
-    {
-        public string[] options;
-
-        public DynamicListAttribute(string friendlyName, params string[] options) : base(friendlyName)
-        {
-            this.options = options;
-        }
-
-        public override bool DrawField(FieldInfo field, PluginConfigObject config, string? ID, bool collapsingHeader)
-        {
-            var changed = false;
-
-            List<string>? fieldVal = (List<string>?)field.GetValue(config);
-            List<string> opts = fieldVal ?? new List<string>();
-
-            var idText = IDText(ID);
-            int indexToRemove = -1;
-
-            ImGui.BeginChild(friendlyName, new Vector2(400, 230));
-
-            List<string> addOptions = new(options);
-            for (int i = 0; i < opts.Count; i++)
-            {
-                addOptions.Remove(opts[i]);
-            }
-
-            int intVal = 0;
-            ImGui.Text("Add");
-            if (ImGui.Combo("##Add" + idText + friendlyName, ref intVal, addOptions.ToArray(), addOptions.Count, 6))
-            {
-                changed = true;
-
-                var change = addOptions[intVal];
-                opts.Add(change);
-                field.SetValue(config, opts);
-
-                TriggerChangeEvent<string>(config, field.Name, change, ChangeType.ListAdd);
-            }
-
-            ImGui.Text(friendlyName + ":");
-            var flags =
-                ImGuiTableFlags.RowBg |
-                ImGuiTableFlags.Borders |
-                ImGuiTableFlags.BordersOuter |
-                ImGuiTableFlags.BordersInner |
-                ImGuiTableFlags.ScrollY |
-                ImGuiTableFlags.SizingFixedSame;
-
-            if (ImGui.BeginTable("##myTable2" + friendlyName + idText, 2, flags, new Vector2(326, 150)))
-            {
-                ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch, 0, 0);
-                ImGui.TableSetupColumn("", ImGuiTableColumnFlags.WidthFixed, 0, 1);
-
-                ImGui.TableSetupScrollFreeze(0, 1);
-                ImGui.TableHeadersRow();
-
-                for (int i = 0; i < opts.Count(); i++)
-                {
-                    ImGui.PushID(i.ToString());
-                    ImGui.TableNextRow(ImGuiTableRowFlags.None);
-
-                    if (ImGui.TableSetColumnIndex(0))
-                    {
-                        ImGui.Text(opts[i]);
-                    }
-
-                    if (ImGui.TableSetColumnIndex(1))
-                    {
-                        ImGui.PushFont(UiBuilder.IconFont);
-                        ImGui.PushStyleColor(ImGuiCol.Button, Vector4.Zero);
-                        ImGui.PushStyleColor(ImGuiCol.ButtonActive, Vector4.Zero);
-                        ImGui.PushStyleColor(ImGuiCol.ButtonHovered, Vector4.Zero);
-
-                        if (ImGui.Button(FontAwesomeIcon.Trash.ToIconString()))
-                        {
-                            changed = true;
-                            indexToRemove = i;
-                        }
-
-                        ImGui.PopFont();
-                        ImGui.PopStyleColor(3);
-                    }
-                }
-
-                ImGui.EndTable();
-            }
-
-            if (indexToRemove >= 0)
-            {
-                changed = true;
-
-                var change = opts[indexToRemove];
-                opts.Remove(change);
-                field.SetValue(config, opts);
-
-                TriggerChangeEvent<string>(config, field.Name, change, ChangeType.ListRemove);
-            }
-
-            ImGui.EndChild();
-
-            return changed;
         }
     }
 

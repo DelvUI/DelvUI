@@ -15,15 +15,13 @@ namespace DelvUI.Config.Windows
 
         private float _alpha = 1f;
         private Vector2 _lastWindowPos = Vector2.Zero;
+        private Vector2 _size = new Vector2(1050, 750);
 
         public MainConfigWindow(string name) : base(name)
         {
-            Flags = ImGuiWindowFlags.NoTitleBar |
-                    ImGuiWindowFlags.NoScrollbar |
-                    ImGuiWindowFlags.NoResize |
-                    ImGuiWindowFlags.NoScrollWithMouse;
-
-            Size = new Vector2(1050, 750);
+            Flags = ImGuiWindowFlags.NoTitleBar;
+            Size = _size;
+            SizeCondition = ImGuiCond.FirstUseEver;
         }
 
         public override void OnClose()
@@ -34,7 +32,7 @@ namespace DelvUI.Config.Windows
         private bool CheckWindowFocus()
         {
             Vector2 mousePos = ImGui.GetMousePos();
-            Vector2 endPos = _lastWindowPos + Size!.Value;
+            Vector2 endPos = _lastWindowPos + _size;
 
             return mousePos.X >= _lastWindowPos.X && mousePos.X <= endPos.X &&
                    mousePos.Y >= _lastWindowPos.Y && mousePos.Y <= endPos.Y;
@@ -50,9 +48,12 @@ namespace DelvUI.Config.Windows
                 _alpha = CheckWindowFocus() ? 1 : 0.5f;
             }
 
-            ImGui.PushStyleColor(ImGuiCol.Border, new Vector4(0f / 255f, 0f / 255f, 0f / 255f, _alpha));
-            ImGui.PushStyleColor(ImGuiCol.BorderShadow, new Vector4(0f / 255f, 0f / 255f, 0f / 255f, _alpha));
-            ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(20f / 255f, 21f / 255f, 20f / 255f, _alpha));
+            if (ConfigurationManager.Instance.OverrideDalamudStyle)
+            {
+                ImGui.PushStyleColor(ImGuiCol.Border, new Vector4(0f / 255f, 0f / 255f, 0f / 255f, _alpha));
+                ImGui.PushStyleColor(ImGuiCol.BorderShadow, new Vector4(0f / 255f, 0f / 255f, 0f / 255f, _alpha));
+                ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(20f / 255f, 21f / 255f, 20f / 255f, _alpha));
+            }
 
             ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 1);
             ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 1);
@@ -62,10 +63,16 @@ namespace DelvUI.Config.Windows
         {
             _lastWindowPos = ImGui.GetWindowPos();
 
-            ImGui.PopStyleColor(3);
+            if (ConfigurationManager.Instance.OverrideDalamudStyle)
+            {
+                ImGui.PopStyleColor(3);
+            }
+
             ImGui.PopStyleVar(2);
 
             node?.Draw(_alpha);
+
+            _size = ImGui.GetWindowSize();
         }
     }
 }

@@ -1,8 +1,9 @@
-﻿using System;
-using System.Numerics;
+﻿using Dalamud.Interface;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using ImGuiNET;
+using System;
+using System.Numerics;
 
 namespace DelvUI.Helpers
 {
@@ -39,8 +40,8 @@ namespace DelvUI.Helpers
         }
         #endregion
 
-        private static float MaxWidth = 300;
-        private static float Margin = 5;
+        private float MaxWidth => 300 * ImGuiHelpers.GlobalScale;
+        private float Margin => 5 * ImGuiHelpers.GlobalScale;
 
         private TooltipsConfig _config => ConfigurationManager.Instance.GetConfigObject<TooltipsConfig>();
 
@@ -99,7 +100,9 @@ namespace DelvUI.Helpers
 
             // calculate text size
             using (FontsManager.Instance.PushFont(_config.TextFontID))
+            {
                 _textSize = ImGui.CalcTextSize(_currentTooltipText, MaxWidth);
+            }
 
             _size = new Vector2(Math.Max(_titleSize.X, _textSize.X) + Margin * 2, _titleSize.Y + _textSize.Y + Margin * 2);
 
@@ -154,6 +157,9 @@ namespace DelvUI.Helpers
                 drawList.AddRect(_position, _position + _size, _config.BorderConfig.Color.Base, 0, ImDrawFlags.None, _config.BorderConfig.Thickness);
             }
 
+            // no idea why i have to do this
+            float globalScaleCorrection = -15 + 15 * ImGuiHelpers.GlobalScale;
+
             if (_currentTooltipTitle != null)
             {
                 // title
@@ -162,7 +168,7 @@ namespace DelvUI.Helpers
                 {
                     cursorPos = new Vector2(windowMargin.X + _size.X / 2f - _titleSize.X / 2f, Margin);
                     ImGui.SetCursorPos(cursorPos);
-                    ImGui.PushTextWrapPos(cursorPos.X + _titleSize.X);
+                    ImGui.PushTextWrapPos(cursorPos.X + _titleSize.X + globalScaleCorrection);
                     ImGui.TextColored(_config.TitleColor.Vector, _currentTooltipTitle);
                     ImGui.PopTextWrapPos();
                 }
@@ -172,7 +178,7 @@ namespace DelvUI.Helpers
                 {
                     cursorPos = new Vector2(windowMargin.X + _size.X / 2f - _textSize.X / 2f, Margin + _titleSize.Y);
                     ImGui.SetCursorPos(cursorPos);
-                    ImGui.PushTextWrapPos(cursorPos.X + _textSize.X);
+                    ImGui.PushTextWrapPos(cursorPos.X + _textSize.X + globalScaleCorrection);
                     ImGui.TextColored(_config.TextColor.Vector, _currentTooltipText);
                     ImGui.PopTextWrapPos();
                 }
@@ -186,7 +192,7 @@ namespace DelvUI.Helpers
                     var textWidth = _size.X - Margin * 2;
 
                     ImGui.SetCursorPos(cursorPos);
-                    ImGui.PushTextWrapPos(cursorPos.X + textWidth);
+                    ImGui.PushTextWrapPos(cursorPos.X + textWidth + globalScaleCorrection);
                     ImGui.TextColored(_config.TextColor.Vector, _currentTooltipText);
                     ImGui.PopTextWrapPos();
                 }

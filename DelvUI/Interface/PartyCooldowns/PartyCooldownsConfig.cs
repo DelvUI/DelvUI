@@ -58,6 +58,9 @@ namespace DelvUI.Interface.PartyCooldowns
         [Checkbox("Show When Solo", isMonitored = true)]
         [Order(21)]
         public bool ShowWhenSolo = false;
+
+        [NestedConfig("Visibility", 200)]
+        public VisibilityConfig VisibilityConfig = new VisibilityConfig();
     }
 
     [Disableable(false)]
@@ -309,7 +312,7 @@ namespace DelvUI.Interface.PartyCooldowns
                             CooldownsDataChangedEvent?.Invoke(this);
                         }
 
-                        if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Priority determines which cooldows show first on the list."); }
+                        ImGuiHelper.SetTooltip("Priority determines which cooldows show first on the list.");
                     }
 
                     // column
@@ -324,7 +327,7 @@ namespace DelvUI.Interface.PartyCooldowns
                             CooldownsDataChangedEvent?.Invoke(this);
                         }
 
-                        if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Allows to separate cooldowns in different columns."); }
+                        ImGuiHelper.SetTooltip("Allows to separate cooldowns in different columns.");
                     }
 
                     ImGui.PopID();

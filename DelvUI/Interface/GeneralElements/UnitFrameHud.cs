@@ -17,9 +17,10 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public unsafe class UnitFrameHud : DraggableHudElement, IHudElementWithActor, IHudElementWithMouseOver, IHudElementWithPreview
+    public unsafe class UnitFrameHud : DraggableHudElement, IHudElementWithActor, IHudElementWithMouseOver, IHudElementWithPreview, IHudElementWithVisibilityConfig
     {
         public UnitFrameConfig Config => (UnitFrameConfig)_config;
+        public VisibilityConfig VisibilityConfig => Config.VisibilityConfig;
 
         private readonly OpenContextMenuFromTarget _openContextMenuFromTarget;
 

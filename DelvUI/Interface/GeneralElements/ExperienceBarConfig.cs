@@ -33,6 +33,9 @@ namespace DelvUI.Interface.GeneralElements
         [NestedConfig("Right Text", 65)]
         public EditableLabelConfig RightLabel;
 
+        [NestedConfig("Visibility", 70)]
+        public VisibilityConfig VisibilityConfig = new VisibilityConfig();
+
         public ExperienceBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
         {
             LeftLabel = new EditableLabelConfig(new Vector2(5, 0), "[job]  Lv[level]  EXP [exp:current-short]/[exp:required-short]", DrawAnchor.BottomLeft, DrawAnchor.TopLeft);

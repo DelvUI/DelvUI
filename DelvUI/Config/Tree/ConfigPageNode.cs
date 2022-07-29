@@ -202,7 +202,8 @@ namespace DelvUI.Config.Tree
 
             ImGui.BeginGroup();
 
-            ImGui.SetCursorPos(new Vector2(ImGui.GetWindowContentRegionWidth() / 2f - buttonWidth - 5, ImGui.GetCursorPosY()));
+            float width = ImGui.GetWindowContentRegionMax().X - ImGui.GetWindowContentRegionMin().X;
+            ImGui.SetCursorPos(new Vector2(width / 2f - buttonWidth - 5, ImGui.GetCursorPosY()));
 
             if (ImGui.Button("Export", new Vector2(120, 24)))
             {

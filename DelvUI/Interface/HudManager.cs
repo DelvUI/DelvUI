@@ -42,6 +42,7 @@ namespace DelvUI.Interface
 
         private Dictionary<uint, JobHudTypes> _jobsMap = null!;
         private Dictionary<uint, Type> _unsupportedJobsMap = null!;
+        private List<Type> _jobTypes = null!;
 
         private double _occupiedInQuestStartTime = -1;
 
@@ -55,6 +56,7 @@ namespace DelvUI.Interface
             ConfigurationManager.Instance.LockEvent += OnHUDLockChanged;
             ConfigurationManager.Instance.ConfigClosedEvent += OnConfingWindowClosed;
             ConfigurationManager.Instance.StrataLevelsChangedEvent += OnStrataLevelsChanged;
+            ConfigurationManager.Instance.GlobalVisibilityEvent += OnGlobalVisibilityChanged;
 
             CreateHudElements();
         }
@@ -89,6 +91,7 @@ namespace DelvUI.Interface
             ConfigurationManager.Instance.LockEvent -= OnHUDLockChanged;
             ConfigurationManager.Instance.ConfigClosedEvent -= OnConfingWindowClosed;
             ConfigurationManager.Instance.StrataLevelsChangedEvent -= OnStrataLevelsChanged;
+            ConfigurationManager.Instance.GlobalVisibilityEvent -= OnGlobalVisibilityChanged;
         }
 
         private void OnConfigReset(ConfigurationManager sender)
@@ -138,6 +141,23 @@ namespace DelvUI.Interface
             }
 
             _hudElements = tmp;
+        }
+
+        private void OnGlobalVisibilityChanged(ConfigurationManager sender, VisibilityConfig config)
+        {
+            foreach (DraggableHudElement element in _hudElements.Values)
+            {
+                if (element is IHudElementWithVisibilityConfig e)
+                {
+                    e.VisibilityConfig?.CopyFrom(config);
+                }
+            }
+
+            foreach (Type jobType in _jobTypes)
+            {
+                JobConfig jobConfig = (JobConfig)ConfigurationManager.Instance.GetConfigObjectForType(jobType);
+                jobConfig.VisibilityConfig.CopyFrom(config);
+            }
         }
 
         private void OnDraggableElementSelected(DraggableHudElement sender)
@@ -622,6 +642,34 @@ namespace DelvUI.Interface
                 [JobIDs.MIN] = typeof(MinerConfig),
                 [JobIDs.BOT] = typeof(BotanistConfig),
                 [JobIDs.FSH] = typeof(FisherConfig),
+            };
+
+            _jobTypes = new List<Type>()
+            {
+                typeof(PaladinConfig),
+                typeof(WarriorConfig),
+                typeof(DarkKnightConfig),
+                typeof(GunbreakerConfig),
+
+                typeof(WhiteMageConfig),
+                typeof(ScholarConfig),
+                typeof(AstrologianConfig),
+                typeof(SageConfig),
+
+                typeof(MonkConfig),
+                typeof(DragoonConfig),
+                typeof(NinjaConfig),
+                typeof(SamuraiConfig),
+                typeof(ReaperConfig),
+
+                typeof(BardConfig),
+                typeof(MachinistConfig),
+                typeof(DancerConfig),
+
+                typeof(BlackMageConfig),
+                typeof(SummonerConfig),
+                typeof(RedMageConfig),
+                typeof(BlueMageConfig)
             };
         }
     }
