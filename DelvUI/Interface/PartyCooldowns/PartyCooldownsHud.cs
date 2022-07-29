@@ -268,7 +268,7 @@ namespace DelvUI.Interface.PartyCooldowns
                     if (Config.ShowTooltips && ImGui.IsMouseHoveringRect(pos, pos + _barConfig.Size))
                     {
                         TooltipsHelper.Instance.ShowTooltipOnCursor(
-                            cooldown.Data.TooltipText(),
+                            cooldown.TooltipText(),
                             cooldown.Data.Name,
                             cooldown.Data.ActionId
                         );

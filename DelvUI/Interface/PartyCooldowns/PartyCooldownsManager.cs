@@ -251,7 +251,7 @@ namespace DelvUI.Interface.PartyCooldowns
             {
                 if (data.Enabled && level >= data.RequiredLevel && data.IsUsableBy(jobId))
                 {
-                    cooldowns.Add(data.ActionId, new PartyCooldown(data, objectId, member));
+                    cooldowns.Add(data.ActionId, new PartyCooldown(data, objectId, level, member));
                 }
             }
 
