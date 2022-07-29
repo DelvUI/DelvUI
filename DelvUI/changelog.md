@@ -1,6 +1,7 @@
 # 1.2.0.1
 Fixes:
 - Fixed DelVUI sometimes crashing on startup.
+- Fixed hotbar commands being spammed in the chat.
 
 # 1.2.0.0
 Features:

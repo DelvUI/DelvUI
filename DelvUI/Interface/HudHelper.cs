@@ -21,6 +21,7 @@ using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
@@ -43,14 +44,15 @@ namespace DelvUI.Interface
 
         private HUDOptionsConfig Config => ConfigurationManager.Instance.GetConfigObject<HUDOptionsConfig>();
 
-        private bool _previousCombatState = true;
-        private bool _isInitial = true;
         private readonly uint[] _goldSaucerIDs = { 144, 388, 389, 390, 391, 579, 792, 899, 941 };
 
         private GetBaseUIObjectDelegate? _getBaseUIObject;
         private SetPositionDelegate? _setPosition;
         private UpdateAddonPositionDelegate? _updateAddonPosition;
         private GetFilePointerDelegate? _getFilePointer = null;
+
+        private readonly string[] _hotbarAddonNames = { "_ActionBar", "_ActionBar01", "_ActionBar02", "_ActionBar03", "_ActionBar04", "_ActionBar05", "_ActionBar06", "_ActionBar07", "_ActionBar08", "_ActionBar09" };
+        private bool? _previousHotbarCrossVisible = null;
 
         public HudHelper()
         {
@@ -165,8 +167,6 @@ namespace DelvUI.Interface
             UpdateJobGauges();
             UpdateDefaultCastBar();
             UpdateDefaultPulltimer();
-
-            _isInitial = false;
         }
 
         public bool IsElementHidden(HudElement element)
@@ -196,6 +196,11 @@ namespace DelvUI.Interface
 
         private void UpdateCombatActionBars()
         {
+            if (Plugin.Condition[ConditionFlag.OccupiedInEvent] || Plugin.Condition[ConditionFlag.OccupiedInQuestEvent])
+            {
+                return;
+            }
+
             HotbarsVisibilityConfig? config = ConfigurationManager.Instance?.GetConfigObject<HotbarsVisibilityConfig>();
             if (config == null) { return; }
 
@@ -214,16 +219,23 @@ namespace DelvUI.Interface
             }
         }
 
-        private void SetHotbarVisible(int index, bool visible)
+        private unsafe void SetHotbarVisible(int index, bool visible)
         {
+            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName(_hotbarAddonNames[index], 1);
+            if (addon == null || addon->IsVisible == visible) { return; }
+
             string numberText = (index + 1).ToString();
             string onOffText = visible ? "on" : "off";
 
             ChatHelper.SendChatMessage("/hotbar display " + numberText + " " + onOffText);
         }
 
-        private void SetCrossHotbarVisible(bool visible)
+        private unsafe void SetCrossHotbarVisible(bool visible)
         {
+            if (_previousHotbarCrossVisible.HasValue && _previousHotbarCrossVisible.Value == visible) { return; }
+
+            _previousHotbarCrossVisible = visible;
+
             string onOffText = visible ? "on" : "off";
             ChatHelper.SendChatMessage("/crosshotbardisplay" + " " + onOffText);
         }
