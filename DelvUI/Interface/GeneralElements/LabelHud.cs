@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface;
 using DelvUI.Config;
@@ -42,31 +43,59 @@ namespace DelvUI.Interface.GeneralElements
 
         protected virtual void DrawLabel(string text, Vector2 parentPos, Vector2 parentSize, GameObject? actor = null)
         {
-            using (FontsManager.Instance.PushFont(Config.FontID))
+            Vector2 size;
+            Vector2 pos;
+
+            if (Config.UseSystemFont())
             {
-                Vector2 size = ImGui.CalcTextSize(text);
-                Vector2 pos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(parentPos + Config.Position, -parentSize, Config.FrameAnchor), size, Config.TextAnchor);
-
-                DrawHelper.DrawInWindow(ID, pos, size, false, true, (drawList) =>
-                {
-                    PluginConfigColor? color = Color(actor);
-
-                    if (Config.ShowShadow)
-                    {
-                        DrawHelper.DrawShadowText(text, pos, color.Base, Config.ShadowColor.Base, drawList, Config.ShadowOffset);
-                    }
-
-                    if (Config.ShowOutline)
-                    {
-                        DrawHelper.DrawOutlinedText(text, pos, color.Base, Config.OutlineColor.Base, drawList);
-                    }
-
-                    if (!Config.ShowOutline && !Config.ShowShadow)
-                    {
-                        drawList.AddText(pos, color.Base, text);
-                    }
-                });
+                size = ImGui.CalcTextSize(text) * Config.GetFontScale();
+                pos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(parentPos + Config.Position, -parentSize, Config.FrameAnchor), size, Config.TextAnchor);
             }
+            else
+            {
+                using (FontsManager.Instance.PushFont(Config.FontID))
+                {
+                    size = ImGui.CalcTextSize(text) * Config.GetFontScale();
+                    pos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(parentPos + Config.Position, -parentSize, Config.FrameAnchor), size, Config.TextAnchor);
+                }
+            }
+
+            Action<ImDrawListPtr> action = (ImDrawListPtr drawList) =>
+            {
+                PluginConfigColor? color = Color(actor);
+
+                if (Config.ShowShadow)
+                {
+                    DrawHelper.DrawShadowText(text, pos, color.Base, Config.ShadowColor.Base, drawList, Config.ShadowOffset);
+                }
+
+                if (Config.ShowOutline)
+                {
+                    DrawHelper.DrawOutlinedText(text, pos, color.Base, Config.OutlineColor.Base, drawList);
+                }
+
+                if (!Config.ShowOutline && !Config.ShowShadow)
+                {
+                    drawList.AddText(pos, color.Base, text);
+                }
+            };
+
+            DrawHelper.DrawInWindow(ID, pos, size, false, true, (drawList) =>
+            {
+                if (Config.UseSystemFont())
+                {
+                    ImGui.SetWindowFontScale(Config.GetFontScale());
+                    action(drawList);
+                    ImGui.SetWindowFontScale(1);
+                }
+                else
+                {
+                    using (FontsManager.Instance.PushFont(Config.FontID))
+                    {
+                        action(drawList);
+                    }
+                }
+            });
         }
 
         public virtual PluginConfigColor Color(GameObject? actor = null)
@@ -119,13 +148,15 @@ namespace DelvUI.Interface.GeneralElements
         protected override void DrawLabel(string text, Vector2 parentPos, Vector2 parentSize, GameObject? actor = null)
         {
             ImGui.PushFont(UiBuilder.IconFont);
-            Vector2 size = ImGui.CalcTextSize(text);
+            Vector2 size = ImGui.CalcTextSize(text) * Config.GetFontScale();
             Vector2 pos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(parentPos + Config.Position, -parentSize, Config.FrameAnchor), size, Config.TextAnchor);
             ImGui.PopFont();
 
             DrawHelper.DrawInWindow(ID, pos, size, false, true, (drawList) =>
             {
+                ImGui.SetWindowFontScale(Config.GetFontScale());
                 ImGui.PushFont(UiBuilder.IconFont);
+
                 PluginConfigColor? color = Color(actor);
 
                 if (Config.ShowShadow)
@@ -144,6 +175,7 @@ namespace DelvUI.Interface.GeneralElements
                 }
 
                 ImGui.PopFont();
+                ImGui.SetWindowFontScale(1);
             });
         }
     }

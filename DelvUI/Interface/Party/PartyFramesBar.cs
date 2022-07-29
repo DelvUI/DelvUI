@@ -50,7 +50,7 @@ namespace DelvUI.Interface.Party
 
             _nameLabelHud = new LabelHud(_configs.HealthBar.NameLabelConfig);
             _healthLabelHud = new LabelHud(_configs.HealthBar.HealthLabelConfig);
-            _orderLabelHud = new LabelHud(_configs.HealthBar.OrderLabelConfig);
+            _orderLabelHud = new LabelHud(_configs.HealthBar.OrderNumberConfig);
             _statusLabelHud = new LabelHud(PlayerStatus.Label);
             _raiseLabelHud = new LabelHud(RaiseTracker.Icon.Label);
             _invulnLabelHud = new LabelHud(InvulnTracker.Icon.Label);
@@ -82,7 +82,7 @@ namespace DelvUI.Interface.Party
             {
                 if (_configs.HealthBar.ColorsConfig.ColorByHealth.UseJobColorAsMaxHealth)
                 {
-                    return Utils.GetColorByScale(scale, _configs.HealthBar.ColorsConfig.ColorByHealth.LowHealthColorThreshold / 100f, _configs.HealthBar.ColorsConfig.ColorByHealth.FullHealthColorThreshold / 100f, _configs.HealthBar.ColorsConfig.ColorByHealth.LowHealthColor, _configs.HealthBar.ColorsConfig.ColorByHealth.FullHealthColor, 
+                    return Utils.GetColorByScale(scale, _configs.HealthBar.ColorsConfig.ColorByHealth.LowHealthColorThreshold / 100f, _configs.HealthBar.ColorsConfig.ColorByHealth.FullHealthColorThreshold / 100f, _configs.HealthBar.ColorsConfig.ColorByHealth.LowHealthColor, _configs.HealthBar.ColorsConfig.ColorByHealth.FullHealthColor,
                         GlobalColors.Instance.SafeColorForJobId(Member.JobId), _configs.HealthBar.ColorsConfig.ColorByHealth.UseMaxHealthColor, _configs.HealthBar.ColorsConfig.ColorByHealth.BlendMode);
                 }
                 else if (_configs.HealthBar.ColorsConfig.ColorByHealth.UseRoleColorAsMaxHealth)
@@ -527,11 +527,12 @@ namespace DelvUI.Interface.Party
             // order
             if (character == null || character?.ObjectKind != ObjectKind.BattleNpc)
             {
-                var order = Member.ObjectId == player.ObjectId ? 1 : Member.Order;
+                int order = Member.ObjectId == player.ObjectId ? 1 : Member.Order;
+                string str = char.ConvertFromUtf32(0xE090 + order - 1).ToString();
 
-                drawActions.Add((_configs.HealthBar.OrderLabelConfig.StrataLevel, () =>
+                drawActions.Add((_configs.HealthBar.OrderNumberConfig.StrataLevel, () =>
                 {
-                    _configs.HealthBar.OrderLabelConfig.SetText("[" + order + "]");
+                    _configs.HealthBar.OrderNumberConfig.SetText(str);
                     _orderLabelHud.Draw(Position, _configs.HealthBar.Size);
                 }
                 ));

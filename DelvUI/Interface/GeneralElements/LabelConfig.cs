@@ -95,6 +95,10 @@ namespace DelvUI.Interface.GeneralElements
     [Exportable(false)]
     public class IconLabelConfig : LabelConfig
     {
+        [DragFloat("Scale", min = 1, max = 5, velocity = 0.05f)]
+        [Order(11)]
+        public float FontScale = 1;
+
         public FontAwesomeIcon IconId;
 
         public IconLabelConfig(Vector2 position, FontAwesomeIcon iconId, DrawAnchor frameAnchor, DrawAnchor textAnchor) : base(position, "", frameAnchor, textAnchor)
@@ -103,6 +107,24 @@ namespace DelvUI.Interface.GeneralElements
         }
 
         public override string GetText() => IconId.ToIconString();
+        public override float GetFontScale() => FontScale;
+    }
+
+    [DisableParentSettings("FontID")]
+    [Exportable(false)]
+    public class DefaultFontLabelConfig : LabelConfig
+    {
+        [DragFloat("Scale", min = 1, max = 5, velocity = 0.05f)]
+        [Order(11)]
+        public float FontScale = 1;
+
+        public DefaultFontLabelConfig(Vector2 position, string text, DrawAnchor frameAnchor, DrawAnchor textAnchor)
+            : base(position, text, frameAnchor, textAnchor)
+        {
+        }
+
+        public override bool UseSystemFont() => true;
+        public override float GetFontScale() => FontScale;
     }
 
     [Exportable(false)]
@@ -171,5 +193,8 @@ namespace DelvUI.Interface.GeneralElements
         {
             _text = text;
         }
+
+        public virtual bool UseSystemFont() => false;
+        public virtual float GetFontScale() => 1;
     }
 }

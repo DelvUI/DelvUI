@@ -42,13 +42,13 @@ namespace DelvUI.Interface.EnemyList
                 if (numberArrayData->AtkArrayData.Size <= index) { break; }
 
                 int objectId = numberArrayData->IntArray[index];
-                string? letter = GetEnemyLetterForIndex(i);
+                int? letter = GetEnemyLetterForIndex(i);
                 int enmityLevel = GetEnmityLevelForIndex(i);
                 _enemiesData.Add(new EnemyListData(objectId, letter, enmityLevel));
             }
         }
 
-        private string? GetEnemyLetterForIndex(int index)
+        private int? GetEnemyLetterForIndex(int index)
         {
             if (_raptureAtkModule == null || _raptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrayCount <= EnemyListNamesIndex)
             {
@@ -70,8 +70,7 @@ namespace DelvUI.Interface.EnemyList
             }
 
             char letterSymbol = name[0];
-            char letter = (char)(65 + letterSymbol - 57457);
-            return letter.ToString();
+            return letterSymbol - 57457;
         }
 
         private int GetEnmityLevelForIndex(int index)
@@ -95,13 +94,13 @@ namespace DelvUI.Interface.EnemyList
     public struct EnemyListData
     {
         public int ObjectId;
-        public string? Letter;
+        public int? LetterIndex;
         public int EnmityLevel;
 
-        public EnemyListData(int objectId, string? letter, int enmityLevel)
+        public EnemyListData(int objectId, int? letterIndex, int enmityLevel)
         {
             ObjectId = objectId;
-            Letter = letter;
+            LetterIndex = letterIndex;
             EnmityLevel = enmityLevel;
         }
     }
