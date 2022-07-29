@@ -56,11 +56,23 @@ namespace DelvUI.Interface.GeneralElements
             AddDrawActions(bar.GetDrawActions(origin, Config.StrataLevel));
 
             // sanctuary icon
-            AddDrawAction(Config.SanctuaryLabel.StrataLevel, () =>
+            if (IsInSanctuary())
             {
-                var pos = Utils.GetAnchoredPosition(origin, Config.Size, Config.Anchor);
-                _sanctuaryLabel.Draw(pos + Config.Position, Config.Size, Actor);
-            });
+                AddDrawAction(Config.SanctuaryLabel.StrataLevel, () =>
+                {
+                    var pos = Utils.GetAnchoredPosition(origin, Config.Size, Config.Anchor);
+                    _sanctuaryLabel.Draw(pos + Config.Position, Config.Size, Actor);
+                });
+            }
+        }
+
+        private unsafe bool IsInSanctuary()
+        {
+            AddonExp* addon = ExperienceHelper.Instance.GetExpAddon();
+            if (addon == null) { return false; }
+            if (addon->AtkUnitBase.UldManager.NodeListCount < 4) { return false; }
+
+            return addon->AtkUnitBase.UldManager.NodeList[4]->IsVisible;
         }
     }
 }
