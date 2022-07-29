@@ -1,3 +1,7 @@
+# 1.2.0.1
+Fixes:
+- Fixed DelVUI sometimes crashing on startup.
+
 # 1.2.0.0
 Features:
 - Completely reworked visibility options for DelvUI elements and the game's hotbars:

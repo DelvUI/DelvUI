@@ -8,14 +8,11 @@ namespace DelvUI.Config.Windows
     public class ChangelogWindow : Window
     {
         public string Changelog { get; set; }
+        private bool _needsToSetSize = true;
 
         public ChangelogWindow(string name, string changelog) : base(name)
         {
             Changelog = changelog;
-
-            float height = ImGui.CalcTextSize(Changelog).Y + 100;
-            Size = new Vector2(500, Math.Min(height, 500));
-            SizeCondition = ImGuiCond.FirstUseEver;
         }
 
         public override void PreDraw()
@@ -23,6 +20,13 @@ namespace DelvUI.Config.Windows
             if (ConfigurationManager.Instance.OverrideDalamudStyle)
             {
                 ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(10f / 255f, 10f / 255f, 10f / 255f, 0.95f));
+            }
+
+            if (_needsToSetSize)
+            {
+                float height = ImGui.CalcTextSize(Changelog).Y + 100;
+                ImGui.SetNextWindowSize(new Vector2(500, Math.Min(height, 500)), ImGuiCond.FirstUseEver);
+                _needsToSetSize = false;
             }
         }
 
