@@ -239,11 +239,10 @@ namespace DelvUI.Interface.EnemyList
                     _healthLabelHud.Draw(origin + pos, Configs.HealthBar.Size, character, name, currentHp, maxHp);
                 });
 
-                EnemyListData data = _helper.EnemiesData.ElementAt(i);
                 int letter = i;
-                if (!Config.Preview && data.LetterIndex.HasValue)
+                if (!Config.Preview && _helper.EnemiesData.ElementAt(i).LetterIndex.HasValue)
                 {
-                    letter = data.LetterIndex.Value;
+                    letter = _helper.EnemiesData.ElementAt(i).LetterIndex!.Value;
                 }
 
                 string str = char.ConvertFromUtf32(0xE071 + letter).ToString();
