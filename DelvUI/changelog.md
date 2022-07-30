@@ -1,5 +1,6 @@
 # 1.2.1.0
 Features:
+- Added "Hide when in duty" option to Visibility settings.
 - Added an icon to the experience bar that shows when the player is in a sanctuary.
 - Order Labels for Party Frames and Enemy List now uses the same symbols from the game:
     + This means it will no longer be a text like '[A]' or '[1]'.
