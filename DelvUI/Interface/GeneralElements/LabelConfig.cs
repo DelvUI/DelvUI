@@ -75,7 +75,7 @@ namespace DelvUI.Interface.GeneralElements
             _text = v.ToString($"F{NumberFormat}", CultureInfo.InvariantCulture);
         }
 
-        public NumericLabelConfig Clone() =>
+        public override NumericLabelConfig Clone() =>
             new NumericLabelConfig(Position, _text, FrameAnchor, TextAnchor)
             {
                 Color = Color,
@@ -196,5 +196,19 @@ namespace DelvUI.Interface.GeneralElements
 
         public virtual bool UseSystemFont() => false;
         public virtual float GetFontScale() => 1;
+
+        public virtual LabelConfig Clone() =>
+            new LabelConfig(Position, _text, FrameAnchor, TextAnchor)
+            {
+                Color = Color,
+                OutlineColor = OutlineColor,
+                ShadowColor = ShadowColor,
+                ShadowOffset = ShadowOffset,
+                ShowOutline = ShowOutline,
+                ShowShadow = ShowShadow,
+                FontID = FontID,
+                UseJobColor = UseJobColor,
+                Enabled = Enabled
+            };
     }
 }

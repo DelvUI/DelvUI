@@ -4,7 +4,12 @@ Features:
 - Order Labels for Party Frames and Enemy List now uses the same symbols from the game:
     + This means it will no longer be a text like '[A]' or '[1]'.
     + These labels will no longer use a custom font, instead theres a Scale setting to make them bigger.
-    + Due to this changes, these label's settings were reset.
+    + Due to these changes, these label's settings will be reset.
+- Reworked Monk's Forms bar:
+    + It now uses chunks for the 3 forms.
+    + A different color can be assigned for each form and also Formless Fist.
+    + When Formless Fist is active, it will show a progress bar with the duration of the buff instead of the chunks.
+    + Due to these changes, the settings for this bar will be reset.
 
 Fixes:
 - Fixed cooldown for Troubadour, Shield Samba and Tactician in Party Cooldowns:
