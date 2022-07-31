@@ -252,7 +252,7 @@ namespace DelvUI.Config.Tree
                     }
                     ImGui.PopStyleColor();
                     ImGui.PopFont();
-                    ImGuiHelper.SetTooltip("Browse presents in wago.io");
+                    ImGuiHelper.SetTooltip("Browse presets in wago.io");
 
                     // discord button
                     ImGui.PushFont(UiBuilder.IconFont);
