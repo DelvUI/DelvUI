@@ -16,6 +16,7 @@ Fixes:
 - Fixed cooldown for Troubadour, Shield Samba and Tactician in Party Cooldowns:
     + It now adapts to the level of each player to account for the level 88 trait that reduces the cooldown from 120s to 90s.
     + The cooldown will now read as "90-120" in the list for these actions.
+- Fixed hotbar commands being spammed while doing PvP.
 
 # 1.2.0.1
 Fixes:
