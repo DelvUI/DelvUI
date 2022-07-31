@@ -11,15 +11,17 @@ namespace DelvUI.Interface.PartyCooldowns
     {
         public readonly PartyCooldownData Data;
         public readonly uint SourceId;
+        public readonly uint MemberLevel;
         public readonly IPartyFramesMember? Member;
 
         public double LastTimeUsed = 0;
         public double OverridenCooldownStartTime = -1;
 
-        public PartyCooldown(PartyCooldownData data, uint sourceID, IPartyFramesMember? member)
+        public PartyCooldown(PartyCooldownData data, uint sourceID, uint level, IPartyFramesMember? member)
         {
             Data = data;
             SourceId = sourceID;
+            MemberLevel = level;
             Member = member;
         }
 
@@ -36,15 +38,33 @@ namespace DelvUI.Interface.PartyCooldowns
 
         public float CooldownTimeRemaining()
         {
+            int cooldown = GetCooldown();
             double timeSinceUse = OverridenCooldownStartTime != -1 ? ImGui.GetTime() - OverridenCooldownStartTime : ImGui.GetTime() - LastTimeUsed;
-            if (timeSinceUse > Data.CooldownDuration)
+
+            if (timeSinceUse > cooldown)
             {
                 OverridenCooldownStartTime = -1;
                 LastTimeUsed = 0;
                 return 0;
             }
 
-            return Data.CooldownDuration - (float)timeSinceUse;
+            return cooldown - (float)timeSinceUse;
+        }
+
+        private int GetCooldown()
+        {
+            // not happy about this but didn't want to over-complicate things
+            // special case for troubadour, shield samba and tactician
+            if (MemberLevel < 88) { return Data.CooldownDuration; }
+            if (Data.ActionId != 7405 && Data.ActionId != 16012 && Data.ActionId != 16889) { return Data.CooldownDuration; }
+
+            return 90;
+        }
+
+        public string TooltipText()
+        {
+            string effectDuration = Data.EffectDuration > 0 ? $"Duration: {Data.EffectDuration}s \n" : "";
+            return $"{effectDuration}Recast Time: {GetCooldown()}s";
         }
     }
 
@@ -69,12 +89,7 @@ namespace DelvUI.Interface.PartyCooldowns
 
         [JsonIgnore] public uint IconId = 0;
         [JsonIgnore] public string Name = "";
-
-        public string TooltipText()
-        {
-            string effectDuration = EffectDuration > 0 ? $"Duration: {EffectDuration}s \n" : "";
-            return $"{effectDuration}Recast Time: {CooldownDuration}s";
-        }
+        [JsonIgnore] public string? OverriddenCooldownText = null;
 
         public virtual bool IsUsableBy(uint jobId)
         {

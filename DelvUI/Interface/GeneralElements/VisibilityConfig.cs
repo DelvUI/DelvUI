@@ -28,6 +28,10 @@ namespace DelvUI.Interface
         [Order(8)]
         public bool HideOnFullHP = false;
 
+        [Checkbox("Hide when in duty")]
+        [Order(9)]
+        public bool HideInDuty = false;
+
         [Checkbox("Always show when in duty")]
         [Order(10)]
         public bool ShowInDuty = false;
@@ -86,6 +90,8 @@ namespace DelvUI.Interface
 
             PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (HideOnFullHP && player != null && player.CurrentHp == player.MaxHp) { return false; }
+
+            if (HideInDuty && IsInDuty()) { return false; }
 
             return true;
         }

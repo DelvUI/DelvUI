@@ -1,3 +1,23 @@
+# 1.2.1.0
+Features:
+- Added "Hide when in duty" option to Visibility settings.
+- Added an icon to the experience bar that shows when the player is in a sanctuary.
+- Order Labels for Party Frames and Enemy List now uses the same symbols from the game:
+    + This means it will no longer be a text like '[A]' or '[1]'.
+    + These labels will no longer use a custom font, instead theres a Scale setting to make them bigger.
+    + Due to these changes, these label's settings will be reset.
+- Reworked Monk's Forms bar:
+    + It now uses chunks for the 3 forms.
+    + A different color can be assigned for each form and also Formless Fist.
+    + When Formless Fist is active, it will show a progress bar with the duration of the buff instead of the chunks.
+    + Due to these changes, the settings for this bar will be reset.
+
+Fixes:
+- Fixed cooldown for Troubadour, Shield Samba and Tactician in Party Cooldowns:
+    + It now adapts to the level of each player to account for the level 88 trait that reduces the cooldown from 120s to 90s.
+    + The cooldown will now read as "90-120" in the list for these actions.
+- Fixed hotbar commands being spammed while doing PvP.
+
 # 1.2.0.1
 Fixes:
 - Fixed DelVUI sometimes crashing on startup.

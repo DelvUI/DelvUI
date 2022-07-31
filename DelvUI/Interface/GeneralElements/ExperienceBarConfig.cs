@@ -1,4 +1,5 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Interface;
+using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Interface.Bars;
@@ -30,8 +31,11 @@ namespace DelvUI.Interface.GeneralElements
         [NestedConfig("Left Text", 60)]
         public EditableLabelConfig LeftLabel;
 
-        [NestedConfig("Right Text", 65)]
+        [NestedConfig("Right Text", 61)]
         public EditableLabelConfig RightLabel;
+
+        [NestedConfig("Sanctuary Icon", 62)]
+        public IconLabelConfig SanctuaryLabel = new IconLabelConfig(new Vector2(5, 0), FontAwesomeIcon.Moon, DrawAnchor.Right, DrawAnchor.Left);
 
         [NestedConfig("Visibility", 70)]
         public VisibilityConfig VisibilityConfig = new VisibilityConfig();

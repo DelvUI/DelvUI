@@ -46,7 +46,7 @@ namespace DelvUI.Interface.EnemyList
 
             _nameLabelHud = new LabelHud(Configs.HealthBar.NameLabel);
             _healthLabelHud = new LabelHud(Configs.HealthBar.HealthLabel);
-            _orderLabelHud = new LabelHud(Configs.HealthBar.OrderLetterLabel);
+            _orderLabelHud = new LabelHud(Configs.HealthBar.OrderLabel);
 
             _castbarHud = new TargetCastbarHud(Configs.CastBar);
             _buffsListHud = new StatusEffectsListHud(Configs.Buffs);
@@ -239,10 +239,16 @@ namespace DelvUI.Interface.EnemyList
                     _healthLabelHud.Draw(origin + pos, Configs.HealthBar.Size, character, name, currentHp, maxHp);
                 });
 
-                string letter = Config.Preview || _helper.EnemiesData.ElementAt(i).Letter == null ? ((char)(i + 65)).ToString() : _helper.EnemiesData.ElementAt(i).Letter!;
-                AddDrawAction(Configs.HealthBar.OrderLetterLabel.StrataLevel, () =>
+                int letter = i;
+                if (!Config.Preview && _helper.EnemiesData.ElementAt(i).LetterIndex.HasValue)
                 {
-                    Configs.HealthBar.OrderLetterLabel.SetText($"[{letter}]");
+                    letter = _helper.EnemiesData.ElementAt(i).LetterIndex!.Value;
+                }
+
+                string str = char.ConvertFromUtf32(0xE071 + letter).ToString();
+                AddDrawAction(Configs.HealthBar.OrderLabel.StrataLevel, () =>
+                {
+                    Configs.HealthBar.OrderLabel.SetText(str);
                     _orderLabelHud.Draw(origin + pos, Configs.HealthBar.Size);
                 });
 

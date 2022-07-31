@@ -60,10 +60,10 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.PerfectBalanceBar.Size);
             }
 
-            if (Config.FormsBar.Enabled)
+            if (Config.StancesBar.Enabled)
             {
-                positions.Add((Config.Position + Config.FormsBar.Position));
-                sizes.Add(Config.FormsBar.Size);
+                positions.Add((Config.Position + Config.StancesBar.Position));
+                sizes.Add(Config.StancesBar.Size);
             }
 
             return (positions, sizes);
@@ -72,7 +72,7 @@ namespace DelvUI.Interface.Jobs
         public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             var position = origin + Config.Position;
-            if (Config.FormsBar.Enabled)
+            if (Config.StancesBar.Enabled)
             {
                 DrawFormsBar(position, player);
             }
@@ -110,24 +110,66 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawFormsBar(Vector2 origin, PlayerCharacter player)
         {
-            Status? form = player.StatusList.FirstOrDefault(o => o.StatusId is 107 or 108 or 109 or 2513 && o.RemainingTime > 0f);
-
-            if (!Config.FormsBar.HideWhenInactive || form is not null)
+            // formless fist
+            Status? formlessFist = player.StatusList.FirstOrDefault(o => o.StatusId == 2513);
+            if (formlessFist != null)
             {
-                float formDuration = form?.RemainingTime ?? 0f;
-                string label = form is not null ? form.StatusId switch
+                float remaining = Math.Abs(formlessFist.RemainingTime);
+
+                BarHud bar = BarUtilities.GetProgressBar(
+                    Config.StancesBar,
+                    null,
+                    new LabelConfig[] { Config.StancesBar.FormlessFistLabel },
+                    remaining,
+                    30f,
+                    0,
+                    player,
+                    Config.StancesBar.FormlessFistColor
+                );
+
+                Config.StancesBar.FormlessFistLabel.SetValue(remaining);
+
+                AddDrawActions(bar.GetDrawActions(origin, Config.StancesBar.StrataLevel));
+                return;
+            }
+
+            // forms
+            Status? form = player.StatusList.FirstOrDefault(o => o.StatusId is 107 or 108 or 109);
+
+            if (!Config.StancesBar.HideWhenInactive || form is not null)
+            {
+                int activeFormIndex = form != null ? (int)form.StatusId - 107 : -1;
+                PluginConfigColor[] chunkColors = new PluginConfigColor[]
                 {
-                    107 => "Opo-Opo Form",
-                    108 => "Raptor Form",
-                    109 => "Coeurl Form",
-                    2513 => "Formless Fist",
-                    _ => ""
-                } : "";
+                    Config.StancesBar.OpoOpoColor,
+                    Config.StancesBar.RaptorColor,
+                    Config.StancesBar.CoeurlColor
+                };
 
-                Config.FormsBar.Label.SetText(label);
+                string[] chunkTexts = new string[] { "I", "II", "III" };
+                LabelConfig[] chunkLabels = new LabelConfig[]
+                {
+                    Config.StancesBar.FormLabel.Clone(),
+                    Config.StancesBar.FormLabel.Clone(),
+                    Config.StancesBar.FormLabel.Clone()
+                };
 
-                BarHud bar = BarUtilities.GetProgressBar(Config.FormsBar, formDuration, 30f, 0, player);
-                AddDrawActions(bar.GetDrawActions(origin, Config.FormsBar.StrataLevel));
+
+                var chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[3];
+
+                for (int i = 0; i < chunks.Length; i++)
+                {
+                    LabelConfig label = chunkLabels[i];
+                    label.SetText(chunkTexts[i]);
+
+                    chunks[i] = new(chunkColors[i], activeFormIndex == i ? 1 : 0, label);
+                }
+
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.StancesBar, chunks, player);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.StancesBar.StrataLevel));
+                }
             }
         }
 
@@ -225,24 +267,18 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawTwinSnakesBar(Vector2 origin, PlayerCharacter player)
         {
-            float twinSnakesDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 3001 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
-            if (!Config.TwinSnakesBar.HideWhenInactive || twinSnakesDuration > 0)
+            BarHud? bar = BarUtilities.GetProcBar(Config.TwinSnakesBar, player, 3001, 15f);
+            if (bar != null)
             {
-                Config.TwinSnakesBar.Label.SetValue(twinSnakesDuration);
-
-                BarHud bar = BarUtilities.GetProgressBar(Config.TwinSnakesBar, twinSnakesDuration, 15f, 0f, player);
                 AddDrawActions(bar.GetDrawActions(origin, Config.TwinSnakesBar.StrataLevel));
             }
         }
 
         private void DrawLeadenFistBar(Vector2 origin, PlayerCharacter player)
         {
-            float leadenFistDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1861 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
-            if (!Config.LeadenFistBar.HideWhenInactive || leadenFistDuration > 0)
+            BarHud? bar = BarUtilities.GetProcBar(Config.LeadenFistBar, player, 1861, 30f);
+            if (bar != null)
             {
-                Config.LeadenFistBar.Label.SetValue(leadenFistDuration);
-
-                BarHud bar = BarUtilities.GetProgressBar(Config.LeadenFistBar, leadenFistDuration, 30f, 0f, player);
                 AddDrawActions(bar.GetDrawActions(origin, Config.LeadenFistBar.StrataLevel));
             }
         }
@@ -270,7 +306,7 @@ namespace DelvUI.Interface.Jobs
         {
             var config = new MonkConfig();
 
-            config.FormsBar.Enabled = false;
+            config.StancesBar.Enabled = false;
             config.LeadenFistBar.FillDirection = BarDirection.Up;
             config.MastersGauge.BlitzTimerLabel.HideIfZero = true;
             config.PerfectBalanceBar.PerfectBalanceLabel.HideIfZero = true;
@@ -285,6 +321,20 @@ namespace DelvUI.Interface.Jobs
             new(new Vector4(246f / 255f, 169f / 255f, 255f / 255f, 100f / 100f))
         );
 
+        [NestedConfig("Leaden Fist", 31)]
+        public ProgressBarConfig LeadenFistBar = new ProgressBarConfig(
+            new(0, -10),
+            new(28, 20),
+            new(new Vector4(255f / 255f, 0f, 0f, 100f / 100f))
+        );
+
+        [NestedConfig("Twin Snakes", 32)]
+        public ProgressBarConfig TwinSnakesBar = new ProgressBarConfig(
+            new(-71, -10),
+            new(111, 20),
+            new(new Vector4(227f / 255f, 255f / 255f, 64f / 255f, 100f / 100f))
+        );
+
         [NestedConfig("Chakra", 35)]
         public ChunkedBarConfig ChakraBar = new ChunkedBarConfig(
             new(0, -32),
@@ -292,39 +342,25 @@ namespace DelvUI.Interface.Jobs
             new(new Vector4(204f / 255f, 115f / 255f, 0f, 100f / 100f))
         );
 
-        [NestedConfig("Masterful Blitz Gauge", 35)]
+        [NestedConfig("Masterful Blitz Gauge", 40)]
         public MastersGauge MastersGauge = new MastersGauge(
             new(0, -54),
             new(254, 20),
             new(new Vector4(204f / 255f, 115f / 255f, 0f, 100f / 100f))
         );
 
-        [NestedConfig("Leaden Fist", 40)]
-        public ProgressBarConfig LeadenFistBar = new ProgressBarConfig(
-            new(0, -10),
-            new(28, 20),
-            new(new Vector4(255f / 255f, 0f, 0f, 100f / 100f))
+        [NestedConfig("Forms", 45)]
+        public MonkStancesBarConfig StancesBar = new MonkStancesBarConfig(
+            new(0, -98),
+            new(254, 20),
+            new(new Vector4(36f / 255f, 131f / 255f, 255f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Twin Snakes", 45)]
-        public ProgressBarConfig TwinSnakesBar = new ProgressBarConfig(
-            new(-71, -10),
-            new(111, 20),
-            new(new Vector4(227f / 255f, 255f / 255f, 64f / 255f, 100f / 100f))
-        );
-
-        [NestedConfig("Perfect Balance", 55)]
+        [NestedConfig("Perfect Balance", 50)]
         public PerfectBalanceBar PerfectBalanceBar = new PerfectBalanceBar(
             new(0, -76),
             new(254, 20),
             new(new Vector4(150f / 255f, 255f / 255f, 255f / 255f, 100f / 100f))
-        );
-
-        [NestedConfig("Forms", 65)]
-        public ProgressBarConfig FormsBar = new ProgressBarConfig(
-            new(0, -98),
-            new(254, 20),
-            new(new Vector4(36f / 255f, 131f / 255f, 255f / 255f, 100f / 100f))
         );
     }
 
@@ -342,7 +378,6 @@ namespace DelvUI.Interface.Jobs
     [DisableParentSettings("FillColor", "FillDirection")]
     public class MastersGauge : ChunkedBarConfig
     {
-
         [ColorEdit4("Lunar Nadi Color")]
         [Order(19)]
         public PluginConfigColor LunarNadiColor = new PluginConfigColor(new Vector4(240f / 255f, 227f / 255f, 246f / 255f, 100f / 100f));
@@ -353,7 +388,7 @@ namespace DelvUI.Interface.Jobs
 
         [ColorEdit4("Raptor Chakra Color")]
         [Order(21)]
-        public PluginConfigColor RaptorChakraColor = new PluginConfigColor(new Vector4(220f / 255f, 115f / 255f, 255f / 255f, 100f / 100f));
+        public PluginConfigColor RaptorChakraColor = new PluginConfigColor(new Vector4(92f / 255f, 123f / 255f, 200f / 255f, 100f / 100f));
 
         [ColorEdit4("Coeurl Chakra Color")]
         [Order(22)]
@@ -361,7 +396,7 @@ namespace DelvUI.Interface.Jobs
 
         [ColorEdit4("Opo-opo Chakra Color")]
         [Order(23)]
-        public PluginConfigColor OpoopoChakraColor = new PluginConfigColor(new Vector4(228f / 255f, 119f / 255f, 110f / 255f, 100f / 100f));
+        public PluginConfigColor OpoopoChakraColor = new PluginConfigColor(new Vector4(184f / 255f, 107f / 255f, 124f / 255f, 100f / 100f));
 
         [DragDropHorizontal("Chakra Order", "Lunar Nadi", "Chakra 1", "Chakra 2", "Chakra 3", "Solar Nadi")]
         [Order(24)]
@@ -373,6 +408,40 @@ namespace DelvUI.Interface.Jobs
         public MastersGauge(Vector2 position, Vector2 size, PluginConfigColor fillColor, int padding = 2) : base(position, size, fillColor, padding)
         {
             BlitzTimerLabel = new NumericLabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+        }
+    }
+
+    [DisableParentSettings("FillColor")]
+    public class MonkStancesBarConfig : ChunkedBarConfig
+    {
+        [ColorEdit4("Opo-opo Color")]
+        [Order(19)]
+        public PluginConfigColor OpoOpoColor = new PluginConfigColor(new Vector4(184f / 255f, 107f / 255f, 124f / 255f, 100f / 100f));
+
+        [ColorEdit4("Raptor Color")]
+        [Order(20)]
+        public PluginConfigColor RaptorColor = new PluginConfigColor(new Vector4(92f / 255f, 123f / 255f, 200f / 255f, 100f / 100f));
+
+        [ColorEdit4("Coeurl Color")]
+        [Order(21)]
+        public PluginConfigColor CoeurlColor = new PluginConfigColor(new Vector4(199f / 255f, 123f / 255f, 78f / 255f, 100f / 100f));
+
+        [ColorEdit4("Formless Fist Color")]
+        [Order(22)]
+        public PluginConfigColor FormlessFistColor = new PluginConfigColor(new Vector4(106f / 255f, 92f / 255f, 191f / 255f, 100f / 100f));
+
+        [NestedConfig("Form Number Text", 500, spacing = true)]
+        public LabelConfig FormLabel;
+
+        [NestedConfig("Formless Fist Duration Text", 1000, separator = false, spacing = true)]
+        public NumericLabelConfig FormlessFistLabel;
+
+        public MonkStancesBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor, int padding = 2) : base(position, size, fillColor, padding)
+        {
+            FormLabel = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+
+            FormlessFistLabel = new NumericLabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+            FormlessFistLabel.Enabled = false;
         }
     }
 }

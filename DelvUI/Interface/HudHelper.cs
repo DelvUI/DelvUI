@@ -196,7 +196,7 @@ namespace DelvUI.Interface
 
         private void UpdateCombatActionBars()
         {
-            if (Plugin.Condition[ConditionFlag.OccupiedInEvent] || Plugin.Condition[ConditionFlag.OccupiedInQuestEvent])
+            if (Plugin.Condition[ConditionFlag.OccupiedInEvent] || Plugin.Condition[ConditionFlag.OccupiedInQuestEvent] || Plugin.ClientState.IsPvP)
             {
                 return;
             }

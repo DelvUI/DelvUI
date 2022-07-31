@@ -91,8 +91,8 @@ namespace DelvUI.Interface.Party
         [NestedConfig("Health Label", 45)]
         public EditableLabelConfig HealthLabelConfig = new EditableLabelConfig(Vector2.Zero, "[health:current-short]", DrawAnchor.Right, DrawAnchor.Right);
 
-        [NestedConfig("Order Position Label", 50)]
-        public LabelConfig OrderLabelConfig = new LabelConfig(new Vector2(2, 4), "[name:first-initial]. [name:last-initial].", DrawAnchor.TopLeft, DrawAnchor.TopLeft);
+        [NestedConfig("Order Label", 50)]
+        public DefaultFontLabelConfig OrderNumberConfig = new DefaultFontLabelConfig(new Vector2(2, 4), "", DrawAnchor.TopLeft, DrawAnchor.TopLeft);
 
         [NestedConfig("Colors", 55)]
         public PartyFramesColorsConfig ColorsConfig = new PartyFramesColorsConfig();
