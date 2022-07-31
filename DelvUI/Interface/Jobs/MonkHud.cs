@@ -267,24 +267,18 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawTwinSnakesBar(Vector2 origin, PlayerCharacter player)
         {
-            float twinSnakesDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 3001 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
-            if (!Config.TwinSnakesBar.HideWhenInactive || twinSnakesDuration > 0)
+            BarHud? bar = BarUtilities.GetProcBar(Config.TwinSnakesBar, player, 3001, 15f);
+            if (bar != null)
             {
-                Config.TwinSnakesBar.Label.SetValue(twinSnakesDuration);
-
-                BarHud bar = BarUtilities.GetProgressBar(Config.TwinSnakesBar, twinSnakesDuration, 15f, 0f, player);
                 AddDrawActions(bar.GetDrawActions(origin, Config.TwinSnakesBar.StrataLevel));
             }
         }
 
         private void DrawLeadenFistBar(Vector2 origin, PlayerCharacter player)
         {
-            float leadenFistDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1861 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
-            if (!Config.LeadenFistBar.HideWhenInactive || leadenFistDuration > 0)
+            BarHud? bar = BarUtilities.GetProcBar(Config.LeadenFistBar, player, 1861, 30f);
+            if (bar != null)
             {
-                Config.LeadenFistBar.Label.SetValue(leadenFistDuration);
-
-                BarHud bar = BarUtilities.GetProgressBar(Config.LeadenFistBar, leadenFistDuration, 30f, 0f, player);
                 AddDrawActions(bar.GetDrawActions(origin, Config.LeadenFistBar.StrataLevel));
             }
         }
