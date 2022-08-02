@@ -59,7 +59,7 @@
         <Content Include="$(ProjectDir)DelvUI.json" CopyToOutputDirectory="Always" />
         <Content Include="$(ProjectDir)changelog.md" CopyToOutputDirectory="Always" />
         <Content Include="$(ProjectDir)Media\**" CopyToOutputDirectory="PreserveNewest" />
-        <Content Include="$(ProjectDir)Media\images\icon.png" Link="images/icon.png" CopyToOutputDirectory="PreserveNewest" Visible="false" />
+        <!-- <Content Include="$(ProjectDir)Media\Images\icon.png" Link="images/icon.png" CopyToOutputDirectory="PreserveNewest" Visible="false" /> -->
     </ItemGroup>
 
     <ItemGroup>
