@@ -98,9 +98,4 @@
         <PackageReference Include="DalamudPackager" Version="2.1.7" />
         <PackageReference Include="Colourful" Version="3.1.0" />
     </ItemGroup>
-
-    <!-- Dalamud Packager Task-->
-    <Target Name="DalamudPackage" AfterTargets="Build">
-        <DalamudPackager ProjectDir="$(ProjectDir)" OutputPath="$(TargetDir)..\$(Configuration)" AssemblyName="$(AssemblyName)" MakeZip="true" Exclude="DelvUI.pdb;DelvUI.deps.json" VersionComponents="4" />
-    </Target>
 </Project>
