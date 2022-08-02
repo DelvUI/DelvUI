@@ -1,3 +1,6 @@
+# 1.3.0.0
+- Added support for Patch 6.2 and Dalamud Api7.
+
 # 1.2.1.0
 Features:
 - Added "Hide when in duty" option to Visibility settings.

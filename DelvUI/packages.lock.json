@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net6.0-windows7.0": {
+      "Colourful": {
+        "type": "Direct",
+        "requested": "[3.1.0, )",
+        "resolved": "3.1.0",
+        "contentHash": "ZeiISkERDoKQfUYnr7L3H9LjRbcklIs932Ud1de81tK5Q9TkC+TZjQ5Vy1y70wd47JBcU/DcG+G0W0RNOMo29g=="
+      },
+      "DalamudPackager": {
+        "type": "Direct",
+        "requested": "[2.1.7, )",
+        "resolved": "2.1.7",
+        "contentHash": "jnZ/sdInyn07ycuWI+pPOtP/xE3v+c4+jYJfDt36FWnBF9NKqkpzfviJtPl/jGLgbaCmFIXu+Yid0N8GvdKefg=="
+      }
+    }
+  }
+}
