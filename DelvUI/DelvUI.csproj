@@ -28,7 +28,6 @@
         <Nullable>enable</Nullable>
         <WarningsAsErrors>Nullable</WarningsAsErrors>
         <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
-        <UseWindowsForms>true</UseWindowsForms>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     </PropertyGroup>
 
