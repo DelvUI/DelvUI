@@ -172,6 +172,11 @@ namespace DelvUI.Interface.Jobs
                 chunks[i] = new(Config.BloodWeaponBar.FillColor, i < stacks ? 1 : 0, i == 2 ? Config.BloodWeaponBar.Label : null);
             }
 
+            if(Config.BloodWeaponBar.FillDirection is BarDirection.Left or BarDirection.Up)
+            {
+                chunks = chunks.Reverse().ToArray();
+            }
+
             Config.BloodWeaponBar.Label.SetValue(duration);
 
             BarHud[] bars = BarUtilities.GetChunkedBars(Config.BloodWeaponBar, chunks, player);
@@ -194,6 +199,11 @@ namespace DelvUI.Interface.Jobs
                 for (int i = 0; i < 3; i++)
                 {
                     chunks[i] = new(Config.DeliriumBar.FillColor, i < stacks ? 1 : 0, i == 1 ? Config.DeliriumBar.Label : null);
+                }
+            
+                if(Config.DeliriumBar.FillDirection is BarDirection.Left or BarDirection.Up)
+                {
+                    chunks = chunks.Reverse().ToArray();
                 }
 
                 Config.DeliriumBar.Label.SetValue(deliriumDuration);
