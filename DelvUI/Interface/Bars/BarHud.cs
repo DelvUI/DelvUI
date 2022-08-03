@@ -13,6 +13,8 @@ namespace DelvUI.Interface.Bars
     public class BarHud
     {
         private string ID { get; set; }
+        
+        private BarConfig? Config { get; set;}
 
         private Rect BackgroundRect { get; set; } = new Rect();
 
@@ -47,7 +49,8 @@ namespace DelvUI.Interface.Bars
             PluginConfigColor? glowColor = null,
             int? glowSize = 1,
             float? current = null,
-            float? max = null)
+            float? max = null,
+            BarConfig? config = null)
         {
             ID = id;
             DrawBorder = drawBorder;
@@ -59,12 +62,14 @@ namespace DelvUI.Interface.Bars
             GlowSize = glowSize ?? 1;
             Current = current;
             Max = max;
+            Config = config;
         }
 
         public BarHud(BarConfig config, GameObject? actor = null, BarGlowConfig? glowConfig = null, float? current = null, float? max = null)
             : this(config.ID, config.DrawBorder, config.BorderColor, config.BorderThickness, config.Anchor, actor, glowConfig?.Color, glowConfig?.Size, current, max)
         {
             BackgroundRect = new Rect(config.Position, config.Size, config.BackgroundColor);
+            Config = config;
         }
 
         public BarHud SetBackground(Rect rect)
@@ -147,6 +152,15 @@ namespace DelvUI.Interface.Bars
             {
                 // Draw background
                 drawList.AddRectFilled(backgroundPos, backgroundPos + BackgroundRect.Size, BackgroundRect.Color.Base);
+
+                // Draw Shadow
+                if (Config is { DrawShadow: true })
+                {
+                    // Right Side
+                    drawList.AddRectFilled(backgroundPos + BackgroundRect.Size with { Y = Config.ShadowOffset }, backgroundPos + BackgroundRect.Size + new Vector2(Config.ShadowOffset, Config.ShadowOffset) + new Vector2(Config.ShadowThickness, Config.ShadowThickness), Config.ShadowColor.Base);
+                    // Bottom Size
+                    drawList.AddRectFilled(backgroundPos + BackgroundRect.Size with { X = Config.ShadowOffset }, backgroundPos + BackgroundRect.Size + new Vector2(Config.ShadowOffset, Config.ShadowOffset) + new Vector2(Config.ShadowThickness, Config.ShadowThickness), Config.ShadowColor.Base);
+                }
 
                 // Draw foregrounds
                 foreach (Rect rect in ForegroundRects)

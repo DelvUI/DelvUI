@@ -30,9 +30,25 @@ namespace DelvUI.Interface.Bars
         [DragInt("Border Thickness", min = 1, max = 10)]
         [Order(37, collapseWith = nameof(DrawBorder))]
         public int BorderThickness = 1;
+        
+        [Checkbox("Draw Shadow", spacing = true)]
+        [Order(38)]
+        public bool DrawShadow = false;
+
+        [ColorEdit4("Shadow Color")]
+        [Order(39, collapseWith = nameof(DrawShadow))]
+        public PluginConfigColor ShadowColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+
+        [DragInt("Shadow Thickness", min = 1, max = 10)]
+        [Order(40, collapseWith = nameof(DrawShadow))]
+        public int ShadowThickness = 1;
+        
+        [DragInt("Shadow Offset", min = 0, max = 10)]
+        [Order(41, collapseWith = nameof(DrawShadow))]
+        public int ShadowOffset = 0;
 
         [Checkbox("Hide When Inactive", spacing = true)]
-        [Order(40)]
+        [Order(42)]
         public bool HideWhenInactive = false;
 
         public BarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor, BarDirection fillDirection = BarDirection.Right)
