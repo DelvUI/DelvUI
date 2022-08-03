@@ -149,9 +149,9 @@ namespace DelvUI.Interface.Jobs
                 string[] chunkTexts = new string[] { "I", "II", "III" };
                 LabelConfig[] chunkLabels = new LabelConfig[]
                 {
-                    Config.StancesBar.FormLabel.Clone(),
-                    Config.StancesBar.FormLabel.Clone(),
-                    Config.StancesBar.FormLabel.Clone()
+                    Config.StancesBar.FormLabel.Clone(0),
+                    Config.StancesBar.FormLabel.Clone(1),
+                    Config.StancesBar.FormLabel.Clone(2)
                 };
 
 

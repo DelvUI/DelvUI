@@ -1,3 +1,6 @@
+# 1.3.0.0
+- Attempt to fix "seemingly random" crashes (mostly related to Window Clipping).
+
 # 1.2.1.0
 Features:
 - Added "Hide when in duty" option to Visibility settings.
