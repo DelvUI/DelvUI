@@ -1,4 +1,4 @@
-﻿using Dalamud.Interface;
+using Dalamud.Interface;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
@@ -305,6 +305,9 @@ namespace DelvUI.Interface.StatusEffects
         [NestedConfig("Border", 25, collapseWith = nameof(CropIcon), collapsingHeader = false)]
         public StatusEffectIconBorderConfig BorderConfig = new();
 
+        [NestedConfig("Shadow", 26, collapseWith = nameof(CropIcon), collapsingHeader = false)]
+        public ShadowConfig ShadowConfig = new(){ Enabled = false, Thickness = 1, Offset = 1 };
+
         [NestedConfig("Dispellable Effects Border", 30, collapseWith = nameof(CropIcon), collapsingHeader = false)]
         public StatusEffectIconBorderConfig DispellableBorderConfig = new(new PluginConfigColor(new Vector4(141f / 255f, 206f / 255f, 229f / 255f, 100f / 100f)), 2);
 
@@ -358,7 +361,7 @@ namespace DelvUI.Interface.StatusEffects
             var config = new LabelConfig(new Vector2(16, -11), "", DrawAnchor.Center, DrawAnchor.Center);
             config.Color = new(Vector4.UnitW);
             config.OutlineColor = new(Vector4.One);
-            config.ShadowColor = new(Vector4.One);
+            config.ShadowConfig.Color = new(Vector4.One);
 
             return config;
         }

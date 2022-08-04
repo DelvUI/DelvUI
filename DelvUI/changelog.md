@@ -1,3 +1,7 @@
+# 1.3.1.0
+Features:
+- Added shadow options to all bars, added shadow thickness for labels.
+
 # 1.3.0.0
 - Attempt to fix "seemingly random" crashes (mostly related to Window Clipping).
 

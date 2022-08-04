@@ -1,4 +1,4 @@
-﻿using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Utility;
@@ -369,6 +369,15 @@ namespace DelvUI.Interface.StatusEffects
                     {
                         var iconPos = iconPositions[i];
                         var statusEffectData = list[i];
+
+                        // shadow
+                        if (Config.IconConfig.ShadowConfig is { Enabled: true })
+                        {
+                            // Right Side
+                            drawList.AddRectFilled(iconPos + Config.IconConfig.Size with { Y = Config.IconConfig.ShadowConfig.Offset }, iconPos + Config.IconConfig.Size + new Vector2(Config.IconConfig.ShadowConfig.Offset, Config.IconConfig.ShadowConfig.Offset) + new Vector2(Config.IconConfig.ShadowConfig.Thickness - 1, Config.IconConfig.ShadowConfig.Thickness - 1), Config.IconConfig.ShadowConfig.Color.Base);
+                            // Bottom Size
+                            drawList.AddRectFilled(iconPos + Config.IconConfig.Size with { X = Config.IconConfig.ShadowConfig.Offset }, iconPos + Config.IconConfig.Size + new Vector2(Config.IconConfig.ShadowConfig.Offset, Config.IconConfig.ShadowConfig.Offset) + new Vector2(Config.IconConfig.ShadowConfig.Thickness - 1, Config.IconConfig.ShadowConfig.Thickness - 1), Config.IconConfig.ShadowConfig.Color.Base);
+                        }
 
                         // icon
                         var cropIcon = Config.IconConfig.CropIcon;
