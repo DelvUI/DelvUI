@@ -66,9 +66,9 @@ namespace DelvUI.Interface.GeneralElements
             {
                 PluginConfigColor? color = Color(actor);
 
-                if (Config.ShowShadow)
+                if (Config.ShadowConfig.Enabled)
                 {
-                    DrawHelper.DrawShadowText(text, pos, color.Base, Config.ShadowColor.Base, drawList, Config.ShadowOffset);
+                    DrawHelper.DrawShadowText(text, pos, color.Base, Config.ShadowConfig.Color.Base, drawList, Config.ShadowConfig.Offset, Config.ShadowConfig.Thickness);
                 }
 
                 if (Config.ShowOutline)
@@ -76,7 +76,7 @@ namespace DelvUI.Interface.GeneralElements
                     DrawHelper.DrawOutlinedText(text, pos, color.Base, Config.OutlineColor.Base, drawList);
                 }
 
-                if (!Config.ShowOutline && !Config.ShowShadow)
+                if (!Config.ShowOutline && !Config.ShadowConfig.Enabled)
                 {
                     drawList.AddText(pos, color.Base, text);
                 }
@@ -163,9 +163,9 @@ namespace DelvUI.Interface.GeneralElements
 
                 PluginConfigColor? color = Color(actor);
 
-                if (Config.ShowShadow)
+                if (Config.ShadowConfig.Enabled)
                 {
-                    DrawHelper.DrawShadowText(text, pos, color.Base, Config.ShadowColor.Base, drawList, Config.ShadowOffset);
+                    DrawHelper.DrawShadowText(text, pos, color.Base, Config.ShadowConfig.Color.Base, drawList, Config.ShadowConfig.Offset, Config.ShadowConfig.Thickness);
                 }
 
                 if (Config.ShowOutline)
@@ -173,7 +173,7 @@ namespace DelvUI.Interface.GeneralElements
                     DrawHelper.DrawOutlinedText(text, pos, color.Base, Config.OutlineColor.Base, drawList);
                 }
 
-                if (!Config.ShowOutline && !Config.ShowShadow)
+                if (!Config.ShowOutline && !Config.ShadowConfig.Enabled)
                 {
                     drawList.AddText(pos, color.Base, text);
                 }

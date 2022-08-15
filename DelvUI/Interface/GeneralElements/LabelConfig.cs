@@ -1,4 +1,4 @@
-﻿using Dalamud.Interface;
+using Dalamud.Interface;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
@@ -75,19 +75,18 @@ namespace DelvUI.Interface.GeneralElements
             _text = v.ToString($"F{NumberFormat}", CultureInfo.InvariantCulture);
         }
 
-        public override NumericLabelConfig Clone() =>
+        public override NumericLabelConfig Clone(int index) =>
             new NumericLabelConfig(Position, _text, FrameAnchor, TextAnchor)
             {
                 Color = Color,
                 OutlineColor = OutlineColor,
-                ShadowColor = ShadowColor,
-                ShadowOffset = ShadowOffset,
+                ShadowConfig = ShadowConfig,
                 ShowOutline = ShowOutline,
-                ShowShadow = ShowShadow,
                 FontID = FontID,
                 UseJobColor = UseJobColor,
                 Enabled = Enabled,
-                HideIfZero = HideIfZero
+                HideIfZero = HideIfZero,
+                ID = ID + "_{index}"
             };
     }
 
@@ -156,19 +155,10 @@ namespace DelvUI.Interface.GeneralElements
         [Order(40, collapseWith = nameof(ShowOutline))]
         public PluginConfigColor OutlineColor = new PluginConfigColor(Vector4.UnitW);
 
-        [Checkbox("Shadow")]
-        [Order(45)]
-        public bool ShowShadow = false;
+        [NestedConfig("Shadow", 45)]
+        public ShadowConfig ShadowConfig = new ShadowConfig() { Enabled = false };
 
-        [ColorEdit4("Color ##Shadow")]
-        [Order(50, collapseWith = nameof(ShowShadow))]
-        public PluginConfigColor ShadowColor = new PluginConfigColor(Vector4.UnitW);
-
-        [DragInt("Offset ##Shadow")]
-        [Order(55, collapseWith = nameof(ShowShadow))]
-        public int ShadowOffset = 2;
-
-        [Checkbox("Use Job Color")]
+        [Checkbox("Use Job Color", spacing = true)]
         [Order(60)]
         public bool UseJobColor = false;
 
@@ -197,18 +187,17 @@ namespace DelvUI.Interface.GeneralElements
         public virtual bool UseSystemFont() => false;
         public virtual float GetFontScale() => 1;
 
-        public virtual LabelConfig Clone() =>
+        public virtual LabelConfig Clone(int index) =>
             new LabelConfig(Position, _text, FrameAnchor, TextAnchor)
             {
                 Color = Color,
                 OutlineColor = OutlineColor,
-                ShadowColor = ShadowColor,
-                ShadowOffset = ShadowOffset,
+                ShadowConfig = ShadowConfig,
                 ShowOutline = ShowOutline,
-                ShowShadow = ShowShadow,
                 FontID = FontID,
                 UseJobColor = UseJobColor,
-                Enabled = Enabled
+                Enabled = Enabled,
+                ID = ID + "_{index}"
             };
     }
 }

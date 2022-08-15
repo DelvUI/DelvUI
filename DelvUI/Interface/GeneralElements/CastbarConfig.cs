@@ -224,9 +224,7 @@ namespace DelvUI.Interface.GeneralElements
                     label.NumberFormat = 1;
                     label.Color = oldValue.Color;
                     label.OutlineColor = oldValue.OutlineColor;
-                    label.ShowShadow = oldValue.ShowShadow;
-                    label.ShadowColor = oldValue.ShadowColor;
-                    label.ShadowOffset = oldValue.ShadowOffset;
+                    label.ShadowConfig = oldValue.ShadowConfig;
                     label.UseJobColor = oldValue.UseJobColor;
 
                     return label;

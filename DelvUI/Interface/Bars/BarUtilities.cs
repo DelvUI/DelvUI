@@ -279,11 +279,11 @@ namespace DelvUI.Interface.Bars
                     switch (config.LabelMode)
                     {
                         case LabelMode.AllChunks:
-                            label = config.Label.Clone();
+                            label = config.Label.Clone(i);
                             label.SetValue(Math.Clamp(current - chunkMin, 0, chunkRange));
                             break;
                         case LabelMode.ActiveChunk:
-                            label = chunkPercent < 1f && chunkPercent > 0f ? config.Label.Clone() : null;
+                            label = chunkPercent < 1f && chunkPercent > 0f ? config.Label.Clone(i) : null;
                             break;
                     };
 

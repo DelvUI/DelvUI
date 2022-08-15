@@ -137,7 +137,7 @@ namespace DelvUI.Config
     public abstract class MovablePluginConfigObject : PluginConfigObject
     {
         [JsonIgnore]
-        public readonly string ID;
+        public string ID;
 
         [StrataLevel("Strata Level")]
         [Order(2)]
