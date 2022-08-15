@@ -428,7 +428,7 @@ namespace DelvUI.Interface
             AssignActors();
 
             var origin = ImGui.GetMainViewport().Size / 2f;
-            if (_hudOptions is { UseGlobalHudShift: true })
+            if (_hudOptions != null && _hudOptions.UseGlobalHudShift)
             {
                 origin += _hudOptions.HudOffset;
             }

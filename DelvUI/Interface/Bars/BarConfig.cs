@@ -31,9 +31,9 @@ namespace DelvUI.Interface.Bars
         [DragInt("Border Thickness", min = 1, max = 10)]
         [Order(37, collapseWith = nameof(DrawBorder))]
         public int BorderThickness = 1;
-        
+
         [NestedConfig("Shadow", 38, spacing = true)]
-        public ShadowConfig ShadowConfig = new(){ Enabled = false, Offset = 2, Thickness = 0};
+        public ShadowConfig ShadowConfig = new ShadowConfig() { Enabled = false };
 
         [Checkbox("Hide When Inactive", spacing = true)]
         [Order(40)]

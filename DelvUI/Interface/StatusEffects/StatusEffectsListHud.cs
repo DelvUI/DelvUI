@@ -371,12 +371,13 @@ namespace DelvUI.Interface.StatusEffects
                         var statusEffectData = list[i];
 
                         // shadow
-                        if (Config.IconConfig.ShadowConfig is { Enabled: true })
+                        if (Config.IconConfig.ShadowConfig! != null && Config.IconConfig.ShadowConfig.Enabled)
                         {
                             // Right Side
-                            drawList.AddRectFilled(iconPos + Config.IconConfig.Size with { Y = Config.IconConfig.ShadowConfig.Offset }, iconPos + Config.IconConfig.Size + new Vector2(Config.IconConfig.ShadowConfig.Offset, Config.IconConfig.ShadowConfig.Offset) + new Vector2(Config.IconConfig.ShadowConfig.Thickness - 1, Config.IconConfig.ShadowConfig.Thickness - 1), Config.IconConfig.ShadowConfig.Color.Base);
+                            drawList.AddRectFilled(iconPos + new Vector2(Config.IconConfig.Size.X, Config.IconConfig.ShadowConfig.Offset), iconPos + Config.IconConfig.Size + new Vector2(Config.IconConfig.ShadowConfig.Offset, Config.IconConfig.ShadowConfig.Offset) + new Vector2(Config.IconConfig.ShadowConfig.Thickness - 1, Config.IconConfig.ShadowConfig.Thickness - 1), Config.IconConfig.ShadowConfig.Color.Base);
+
                             // Bottom Size
-                            drawList.AddRectFilled(iconPos + Config.IconConfig.Size with { X = Config.IconConfig.ShadowConfig.Offset }, iconPos + Config.IconConfig.Size + new Vector2(Config.IconConfig.ShadowConfig.Offset, Config.IconConfig.ShadowConfig.Offset) + new Vector2(Config.IconConfig.ShadowConfig.Thickness - 1, Config.IconConfig.ShadowConfig.Thickness - 1), Config.IconConfig.ShadowConfig.Color.Base);
+                            drawList.AddRectFilled(iconPos + new Vector2(Config.IconConfig.ShadowConfig.Offset, Config.IconConfig.Size.Y), iconPos + Config.IconConfig.Size + new Vector2(Config.IconConfig.ShadowConfig.Offset, Config.IconConfig.ShadowConfig.Offset) + new Vector2(Config.IconConfig.ShadowConfig.Thickness - 1, Config.IconConfig.ShadowConfig.Thickness - 1), Config.IconConfig.ShadowConfig.Color.Base);
                         }
 
                         // icon

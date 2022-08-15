@@ -13,7 +13,7 @@ namespace DelvUI.Interface.Bars
     public class BarHud
     {
         private string ID { get; set; }
-        
+
         private Rect BackgroundRect { get; set; } = new Rect();
 
         private List<Rect> ForegroundRects { get; set; } = new List<Rect>();
@@ -37,7 +37,7 @@ namespace DelvUI.Interface.Bars
         private float? Current;
         private float? Max;
 
-        private ShadowConfig? ShadowConfig { get; set;}
+        private ShadowConfig? ShadowConfig { get; set; }
 
         public BarHud(
             string id,
@@ -154,12 +154,13 @@ namespace DelvUI.Interface.Bars
                 drawList.AddRectFilled(backgroundPos, backgroundPos + BackgroundRect.Size, BackgroundRect.Color.Base);
 
                 // Draw Shadow
-                if (ShadowConfig is { Enabled: true })
+                if (ShadowConfig != null && ShadowConfig.Enabled)
                 {
                     // Right Side
-                    drawList.AddRectFilled(backgroundPos + BackgroundRect.Size with { Y = ShadowConfig.Offset }, backgroundPos + BackgroundRect.Size + new Vector2(ShadowConfig.Offset, ShadowConfig.Offset) + new Vector2(ShadowConfig.Thickness - 1, ShadowConfig.Thickness - 1), ShadowConfig.Color.Base);
+                    drawList.AddRectFilled(backgroundPos + new Vector2(BackgroundRect.Size.X, ShadowConfig.Offset), backgroundPos + BackgroundRect.Size + new Vector2(ShadowConfig.Offset, ShadowConfig.Offset) + new Vector2(ShadowConfig.Thickness - 1, ShadowConfig.Thickness - 1), ShadowConfig.Color.Base);
+
                     // Bottom Size
-                    drawList.AddRectFilled(backgroundPos + BackgroundRect.Size with { X = ShadowConfig.Offset }, backgroundPos + BackgroundRect.Size + new Vector2(ShadowConfig.Offset, ShadowConfig.Offset) + new Vector2(ShadowConfig.Thickness - 1, ShadowConfig.Thickness - 1), ShadowConfig.Color.Base);
+                    drawList.AddRectFilled(backgroundPos + new Vector2(ShadowConfig.Offset, BackgroundRect.Size.Y), backgroundPos + BackgroundRect.Size + new Vector2(ShadowConfig.Offset, ShadowConfig.Offset) + new Vector2(ShadowConfig.Thickness - 1, ShadowConfig.Thickness - 1), ShadowConfig.Color.Base);
                 }
 
                 // Draw foregrounds

@@ -154,11 +154,11 @@ namespace DelvUI.Interface.GeneralElements
         [ColorEdit4("Color ##Outline")]
         [Order(40, collapseWith = nameof(ShowOutline))]
         public PluginConfigColor OutlineColor = new PluginConfigColor(Vector4.UnitW);
-        
-        [NestedConfig("Shadow", 45)]
-        public ShadowConfig ShadowConfig = new(){ Enabled = false, Offset = 2, Thickness = 1};
 
-        [Checkbox("Use Job Color")]
+        [NestedConfig("Shadow", 45)]
+        public ShadowConfig ShadowConfig = new ShadowConfig() { Enabled = false };
+
+        [Checkbox("Use Job Color", spacing = true)]
         [Order(60)]
         public bool UseJobColor = false;
 

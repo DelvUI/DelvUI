@@ -306,7 +306,7 @@ namespace DelvUI.Interface.StatusEffects
         public StatusEffectIconBorderConfig BorderConfig = new();
 
         [NestedConfig("Shadow", 26, collapseWith = nameof(CropIcon), collapsingHeader = false)]
-        public ShadowConfig ShadowConfig = new(){ Enabled = false, Thickness = 1, Offset = 1 };
+        public ShadowConfig ShadowConfig = new ShadowConfig() { Enabled = false };
 
         [NestedConfig("Dispellable Effects Border", 30, collapseWith = nameof(CropIcon), collapsingHeader = false)]
         public StatusEffectIconBorderConfig DispellableBorderConfig = new(new PluginConfigColor(new Vector4(141f / 255f, 206f / 255f, 229f / 255f, 100f / 100f)), 2);
