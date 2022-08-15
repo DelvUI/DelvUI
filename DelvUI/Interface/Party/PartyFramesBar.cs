@@ -341,6 +341,8 @@ namespace DelvUI.Interface.Party
             }
 
             var character = Member.Character;
+            
+            
 
             // role/job icon
             if (RoleIcon.Enabled)
@@ -499,8 +501,14 @@ namespace DelvUI.Interface.Party
                 {
                     drawName = false;
                 }
+                {
+                    drawName = false;
+                }
             }
             else if (PlayerStatus.Enabled && PlayerStatus.HideName && Member.Status != PartyMemberStatus.None)
+            {
+                drawName = false;
+            }else if (character is BattleChara { IsCasting: true } && _configs.CastBar.HideNameWhenCasting)
             {
                 drawName = false;
             }
