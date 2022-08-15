@@ -1,3 +1,7 @@
+# 1.3.0.1
+Fixes:
+- Blood Weapon and Delirium fill directions now follow the correct direction.
+
 # 1.3.0.0
 - Attempt to fix "seemingly random" crashes (mostly related to Window Clipping).
 
