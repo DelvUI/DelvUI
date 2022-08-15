@@ -369,6 +369,10 @@ namespace DelvUI.Interface.Party
             return config;
         }
 
+        [Checkbox("Hide Name When Casting")]
+        [Order(6)]
+        public bool HideNameWhenCasting = false;
+
         [Anchor("Health Bar Anchor")]
         [Order(16)]
         public DrawAnchor HealthBarAnchor = DrawAnchor.BottomLeft;
