@@ -1,4 +1,9 @@
-# 1.3.0.1
+# 1.3.1.0
+Features:
+- Added a setting to hide the player name while casting on the Party Frames.
+- Added shadow options to all bars and added shadow thickness for labels:
+  + Due to these changes, all labels' shadow settings will be reset.
+
 Fixes:
 - Blood Weapon and Delirium fill directions now follow the correct direction.
 

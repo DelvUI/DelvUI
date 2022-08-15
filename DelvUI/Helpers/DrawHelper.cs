@@ -90,12 +90,15 @@ namespace DelvUI.Helpers
             drawList.AddText(new Vector2(pos.X, pos.Y), color, text);
         }
 
-        public static void DrawShadowText(string text, Vector2 pos, uint color, uint shadowColor, ImDrawListPtr drawList, int offset = 1)
+        public static void DrawShadowText(string text, Vector2 pos, uint color, uint shadowColor, ImDrawListPtr drawList, int offset = 1, int thickness = 1)
         {
             // TODO: Add parameter to allow to choose a direction
 
             // Shadow
-            drawList.AddText(new Vector2(pos.X + offset, pos.Y + offset), shadowColor, text);
+            for (int i = 0; i < thickness; i++)
+            {
+                drawList.AddText(new Vector2(pos.X + i + offset, pos.Y  + i + offset), shadowColor, text);
+            }
 
             // Text
             drawList.AddText(new Vector2(pos.X, pos.Y), color, text);

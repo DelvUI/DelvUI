@@ -1,4 +1,4 @@
-﻿using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
@@ -13,7 +13,7 @@ namespace DelvUI.Interface.Bars
     public class BarHud
     {
         private string ID { get; set; }
-
+        
         private Rect BackgroundRect { get; set; } = new Rect();
 
         private List<Rect> ForegroundRects { get; set; } = new List<Rect>();
@@ -37,6 +37,8 @@ namespace DelvUI.Interface.Bars
         private float? Current;
         private float? Max;
 
+        private ShadowConfig? ShadowConfig { get; set;}
+
         public BarHud(
             string id,
             bool drawBorder = true,
@@ -47,7 +49,8 @@ namespace DelvUI.Interface.Bars
             PluginConfigColor? glowColor = null,
             int? glowSize = 1,
             float? current = null,
-            float? max = null)
+            float? max = null,
+            ShadowConfig? shadowConfig = null)
         {
             ID = id;
             DrawBorder = drawBorder;
@@ -59,12 +62,14 @@ namespace DelvUI.Interface.Bars
             GlowSize = glowSize ?? 1;
             Current = current;
             Max = max;
+            ShadowConfig = shadowConfig;
         }
 
         public BarHud(BarConfig config, GameObject? actor = null, BarGlowConfig? glowConfig = null, float? current = null, float? max = null)
             : this(config.ID, config.DrawBorder, config.BorderColor, config.BorderThickness, config.Anchor, actor, glowConfig?.Color, glowConfig?.Size, current, max)
         {
             BackgroundRect = new Rect(config.Position, config.Size, config.BackgroundColor);
+            ShadowConfig = config.ShadowConfig;
         }
 
         public BarHud SetBackground(Rect rect)
@@ -147,6 +152,15 @@ namespace DelvUI.Interface.Bars
             {
                 // Draw background
                 drawList.AddRectFilled(backgroundPos, backgroundPos + BackgroundRect.Size, BackgroundRect.Color.Base);
+
+                // Draw Shadow
+                if (ShadowConfig is { Enabled: true })
+                {
+                    // Right Side
+                    drawList.AddRectFilled(backgroundPos + BackgroundRect.Size with { Y = ShadowConfig.Offset }, backgroundPos + BackgroundRect.Size + new Vector2(ShadowConfig.Offset, ShadowConfig.Offset) + new Vector2(ShadowConfig.Thickness - 1, ShadowConfig.Thickness - 1), ShadowConfig.Color.Base);
+                    // Bottom Size
+                    drawList.AddRectFilled(backgroundPos + BackgroundRect.Size with { X = ShadowConfig.Offset }, backgroundPos + BackgroundRect.Size + new Vector2(ShadowConfig.Offset, ShadowConfig.Offset) + new Vector2(ShadowConfig.Thickness - 1, ShadowConfig.Thickness - 1), ShadowConfig.Color.Base);
+                }
 
                 // Draw foregrounds
                 foreach (Rect rect in ForegroundRects)

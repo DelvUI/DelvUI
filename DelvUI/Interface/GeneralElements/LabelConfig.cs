@@ -1,4 +1,4 @@
-﻿using Dalamud.Interface;
+using Dalamud.Interface;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
@@ -80,10 +80,8 @@ namespace DelvUI.Interface.GeneralElements
             {
                 Color = Color,
                 OutlineColor = OutlineColor,
-                ShadowColor = ShadowColor,
-                ShadowOffset = ShadowOffset,
+                ShadowConfig = ShadowConfig,
                 ShowOutline = ShowOutline,
-                ShowShadow = ShowShadow,
                 FontID = FontID,
                 UseJobColor = UseJobColor,
                 Enabled = Enabled,
@@ -156,18 +154,9 @@ namespace DelvUI.Interface.GeneralElements
         [ColorEdit4("Color ##Outline")]
         [Order(40, collapseWith = nameof(ShowOutline))]
         public PluginConfigColor OutlineColor = new PluginConfigColor(Vector4.UnitW);
-
-        [Checkbox("Shadow")]
-        [Order(45)]
-        public bool ShowShadow = false;
-
-        [ColorEdit4("Color ##Shadow")]
-        [Order(50, collapseWith = nameof(ShowShadow))]
-        public PluginConfigColor ShadowColor = new PluginConfigColor(Vector4.UnitW);
-
-        [DragInt("Offset ##Shadow")]
-        [Order(55, collapseWith = nameof(ShowShadow))]
-        public int ShadowOffset = 2;
+        
+        [NestedConfig("Shadow", 45)]
+        public ShadowConfig ShadowConfig = new(){ Enabled = false, Offset = 2, Thickness = 1};
 
         [Checkbox("Use Job Color")]
         [Order(60)]
@@ -203,10 +192,8 @@ namespace DelvUI.Interface.GeneralElements
             {
                 Color = Color,
                 OutlineColor = OutlineColor,
-                ShadowColor = ShadowColor,
-                ShadowOffset = ShadowOffset,
+                ShadowConfig = ShadowConfig,
                 ShowOutline = ShowOutline,
-                ShowShadow = ShowShadow,
                 FontID = FontID,
                 UseJobColor = UseJobColor,
                 Enabled = Enabled,
