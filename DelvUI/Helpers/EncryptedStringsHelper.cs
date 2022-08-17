@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Dalamud;
+using System.Collections.Generic;
 
 namespace DelvUI.Helpers
 {
@@ -9,7 +10,10 @@ namespace DelvUI.Helpers
             if (map.TryGetValue(key, out string[]? strings) && strings != null)
             {
                 int language = (int)Plugin.ClientState.ClientLanguage;
-                if (language < 0 || language > strings.Length) { return null; }
+                if (language < 0 || language >= strings.Length) 
+                {
+                    language = (int)ClientLanguage.English;
+                }
 
                 return strings[language];
             }

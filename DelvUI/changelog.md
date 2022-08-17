@@ -1,6 +1,9 @@
 # 1.4.0.0
 - Added support for Patch 6.2 and Dalamud Api7.
 
+# 1.3.1.1
+- Fixed crash related to obfuscated texts for Actions or Status Effects.
+
 # 1.3.1.0
 Features:
 - Added a setting to hide the player name while casting on the Party Frames.
