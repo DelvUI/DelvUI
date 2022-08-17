@@ -1,3 +1,6 @@
+# 1.3.1.1
+- Fixed crash related to obfuscated texts for Actions or Status Effects.
+
 # 1.3.1.0
 Features:
 - Added a setting to hide the player name while casting on the Party Frames.
