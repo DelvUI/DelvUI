@@ -135,7 +135,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawSacredSoilBar(Vector2 origin, PlayerCharacter player)
         {
-            float sacredSoilDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 298 or 1944 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
+            float sacredSoilDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 298 or 1944 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.SacredSoilBar.HideWhenInactive || sacredSoilDuration > 0)
             {

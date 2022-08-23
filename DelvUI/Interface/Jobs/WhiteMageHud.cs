@@ -144,7 +144,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawAsylumBar(Vector2 origin, PlayerCharacter player)
         {
-            float asylymDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 739 or 1911 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
+            float asylymDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 739 or 1911 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.AsylumBar.HideWhenInactive || asylymDuration > 0)
             {
@@ -157,7 +157,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawPresenceOfMindBar(Vector2 origin, PlayerCharacter player)
         {
-            float presenceOfMindDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 157 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
+            float presenceOfMindDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 157 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.PresenceOfMindBar.HideWhenInactive || presenceOfMindDuration > 0)
             {
@@ -170,7 +170,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawPlenaryBar(Vector2 origin, PlayerCharacter player)
         {
-            float plenaryDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1219 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
+            float plenaryDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1219 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.PlenaryBar.HideWhenInactive || plenaryDuration > 0)
             {
@@ -183,7 +183,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawTemperanceBar(Vector2 origin, PlayerCharacter player)
         {
-            float temperanceDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1872 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
+            float temperanceDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1872 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.TemperanceBar.HideWhenInactive || temperanceDuration > 0)
             {

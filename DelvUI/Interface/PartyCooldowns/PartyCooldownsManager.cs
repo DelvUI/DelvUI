@@ -1,6 +1,7 @@
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Hooking;
+using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.Party;
@@ -19,13 +20,27 @@ namespace DelvUI.Interface.PartyCooldowns
 
         private PartyCooldownsManager()
         {
-            IntPtr funcPtr = Plugin.SigScanner.ScanText("4C 89 44 24 ?? 55 56 57 41 54 41 55 41 56 48 8D 6C 24");
-            OnActionUsedHook = Hook<OnActionUsedDelegate>.FromAddress(funcPtr, OnActionUsed);
-            OnActionUsedHook.Enable();
+            try
+            {
+                IntPtr funcPtr = Plugin.SigScanner.ScanText("4C 89 44 24 ?? 55 56 41 54 41 55 41 56");
+                OnActionUsedHook = Hook<OnActionUsedDelegate>.FromAddress(funcPtr, OnActionUsed);
+                OnActionUsedHook?.Enable();
+            }
+            catch
+            {
+                PluginLog.Error("PartyCooldowns OnActionUsed Hook failed!!!");
+            }
 
-            IntPtr actorControlPtr = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 0F B7 0B 83 E9 64");
-            ActorControlHook = Hook<ActorControlDelegate>.FromAddress(actorControlPtr, OnActorControl);
-            ActorControlHook.Enable();
+            try
+            {
+                IntPtr actorControlPtr = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 0F B7 0B 83 E9 64");
+                ActorControlHook = Hook<ActorControlDelegate>.FromAddress(actorControlPtr, OnActorControl);
+                ActorControlHook?.Enable();
+            }
+            catch
+            {
+                PluginLog.Error("PartyCooldowns OnActorControl Hook failed!!!");
+            }
 
             PartyManager.Instance.MembersChangedEvent += OnMembersChanged;
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
@@ -61,11 +76,11 @@ namespace DelvUI.Interface.PartyCooldowns
                 return;
             }
 
-            OnActionUsedHook.Disable();
-            OnActionUsedHook.Dispose();
+            OnActionUsedHook?.Disable();
+            OnActionUsedHook?.Dispose();
 
-            ActorControlHook.Disable();
-            ActorControlHook.Dispose();
+            ActorControlHook?.Disable();
+            ActorControlHook?.Dispose();
 
             PartyManager.Instance.MembersChangedEvent -= OnMembersChanged;
             Plugin.JobChangedEvent -= OnJobChanged;
@@ -99,10 +114,10 @@ namespace DelvUI.Interface.PartyCooldowns
         #endregion Singleton
 
         private delegate void OnActionUsedDelegate(int characterId, IntPtr characterAddress, IntPtr position, IntPtr effect, IntPtr unk1, IntPtr unk2);
-        private Hook<OnActionUsedDelegate> OnActionUsedHook;
+        private Hook<OnActionUsedDelegate>? OnActionUsedHook;
 
         private delegate void ActorControlDelegate(uint entityId, uint id, uint unk1, uint type, uint unk2, uint unk3, uint unk4, uint unk5, UInt64 targetId, byte unk6);
-        private Hook<ActorControlDelegate> ActorControlHook;
+        private Hook<ActorControlDelegate>? ActorControlHook;
 
         private Dictionary<uint, Dictionary<uint, PartyCooldown>>? _oldMap;
         private Dictionary<uint, Dictionary<uint, PartyCooldown>> _cooldownsMap = new Dictionary<uint, Dictionary<uint, PartyCooldown>>();
@@ -117,7 +132,7 @@ namespace DelvUI.Interface.PartyCooldowns
 
         private void OnActorControl(uint entityId, uint id, uint unk1, uint type, uint unk2, uint unk3, uint unk4, uint unk5, UInt64 targetId, byte unk6)
         {
-            ActorControlHook.Original(entityId, id, unk1, type, unk2, unk3, unk4, unk5, targetId, unk6);
+            ActorControlHook?.Original(entityId, id, unk1, type, unk2, unk3, unk4, unk5, targetId, unk6);
 
             // detect wipe fadeouts (not 100% reliable but good enough)
             if (type == 0x40000010)
@@ -197,7 +212,7 @@ namespace DelvUI.Interface.PartyCooldowns
                 }
             }
 
-            OnActionUsedHook.Original(characterId, characterAddress, position, effect, unk1, unk2);
+            OnActionUsedHook?.Original(characterId, characterAddress, position, effect, unk1, unk2);
         }
 
         private void OnMembersChanged(PartyManager sender)

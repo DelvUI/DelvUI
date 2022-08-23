@@ -40,7 +40,7 @@
 	<PropertyGroup>
 		<!-- Distribution version for GitHub CI. 'release' is currently .NET 5 -->
 		<DalamudCIDist>release</DalamudCIDist>
-		<DalamudVersion>dev</DalamudVersion>
+		<DalamudVersion>6692d56</DalamudVersion>
 		<DalamudLocal>../dalamud/</DalamudLocal>
 		<DalamudLibPath>$(APPDATA)\XIVLauncher\addon\Hooks\$(DalamudVersion)\</DalamudLibPath>
 	</PropertyGroup>
@@ -95,7 +95,7 @@
 
 	<!-- NuGet Packages -->
 	<ItemGroup>
-		<PackageReference Include="DalamudPackager" Version="2.1.7" />
+		<PackageReference Include="DalamudPackager" Version="2.1.8" />
 		<PackageReference Include="Colourful" Version="3.1.0" />
 	</ItemGroup>
 </Project>

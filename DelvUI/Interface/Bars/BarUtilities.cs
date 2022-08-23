@@ -116,7 +116,7 @@ namespace DelvUI.Interface.Bars
 
             if (target != null && target is BattleChara targetChara)
             {
-                status = targetChara.StatusList.FirstOrDefault(o => o.SourceID == player.ObjectId && statusIDs.Contains(o.StatusId));
+                status = targetChara.StatusList.FirstOrDefault(o => o.SourceId == player.ObjectId && statusIDs.Contains(o.StatusId));
             }
 
             if (status == null && config.HideWhenInactive)

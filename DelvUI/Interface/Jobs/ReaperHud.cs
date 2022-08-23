@@ -88,7 +88,7 @@ namespace DelvUI.Interface.Jobs
 
             if (actor is BattleChara target)
             {
-                duration = target.StatusList.FirstOrDefault(o => o.StatusId is 2586 && o.SourceID == player.ObjectId && o.RemainingTime > 0)?.RemainingTime ?? 0f;
+                duration = target.StatusList.FirstOrDefault(o => o.StatusId is 2586 && o.SourceId == player.ObjectId && o.RemainingTime > 0)?.RemainingTime ?? 0f;
             }
 
             if (!Config.DeathsDesignBar.HideWhenInactive || duration > 0)

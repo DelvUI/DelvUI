@@ -110,7 +110,7 @@ namespace DelvUI.Interface.Jobs
 
             if (target != null && target is BattleChara targetChara)
             {
-                dotExists = targetChara.StatusList.FirstOrDefault(o => o.SourceID == player.ObjectId && o.StatusId == 1723) != null;
+                dotExists = targetChara.StatusList.FirstOrDefault(o => o.SourceId == player.ObjectId && o.StatusId == 1723) != null;
             }
 
             if (dotExists)

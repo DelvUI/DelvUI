@@ -55,9 +55,9 @@ namespace DelvUI.Helpers
                 _countdownTimerHook = Hook<CountdownTimer>.FromAddress(countdownPtr, CountdownTimerFunc);
                 _countdownTimerHook?.Enable();
             }
-            catch (Exception e)
+            catch
             {
-                PluginLog.Error("Could not hook to timer\n" + e);
+                PluginLog.Error("PullTimeHelper CountdownTimer Hook failed!!!");
             }
         }
         public static void Initialize() { Instance = new PullTimerHelper(); }
