@@ -1,3 +1,6 @@
+# 1.3.1.2
+- Fixed the Echo not being able to be dismissed by right clicking it.
+
 # 1.3.1.1
 - Fixed crash related to obfuscated texts for Actions or Status Effects.
 
