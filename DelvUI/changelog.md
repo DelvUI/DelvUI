@@ -1,5 +1,9 @@
 # 1.4.0.0
+Features:
 - Added support for Patch 6.2 and Dalamud Api7.
+
+Fixes:
+- Fixed the Echo status effect not being removed when right clicking on it.
 
 # 1.3.1.1
 - Fixed crash related to obfuscated texts for Actions or Status Effects.

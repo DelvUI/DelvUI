@@ -476,8 +476,9 @@ namespace DelvUI.Interface.StatusEffects
 
                 // remove buff on right click
                 bool isFromPlayer = data.Status.SourceID == Plugin.ClientState.LocalPlayer?.ObjectId;
+                bool isTheEcho = data.Status.StatusID is 42 or 239;
 
-                if (data.Data.Category == 1 && isFromPlayer && rightClick)
+                if (data.Data.Category == 1 && (isFromPlayer || isTheEcho) && rightClick)
                 {
                     ChatHelper.SendChatMessage("/statusoff \"" + data.Data.Name + "\"");
 
