@@ -13,6 +13,7 @@ using System.Globalization;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
+using StructsBattleChara = FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -164,10 +165,8 @@ namespace DelvUI.Interface.GeneralElements
             ActionType currentCastType = (ActionType)battleChara.CastActionType;
             currentCastTime = battleChara.CurrentCastTime;
 
-            //totalCastTime = battleChara.TotalCastTime;
-            float[] castTime = new float[1];
-            Marshal.Copy(battleChara.Address + 0x1CB0 + 0x3C, castTime, 0, 1);
-            totalCastTime = castTime[0];
+            StructsBattleChara* chara = (StructsBattleChara*)battleChara.Address;
+            totalCastTime = chara->SpellCastInfo.AdjustedTotalCastTime;
 
             if (LastUsedCast == null || LastUsedCast.CastId != currentCastId || LastUsedCast.ActionType != currentCastType)
             {
