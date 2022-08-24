@@ -10,8 +10,8 @@ namespace DelvUI.Interface.EnemyList
     public unsafe class EnemyListHelper
     {
         private RaptureAtkModule* _raptureAtkModule = null;
-        private const int EnemyListInfoIndex = 19;
-        private const int EnemyListNamesIndex = 17;
+        private const int EnemyListInfoIndex = 21;
+        private const int EnemyListNamesIndex = 19;
 
         private List<EnemyListData> _enemiesData = new List<EnemyListData>();
         public IReadOnlyCollection<EnemyListData> EnemiesData => _enemiesData.AsReadOnly();
