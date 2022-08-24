@@ -40,7 +40,7 @@
 	<PropertyGroup>
 		<!-- Distribution version for GitHub CI. 'release' is currently .NET 5 -->
 		<DalamudCIDist>release</DalamudCIDist>
-		<DalamudVersion>6692d56</DalamudVersion>
+		<DalamudVersion>dev</DalamudVersion>
 		<DalamudLocal>../dalamud/</DalamudLocal>
 		<DalamudLibPath>$(APPDATA)\XIVLauncher\addon\Hooks\$(DalamudVersion)\</DalamudLibPath>
 	</PropertyGroup>
