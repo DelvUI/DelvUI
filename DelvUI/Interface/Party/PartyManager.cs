@@ -89,7 +89,7 @@ namespace DelvUI.Interface.Party
 
         private const int PartyListInfoOffset = 0x0CD0;
         private const int PartyListMemberRawInfoSize = 0x20;
-        private const int PartyJobIconIdsOffset = 0x1320;
+        private const int PartyJobIconIdsOffset = 0x1298;
 
         private const int PartyCrossWorldNameOffset = 0x101A;
         private const int PartyCrossWorldDisplayNameOffset = 0x0FB2;

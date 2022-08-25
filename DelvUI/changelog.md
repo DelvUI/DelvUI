@@ -1,3 +1,7 @@
+# 1.4.0.1
+Fixes:
+- Fixed job icons not working on cross-world parties.
+
 # 1.4.0.0
 Features:
 - Added support for Patch 6.2 and Dalamud Api7.
