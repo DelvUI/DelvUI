@@ -6,7 +6,7 @@ jobs:
   build-debug:
     # 2019 version has .NET 5 installed by default.
     # Switch to windows-2022 when updating to .NET 6.
-    runs-on: windows-2019
+    runs-on: windows-2022
 
     env:
       #/ Skips dotnet's initial cache populating.
