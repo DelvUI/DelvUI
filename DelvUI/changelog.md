@@ -1,4 +1,7 @@
-# 1.4.0.1
+# 1.4.1.0
+Features:
+- Added visibility settings for Island Sanctuary.
+
 Fixes:
 - Fixed job icons not working on cross-world parties.
 - Fixed Ninja Job Hud not working properly.

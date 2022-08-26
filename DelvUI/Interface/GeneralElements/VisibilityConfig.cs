@@ -32,25 +32,33 @@ namespace DelvUI.Interface
         [Order(9)]
         public bool HideInDuty = false;
 
-        [Checkbox("Always show when in duty")]
+        [Checkbox("Hide in Island Sanctuary")]
         [Order(10)]
+        public bool HideInIslandSanctuary = false;
+
+        [Checkbox("Always show when in duty")]
+        [Order(20)]
         public bool ShowInDuty = false;
 
         [Checkbox("Always show when weapon is drawn")]
-        [Order(11)]
+        [Order(21)]
         public bool ShowOnWeaponDrawn = false;
 
         [Checkbox("Always show when crafting")]
-        [Order(12)]
+        [Order(22)]
         public bool ShowWhileCrafting = false;
 
         [Checkbox("Always show when gathering")]
-        [Order(13)]
+        [Order(23)]
         public bool ShowWhileGathering = false;
 
         [Checkbox("Always show while in a party")]
-        [Order(14)]
+        [Order(24)]
         public bool ShowInParty = false;
+
+        [Checkbox("Always show while in Island Sanctuary")]
+        [Order(25)]
+        public bool ShowInIslandSanctuary = false;
 
 
         private bool IsInCombat() => Plugin.Condition[ConditionFlag.InCombat];
@@ -63,6 +71,10 @@ namespace DelvUI.Interface
 
         private bool HasWeaponDrawn() => (Plugin.ClientState.LocalPlayer != null && Plugin.ClientState.LocalPlayer.StatusFlags.HasFlag(StatusFlags.WeaponOut));
 
+        private bool IsInGoldSaucer() => _goldSaucerIDs.Any(id => id == Plugin.ClientState.TerritoryType);
+
+        private bool IsInIslandSanctuary() => Plugin.ClientState.TerritoryType == 1055;
+
         private readonly uint[] _goldSaucerIDs = { 144, 388, 389, 390, 391, 579, 792, 899, 941 };
 
         public bool IsElementVisible(HudElement? element = null)
@@ -72,7 +84,10 @@ namespace DelvUI.Interface
             if (element != null && element.GetType() == typeof(PlayerCastbarHud)) { return true; }
             if (element != null && !element.GetConfig().Enabled) { return false; }
 
-            if (ShowInDuty && IsInDuty()) { return true; }
+            bool isInIslandSanctuary = IsInIslandSanctuary();
+            bool isInDuty = IsInDuty() && !isInIslandSanctuary;
+
+            if (ShowInDuty && isInDuty) { return true; }
 
             if (ShowOnWeaponDrawn && HasWeaponDrawn()) { return true; }
 
@@ -82,16 +97,21 @@ namespace DelvUI.Interface
 
             if (ShowInParty && PartyManager.Instance.MemberCount > 1) { return true; }
 
+            if (ShowInIslandSanctuary && isInIslandSanctuary) { return true; }
+
+
             if (HideOutsideOfCombat && !IsInCombat()) { return false; }
 
             if (HideInCombat && IsInCombat()) { return false; }
 
-            if (HideInGoldSaucer && _goldSaucerIDs.Any(id => id == Plugin.ClientState.TerritoryType)) { return false; }
+            if (HideInGoldSaucer && IsInGoldSaucer()) { return false; }
 
             PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (HideOnFullHP && player != null && player.CurrentHp == player.MaxHp) { return false; }
 
-            if (HideInDuty && IsInDuty()) { return false; }
+            if (HideInDuty && isInDuty) { return false; }
+
+            if (HideInIslandSanctuary && isInIslandSanctuary) { return false; }
 
             return true;
         }
@@ -99,14 +119,19 @@ namespace DelvUI.Interface
         public void CopyFrom(VisibilityConfig config)
         {
             Enabled = config.Enabled;
+
             HideOutsideOfCombat = config.HideOutsideOfCombat;
             HideInGoldSaucer = config.HideInGoldSaucer;
             HideOnFullHP = config.HideOnFullHP;
+            HideInDuty = config.HideInDuty;
+            HideInIslandSanctuary = config.HideInIslandSanctuary;
+
             ShowInDuty = config.ShowInDuty;
             ShowOnWeaponDrawn = config.ShowOnWeaponDrawn;
             ShowWhileCrafting = config.ShowWhileCrafting;
             ShowWhileGathering = config.ShowWhileGathering;
             ShowInParty = config.ShowInParty;
+            ShowInIslandSanctuary = config.ShowInIslandSanctuary;
         }
 
         public VisibilityConfig()
