@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -169,12 +170,13 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawHutonGauge(Vector2 origin, PlayerCharacter player)
+        private unsafe void DrawHutonGauge(Vector2 origin, PlayerCharacter player)
         {
-            NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
-            float hutonDuration = gauge.HutonTimer / 1000f;
+            NINGauge g = Plugin.JobGauges.Get<NINGauge>();
+            TmpNinjaGauge *gauge = (TmpNinjaGauge*)g.Address;
+            float hutonDuration = gauge->HutonTimer / 1000f;
 
-            if (!Config.HutonBar.HideWhenInactive || gauge.HutonTimer > 0)
+            if (!Config.HutonBar.HideWhenInactive || gauge->HutonTimer > 0)
             {
                 Config.HutonBar.Label.SetValue(hutonDuration);
 
@@ -183,15 +185,16 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawNinkiGauge(Vector2 origin, PlayerCharacter player)
+        private unsafe void DrawNinkiGauge(Vector2 origin, PlayerCharacter player)
         {
-            NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
+            NINGauge g = Plugin.JobGauges.Get<NINGauge>();
+            TmpNinjaGauge* gauge = (TmpNinjaGauge*)g.Address;
 
-            if (!Config.NinkiBar.HideWhenInactive || gauge.Ninki > 0)
+            if (!Config.NinkiBar.HideWhenInactive || gauge->Ninki > 0)
             {
-                Config.NinkiBar.Label.SetValue(gauge.Ninki);
+                Config.NinkiBar.Label.SetValue(gauge->Ninki);
 
-                BarHud[] bars = BarUtilities.GetChunkedProgressBars(Config.NinkiBar, 2, gauge.Ninki, 100, 0, player);
+                BarHud[] bars = BarUtilities.GetChunkedProgressBars(Config.NinkiBar, 2, gauge->Ninki, 100, 0, player);
                 foreach (BarHud bar in bars)
                 {
                     AddDrawActions(bar.GetDrawActions(origin, Config.NinkiBar.StrataLevel));
@@ -329,5 +332,13 @@ namespace DelvUI.Interface.Jobs
             Label.Enabled = true;
             UsePartialFillColor = true;
         }
+    }
+
+    [StructLayout(LayoutKind.Explicit, Size = 0x10)]
+    public struct TmpNinjaGauge
+    {
+        [FieldOffset(0x08)] public ushort HutonTimer;
+        [FieldOffset(0x0A)] public byte Ninki;
+        [FieldOffset(0x0B)] public byte HutonManualCasts;
     }
 }
