@@ -3,8 +3,9 @@ Features:
 - Added visibility settings for Island Sanctuary.
 
 Fixes:
-- Fixed job icons not working on cross-world parties.
 - Fixed Ninja Job Hud not working properly.
+- Fixed Astrologian's Minor Arcana cooldown.
+- Fixed job icons not working on cross-world parties.
 - Fixed Target of Target not working.
 - Fixed name hide logic for the Party Frames.
 

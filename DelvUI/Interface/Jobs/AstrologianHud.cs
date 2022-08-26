@@ -338,7 +338,7 @@ namespace DelvUI.Interface.Jobs
 
             float crownCardPresent;
             float crownCardMax;
-            float cooldown = _spellHelper.GetSpellCooldown(7443);
+            float cooldown = 60f; // _spellHelper.GetSpellCooldown(7443);
 
             if (crownCardDrawn != "")
             {
