@@ -586,7 +586,7 @@ namespace DelvUI.Interface.Party
                 return false;
             }
 
-            if (character is BattleChara { IsCasting: true } && _configs.CastBar.HideNameWhenCasting)
+            if (character is BattleChara { IsCasting: true } && _configs.CastBar.Enabled && _configs.CastBar.HideNameWhenCasting)
             {
                 return false;
             }
