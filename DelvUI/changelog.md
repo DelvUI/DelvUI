@@ -8,7 +8,7 @@ Fixes:
 - Fixed job icons not working on cross-world parties.
 - Fixed Target of Target not working.
 - Fixed name hide logic for the Party Frames.
-- Fixed enmity indicators not working in Party Frames.
+- Fixed emnity indicators not working in Party Frames.
 
 # 1.4.0.0
 Features:
