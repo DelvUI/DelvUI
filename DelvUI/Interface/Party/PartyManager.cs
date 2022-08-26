@@ -304,7 +304,7 @@ namespace DelvUI.Interface.Party
             // we can pretty much deduce that the chocobo is the one with aggro
             // this might fail on some cases when there are other players not in party hitting the same thing
             // but the edge case is so minor we should be fine
-            EnmityLevel chocoboEnmity = PartyListAddon->EnmityLeaderIndex == -1 && PartyListAddon->PartyMember[0].EmnityByte == 1 ? EnmityLevel.Leader : EnmityLevel.Last;
+            EnmityLevel chocoboEnmity = PartyListAddon->EnmityLeaderIndex == -1 && EnmityByteForIndex(0) == 1 ? EnmityLevel.Leader : EnmityLevel.Last;
 
             if (needsUpdate)
             {
@@ -551,13 +551,25 @@ namespace DelvUI.Interface.Party
                 return EnmityLevel.Last;
             }
 
-            EnmityLevel enmityLevel = (EnmityLevel)PartyListAddon->PartyMember[index].EmnityByte;
+            EnmityLevel enmityLevel = (EnmityLevel)EnmityByteForIndex(index);
             if (enmityLevel == EnmityLevel.Leader && PartyListAddon->EnmityLeaderIndex != index)
             {
                 enmityLevel = EnmityLevel.Last;
             }
 
             return enmityLevel;
+        }
+
+        private byte EnmityByteForIndex(int index)
+        {
+            TmpPartyListMemberStruct* member = (TmpPartyListMemberStruct*)(new IntPtr(PartyListAddon) + 0x220 + (248 * index));
+            return member->EmnityByte;
+        }
+
+        private byte EnmityByteForTrustIndex(int index)
+        {
+            TmpPartyListMemberStruct* member = (TmpPartyListMemberStruct*)(new IntPtr(PartyListAddon) + 0x9E0 + (248 * index));
+            return member->EmnityByte;
         }
 
         private EnmityLevel EnmityForTrustMemberIndex(int index)
@@ -567,7 +579,7 @@ namespace DelvUI.Interface.Party
                 return EnmityLevel.Last;
             }
 
-            return (EnmityLevel)PartyListAddon->TrustMember[index].EmnityByte;
+            return (EnmityLevel)EnmityByteForTrustIndex(index);
         }
 
         private bool IsPartyLeader(int index)
@@ -714,5 +726,12 @@ namespace DelvUI.Interface.Party
             public string Name => Marshal.PtrToStringUTF8(new IntPtr(NamePtr)) ?? "";
         }
         #endregion
+    }
+
+    [StructLayout(LayoutKind.Explicit, Size = 248)]
+    public struct TmpPartyListMemberStruct
+    {
+        [FieldOffset(240)]
+        public byte EmnityByte;
     }
 }
