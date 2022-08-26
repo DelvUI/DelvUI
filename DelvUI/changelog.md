@@ -3,6 +3,7 @@ Fixes:
 - Fixed job icons not working on cross-world parties.
 - Fixed Ninja Job Hud not working properly.
 - Fixed Target of Target not working.
+- Fixed name hide logic for the Party Frames.
 
 # 1.4.0.0
 Features:

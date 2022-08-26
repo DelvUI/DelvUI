@@ -1,18 +1,18 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
+using DelvUI.Enums;
 using DelvUI.Helpers;
+using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
-using Dalamud.Game.ClientState.Objects.Types;
-using System.Collections.Generic;
-using Dalamud.Game.ClientState.Statuses;
-using DelvUI.Enums;
-using DelvUI.Interface.Bars;
-using FFXIVClientStructs.FFXIV.Client.UI;
 
 namespace DelvUI.Interface.Party
 {
@@ -334,16 +334,14 @@ namespace DelvUI.Interface.Party
         {
             List<(StrataLevel, Action)> drawActions = new List<(StrataLevel, Action)>();
 
-            var player = Plugin.ClientState.LocalPlayer;
+            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (!Visible || Member is null || player == null)
             {
                 StopMouseover();
                 return drawActions;
             }
 
-            var character = Member.Character;
-            
-            
+            Character? character = Member.Character;
 
             // role/job icon
             if (RoleIcon.Enabled)
@@ -494,26 +492,7 @@ namespace DelvUI.Interface.Party
             var showingRaise = ShowingRaise();
             var showingInvuln = ShowingInvuln();
 
-            var drawName = true;
-
-            if (showingRaise || showingInvuln)
-            {
-                if ((showingRaise && RaiseTracker.HideNameWhenRaised) || (showingInvuln && InvulnTracker.HideNameWhenInvuln))
-                {
-                    drawName = false;
-                }
-                {
-                    drawName = false;
-                }
-            }
-            else if (PlayerStatus.Enabled && PlayerStatus.HideName && Member.Status != PartyMemberStatus.None)
-            {
-                drawName = false;
-            }else if (character is BattleChara { IsCasting: true } && _configs.CastBar.HideNameWhenCasting)
-            {
-                drawName = false;
-            }
-
+            var drawName = ShouldDrawName(character, showingRaise, showingInvuln);
             if (drawName)
             {
                 drawActions.Add((_configs.HealthBar.NameLabelConfig.StrataLevel, () =>
@@ -588,6 +567,31 @@ namespace DelvUI.Interface.Party
             }
 
             return drawActions;
+        }
+
+        private bool ShouldDrawName(Character? character, bool showingRaise, bool showingInvuln)
+        {
+            if (showingRaise && RaiseTracker.HideNameWhenRaised)
+            {
+                return false;
+            }
+
+            if (showingInvuln && InvulnTracker.HideNameWhenInvuln)
+            {
+                return false;
+            }
+
+            if (Member != null && PlayerStatus.Enabled && PlayerStatus.HideName && Member.Status != PartyMemberStatus.None)
+            {
+                return false;
+            }
+
+            if (character is BattleChara { IsCasting: true } && _configs.CastBar.HideNameWhenCasting)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private bool ShowingRaise() =>
