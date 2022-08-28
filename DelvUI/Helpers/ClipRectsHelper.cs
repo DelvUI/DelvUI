@@ -170,6 +170,7 @@ namespace DelvUI.Helpers
             "ContentsFinderSetting",
             "ContentsFinderMenu",
             "ContentsInfo",
+            "WeeklyBingo",
             "Dawn",
             "DawnStory",
             "DawnStoryMemberSelect",
