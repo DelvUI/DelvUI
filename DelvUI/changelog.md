@@ -1,6 +1,7 @@
 # 1.4.1.1
 Fixes:
 - Fixed Target of Target (again).
+- Fixed Astrologian's Minor Arcana cooldown (again).
 
 # 1.4.1.0
 Features:
