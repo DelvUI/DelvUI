@@ -382,19 +382,9 @@ namespace DelvUI.Helpers
                 return null;
             }
 
-            long[] tmp = new long[1];
-            Marshal.Copy(target.Address + 0x1A68, tmp, 0, 1);
-            long totId = tmp[0];
-
-            if (player != null)
+            if (target.TargetObjectId == 0 && player != null && player.TargetObjectId == 0)
             {
-                Marshal.Copy(player.Address + 0x1A68, tmp, 0, 1);
-                long targetId = tmp[0];
-
-                if (totId == 0 && targetId == 0)
-                {
-                    return player;
-                }
+                return player;
             }
 
             // only the first 200 elements in the array are relevant due to the order in which SE packs data into the array
@@ -402,7 +392,7 @@ namespace DelvUI.Helpers
             for (int i = 0; i < 200; i += 2)
             {
                 GameObject? actor = actors[i];
-                if (actor?.ObjectId == totId)
+                if (actor?.ObjectId == target.TargetObjectId) 
                 {
                     return actor;
                 }

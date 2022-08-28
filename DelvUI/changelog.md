@@ -1,3 +1,7 @@
+# 1.4.1.1
+Fixes:
+- Fixed Target of Target (again).
+
 # 1.4.1.0
 Features:
 - Added visibility settings for Island Sanctuary.
@@ -8,7 +12,7 @@ Fixes:
 - Fixed job icons not working on cross-world parties.
 - Fixed Target of Target not working.
 - Fixed name hide logic for the Party Frames.
-- Fixed emnity indicators not working in Party Frames.
+- Fixed enmity indicators not working in Party Frames.
 
 # 1.4.0.0
 Features:
