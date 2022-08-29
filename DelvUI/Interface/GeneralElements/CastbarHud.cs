@@ -6,6 +6,7 @@ using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -58,6 +59,11 @@ namespace DelvUI.Interface.GeneralElements
 
             UpdateCurrentCast(out float currentCastTime, out float totalCastTime);
             if (totalCastTime == 0 || currentCastTime >= totalCastTime)
+            {
+                return;
+            }
+
+            if (!ShouldShow() && !Config.Preview)
             {
                 return;
             }
@@ -180,6 +186,8 @@ namespace DelvUI.Interface.GeneralElements
         }
 
         public virtual PluginConfigColor GetColor() => Config.FillColor;
+
+        public virtual bool ShouldShow() => true;
     }
 
     public class PlayerCastbarHud : CastbarHud
@@ -265,6 +273,27 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             return Config.FillColor;
+        }
+
+        public override unsafe bool ShouldShow()
+        {
+            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_TargetInfo", 1);
+            if (addon != null && addon->IsVisible)
+            {
+                if (addon->UldManager.NodeListCount < 41) { return true; }
+
+                return addon->UldManager.NodeList[41]->IsVisible;
+            }
+
+            addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_TargetInfoCastBar", 1);
+            if (addon != null && addon->IsVisible)
+            {
+                if (addon->UldManager.NodeListCount < 2) { return true; }
+
+                return addon->UldManager.NodeList[2]->IsVisible;
+            }
+
+            return true;
         }
     }
 }

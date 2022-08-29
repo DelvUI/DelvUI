@@ -1,3 +1,6 @@
+# 1.4.2.0
+- Fixed some enemy abilities showing a castbar when they shouldn't.
+
 # 1.4.1.1
 Fixes:
 - Fixed Target of Target (again).
