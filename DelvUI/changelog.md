@@ -1,3 +1,6 @@
+# 1.4.3.0
+- Fixed ability and status effects names in P5S, P6S and P7S.
+
 # 1.4.2.0
 - Fixed some enemy abilities showing a castbar when they shouldn't.
 
