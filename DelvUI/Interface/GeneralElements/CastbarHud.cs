@@ -277,20 +277,66 @@ namespace DelvUI.Interface.GeneralElements
 
         public override unsafe bool ShouldShow()
         {
-            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_TargetInfo", 1);
-            if (addon != null && addon->IsVisible)
+            bool? targetCasting = Utils.IsTargetCasting();
+            if (targetCasting.HasValue)
             {
-                if (addon->UldManager.NodeListCount < 41) { return true; }
-
-                return addon->UldManager.NodeList[41]->IsVisible;
+                return targetCasting.Value;
             }
 
-            addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_TargetInfoCastBar", 1);
-            if (addon != null && addon->IsVisible)
-            {
-                if (addon->UldManager.NodeListCount < 2) { return true; }
+            return true;
+        }
+    }
 
-                return addon->UldManager.NodeList[2]->IsVisible;
+    public class FocusTargetCastbarHud : TargetCastbarHud
+    {
+        private TargetCastbarConfig Config => (TargetCastbarConfig)_config;
+
+        public FocusTargetCastbarHud(TargetCastbarConfig config, string? displayName = null) : base(config, displayName)
+        {
+
+        }
+
+        public override unsafe bool ShouldShow()
+        {
+            bool? focusTargetCasting = Utils.IsFocusTargetCasting();
+            if (focusTargetCasting.HasValue)
+            {
+                return focusTargetCasting.Value;
+            }
+
+            return true;
+        }
+    }
+
+    public class TargetOfTargetCastbarHud : TargetCastbarHud
+    {
+        private TargetCastbarConfig Config => (TargetCastbarConfig)_config;
+
+        public TargetOfTargetCastbarHud(TargetCastbarConfig config, string? displayName = null) : base(config, displayName)
+        {
+
+        }
+
+        public override unsafe bool ShouldShow()
+        {
+            GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            if (Actor == target)
+            {
+                bool? targetCasting = Utils.IsTargetCasting();
+                if (targetCasting.HasValue)
+                {
+                    return targetCasting.Value;
+                }
+            }
+
+            GameObject? focusTarget = Plugin.TargetManager.FocusTarget;
+            if (Actor == focusTarget)
+            {
+                bool? focusTargetCasting = Utils.IsFocusTargetCasting();
+                if (focusTargetCasting.HasValue)
+                {
+                    return focusTargetCasting.Value;
+                }
             }
 
             return true;

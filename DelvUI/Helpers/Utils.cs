@@ -15,6 +15,7 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using StructsCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace DelvUI.Helpers
 {
@@ -459,6 +460,40 @@ namespace DelvUI.Helpers
                     PluginLog.Error("Error trying to open url: " + e.Message);
                 }
             }
+        }
+
+        public static unsafe bool? IsTargetCasting()
+        {
+            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_TargetInfo", 1);
+            if (addon != null && addon->IsVisible)
+            {
+                if (addon->UldManager.NodeListCount < 41) { return true; }
+
+                return addon->UldManager.NodeList[41]->IsVisible;
+            }
+
+            addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_TargetInfoCastBar", 1);
+            if (addon != null && addon->IsVisible)
+            {
+                if (addon->UldManager.NodeListCount < 2) { return true; }
+
+                return addon->UldManager.NodeList[2]->IsVisible;
+            }
+
+            return null;
+        }
+
+        public static unsafe bool? IsFocusTargetCasting()
+        {
+            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_FocusTargetInfo", 1);
+            if (addon != null && addon->IsVisible)
+            {
+                if (addon->UldManager.NodeListCount < 16) { return true; }
+
+                return addon->UldManager.NodeList[16]->IsVisible;
+            }
+
+            return null;
         }
     }
 }

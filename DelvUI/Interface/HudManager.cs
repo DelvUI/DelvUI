@@ -1,4 +1,6 @@
 using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface;
 using DelvUI.Config;
 using DelvUI.Helpers;
@@ -12,7 +14,6 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 
 namespace DelvUI.Interface
@@ -280,14 +281,14 @@ namespace DelvUI.Interface
             _hudElementsWithPreview.Add(targetCastbar);
 
             var targetOfTargetCastbarConfig = ConfigurationManager.Instance.GetConfigObject<TargetOfTargetCastbarConfig>();
-            var targetOfTargetCastbar = new TargetCastbarHud(targetOfTargetCastbarConfig, "ToT Castbar");
+            var targetOfTargetCastbar = new TargetOfTargetCastbarHud(targetOfTargetCastbarConfig, "ToT Castbar");
             targetOfTargetCastbar.ParentConfig = _totUnitFrameHud.Config;
             _hudElements.Add(targetOfTargetCastbarConfig, targetOfTargetCastbar);
             _hudElementsUsingTargetOfTarget.Add(targetOfTargetCastbar);
             _hudElementsWithPreview.Add(targetOfTargetCastbar);
 
             var focusTargetCastbarConfig = ConfigurationManager.Instance.GetConfigObject<FocusTargetCastbarConfig>();
-            var focusTargetCastbar = new TargetCastbarHud(focusTargetCastbarConfig, "Focus Castbar");
+            var focusTargetCastbar = new FocusTargetCastbarHud(focusTargetCastbarConfig, "Focus Castbar");
             focusTargetCastbar.ParentConfig = _focusTargetUnitFrameHud.Config;
             _hudElements.Add(focusTargetCastbarConfig, focusTargetCastbar);
             _hudElementsUsingFocusTarget.Add(focusTargetCastbar);
@@ -536,7 +537,7 @@ namespace DelvUI.Interface
         private void AssignActors()
         {
             // player
-            var player = Plugin.ClientState.LocalPlayer;
+            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             foreach (var element in _hudElementsUsingPlayer)
             {
                 element.Actor = player;
@@ -548,7 +549,7 @@ namespace DelvUI.Interface
             }
 
             // target
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             foreach (var element in _hudElementsUsingTarget)
             {
                 element.Actor = target;
@@ -560,14 +561,14 @@ namespace DelvUI.Interface
             }
 
             // target of target
-            var targetOfTarget = Utils.FindTargetOfTarget(target, player, Plugin.ObjectTable);
+            GameObject? targetOfTarget = Utils.FindTargetOfTarget(target, player, Plugin.ObjectTable);
             foreach (var element in _hudElementsUsingTargetOfTarget)
             {
                 element.Actor = targetOfTarget;
             }
 
             // focus
-            var focusTarget = Plugin.TargetManager.FocusTarget;
+            GameObject? focusTarget = Plugin.TargetManager.FocusTarget;
             foreach (var element in _hudElementsUsingFocusTarget)
             {
                 element.Actor = focusTarget;

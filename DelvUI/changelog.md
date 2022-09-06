@@ -1,3 +1,7 @@
+# 1.4.2.3
+- Fixed Focus Target Castbar not showing sometimes.
+- Fixed Target of Target Castbar not showing sometimes.
+
 # 1.4.2.2
 - Fixed abilities and status effects names in P8S (English only for now).
 
