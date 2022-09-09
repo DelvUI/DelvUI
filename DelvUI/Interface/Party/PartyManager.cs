@@ -99,9 +99,11 @@ namespace DelvUI.Interface.Party
         private const int PartyTrustEntrySize = 0x20;
 
         private const int PartyMembersInfoIndex = 11;
+        private const int FirstOfMyRoleOrder = 8;
 
         private List<PartyListMemberInfo> _partyMembersInfo = null!;
         private bool _dirty = false;
+        private uint _previousJob = 0;
 
         private List<IPartyFramesMember> _groupMembers = new List<IPartyFramesMember>();
         public IReadOnlyCollection<IPartyFramesMember> GroupMembers => _groupMembers.AsReadOnly();
@@ -159,10 +161,21 @@ namespace DelvUI.Interface.Party
 
         private void Update()
         {
-            var player = Plugin.ClientState.LocalPlayer;
+            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (player is null || player is not PlayerCharacter)
             {
                 return;
+            }
+
+            // detect job change
+            if (player.ClassJob.Id != _previousJob)
+            {
+                _previousJob = player.ClassJob.Id;
+
+                if (_config.PlayerOrderOverrideEnabled && _config.PlayerOrder == FirstOfMyRoleOrder)
+                {
+                    _dirty = true;
+                }
             }
 
             try
@@ -198,10 +211,26 @@ namespace DelvUI.Interface.Party
                 // if party is the same, just update actor references
                 if (!partyChanged)
                 {
-                    foreach (var member in _groupMembers)
+                    bool jobsChanged = false;
+                    PartyFramesMember? playerMember = null;
+
+                    foreach (IPartyFramesMember member in _groupMembers)
                     {
-                        var index = member.ObjectId == player.ObjectId ? 0 : member.Order - 1;
-                        member.Update(EnmityForIndex(index), StatusForIndex(index), IsPartyLeader(index), JobIdForIndex(index));
+                        int index = member.ObjectId == player.ObjectId ? 0 : member.Order - 1;
+                        uint jobId = JobIdForIndex(index);
+                        jobsChanged = jobsChanged || jobId != member.JobId;
+
+                        if (index == 0 && member is PartyFramesMember m)
+                        {
+                            playerMember = m;
+                        }
+
+                        member.Update(EnmityForIndex(index), StatusForIndex(index), IsPartyLeader(index), jobId);
+                    }
+
+                    if (jobsChanged & playerMember != null)
+                    {
+                        Sort(player, playerMember);
                     }
                 }
                 // cross world party
@@ -241,10 +270,10 @@ namespace DelvUI.Interface.Party
             {
                 _groupMembers.Clear();
 
-                int order = _config.PlayerOrderOverrideEnabled ? _config.PlayerOrder + 1 : 1;
-                _groupMembers.Add(new PartyFramesMember(player, order, EnmityForIndex(0), PartyMemberStatus.None, true));
+                PartyFramesMember playerMember = new PartyFramesMember(player, 1, EnmityForIndex(0), PartyMemberStatus.None, true);
+                _groupMembers.Add(playerMember);
 
-                order = 2;
+                int order = 2;
 
                 for (int i = 0; i < trustCount; i++)
                 {
@@ -256,11 +285,7 @@ namespace DelvUI.Interface.Party
                     }
                 }
 
-                // sort
-                SortGroupMembers(player);
-                _dirty = false;
-
-                MembersChangedEvent?.Invoke(this);
+                Sort(player, playerMember);
             }
             else
             {
@@ -390,33 +415,18 @@ namespace DelvUI.Interface.Party
             {
                 bool isPlayer = i == 0;
 
-                int order;
-                if (isPlayer && _config.PlayerOrderOverrideEnabled)
-                {
-                    order = _config.PlayerOrder + 1;
-                }
-                else
-                {
-                    order = i + 1;
-                }
+                int order = i + 1;
+                EnmityLevel enmity = EnmityForIndex(i);
+                PartyMemberStatus status = StatusForIndex(i);
+                bool isPartyLeader = IsPartyLeader(i);
 
-                var enmity = EnmityForIndex(i);
-                var status = StatusForIndex(i);
-                var isPartyLeader = IsPartyLeader(i);
-
-                var member = isPlayer ?
+                PartyFramesMember member = isPlayer ?
                     new PartyFramesMember(player, order, enmity, status, isPartyLeader) :
                     new PartyFramesMember(NameForIndex(i), order, JobIdForIndex(i), status, isPartyLeader);
-
                 _groupMembers.Add(member);
             }
 
-            // sort according to default party list
-            SortGroupMembers(player);
-            _dirty = false;
-
-            // fire event
-            MembersChangedEvent?.Invoke(this);
+            Sort(player, null);
         }
 
         private void UpdateRegularParty(PlayerCharacter player)
@@ -424,33 +434,27 @@ namespace DelvUI.Interface.Party
             // create new members array with dalamud's data
             _groupMembers.Clear();
 
+            PartyFramesMember? playerMember = null;
+
             for (int i = 0; i < Plugin.PartyList.Length; i++)
             {
                 var partyMember = Plugin.PartyList[i];
-                if (partyMember == null)
-                {
-                    continue;
-                }
+                if (partyMember == null) { continue; }
 
-                var isPlayer = partyMember.ObjectId == player.ObjectId;
-
-                // player order override
-                int order;
-                if (isPlayer && _config.PlayerOrderOverrideEnabled)
-                {
-                    order = _config.PlayerOrder + 1;
-                }
-                else
-                {
-                    order = IndexForPartyMember(partyMember) ?? 9;
-                }
-
+                bool isPlayer = partyMember.ObjectId == player.ObjectId;
+                int order = isPlayer ? 1 : (IndexForPartyMember(partyMember) ?? 9);
                 int index = isPlayer ? 0 : order - 1;
                 EnmityLevel enmity = EnmityForIndex(index);
                 PartyMemberStatus status = StatusForIndex(index);
                 bool isPartyLeader = i == Plugin.PartyList.PartyLeaderIndex;
 
-                var member = new PartyFramesMember(partyMember, order, enmity, status, isPartyLeader);
+                PartyFramesMember member = new PartyFramesMember(partyMember, order, enmity, status, isPartyLeader);
+
+                if (isPlayer)
+                {
+                    playerMember = member;
+                }
+
                 _groupMembers.Add(member);
 
                 // player's chocobo (always last)
@@ -464,7 +468,29 @@ namespace DelvUI.Interface.Party
                 }
             }
 
-            // sort according to default party list
+            Sort(player, playerMember);
+        }
+
+        private void Sort(PlayerCharacter player, PartyFramesMember? playerMember)
+        {
+            // calculate player overriden position
+            if (playerMember != null && _config.PlayerOrderOverrideEnabled)
+            {
+                if (_config.PlayerOrder == FirstOfMyRoleOrder)
+                {
+                    int? roleFirstOrder = PartyOrderHelper.GetRoleFirstOrder(_groupMembers);
+                    if (roleFirstOrder.HasValue)
+                    {
+                        playerMember.Order = roleFirstOrder.Value + 1;
+                    }
+                }
+                else
+                {
+                    playerMember.Order = _config.PlayerOrder + 1;
+                }
+            }
+
+            // sort
             SortGroupMembers(player);
             _dirty = false;
 

@@ -1,3 +1,8 @@
+# 1.4.3.0
+- Added a "First of my role" setting to the player overriden position for Party Frames:
+    + It will place the player as the first of their current role, respecting the game's party list sorting settings.
+    + In cross-world parties the party is not sorted so this setting will not work properly.
+
 # 1.4.2.3
 - Fixed Focus Target Castbar not showing sometimes.
 - Fixed Target of Target Castbar not showing sometimes.

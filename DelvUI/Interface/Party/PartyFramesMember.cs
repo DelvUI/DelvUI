@@ -32,7 +32,7 @@ namespace DelvUI.Interface.Party
         public uint ObjectId => _partyMember != null ? _partyMember.ObjectId : _objectID;
         public Character? Character { get; private set; }
 
-        public int Order { get; private set; }
+        public int Order { get; set; }
         public string Name => _partyMember != null ? _partyMember.Name.ToString() : (Character != null ? Character.Name.ToString() : _name);
         public uint Level => _partyMember != null ? _partyMember.Level : (Character != null ? Character.Level : (uint)0);
         public uint JobId => _partyMember != null ? _partyMember.ClassJob.Id : (Character != null ? Character.ClassJob.Id : _jobId);
@@ -117,7 +117,7 @@ namespace DelvUI.Interface.Party
         public uint ObjectId => GameObject.InvalidGameObjectId;
         public Character? Character => null;
 
-        public int Order { get; private set; }
+        public int Order { get; set; }
         public string Name => "Fake Name";
         public uint Level { get; private set; }
         public uint JobId { get; private set; }

@@ -50,7 +50,7 @@ namespace DelvUI.Interface.Party
         [Order(25)]
         public bool PlayerOrderOverrideEnabled = false;
 
-        [Combo("Player Position", "1", "2", "3", "4", "5", "6", "7", "8", isMonitored = true)]
+        [Combo("Player Position", "1", "2", "3", "4", "5", "6", "7", "8", "First of my role", isMonitored = true)]
         [Order(25, collapseWith = nameof(PlayerOrderOverrideEnabled))]
         public int PlayerOrder = 1;
 
