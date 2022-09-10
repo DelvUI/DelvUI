@@ -1,5 +1,8 @@
+# 1.4.4.0
+- Added a Ready Check Status Icon for the Party Frames.
+
 # 1.4.3.0
-- Added a "First of my role" setting to the player overriden position for Party Frames:
+- Added a "First of my role" setting to the player overridden position for the Party Frames:
     + It will place the player as the first of their current role, respecting the game's party list sorting settings.
     + In cross-world parties the party is not sorted so this setting will not work properly.
 

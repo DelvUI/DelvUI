@@ -400,7 +400,7 @@ namespace DelvUI.Interface.Party
             DrawAnchor.TopLeft
         );
 
-        [NestedConfig("Leader", 15)]
+        [NestedConfig("Leader", 11)]
         public PartyFramesLeaderIconConfig Leader = new PartyFramesLeaderIconConfig(
             new Vector2(-12, -12),
             new Vector2(24, 24),
@@ -408,8 +408,11 @@ namespace DelvUI.Interface.Party
             DrawAnchor.TopLeft
         );
 
-        [NestedConfig("Player Status", 15)]
+        [NestedConfig("Player Status", 12)]
         public PartyFramesPlayerStatusConfig PlayerStatus = new PartyFramesPlayerStatusConfig();
+
+        [NestedConfig("Ready Check Status", 13)]
+        public PartyFramesReadyCheckStatusConfig ReadyCheckStatus = new PartyFramesReadyCheckStatusConfig();
 
         protected override PluginConfigObject? InternalLoad(FileInfo fileInfo, string currentVersion, string? previousVersion)
         {
@@ -512,6 +515,28 @@ namespace DelvUI.Interface.Party
 
         [NestedConfig("Label", 15)]
         public LabelConfig Label = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+    }
+
+    [Exportable(false)]
+    public class PartyFramesReadyCheckStatusConfig : PluginConfigObject
+    {
+        public new static PartyFramesReadyCheckStatusConfig DefaultConfig() => new PartyFramesReadyCheckStatusConfig();
+
+        [Checkbox("Hide Name When Showing Status")]
+        [Order(5)]
+        public bool HideName = false;
+
+        [DragInt("Duration (seconds)", min = 1, max = 60, help = "Determines for how long the icons will show after a ready check is finished.")]
+        [Order(6)]
+        public int Duration = 10;
+
+        [NestedConfig("Icon", 10)]
+        public IconConfig Icon = new IconConfig(
+            new Vector2(0, 0),
+            new Vector2(24, 24),
+            DrawAnchor.Center,
+            DrawAnchor.Center
+        );
     }
 
     [Exportable(false)]

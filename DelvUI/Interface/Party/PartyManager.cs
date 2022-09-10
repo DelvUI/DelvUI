@@ -22,9 +22,11 @@ namespace DelvUI.Interface.Party
         #region Singleton
         public static PartyManager Instance { get; private set; } = null!;
         private PartyFramesConfig _config = null!;
+        private PartyFramesIconsConfig _iconsConfig = null!;
 
         private PartyManager()
         {
+            _readyCheckHelper = new PartyReadyCheckHelper();
             _raiseTracker = new PartyFramesRaiseTracker();
             _invulnTracker = new PartyFramesInvulnTracker();
             _cleanseTracker = new PartyFramesCleanseTracker();
@@ -59,6 +61,7 @@ namespace DelvUI.Interface.Party
                 return;
             }
 
+            _readyCheckHelper.Dispose();
             _raiseTracker.Dispose();
             _invulnTracker.Dispose();
             _cleanseTracker.Dispose();
@@ -78,6 +81,8 @@ namespace DelvUI.Interface.Party
 
             _config = sender.GetConfigObject<PartyFramesConfig>();
             _config.ValueChangeEvent += OnConfigPropertyChanged;
+
+            _iconsConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesIconsConfig>();
         }
 
         #endregion Singleton
@@ -109,6 +114,7 @@ namespace DelvUI.Interface.Party
         public IReadOnlyCollection<IPartyFramesMember> GroupMembers => _groupMembers.AsReadOnly();
         public uint MemberCount => (uint)_groupMembers.Count;
 
+        private PartyReadyCheckHelper _readyCheckHelper;
         private PartyFramesRaiseTracker _raiseTracker;
         private PartyFramesInvulnTracker _invulnTracker;
         private PartyFramesCleanseTracker _cleanseTracker;
@@ -178,6 +184,12 @@ namespace DelvUI.Interface.Party
                 }
             }
 
+            // ready check update
+            if (_iconsConfig.ReadyCheckStatus.Enabled)
+            {
+                _readyCheckHelper.Update(_iconsConfig.ReadyCheckStatus.Duration);
+            }
+
             try
             {
                 // trust
@@ -225,7 +237,7 @@ namespace DelvUI.Interface.Party
                             playerMember = m;
                         }
 
-                        member.Update(EnmityForIndex(index), StatusForIndex(index), IsPartyLeader(index), jobId);
+                        member.Update(EnmityForIndex(index), StatusForIndex(index), ReadyCheckStatusForIndex(index), IsPartyLeader(index), jobId);
                     }
 
                     if (jobsChanged & playerMember != null)
@@ -270,7 +282,7 @@ namespace DelvUI.Interface.Party
             {
                 _groupMembers.Clear();
 
-                PartyFramesMember playerMember = new PartyFramesMember(player, 1, EnmityForIndex(0), PartyMemberStatus.None, true);
+                PartyFramesMember playerMember = new PartyFramesMember(player, 1, EnmityForIndex(0), PartyMemberStatus.None, ReadyCheckStatus.None, true);
                 _groupMembers.Add(playerMember);
 
                 int order = 2;
@@ -280,7 +292,7 @@ namespace DelvUI.Interface.Party
                     Character? trustChara = Utils.GetGameObjectByName(names[i]) as Character;
                     if (trustChara != null)
                     {
-                        _groupMembers.Add(new PartyFramesMember(trustChara, order, EnmityForTrustMemberIndex(i), PartyMemberStatus.None, false));
+                        _groupMembers.Add(new PartyFramesMember(trustChara, order, EnmityForTrustMemberIndex(i), PartyMemberStatus.None, ReadyCheckStatus.None, false));
                         order++;
                     }
                 }
@@ -293,11 +305,11 @@ namespace DelvUI.Interface.Party
                 {
                     if (_groupMembers[i].ObjectId == player.ObjectId)
                     {
-                        _groupMembers[i].Update(EnmityForIndex(0), PartyMemberStatus.None, true, player.ClassJob.Id);
+                        _groupMembers[i].Update(EnmityForIndex(0), PartyMemberStatus.None, ReadyCheckStatus.None, true, player.ClassJob.Id);
                     }
                     else
                     {
-                        _groupMembers[i].Update(EnmityForTrustMemberIndex(Math.Max(0, _groupMembers[i].Order - 2)), PartyMemberStatus.None, false, 0);
+                        _groupMembers[i].Update(EnmityForTrustMemberIndex(Math.Max(0, _groupMembers[i].Order - 2)), PartyMemberStatus.None, ReadyCheckStatus.None, false, 0);
                     }
                 }
             }
@@ -335,11 +347,11 @@ namespace DelvUI.Interface.Party
             {
                 _groupMembers.Clear();
 
-                _groupMembers.Add(new PartyFramesMember(player, 1, playerEnmity, PartyMemberStatus.None, true));
+                _groupMembers.Add(new PartyFramesMember(player, 1, playerEnmity, PartyMemberStatus.None, ReadyCheckStatus.None, true));
 
                 if (chocobo != null)
                 {
-                    _groupMembers.Add(new PartyFramesMember(chocobo, 2, chocoboEnmity, PartyMemberStatus.None, false));
+                    _groupMembers.Add(new PartyFramesMember(chocobo, 2, chocoboEnmity, PartyMemberStatus.None, ReadyCheckStatus.None, false));
                 }
 
                 MembersChangedEvent?.Invoke(this);
@@ -348,7 +360,7 @@ namespace DelvUI.Interface.Party
             {
                 for (int i = 0; i < _groupMembers.Count; i++)
                 {
-                    _groupMembers[i].Update(i == 0 ? playerEnmity : chocoboEnmity, PartyMemberStatus.None, i == 0, i == 0 ? player.ClassJob.Id : 0);
+                    _groupMembers[i].Update(i == 0 ? playerEnmity : chocoboEnmity, PartyMemberStatus.None, ReadyCheckStatus.None, i == 0, i == 0 ? player.ClassJob.Id : 0);
                 }
             }
         }
@@ -418,11 +430,12 @@ namespace DelvUI.Interface.Party
                 int order = i + 1;
                 EnmityLevel enmity = EnmityForIndex(i);
                 PartyMemberStatus status = StatusForIndex(i);
+                ReadyCheckStatus readyCheckStatus = ReadyCheckStatusForIndex(i);
                 bool isPartyLeader = IsPartyLeader(i);
 
                 PartyFramesMember member = isPlayer ?
-                    new PartyFramesMember(player, order, enmity, status, isPartyLeader) :
-                    new PartyFramesMember(NameForIndex(i), order, JobIdForIndex(i), status, isPartyLeader);
+                    new PartyFramesMember(player, order, enmity, status, readyCheckStatus, isPartyLeader) :
+                    new PartyFramesMember(NameForIndex(i), order, JobIdForIndex(i), status, readyCheckStatus, isPartyLeader);
                 _groupMembers.Add(member);
             }
 
@@ -446,9 +459,10 @@ namespace DelvUI.Interface.Party
                 int index = isPlayer ? 0 : order - 1;
                 EnmityLevel enmity = EnmityForIndex(index);
                 PartyMemberStatus status = StatusForIndex(index);
+                ReadyCheckStatus readyCheckStatus = ReadyCheckStatusForIndex(i);
                 bool isPartyLeader = i == Plugin.PartyList.PartyLeaderIndex;
 
-                PartyFramesMember member = new PartyFramesMember(partyMember, order, enmity, status, isPartyLeader);
+                PartyFramesMember member = new PartyFramesMember(partyMember, order, enmity, status, readyCheckStatus, isPartyLeader);
 
                 if (isPlayer)
                 {
@@ -463,7 +477,7 @@ namespace DelvUI.Interface.Party
                     var companion = Utils.GetBattleChocobo(player);
                     if (companion is Character companionCharacter)
                     {
-                        _groupMembers.Add(new PartyFramesMember(companionCharacter, 10, EnmityLevel.Last, PartyMemberStatus.None, false));
+                        _groupMembers.Add(new PartyFramesMember(companionCharacter, 10, EnmityLevel.Last, PartyMemberStatus.None, ReadyCheckStatus.None, false));
                     }
                 }
             }
@@ -553,6 +567,16 @@ namespace DelvUI.Interface.Party
             }
 
             return PartyMemberStatus.None;
+        }
+
+        private ReadyCheckStatus ReadyCheckStatusForIndex(int index)
+        {
+            if (!_iconsConfig.ReadyCheckStatus.Enabled || index < 0 || index > 7)
+            {
+                return ReadyCheckStatus.None;
+            }
+
+            return _readyCheckHelper.GetStatusForIndex(index);
         }
 
         private uint JobIdForIndex(int index)

@@ -3,7 +3,6 @@ using Dalamud.Game.ClientState.Party;
 using DelvUI.Helpers;
 using ImGuiNET;
 using System;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace DelvUI.Interface.Party
 {
@@ -43,17 +42,19 @@ namespace DelvUI.Interface.Party
         public float Shield => Utils.ActorShieldValue(Character);
         public EnmityLevel EnmityLevel { get; private set; } = EnmityLevel.Last;
         public PartyMemberStatus Status { get; private set; } = PartyMemberStatus.None;
+        public ReadyCheckStatus ReadyCheckStatus { get; private set; } = ReadyCheckStatus.None;
         public bool IsPartyLeader { get; private set; } = false;
         public float? RaiseTime { get; set; }
         public InvulnStatus? InvulnStatus { get; set; }
         public bool HasDispellableDebuff { get; set; } = false;
 
-        public PartyFramesMember(PartyMember partyMember, int order, EnmityLevel enmityLevel, PartyMemberStatus status, bool isPartyLeader)
+        public PartyFramesMember(PartyMember partyMember, int order, EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader)
         {
             _partyMember = partyMember;
             Order = order;
             EnmityLevel = enmityLevel;
             Status = status;
+            ReadyCheckStatus = readyCheckStatus;
             IsPartyLeader = isPartyLeader;
 
             var gameObject = partyMember.GameObject;
@@ -63,30 +64,33 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        public PartyFramesMember(Character character, int order, EnmityLevel enmityLevel, PartyMemberStatus status, bool isPartyLeader)
+        public PartyFramesMember(Character character, int order, EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader)
         {
             Order = order;
             EnmityLevel = enmityLevel;
             Status = status;
+            ReadyCheckStatus = readyCheckStatus;
             IsPartyLeader = isPartyLeader;
 
             _objectID = character.ObjectId;
             Character = character;
         }
 
-        public PartyFramesMember(string? name, int order, uint jobId, PartyMemberStatus status, bool isPartyLeader)
+        public PartyFramesMember(string? name, int order, uint jobId, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader)
         {
             Order = order;
             Status = status;
+            ReadyCheckStatus = readyCheckStatus;
             IsPartyLeader = isPartyLeader;
             _name = name ?? "";
             _jobId = jobId;
         }
 
-        public void Update(EnmityLevel enmityLevel, PartyMemberStatus status, bool isPartyLeader, uint jobId = 0)
+        public void Update(EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader, uint jobId = 0)
         {
             EnmityLevel = enmityLevel;
             Status = status;
+            ReadyCheckStatus = readyCheckStatus;
             IsPartyLeader = isPartyLeader;
 
             if (jobId > 0)
@@ -128,6 +132,7 @@ namespace DelvUI.Interface.Party
         public float Shield { get; private set; }
         public EnmityLevel EnmityLevel { get; private set; }
         public PartyMemberStatus Status { get; private set; }
+        public ReadyCheckStatus ReadyCheckStatus { get; private set; }
         public bool IsPartyLeader { get; }
         public float? RaiseTime { get; set; }
         public InvulnStatus? InvulnStatus { get; set; }
@@ -145,13 +150,14 @@ namespace DelvUI.Interface.Party
             Shield = order == 2 || order == 3 ? 0 : RNG.Next(30) / 100f;
             EnmityLevel = order <= 1 ? (EnmityLevel)order + 1 : EnmityLevel.Last;
             Status = order < 3 ? PartyMemberStatus.None : (order == 3 ? PartyMemberStatus.Dead : (PartyMemberStatus)RNG.Next(0, 3));
+            ReadyCheckStatus = (ReadyCheckStatus)RNG.Next(0, 3);
             IsPartyLeader = order == 0;
             HasDispellableDebuff = RNG.Next(0, 2) == 1;
             RaiseTime = order == 2 ? RNG.Next(0, 60) : null;
             InvulnStatus = order == 0 ? new InvulnStatus(3077, RNG.Next(0, 10), 810) : null;
         }
 
-        public void Update(EnmityLevel enmityLevel, PartyMemberStatus status, bool isPartyLeader, uint jobId)
+        public void Update(EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader, uint jobId)
         {
 
         }
@@ -173,11 +179,12 @@ namespace DelvUI.Interface.Party
         public float Shield { get; }
         public EnmityLevel EnmityLevel { get; }
         public PartyMemberStatus Status { get; }
+        public ReadyCheckStatus ReadyCheckStatus { get; }
         public bool IsPartyLeader { get; }
         public float? RaiseTime { get; set; }
         public InvulnStatus? InvulnStatus { get; set; }
         public bool HasDispellableDebuff { get; set; }
 
-        public void Update(EnmityLevel enmityLevel, PartyMemberStatus status, bool isPartyLeader, uint jobId);
+        public void Update(EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader, uint jobId);
     }
 }

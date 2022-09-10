@@ -9,6 +9,7 @@ using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
+using ImGuiScene;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -35,6 +36,8 @@ namespace DelvUI.Interface.Party
         private StatusEffectsListHud _buffsListHud;
         private StatusEffectsListHud _debuffsListHud;
 
+        private TextureWrap? _readyCheckTexture = null;
+
         public bool Visible = false;
         public Vector2 Position;
 
@@ -59,6 +62,8 @@ namespace DelvUI.Interface.Party
             _castbarHud = new CastbarHud(_configs.CastBar);
             _buffsListHud = new StatusEffectsListHud(_configs.Buffs);
             _debuffsListHud = new StatusEffectsListHud(_configs.Debuffs);
+
+            _readyCheckTexture = TexturesCache.Instance.GetTextureFromPath("ui/uld/ReadyCheck_hr1.tex") ?? TexturesCache.Instance.GetTextureFromPath("ui/uld/ReadyCheck.tex");
         }
 
         public PluginConfigColor GetColor(float scale)
@@ -363,8 +368,8 @@ namespace DelvUI.Interface.Party
 
                 if (iconId > 0)
                 {
-                    var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, RoleIcon.FrameAnchor);
-                    var iconPos = Utils.GetAnchoredPosition(parentPos + RoleIcon.Position, RoleIcon.Size, RoleIcon.Anchor);
+                    Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, RoleIcon.FrameAnchor);
+                    Vector2 iconPos = Utils.GetAnchoredPosition(parentPos + RoleIcon.Position, RoleIcon.Size, RoleIcon.Anchor);
 
                     drawActions.Add((RoleIcon.StrataLevel, () =>
                     {
@@ -380,8 +385,8 @@ namespace DelvUI.Interface.Party
             // leader icon
             if (LeaderIcon.Enabled && Member.IsPartyLeader)
             {
-                var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, LeaderIcon.FrameAnchor);
-                var iconPos = Utils.GetAnchoredPosition(parentPos + LeaderIcon.Position, LeaderIcon.Size, LeaderIcon.Anchor);
+                Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, LeaderIcon.FrameAnchor);
+                Vector2 iconPos = Utils.GetAnchoredPosition(parentPos + LeaderIcon.Position, LeaderIcon.Size, LeaderIcon.Anchor);
 
                 drawActions.Add((LeaderIcon.StrataLevel, () =>
                 {
@@ -399,8 +404,8 @@ namespace DelvUI.Interface.Party
                 uint? iconId = IconIdForStatus(Member.Status);
                 if (iconId.HasValue)
                 {
-                    var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, PlayerStatus.Icon.FrameAnchor);
-                    var iconPos = Utils.GetAnchoredPosition(parentPos + PlayerStatus.Icon.Position, PlayerStatus.Icon.Size, PlayerStatus.Icon.Anchor);
+                    Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, PlayerStatus.Icon.FrameAnchor);
+                    Vector2 iconPos = Utils.GetAnchoredPosition(parentPos + PlayerStatus.Icon.Position, PlayerStatus.Icon.Size, PlayerStatus.Icon.Anchor);
 
                     drawActions.Add((PlayerStatus.Icon.StrataLevel, () =>
                     {
@@ -413,11 +418,29 @@ namespace DelvUI.Interface.Party
                 }
             }
 
+            // ready check status icon
+            if (Member.ReadyCheckStatus != ReadyCheckStatus.None && ReadyCheck.Enabled && ReadyCheck.Icon.Enabled && _readyCheckTexture != null)
+            {
+                Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, ReadyCheck.Icon.FrameAnchor);
+                Vector2 iconPos = Utils.GetAnchoredPosition(parentPos + ReadyCheck.Icon.Position, ReadyCheck.Icon.Size, ReadyCheck.Icon.Anchor);
+
+                drawActions.Add((ReadyCheck.Icon.StrataLevel, () =>
+                {
+                    DrawHelper.DrawInWindow(ReadyCheck.Icon.ID, iconPos, ReadyCheck.Icon.Size, false, false, (drawList) =>
+                    {
+                        Vector2 uv0 = new Vector2(0.5f * (int)Member.ReadyCheckStatus, 0f);
+                        Vector2 uv1 = new Vector2(0.5f + 0.5f * (int)Member.ReadyCheckStatus, 1f);
+                        drawList.AddImage(_readyCheckTexture.ImGuiHandle, iconPos, iconPos + ReadyCheck.Icon.Size, uv0, uv1);
+                    });
+                }
+                ));
+            }
+
             // raise icon
             if (ShowingRaise())
             {
-                var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, RaiseTracker.Icon.FrameAnchor);
-                var iconPos = Utils.GetAnchoredPosition(parentPos + RaiseTracker.Icon.Position, RaiseTracker.Icon.Size, RaiseTracker.Icon.Anchor);
+                Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, RaiseTracker.Icon.FrameAnchor);
+                Vector2 iconPos = Utils.GetAnchoredPosition(parentPos + RaiseTracker.Icon.Position, RaiseTracker.Icon.Size, RaiseTracker.Icon.Anchor);
 
                 drawActions.Add((RaiseTracker.Icon.StrataLevel, () =>
                 {
@@ -432,8 +455,8 @@ namespace DelvUI.Interface.Party
             // invuln icon
             if (ShowingInvuln())
             {
-                var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, InvulnTracker.Icon.FrameAnchor);
-                var iconPos = Utils.GetAnchoredPosition(parentPos + InvulnTracker.Icon.Position, InvulnTracker.Icon.Size, InvulnTracker.Icon.Anchor);
+                Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, InvulnTracker.Icon.FrameAnchor);
+                Vector2 iconPos = Utils.GetAnchoredPosition(parentPos + InvulnTracker.Icon.Position, InvulnTracker.Icon.Size, InvulnTracker.Icon.Anchor);
 
                 drawActions.Add((InvulnTracker.Icon.StrataLevel, () =>
                 {
@@ -448,7 +471,7 @@ namespace DelvUI.Interface.Party
             // mana
             if (ShowMana())
             {
-                var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.ManaBar.HealthBarAnchor);
+                Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.ManaBar.HealthBarAnchor);
                 drawActions.Add((_configs.ManaBar.StrataLevel, () =>
                 {
                     _manaBarHud.Actor = character;
@@ -460,7 +483,7 @@ namespace DelvUI.Interface.Party
             }
 
             // buffs / debuffs
-            var buffsPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.Buffs.HealthBarAnchor);
+            Vector2 buffsPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.Buffs.HealthBarAnchor);
             drawActions.Add((_configs.Buffs.StrataLevel, () =>
             {
                 _buffsListHud.Actor = character;
@@ -469,7 +492,7 @@ namespace DelvUI.Interface.Party
             }
             ));
 
-            var debuffsPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.Debuffs.HealthBarAnchor);
+            Vector2 debuffsPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.Debuffs.HealthBarAnchor);
             drawActions.Add((_configs.Debuffs.StrataLevel, () =>
             {
                 _debuffsListHud.Actor = character;
@@ -479,7 +502,7 @@ namespace DelvUI.Interface.Party
             ));
 
             // castbar
-            var castbarPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.CastBar.HealthBarAnchor);
+            Vector2 castbarPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.CastBar.HealthBarAnchor);
             drawActions.Add((_configs.CastBar.StrataLevel, () =>
             {
                 _castbarHud.Actor = character;
@@ -489,10 +512,10 @@ namespace DelvUI.Interface.Party
             ));
 
             // name
-            var showingRaise = ShowingRaise();
-            var showingInvuln = ShowingInvuln();
+            bool showingRaise = ShowingRaise();
+            bool showingInvuln = ShowingInvuln();
 
-            var drawName = ShouldDrawName(character, showingRaise, showingInvuln);
+            bool drawName = ShouldDrawName(character, showingRaise, showingInvuln);
             if (drawName)
             {
                 drawActions.Add((_configs.HealthBar.NameLabelConfig.StrataLevel, () =>
@@ -541,8 +564,8 @@ namespace DelvUI.Interface.Party
             // raise label
             if (showingRaise)
             {
-                var duration = Math.Abs(Member.RaiseTime!.Value);
-                var text = duration < 10 ? duration.ToString("N1", CultureInfo.InvariantCulture) : Utils.DurationToString(duration);
+                float duration = Math.Abs(Member.RaiseTime!.Value);
+                string? text = duration < 10 ? duration.ToString("N1", CultureInfo.InvariantCulture) : Utils.DurationToString(duration);
 
                 drawActions.Add((RaiseTracker.Icon.Label.StrataLevel, () =>
                 {
@@ -555,8 +578,8 @@ namespace DelvUI.Interface.Party
             // invuln label
             if (showingInvuln)
             {
-                var duration = Math.Abs(Member.InvulnStatus!.InvulnTime);
-                var text = duration < 10 ? duration.ToString("N1", CultureInfo.InvariantCulture) : Utils.DurationToString(duration);
+                float duration = Math.Abs(Member.InvulnStatus!.InvulnTime);
+                string? text = duration < 10 ? duration.ToString("N1", CultureInfo.InvariantCulture) : Utils.DurationToString(duration);
 
                 drawActions.Add((InvulnTracker.Icon.Label.StrataLevel, () =>
                 {
@@ -582,6 +605,11 @@ namespace DelvUI.Interface.Party
             }
 
             if (Member != null && PlayerStatus.Enabled && PlayerStatus.HideName && Member.Status != PartyMemberStatus.None)
+            {
+                return false;
+            }
+
+            if (Member != null && ReadyCheck.Enabled && ReadyCheck.HideName && Member.ReadyCheckStatus != ReadyCheckStatus.None)
             {
                 return false;
             }
@@ -644,6 +672,7 @@ namespace DelvUI.Interface.Party
         private PartyFramesRoleIconConfig RoleIcon => _configs.Icons.Role;
         private PartyFramesLeaderIconConfig LeaderIcon => _configs.Icons.Leader;
         private PartyFramesPlayerStatusConfig PlayerStatus => _configs.Icons.PlayerStatus;
+        private PartyFramesReadyCheckStatusConfig ReadyCheck => _configs.Icons.ReadyCheckStatus;
         private PartyFramesRaiseTrackerConfig RaiseTracker => _configs.Trackers.Raise;
         private PartyFramesInvulnTrackerConfig InvulnTracker => _configs.Trackers.Invuln;
         private PartyFramesCleanseTrackerConfig CleanseTracker => _configs.Trackers.Cleanse;
