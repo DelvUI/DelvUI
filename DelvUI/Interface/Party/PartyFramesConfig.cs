@@ -534,8 +534,8 @@ namespace DelvUI.Interface.Party
         public IconConfig Icon = new IconConfig(
             new Vector2(0, 0),
             new Vector2(24, 24),
-            DrawAnchor.Center,
-            DrawAnchor.Center
+            DrawAnchor.TopRight,
+            DrawAnchor.TopRight
         );
     }
 

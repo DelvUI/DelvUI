@@ -18,9 +18,13 @@ namespace DelvUI.Interface.Party
         private Hook<ReadyCheckDelegate>? _onReadyCheckStartHook;
         private Hook<ReadyCheckDelegate>? _onReadyCheckEndHook;
 
+        private delegate void ActorControlDelegate(uint entityId, uint id, uint unk1, uint type, uint unk2, uint unk3, uint unk4, uint unk5, UInt64 targetId, byte unk6);
+        private Hook<ActorControlDelegate>? _actorControlHook;
+
         private IntPtr _readyCheckData = IntPtr.Zero;
         private bool _readyCheckOngoing = false;
         private double _lastReadyCheckEndTime = -1;
+
 
         public PartyReadyCheckHelper()
         {
@@ -33,6 +37,10 @@ namespace DelvUI.Interface.Party
                 IntPtr endPtr = Plugin.SigScanner.ScanText("40 ?? 53 48 ?? ?? ?? ?? 48 81 ?? ?? ?? ?? ?? 48 8B ?? ?? ?? ?? ?? 48 33 ?? ?? 89 ?? ?? ?? 83 ?? ?? ?? 48 8B ?? 75 ?? 48");
                 _onReadyCheckEndHook = Hook<ReadyCheckDelegate>.FromAddress(endPtr, OnReadycheckEnd);
                 _onReadyCheckEndHook?.Enable();
+
+                IntPtr actorControlPtr = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 0F B7 0B 83 E9 64");
+                _actorControlHook = Hook<ActorControlDelegate>.FromAddress(actorControlPtr, OnActorControl);
+                _actorControlHook?.Enable();
             }
             catch (Exception e)
             {
@@ -58,6 +66,9 @@ namespace DelvUI.Interface.Party
 
             _onReadyCheckEndHook?.Disable();
             _onReadyCheckEndHook?.Dispose();
+
+            _actorControlHook?.Disable();
+            _actorControlHook?.Dispose();
         }
 
         private void OnReadyCheckStart(IntPtr ptr)
@@ -73,6 +84,18 @@ namespace DelvUI.Interface.Party
             _readyCheckData = ptr;
             _readyCheckOngoing = false;
             _lastReadyCheckEndTime = ImGui.GetTime();
+        }
+
+        private void OnActorControl(uint entityId, uint id, uint unk1, uint type, uint unk2, uint unk3, uint unk4, uint unk5, UInt64 targetId, byte unk6)
+        {
+            _actorControlHook?.Original(entityId, id, unk1, type, unk2, unk3, unk4, unk5, targetId, unk6);
+
+            // I'm not exactly sure what id == 503 means, but its always triggered when the fight starts
+            // which is all I care about
+            if (id == 503)
+            {
+                _readyCheckData = IntPtr.Zero;
+            }
         }
 
         public void Update(double maxDuration)
