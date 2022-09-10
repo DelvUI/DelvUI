@@ -135,7 +135,7 @@ namespace DelvUI.Interface.PartyCooldowns
             ActorControlHook?.Original(entityId, id, unk1, type, unk2, unk3, unk4, unk5, targetId, unk6);
 
             // detect wipe fadeouts (not 100% reliable but good enough)
-            if (type == 0x40000010)
+            if (type == 0x4000000F)
             {
                 ResetCooldowns();
             }

@@ -1,5 +1,6 @@
 # 1.4.4.0
 - Added a Ready Check Status Icon for the Party Frames.
+- Fixed Party Cooldowns not resetting after a wipe.
 
 # 1.4.3.0
 - Added a "First of my role" setting to the player overridden position for the Party Frames:
