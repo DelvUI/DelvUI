@@ -234,13 +234,24 @@ namespace DelvUI.Interface.Jobs
         protected void DrawTripleCastBar(Vector2 origin, PlayerCharacter player)
         {
             byte stackCount = player.StatusList.FirstOrDefault(o => o.StatusId is 1211)?.StackCount ?? 0;
+            int maxCount = 3;
+
+            if (Config.TriplecastBar.CountSwiftcast)
+            {
+                bool hasSwiftcast = player.StatusList.FirstOrDefault(o => o.StatusId is 167) != null;
+                if (hasSwiftcast)
+                {
+                    stackCount++;
+                    maxCount = stackCount == 4 ? 4 : 3;
+                }
+            }
 
             if (Config.TriplecastBar.HideWhenInactive && stackCount == 0)
             {
                 return;
             };
 
-            BarHud[] bars = BarUtilities.GetChunkedBars(Config.TriplecastBar, 3, stackCount, 3f);
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.TriplecastBar, maxCount, stackCount, maxCount);
             foreach (BarHud bar in bars)
             {
                 AddDrawActions(bar.GetDrawActions(origin, Config.TriplecastBar.StrataLevel));
@@ -417,7 +428,7 @@ namespace DelvUI.Interface.Jobs
         );
 
         [NestedConfig("Triplecast Bar", 50)]
-        public ChunkedBarConfig TriplecastBar = new ChunkedBarConfig(
+        public BlackMageTriplecastBarConfig TriplecastBar = new BlackMageTriplecastBarConfig(
             new(0, -55),
             new(254, 10),
             new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f))
@@ -550,6 +561,19 @@ namespace DelvUI.Interface.Jobs
         public BarGlowConfig GlowConfig = new BarGlowConfig();
 
         public BlackMageParadoxBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+             : base(position, size, fillColor)
+        {
+        }
+    }
+
+    [Exportable(false)]
+    public class BlackMageTriplecastBarConfig : ChunkedBarConfig
+    {
+        [Checkbox("Count Swiftcast" + "##Triplecast", spacing = true)]
+        [Order(50)]
+        public bool CountSwiftcast = false;
+
+        public BlackMageTriplecastBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
              : base(position, size, fillColor)
         {
         }
