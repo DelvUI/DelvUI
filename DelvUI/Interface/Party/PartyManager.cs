@@ -229,15 +229,17 @@ namespace DelvUI.Interface.Party
                     foreach (IPartyFramesMember member in _groupMembers)
                     {
                         int index = member.ObjectId == player.ObjectId ? 0 : member.Order - 1;
+                        ReadyCheckStatus readyCheckStatus = ReadyCheckStatusForMember(member, index, player.ObjectId);
+
                         uint jobId = JobIdForIndex(index);
                         jobsChanged = jobsChanged || jobId != member.JobId;
 
-                        if (index == 0 && member is PartyFramesMember m)
+                        if (index == 0)
                         {
-                            playerMember = m;
+                            playerMember = member as PartyFramesMember;
                         }
 
-                        member.Update(EnmityForIndex(index), StatusForIndex(index), ReadyCheckStatusForIndex(index), IsPartyLeader(index), jobId);
+                        member.Update(EnmityForIndex(index), StatusForIndex(index), readyCheckStatus, IsPartyLeader(index), jobId);
                     }
 
                     if (jobsChanged & playerMember != null)
@@ -246,7 +248,7 @@ namespace DelvUI.Interface.Party
                     }
                 }
                 // cross world party
-                else if (Plugin.PartyList.Length < _realMemberCount)
+                else if (IsCrossWorldParty())
                 {
                     UpdateCrossWorldParty(player);
                 }
@@ -259,6 +261,51 @@ namespace DelvUI.Interface.Party
                 UpdateTrackers();
             }
             catch { }
+        }
+
+        private bool IsCrossWorldParty()
+        {
+            return Plugin.PartyList.Length < _realMemberCount;
+        }
+
+        private ReadyCheckStatus ReadyCheckStatusForMember(IPartyFramesMember member, int index, uint playerId)
+        {
+            if (!_iconsConfig.ReadyCheckStatus.Enabled) { return ReadyCheckStatus.None; }
+
+            bool isCrossWorld = IsCrossWorldParty();
+
+            // regular party
+            if (!isCrossWorld)
+            {
+                //  local player
+                if (member.ObjectId == playerId)
+                {
+                    return _readyCheckHelper.GetStatusForIndex(0, isCrossWorld);
+                }
+
+                // find index 
+                bool foundPlayer = false;
+                for (int i = 0; i < Plugin.PartyList.Length; i++)
+                {
+                    PartyMember dalamudMember = Plugin.PartyList.ElementAt(i);
+                    if (dalamudMember.ObjectId == playerId)
+                    {
+                        foundPlayer = true;
+                        continue;
+                    }
+
+                    if (dalamudMember.ObjectId == member.ObjectId)
+                    {
+                        return _readyCheckHelper.GetStatusForIndex(foundPlayer ? i : i + 1, isCrossWorld);
+                    }
+                }
+            }
+            else
+            {
+                return _readyCheckHelper.GetStatusForIndex(index, isCrossWorld);
+            }
+
+            return ReadyCheckStatus.None;
         }
 
         private void UpdateTrustParty(PlayerCharacter player, int trustCount)
@@ -430,12 +477,11 @@ namespace DelvUI.Interface.Party
                 int order = i + 1;
                 EnmityLevel enmity = EnmityForIndex(i);
                 PartyMemberStatus status = StatusForIndex(i);
-                ReadyCheckStatus readyCheckStatus = ReadyCheckStatusForIndex(i);
                 bool isPartyLeader = IsPartyLeader(i);
 
                 PartyFramesMember member = isPlayer ?
-                    new PartyFramesMember(player, order, enmity, status, readyCheckStatus, isPartyLeader) :
-                    new PartyFramesMember(NameForIndex(i), order, JobIdForIndex(i), status, readyCheckStatus, isPartyLeader);
+                    new PartyFramesMember(player, order, enmity, status, ReadyCheckStatus.None, isPartyLeader) :
+                    new PartyFramesMember(NameForIndex(i), order, JobIdForIndex(i), status, ReadyCheckStatus.None, isPartyLeader);
                 _groupMembers.Add(member);
             }
 
@@ -459,10 +505,9 @@ namespace DelvUI.Interface.Party
                 int index = isPlayer ? 0 : order - 1;
                 EnmityLevel enmity = EnmityForIndex(index);
                 PartyMemberStatus status = StatusForIndex(index);
-                ReadyCheckStatus readyCheckStatus = ReadyCheckStatusForIndex(i);
                 bool isPartyLeader = i == Plugin.PartyList.PartyLeaderIndex;
 
-                PartyFramesMember member = new PartyFramesMember(partyMember, order, enmity, status, readyCheckStatus, isPartyLeader);
+                PartyFramesMember member = new PartyFramesMember(partyMember, order, enmity, status, ReadyCheckStatus.None, isPartyLeader);
 
                 if (isPlayer)
                 {
@@ -567,16 +612,6 @@ namespace DelvUI.Interface.Party
             }
 
             return PartyMemberStatus.None;
-        }
-
-        private ReadyCheckStatus ReadyCheckStatusForIndex(int index)
-        {
-            if (!_iconsConfig.ReadyCheckStatus.Enabled || index < 0 || index > 7)
-            {
-                return ReadyCheckStatus.None;
-            }
-
-            return _readyCheckHelper.GetStatusForIndex(index);
         }
 
         private uint JobIdForIndex(int index)

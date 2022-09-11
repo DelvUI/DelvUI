@@ -1,5 +1,7 @@
 ﻿using Dalamud.Hooking;
 using Dalamud.Logging;
+using Dalamud.Memory;
+using FFXIVClientStructs.FFXIV.Client.UI.Info;
 using ImGuiNET;
 using System;
 
@@ -76,6 +78,8 @@ namespace DelvUI.Interface.Party
             _onReadyCheckStartHook?.Original(ptr);
             _readyCheckData = ptr;
             _readyCheckOngoing = true;
+
+            PluginLog.Log(_readyCheckData.ToString("X"));
         }
 
         private void OnReadycheckEnd(IntPtr ptr)
@@ -106,21 +110,48 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        public unsafe ReadyCheckStatus GetStatusForIndex(int index)
+        public unsafe ReadyCheckStatus GetStatusForIndex(int index, bool isCrossWorld)
         {
             if (_readyCheckData == IntPtr.Zero || index < 0 || index > 7)
             {
                 return ReadyCheckStatus.None;
             }
 
-            int* ptr = (int*)(_readyCheckData + 0xB8 + (0x10 * index));
-            int rawStatus = *ptr;
+            int rawStatus = -1;
+            if (!isCrossWorld)
+            {
+                int* ptr = (int*)(_readyCheckData + 0xB8 + (0x10 * index));
+                rawStatus = *ptr;
+            }
+            else
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    long* ptr = (long*)(_readyCheckData + 0xB0 + (0x10 * i));
+                    long id = *ptr;
 
-            if (rawStatus == 2)
+                    CrossRealmMember* member = InfoProxyCrossRealm.GetMemberByContentId((ulong)id);
+                    if (member == null) { continue; }
+
+                    if (member->MemberIndex == index)
+                    {
+                        int* p = (int*)(_readyCheckData + 0xB8 + (0x10 * i));
+                        rawStatus = *p;
+                        break;
+                    }
+                }
+            }
+
+            return ParseStatus(rawStatus);
+        }
+
+        private ReadyCheckStatus ParseStatus(int rawValue)
+        {
+            if (rawValue == 2)
             {
                 return ReadyCheckStatus.Ready;
             }
-            else if (rawStatus > 2 && rawStatus < 5)
+            else if (rawValue > 2 && rawValue < 5)
             {
                 return ReadyCheckStatus.NotReady;
             }
