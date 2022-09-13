@@ -215,7 +215,7 @@ namespace DelvUI.Interface.Party
             }
 
             float hpScale = maxHp > 0 ? (float)currentHp / (float)maxHp : 1;
-            PluginConfigColor? hpColor = _configs.HealthBar.RangeConfig.Enabled
+            PluginConfigColor? hpColor = _configs.HealthBar.RangeConfig.Enabled && character != null
             ? GetDistanceColor(character, GetColor(hpScale))
             : GetColor(hpScale);
 

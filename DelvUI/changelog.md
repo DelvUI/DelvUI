@@ -1,4 +1,7 @@
 # 1.4.4.1
+- Fixed abilities and status effect names for German, French and Japanese in Abyssos (Savage).
+- Fixed tooltipes being shown when mouseovering on hidden elements.
+- Fixed Party Frames preview looking too dark.
 - Fixed Enemy List Shadows.
 
 # 1.4.4.0

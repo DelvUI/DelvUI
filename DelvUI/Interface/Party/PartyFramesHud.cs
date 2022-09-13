@@ -290,7 +290,7 @@ namespace DelvUI.Interface.Party
             // area bg
             if (Config.Preview)
             {
-                AddDrawAction(Config.StrataLevel, () =>
+                AddDrawAction(StrataLevel.LOWEST, () =>
                 {
                     ImDrawListPtr drawList = ImGui.GetWindowDrawList();
                     Vector2 bgPos = origin + Config.Position - _contentMargin;
