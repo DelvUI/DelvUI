@@ -1,3 +1,8 @@
+# 1.4.4.1
+- Fixed abilities and status effect names for German, French and Japanese in Abyssos (Savage).
+- Fixed tooltipes being shown when mouseovering on hidden elements.
+- Fixed Party Frames preview looking too dark.
+
 # 1.4.4.0
 - Added a Ready Check Status Icon for the Party Frames.
 - Added a "Count Swiftcast" setting to Black Mage's Triplecast Bar, which will add an extra charge to the bar when the buff is active.

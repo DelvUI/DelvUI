@@ -96,7 +96,10 @@ namespace DelvUI.Helpers
         {
             foreach (DraggableHudElement element in elements)
             {
-                element.PrepareForDraw(origin);
+                if (!hudHelper.IsElementHidden(element))
+                {
+                    element.PrepareForDraw(origin);
+                }
             }
 
             jobHud?.PrepareForDraw(origin);
