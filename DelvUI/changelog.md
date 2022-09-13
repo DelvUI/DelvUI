@@ -1,3 +1,6 @@
+# 1.4.4.1
+- Fixed Enemy List Shadows.
+
 # 1.4.4.0
 - Added a Ready Check Status Icon for the Party Frames.
 - Added a "Count Swiftcast" setting to Black Mage's Triplecast Bar, which will add an extra charge to the bar when the buff is active.
