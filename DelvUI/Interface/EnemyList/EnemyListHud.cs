@@ -163,7 +163,8 @@ namespace DelvUI.Interface.EnemyList
                     GetBorderThickness(character),
                     DrawAnchor.TopLeft,
                     current: currentHp,
-                    max: maxHp
+                    max: maxHp,
+                    shadowConfig: Configs.HealthBar.ShadowConfig
                 );
 
                 bar.SetBackground(background);
