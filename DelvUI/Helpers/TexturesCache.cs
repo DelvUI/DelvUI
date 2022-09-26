@@ -145,7 +145,7 @@ namespace DelvUI.Helpers
 
         private TexturesCache()
         {
-            _penumbraPathResolver = Plugin.PluginInterface.GetIpcSubscriber<string, string>("Penumbra.ResolveDefaultPath");
+            _penumbraPathResolver = Plugin.PluginInterface.GetIpcSubscriber<string, string>("Penumbra.ResolveInterfacePath");
         }
 
         public static void Initialize() { Instance = new TexturesCache(); }

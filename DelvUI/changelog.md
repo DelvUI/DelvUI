@@ -1,3 +1,6 @@
+# 1.4.5.0
+- Fixed DelvUI not working properly with Penumbra v0.5.8.0 and their new Interface Collection.
+
 # 1.4.4.1
 - Fixed abilities and status effect names for German, French and Japanese in Abyssos (Savage).
 - Fixed tooltipes being shown when mouseovering on hidden elements.
