@@ -32,7 +32,7 @@ namespace DelvUI.Interface.EnemyList
         private LabelHud _nameLabelHud;
         private LabelHud _healthLabelHud;
         private LabelHud _orderLabelHud;
-        private TargetCastbarHud _castbarHud;
+        private EnemyListCastbarHud _castbarHud;
         private StatusEffectsListHud _buffsListHud;
         private StatusEffectsListHud _debuffsListHud;
 
@@ -48,7 +48,7 @@ namespace DelvUI.Interface.EnemyList
             _healthLabelHud = new LabelHud(Configs.HealthBar.HealthLabel);
             _orderLabelHud = new LabelHud(Configs.HealthBar.OrderLabel);
 
-            _castbarHud = new TargetCastbarHud(Configs.CastBar);
+            _castbarHud = new EnemyListCastbarHud(Configs.CastBar);
             _buffsListHud = new StatusEffectsListHud(Configs.Buffs);
             _debuffsListHud = new StatusEffectsListHud(Configs.Debuffs);
 
@@ -271,6 +271,7 @@ namespace DelvUI.Interface.EnemyList
                 });
 
                 // castbar
+                _castbarHud.EnemyListIndex = i;
                 var castbarPos = Utils.GetAnchoredPosition(origin + pos, -Configs.HealthBar.Size, Configs.CastBar.HealthBarAnchor);
                 AddDrawAction(Configs.CastBar.StrataLevel, () =>
                 {

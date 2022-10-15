@@ -1,21 +1,21 @@
 using Colourful;
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Statuses;
 using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using Dalamud.Game.ClientState.Objects.SubKinds;
 using StructsCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace DelvUI.Helpers
 {
@@ -393,7 +393,7 @@ namespace DelvUI.Helpers
             for (int i = 0; i < 200; i += 2)
             {
                 GameObject? actor = actors[i];
-                if (actor?.ObjectId == target.TargetObjectId) 
+                if (actor?.ObjectId == target.TargetObjectId)
                 {
                     return actor;
                 }
@@ -491,6 +491,27 @@ namespace DelvUI.Helpers
                 if (addon->UldManager.NodeListCount < 16) { return true; }
 
                 return addon->UldManager.NodeList[16]->IsVisible;
+            }
+
+            return null;
+        }
+
+        public static unsafe bool? IsEnemyInListCasting(int index)
+        {
+            if (index < 0 || index > 7) { return null; }
+
+            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_EnemyList", 1);
+            if (addon != null && addon->IsVisible)
+            {
+                if (addon->UldManager.NodeListCount < 11) { return true; }
+
+                AtkResNode* node = addon->UldManager.NodeList[11 - index];
+                if (node == null || !node->IsVisible) { return false; }
+
+                AtkComponentBase* component = node->GetComponent();
+                if (component == null || component->UldManager.NodeListCount < 12) { return true; }
+
+                return component->UldManager.NodeList[12]->IsVisible;
             }
 
             return null;

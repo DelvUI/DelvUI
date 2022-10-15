@@ -5,6 +5,7 @@ using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
+using DelvUI.Interface.EnemyList;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
@@ -337,6 +338,29 @@ namespace DelvUI.Interface.GeneralElements
                 {
                     return focusTargetCasting.Value;
                 }
+            }
+
+            return true;
+        }
+    }
+
+    public class EnemyListCastbarHud : TargetCastbarHud
+    {
+        private EnemyListCastbarConfig Config => (EnemyListCastbarConfig)_config;
+
+        public int EnemyListIndex = 0;
+
+        public EnemyListCastbarHud(EnemyListCastbarConfig config, string? displayName = null) : base(config, displayName)
+        {
+
+        }
+
+        public override unsafe bool ShouldShow()
+        {
+            bool? casting = Utils.IsEnemyInListCasting(EnemyListIndex);
+            if (casting.HasValue)
+            {
+                return casting.Value;
             }
 
             return true;

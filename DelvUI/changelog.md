@@ -1,3 +1,6 @@
+# 1.4.5.1
+- Fixed Enemy List castbars not working properly.
+
 # 1.4.5.0
 - Fixed DelvUI not working properly with Penumbra v0.5.8.0 and their new Interface Collection.
 
