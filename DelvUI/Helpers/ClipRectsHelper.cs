@@ -108,6 +108,7 @@ namespace DelvUI.Helpers
             "LookingForGroupCondition",
             "LookingForGroupDetail",
             "LookingForGroup",
+            "VVDFinder",
             "ReadyCheck",
             "Marker",
             "FieldMarker",
