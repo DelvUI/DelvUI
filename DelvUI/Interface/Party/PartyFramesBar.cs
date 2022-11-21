@@ -544,7 +544,7 @@ namespace DelvUI.Interface.Party
                 drawActions.Add((_configs.HealthBar.OrderNumberConfig.StrataLevel, () =>
                 {
                     _configs.HealthBar.OrderNumberConfig.SetText(str);
-                    _orderLabelHud.Draw(Position, _configs.HealthBar.Size);
+                    _orderLabelHud.Draw(Position, _configs.HealthBar.Size, character);
                 }
                 ));
             }

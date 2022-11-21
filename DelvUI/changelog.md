@@ -1,3 +1,6 @@
+# 1.4.5.2
+- Fixed job and role colors not working properly for the Party Frames Health Bar's order label.
+
 # 1.4.5.1
 - Fixed Enemy List castbars not working properly.
 
