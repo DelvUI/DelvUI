@@ -6,12 +6,15 @@ using Dalamud.Game.ClientState.Party;
 using Dalamud.Memory;
 using DelvUI.Config;
 using DelvUI.Helpers;
+using FFXIVClientStructs.FFXIV.Client.Game.Group;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using StructsFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework;
+using DalamudPartyMember = Dalamud.Game.ClientState.Party.PartyMember;
+using StructsPartyMember = FFXIVClientStructs.FFXIV.Client.Game.Group.PartyMember;
 
 namespace DelvUI.Interface.Party
 {
@@ -96,8 +99,8 @@ namespace DelvUI.Interface.Party
         private const int PartyListMemberRawInfoSize = 0x20;
         private const int PartyJobIconIdsOffset = 0x1298;
 
-        private const int PartyCrossWorldNameOffset = 0x101A;
-        private const int PartyCrossWorldDisplayNameOffset = 0x0FB2;
+        private const int PartyCrossWorldNameOffset = 0x14CA;
+        private const int PartyCrossWorldDisplayNameOffset = 0x1462;
         private const int PartyCrossWorldEntrySize = 0xD8;
 
         private const int PartyTrustNameOffset = 0x0CF0;
@@ -113,6 +116,9 @@ namespace DelvUI.Interface.Party
         private List<IPartyFramesMember> _groupMembers = new List<IPartyFramesMember>();
         public IReadOnlyCollection<IPartyFramesMember> GroupMembers => _groupMembers.AsReadOnly();
         public uint MemberCount => (uint)_groupMembers.Count;
+        
+        private uint _groupMemberCount => GroupManager.Instance()->MemberCount;
+        private int _realMemberCount => PartyListAddon != null ? PartyListAddon->MemberCount : Plugin.PartyList.Length;
 
         private PartyReadyCheckHelper _readyCheckHelper;
         private PartyFramesRaiseTracker _raiseTracker;
@@ -162,8 +168,6 @@ namespace DelvUI.Interface.Party
 
             Update();
         }
-
-        private int _realMemberCount => PartyListAddon != null ? PartyListAddon->MemberCount : Plugin.PartyList.Length;
 
         private void Update()
         {
@@ -265,7 +269,7 @@ namespace DelvUI.Interface.Party
 
         private bool IsCrossWorldParty()
         {
-            return Plugin.PartyList.Length < _realMemberCount;
+            return _groupMemberCount < _realMemberCount;
         }
 
         private ReadyCheckStatus ReadyCheckStatusForMember(IPartyFramesMember member, int index, uint playerId)
@@ -287,14 +291,14 @@ namespace DelvUI.Interface.Party
                 bool foundPlayer = false;
                 for (int i = 0; i < Plugin.PartyList.Length; i++)
                 {
-                    PartyMember dalamudMember = Plugin.PartyList.ElementAt(i);
-                    if (dalamudMember.ObjectId == playerId)
+                    DalamudPartyMember? dalamudMember = GetPartyMemberForIndex(i);
+                    if (dalamudMember?.ObjectId == playerId)
                     {
                         foundPlayer = true;
                         continue;
                     }
 
-                    if (dalamudMember.ObjectId == member.ObjectId)
+                    if (dalamudMember?.ObjectId == member.ObjectId)
                     {
                         return _readyCheckHelper.GetStatusForIndex(foundPlayer ? i : i + 1, isCrossWorld);
                     }
@@ -495,9 +499,9 @@ namespace DelvUI.Interface.Party
 
             PartyFramesMember? playerMember = null;
 
-            for (int i = 0; i < Plugin.PartyList.Length; i++)
+            for (int i = 0; i < _groupMemberCount; i++)
             {
-                var partyMember = Plugin.PartyList[i];
+                DalamudPartyMember? partyMember = GetPartyMemberForIndex(i);
                 if (partyMember == null) { continue; }
 
                 bool isPlayer = partyMember.ObjectId == player.ObjectId;
@@ -528,6 +532,17 @@ namespace DelvUI.Interface.Party
             }
 
             Sort(player, playerMember);
+        }
+
+        private DalamudPartyMember? GetPartyMemberForIndex(int index)
+        {
+            if (_groupMemberCount <= 0)
+            {
+                return null;
+            }
+
+            StructsPartyMember* memberStruct = GroupManager.Instance()->GetPartyMemberByIndex(index);
+            return Plugin.PartyList.CreatePartyMemberReference(new IntPtr(memberStruct));
         }
 
         private void Sort(PlayerCharacter player, PartyFramesMember? playerMember)
@@ -667,7 +682,7 @@ namespace DelvUI.Interface.Party
             return index == partyLeadIndex;
         }
 
-        private int? IndexForPartyMember(PartyMember member)
+        private int? IndexForPartyMember(Dalamud.Game.ClientState.Party.PartyMember member)
         {
             if (_partyMembersInfo == null || _partyMembersInfo.Count == 0)
             {
