@@ -145,7 +145,7 @@ namespace DelvUI.Interface.StatusEffects
                 }
                 else
                 {
-                    status = (StatusStruct*)character!.StatusList[i]?.Address;
+                    status = character?.StatusList[i] == null ? null : (StatusStruct*)character.StatusList[i]!.Address;
                 }
 
                 if (status == null || status->StatusID == 0)
@@ -162,7 +162,7 @@ namespace DelvUI.Interface.StatusEffects
                 }
                 else
                 {
-                    data = character!.StatusList[i]?.GameData;
+                    data = character?.StatusList[i]?.GameData;
                 }
                 if (data == null)
                 {
@@ -183,13 +183,13 @@ namespace DelvUI.Interface.StatusEffects
                 }
 
                 // buffs
-                if (!Config.ShowBuffs && data.Category == 1)
+                if (!Config.ShowBuffs && data.StatusCategory == 1)
                 {
                     continue;
                 }
 
                 // debuffs
-                if (!Config.ShowDebuffs && data.Category != 1)
+                if (!Config.ShowDebuffs && data.StatusCategory != 1)
                 {
                     continue;
                 }
@@ -478,7 +478,7 @@ namespace DelvUI.Interface.StatusEffects
                 bool isFromPlayer = data.Status.SourceID == Plugin.ClientState.LocalPlayer?.ObjectId;
                 bool isTheEcho = data.Status.StatusID is 42 or 239;
 
-                if (data.Data.Category == 1 && (isFromPlayer || isTheEcho) && rightClick)
+                if (data.Data.StatusCategory == 1 && (isFromPlayer || isTheEcho) && rightClick)
                 {
                     ChatHelper.SendChatMessage("/statusoff \"" + data.Data.Name + "\"");
 

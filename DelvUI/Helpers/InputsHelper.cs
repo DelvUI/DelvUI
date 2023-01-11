@@ -66,7 +66,8 @@ namespace DelvUI.Helpers
 
             try
             {
-                _requestActionHook = Hook<UseActionDelegate>.FromAddress((IntPtr)ActionManager.fpUseAction, HandleRequestAction);
+                IntPtr ptr = Plugin.SigScanner.ScanText(ActionManager.Addresses.UseAction.String);
+                _requestActionHook = Hook<UseActionDelegate>.FromAddress(ptr, HandleRequestAction);
                 _requestActionHook?.Enable();
             }
             catch
