@@ -1,5 +1,5 @@
 # 1.5.0.0
-- Added .NET 7 and Dalamud API8 support.
+- Added support for Patch 6.3 and Dalamud Api8.
 
 # 1.4.5.2
 - Fixed job and role colors not working properly for the Party Frames Health Bar's order label.

@@ -464,8 +464,8 @@ namespace DelvUI.Interface.StatusEffects
                 if (Config.ShowTooltips)
                 {
                     TooltipsHelper.Instance.ShowTooltipOnCursor(
-                        EncryptedStringsHelper.GetStatusDescriptionString(data.Status.StatusID) ?? data.Data.Description.ToDalamudString().ToString(),
-                        EncryptedStringsHelper.GetStatusNameString(data.Status.StatusID) ?? data.Data.Name,
+                        EncryptedStringsHelper.GetString(data.Data.Description.ToDalamudString().ToString()),
+                        EncryptedStringsHelper.GetString(data.Data.Name),
                         data.Status.StatusID,
                         GetStatusActorName(data.Status)
                     );
