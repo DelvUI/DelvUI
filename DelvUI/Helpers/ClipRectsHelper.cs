@@ -104,6 +104,8 @@ namespace DelvUI.Helpers
             "Social",
             "SocialDetailA",
             "SocialDetailB",
+            "NeedGreed",
+            "BannerMIP",
             "LookingForGroupSearch",
             "LookingForGroupCondition",
             "LookingForGroupDetail",
