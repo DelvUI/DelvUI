@@ -247,11 +247,11 @@ namespace DelvUI.Interface.PartyCooldowns
 
             if (ImGui.BeginTable("##DelvUI_PartyCooldownsTable", 7, flags, new Vector2(800, 500)))
             {
-                ImGui.TableSetupColumn("Enabled", ImGuiTableColumnFlags.WidthStretch, 6, 0);
+                ImGui.TableSetupColumn("Enabled", ImGuiTableColumnFlags.WidthStretch, 9, 0);
                 ImGui.TableSetupColumn("Icon", ImGuiTableColumnFlags.WidthStretch, 5, 1);
-                ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch, 22, 2);
-                ImGui.TableSetupColumn("Cooldown", ImGuiTableColumnFlags.WidthStretch, 10, 3);
-                ImGui.TableSetupColumn("Duration", ImGuiTableColumnFlags.WidthStretch, 10, 4);
+                ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch, 24, 2);
+                ImGui.TableSetupColumn("Cooldown", ImGuiTableColumnFlags.WidthStretch, 12, 3);
+                ImGui.TableSetupColumn("Duration", ImGuiTableColumnFlags.WidthStretch, 12, 4);
                 ImGui.TableSetupColumn("Priority", ImGuiTableColumnFlags.WidthStretch, 22, 5);
                 ImGui.TableSetupColumn("Section", ImGuiTableColumnFlags.WidthStretch, 22, 6);
 
@@ -298,7 +298,7 @@ namespace DelvUI.Interface.PartyCooldowns
                     // cooldown
                     if (ImGui.TableSetColumnIndex(3))
                     {
-                        string cooldownText = cooldown.OverriddenCooldownText != null ? cooldown.OverriddenCooldownText : $"{cooldown.EffectDuration}";
+                        string cooldownText = cooldown.OverriddenCooldownText != null ? cooldown.OverriddenCooldownText : $"{cooldown.CooldownDuration}";
                         ImGui.Text(cooldownText);
                     }
 
@@ -364,7 +364,7 @@ namespace DelvUI.Interface.PartyCooldowns
             [7535] = NewData(7535, JobRoles.Tank, 22, 60, 10, 100, 1), // reprisal
             [3540] = NewData(3540, JobIDs.PLD, 56, 90, 30, 90, 2), // divine veil
             [7385] = NewData(7385, JobIDs.PLD, 70, 120, 18, 90, 2), // passage of arms
-            [7388] = NewData(7388, JobIDs.WAR, 68, 90, 15, 90, 2), // shake it off
+            [7388] = NewData(7388, JobIDs.WAR, 68, 90, 30, 90, 2), // shake it off
             [16471] = NewData(16471, JobIDs.DRK, 76, 90, 15, 90, 2), // dark missionary
             [16160] = NewData(16160, JobIDs.GNB, 64, 90, 15, 90, 2), // heart of light
 
@@ -393,7 +393,7 @@ namespace DelvUI.Interface.PartyCooldowns
             // RANGED
             [118] = NewData(118, JobIDs.BRD, 50, 120, 15, 30, 3), // battle voice
             [7405] = NewData(7405, JobIDs.BRD, 62, 90, 15, 70, 2, true, "90-120"), // troubadour
-            [7408] = NewData(7408, JobIDs.BRD, 66, 90, 15, 40, 2), // nature's minne
+            [7408] = NewData(7408, JobIDs.BRD, 66, 120, 15, 40, 2), // nature's minne
             [25785] = NewData(25785, JobIDs.BRD, 90, 110, 15, 30, 3), // radiant finale
             [16012] = NewData(16012, JobIDs.DNC, 56, 90, 15, 70, 2, true, "90-120"), // shield samba
             [16004] = NewData(16004, JobIDs.DNC, 70, 120, 20, 30, 3), // technical step / finish
