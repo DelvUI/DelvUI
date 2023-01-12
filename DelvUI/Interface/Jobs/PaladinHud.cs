@@ -18,10 +18,6 @@ namespace DelvUI.Interface.Jobs
     {
         private new PaladinConfig Config => (PaladinConfig)_config;
 
-        // goring blade and blade of valor
-        private static readonly List<uint> DoTIDs = new() { 725, 2721 };
-        private static readonly List<float> DoTDurations = new() { 21, 21 };
-
         public PaladinHud(PaladinConfig config, string? displayName = null) : base(config, displayName)
         {
         }
@@ -81,11 +77,6 @@ namespace DelvUI.Interface.Jobs
             {
                 DrawAtonementBar(pos, player);
             }
-
-            if (Config.GoringBladeBar.Enabled)
-            {
-                DrawDoTBar(pos, player);
-            }
         }
 
         private void DrawOathGauge(Vector2 origin, PlayerCharacter player)
@@ -112,7 +103,7 @@ namespace DelvUI.Interface.Jobs
             {
                 Config.FightOrFlightBar.Label.SetValue(fightOrFlightDuration);
 
-                BarHud bar = BarUtilities.GetProgressBar(Config.FightOrFlightBar, fightOrFlightDuration, 25f, 0f, player);
+                BarHud bar = BarUtilities.GetProgressBar(Config.FightOrFlightBar, fightOrFlightDuration, 20f, 0f, player);
                 AddDrawActions(bar.GetDrawActions(origin, Config.FightOrFlightBar.StrataLevel));
             }
         }
@@ -125,9 +116,9 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.RequiescatStacksBar.HideWhenInactive || requiescatDuration > 0)
             {
-                var chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[5];
+                var chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[4];
 
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 4; i++)
                 {
                     chunks[i] = new(Config.RequiescatStacksBar.FillColor, i < stacks ? 1 : 0, i == 2 ? Config.RequiescatStacksBar.Label : null);
                 }
@@ -152,17 +143,6 @@ namespace DelvUI.Interface.Jobs
             foreach (BarHud bar in bars)
             {
                 AddDrawActions(bar.GetDrawActions(origin, Config.AtonementBar.StrataLevel));
-            }
-        }
-
-        private void DrawDoTBar(Vector2 origin, PlayerCharacter player)
-        {
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-
-            BarHud? bar = BarUtilities.GetDoTBar(Config.GoringBladeBar, player, target, DoTIDs, DoTDurations);
-            if (bar != null)
-            {
-                AddDrawActions(bar.GetDrawActions(origin, Config.GoringBladeBar.StrataLevel));
             }
         }
     }
@@ -213,16 +193,6 @@ namespace DelvUI.Interface.Jobs
             new Vector2(0, -10),
             new Vector2(254, 20),
             new PluginConfigColor(new Vector4(240f / 255f, 176f / 255f, 0f / 255f, 100f / 100f))
-        );
-
-        [NestedConfig("DoT Bar", 55)]
-        public ProgressBarConfig GoringBladeBar = new ProgressBarConfig(
-            new(0, -76),
-            new(254, 20),
-            new PluginConfigColor(new Vector4(255f / 255f, 128f / 255f, 0f / 255f, 100f / 100f)),
-            BarDirection.Right,
-            new PluginConfigColor(new Vector4(233f / 255f, 33f / 255f, 33f / 255f, 53f / 100f)),
-            5
         );
     }
 }

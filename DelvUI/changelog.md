@@ -1,5 +1,7 @@
 # 1.5.0.0
 - Added support for Patch 6.3 and Dalamud Api8.
+- Removed the DoT Bar from Paladin's hud.
+- Made improvements to better handle obfuscated abilities and status effect names in future raids.
 
 # 1.4.5.2
 - Fixed job and role colors not working properly for the Party Frames Health Bar's order label.
