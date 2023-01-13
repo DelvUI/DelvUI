@@ -139,7 +139,7 @@ namespace DelvUI.Interface.Jobs
             {
                 Config.OverheatGauge.Label.SetValue(gauge.OverheatTimeRemaining / 1000f);
 
-                BarHud bar = BarUtilities.GetProgressBar(Config.OverheatGauge, gauge.OverheatTimeRemaining / 1000f, 8, 0f, player);
+                BarHud bar = BarUtilities.GetProgressBar(Config.OverheatGauge, gauge.OverheatTimeRemaining / 1000f, 10, 0f, player);
                 AddDrawActions(bar.GetDrawActions(origin, Config.OverheatGauge.StrataLevel));
             }
         }
