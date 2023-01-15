@@ -437,7 +437,8 @@ namespace DelvUI.Interface.Party
             }
 
             // raise icon
-            if (ShowingRaise())
+            bool showingRaise = ShowingRaise();
+            if (showingRaise && RaiseTracker.Icon.Enabled)
             {
                 Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, RaiseTracker.Icon.FrameAnchor);
                 Vector2 iconPos = Utils.GetAnchoredPosition(parentPos + RaiseTracker.Icon.Position, RaiseTracker.Icon.Size, RaiseTracker.Icon.Anchor);
@@ -453,7 +454,8 @@ namespace DelvUI.Interface.Party
             }
 
             // invuln icon
-            if (ShowingInvuln())
+            bool showingInvuln = ShowingInvuln();
+            if (showingInvuln && InvulnTracker.Icon.Enabled)
             {
                 Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, InvulnTracker.Icon.FrameAnchor);
                 Vector2 iconPos = Utils.GetAnchoredPosition(parentPos + InvulnTracker.Icon.Position, InvulnTracker.Icon.Size, InvulnTracker.Icon.Anchor);
@@ -512,9 +514,6 @@ namespace DelvUI.Interface.Party
             ));
 
             // name
-            bool showingRaise = ShowingRaise();
-            bool showingInvuln = ShowingInvuln();
-
             bool drawName = ShouldDrawName(character, showingRaise, showingInvuln);
             if (drawName)
             {

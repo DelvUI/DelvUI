@@ -1,3 +1,7 @@
+# 1.5.0.1
+- Added Machinist's Dismatle to Party Cooldowns.
+- Fixed Invulnerabilities and Raise Trackers' icons not being disableable.
+
 # 1.5.0.0
 - Added support for Patch 6.3 and Dalamud Api8.
 - Removed the DoT Bar from Paladin's hud.
