@@ -398,6 +398,7 @@ namespace DelvUI.Interface.PartyCooldowns
             [16012] = NewData(16012, JobIDs.DNC, 56, 90, 15, 70, 2, true, "90-120"), // shield samba
             [16004] = NewData(16004, JobIDs.DNC, 70, 120, 20, 30, 3), // technical step / finish
             [16889] = NewData(16889, JobIDs.MCH, 56, 90, 15, 70, 2, true, "90-120"), // tactician
+            [2887] = NewData(2887, JobIDs.MCH, 62, 120, 10, 70, 2, true), // dismantle
 
             // CASTER
             [7560] = NewData(7560, JobRoles.DPSCaster, 8, 90, 10, 100, 1), // addle
