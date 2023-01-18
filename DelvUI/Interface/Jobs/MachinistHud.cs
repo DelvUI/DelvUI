@@ -1,9 +1,12 @@
 ﻿using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
+using DelvUI.Interface.GeneralElements;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,10 +30,10 @@ namespace DelvUI.Interface.Jobs
             List<Vector2> positions = new List<Vector2>();
             List<Vector2> sizes = new List<Vector2>();
 
-            if (Config.OverheatGauge.Enabled)
+            if (Config.OverheatChunkedGauge.Enabled)
             {
-                positions.Add(Config.Position + Config.OverheatGauge.Position);
-                sizes.Add(Config.OverheatGauge.Size);
+                positions.Add(Config.Position + Config.OverheatChunkedGauge.Position);
+                sizes.Add(Config.OverheatChunkedGauge.Size);
             }
 
             if (Config.HeatGauge.Enabled)
@@ -52,7 +55,7 @@ namespace DelvUI.Interface.Jobs
         {
             Vector2 pos = origin + Config.Position;
 
-            if (Config.OverheatGauge.Enabled)
+            if (Config.OverheatChunkedGauge.Enabled)
             {
                 DrawOverheatBar(pos, player);
             }
@@ -118,15 +121,16 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.AutomatonBar.HideWhenInactive || gauge.IsRobotActive)
             {
+                float remaining = gauge.SummonTimeRemaining / 1000f;
                 if (!_robotMaxDurationSet && gauge.IsRobotActive)
                 {
-                    _robotMaxDuration = gauge.SummonTimeRemaining / 1000f;
+                    _robotMaxDuration = remaining;
                     _robotMaxDurationSet = true;
                 }
+                
+                Config.AutomatonBar.Label.SetValue(remaining);
 
-                Config.AutomatonBar.Label.SetValue(gauge.SummonTimeRemaining / 1000f);
-
-                BarHud bar = BarUtilities.GetProgressBar(Config.AutomatonBar, gauge.SummonTimeRemaining / 1000, _robotMaxDuration > 0 ? _robotMaxDuration : 1f, 0f, player);
+                BarHud bar = BarUtilities.GetProgressBar(Config.AutomatonBar, remaining, _robotMaxDuration > 0 ? _robotMaxDuration : 1f, 0f, player);
                 AddDrawActions(bar.GetDrawActions(origin, Config.AutomatonBar.StrataLevel));
             }
         }
@@ -134,13 +138,23 @@ namespace DelvUI.Interface.Jobs
         private void DrawOverheatBar(Vector2 origin, PlayerCharacter player)
         {
             MCHGauge gauge = Plugin.JobGauges.Get<MCHGauge>();
+            byte stackCount = player.StatusList.FirstOrDefault(o => o.StatusId is 2688)?.StackCount ?? 0;
 
-            if (!Config.OverheatGauge.HideWhenInactive || gauge.IsOverheated)
+            if (!Config.OverheatChunkedGauge.HideWhenInactive || stackCount > 0)
             {
-                Config.OverheatGauge.Label.SetValue(gauge.OverheatTimeRemaining / 1000f);
+                LabelConfig[]? labels = null;
+                if (Config.OverheatChunkedGauge.DurationLabel.Enabled)
+                {
+                    Config.OverheatChunkedGauge.DurationLabel.SetValue(gauge.OverheatTimeRemaining / 1000f);
+                    labels = new LabelConfig[5];
+                    labels[2] = Config.OverheatChunkedGauge.DurationLabel;
+                }
 
-                BarHud bar = BarUtilities.GetProgressBar(Config.OverheatGauge, gauge.OverheatTimeRemaining / 1000f, 10, 0f, player);
-                AddDrawActions(bar.GetDrawActions(origin, Config.OverheatGauge.StrataLevel));
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.OverheatChunkedGauge, 5, stackCount, 5, labels: labels );
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.OverheatChunkedGauge.StrataLevel));
+                }
             }
         }
 
@@ -174,7 +188,7 @@ namespace DelvUI.Interface.Jobs
         }
 
         [NestedConfig("Overheat Gauge", 30)]
-        public ProgressBarConfig OverheatGauge = new ProgressBarConfig(
+        public MachinistOverheatBarConfig OverheatChunkedGauge = new MachinistOverheatBarConfig(
             new Vector2(0, -54),
             new Vector2(254, 20),
             new PluginConfigColor(new Vector4(255f / 255f, 239f / 255f, 14f / 255f, 100f / 100f))
@@ -224,6 +238,20 @@ namespace DelvUI.Interface.Jobs
 
         public MachinistBatteryGaugeConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
         {
+        }
+    }
+
+    [Exportable(false)]
+    public class MachinistOverheatBarConfig : ChunkedBarConfig
+    {
+        [NestedConfig("Duration Text", 1000)]
+        public NumericLabelConfig DurationLabel;
+
+        public MachinistOverheatBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+             : base(position, size, fillColor)
+        {
+            DurationLabel = new NumericLabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+            DurationLabel.HideIfZero = true;
         }
     }
 }
