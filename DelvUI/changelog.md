@@ -1,10 +1,14 @@
 # 1.5.1.0
-- Fixed tooltips sometimes cutting off.
-- Fixed Machinist Automaton Queen Bar's choppiness.
+Features:
+- Added Sign Icons to all Unit Frames, Party Frames and Enemy List.
 - Reworked Machinist's Overheat Bar:
     + It now uses chunks for the 5 stacks.
     + The label displays the remaining duration of the buff.
     + Due to these changes, the settings for this bar will be reset.
+
+Fixes:
+- Fixed tooltips sometimes cutting off.
+- Fixed Machinist Automaton Queen Bar's choppiness.
 
 # 1.5.0.2
 - Fixed Enemy List castbars not working properly.
