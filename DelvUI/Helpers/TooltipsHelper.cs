@@ -168,7 +168,7 @@ namespace DelvUI.Helpers
                 {
                     cursorPos = new Vector2(windowMargin.X + _size.X / 2f - _titleSize.X / 2f, Margin);
                     ImGui.SetCursorPos(cursorPos);
-                    ImGui.PushTextWrapPos(cursorPos.X + _titleSize.X + globalScaleCorrection);
+                    ImGui.PushTextWrapPos(cursorPos.X + _titleSize.X + globalScaleCorrection + Margin);
                     ImGui.TextColored(_config.TitleColor.Vector, _currentTooltipTitle);
                     ImGui.PopTextWrapPos();
                 }
@@ -178,7 +178,7 @@ namespace DelvUI.Helpers
                 {
                     cursorPos = new Vector2(windowMargin.X + _size.X / 2f - _textSize.X / 2f, Margin + _titleSize.Y);
                     ImGui.SetCursorPos(cursorPos);
-                    ImGui.PushTextWrapPos(cursorPos.X + _textSize.X + globalScaleCorrection);
+                    ImGui.PushTextWrapPos(cursorPos.X + _textSize.X + globalScaleCorrection + Margin);
                     ImGui.TextColored(_config.TextColor.Vector, _currentTooltipText);
                     ImGui.PopTextWrapPos();
                 }
@@ -192,7 +192,7 @@ namespace DelvUI.Helpers
                     var textWidth = _size.X - Margin * 2;
 
                     ImGui.SetCursorPos(cursorPos);
-                    ImGui.PushTextWrapPos(cursorPos.X + textWidth + globalScaleCorrection);
+                    ImGui.PushTextWrapPos(cursorPos.X + textWidth + globalScaleCorrection + Margin);
                     ImGui.TextColored(_config.TextColor.Vector, _currentTooltipText);
                     ImGui.PopTextWrapPos();
                 }
