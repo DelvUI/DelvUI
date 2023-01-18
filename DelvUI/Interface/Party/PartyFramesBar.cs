@@ -382,6 +382,26 @@ namespace DelvUI.Interface.Party
                 }
             }
 
+            // sign icon
+            if (SignIcon.Enabled)
+            {
+                uint? iconId = SignIcon.IconID(character);
+                if (iconId.HasValue)
+                {
+                    Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, SignIcon.FrameAnchor);
+                    Vector2 iconPos = Utils.GetAnchoredPosition(parentPos + SignIcon.Position, SignIcon.Size, SignIcon.Anchor);
+
+                    drawActions.Add((SignIcon.StrataLevel, () =>
+                    {
+                        DrawHelper.DrawInWindow(SignIcon.ID, iconPos, SignIcon.Size, false, false, (drawList) =>
+                        {
+                            DrawHelper.DrawIcon(iconId.Value, iconPos, SignIcon.Size, false, drawList);
+                        });
+                    }
+                    ));
+                }
+            }
+
             // leader icon
             if (LeaderIcon.Enabled && Member.IsPartyLeader)
             {
@@ -669,6 +689,7 @@ namespace DelvUI.Interface.Party
 
         #region convenience
         private PartyFramesRoleIconConfig RoleIcon => _configs.Icons.Role;
+        private SignIconConfig SignIcon => _configs.Icons.Sign;
         private PartyFramesLeaderIconConfig LeaderIcon => _configs.Icons.Leader;
         private PartyFramesPlayerStatusConfig PlayerStatus => _configs.Icons.PlayerStatus;
         private PartyFramesReadyCheckStatusConfig ReadyCheck => _configs.Icons.ReadyCheckStatus;

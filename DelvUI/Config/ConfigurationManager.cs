@@ -527,6 +527,7 @@ namespace DelvUI.Config
             typeof(EnemyListConfig),
             typeof(EnemyListHealthBarConfig),
             typeof(EnemyListEnmityIconConfig),
+            typeof(EnemyListSignIconConfig),
             typeof(EnemyListCastbarConfig),
             typeof(EnemyListBuffsConfig),
             typeof(EnemyListDebuffsConfig),

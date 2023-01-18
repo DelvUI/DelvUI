@@ -748,6 +748,8 @@ namespace DelvUI.Interface.Party
 
         public void UpdatePreview()
         {
+            _iconsConfig.Sign.Preview = _config.Preview;
+
             if (!_config.Preview)
             {
                 _groupMembers.Clear();

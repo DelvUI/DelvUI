@@ -400,7 +400,15 @@ namespace DelvUI.Interface.Party
             DrawAnchor.TopLeft
         );
 
-        [NestedConfig("Leader", 11)]
+        [NestedConfig("Sign", 11)]
+        public SignIconConfig Sign = new SignIconConfig(
+            new Vector2(0, -10),
+            new Vector2(30, 30),
+            DrawAnchor.Top,
+            DrawAnchor.Top
+        );
+
+        [NestedConfig("Leader", 12)]
         public PartyFramesLeaderIconConfig Leader = new PartyFramesLeaderIconConfig(
             new Vector2(-12, -12),
             new Vector2(24, 24),
@@ -408,10 +416,10 @@ namespace DelvUI.Interface.Party
             DrawAnchor.TopLeft
         );
 
-        [NestedConfig("Player Status", 12)]
+        [NestedConfig("Player Status", 13)]
         public PartyFramesPlayerStatusConfig PlayerStatus = new PartyFramesPlayerStatusConfig();
 
-        [NestedConfig("Ready Check Status", 13)]
+        [NestedConfig("Ready Check Status", 14)]
         public PartyFramesReadyCheckStatusConfig ReadyCheckStatus = new PartyFramesReadyCheckStatusConfig();
 
         protected override PluginConfigObject? InternalLoad(FileInfo fileInfo, string currentVersion, string? previousVersion)

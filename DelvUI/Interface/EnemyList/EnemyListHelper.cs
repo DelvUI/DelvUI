@@ -1,4 +1,5 @@
 ﻿using Dalamud.Memory;
+using DelvUI.Helpers;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
@@ -42,13 +43,13 @@ namespace DelvUI.Interface.EnemyList
                 if (numberArrayData->AtkArrayData.Size <= index) { break; }
 
                 int objectId = numberArrayData->IntArray[index];
-                int? letter = GetEnemyLetterForIndex(i);
+                int? letter = GetEnemyLetter(objectId, i);
                 int enmityLevel = GetEnmityLevelForIndex(i);
                 _enemiesData.Add(new EnemyListData(objectId, letter, enmityLevel));
             }
         }
 
-        private int? GetEnemyLetterForIndex(int index)
+        private int? GetEnemyLetter(int objectId, int index)
         {
             if (_raptureAtkModule == null || _raptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrayCount <= EnemyListNamesIndex)
             {
@@ -69,7 +70,8 @@ namespace DelvUI.Interface.EnemyList
                 return null;
             }
 
-            char letterSymbol = name[0];
+            bool isMarked = Utils.SignIconIDForObjectID((uint)objectId) != null;
+            char letterSymbol = isMarked && name.Length > 1 ? name[2] : name[0];
             return letterSymbol - 57457;
         }
 

@@ -8,6 +8,7 @@ using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
 using System.Diagnostics;
@@ -512,6 +513,35 @@ namespace DelvUI.Helpers
                 if (component == null || component->UldManager.NodeListCount < 13) { return true; }
 
                 return component->UldManager.NodeList[12]->IsVisible;
+            }
+
+            return null;
+        }
+
+        public static unsafe uint? SignIconIDForActor(GameObject? actor)
+        {
+            if (actor == null)
+            {
+                return null;
+            }
+
+            return SignIconIDForObjectID(actor.ObjectId);
+        }
+
+        public static unsafe uint? SignIconIDForObjectID(uint objectId)
+        {
+            MarkingController* markingController = MarkingController.Instance();
+            if (objectId == 0 || markingController == null)
+            {
+                return null;
+            }
+
+            for (int i = 0; i < 14; i++)
+            {
+                if (objectId == markingController->MarkerArray[i])
+                {
+                    return (uint)(60701 + i);
+                }
             }
 
             return null;

@@ -233,6 +233,26 @@ namespace DelvUI.Interface.EnemyList
                     });
                 }
 
+                // sign icon
+                uint? signIconId = null;
+                if (Configs.SignIcon.Enabled)
+                {
+                    signIconId = Configs.SignIcon.IconID(character);
+                    if (signIconId.HasValue)
+                    {
+                        var parentPos = Utils.GetAnchoredPosition(origin + pos, -Configs.HealthBar.Size, Configs.SignIcon.HealthBarAnchor);
+                        var iconPos = Utils.GetAnchoredPosition(parentPos + Configs.SignIcon.Position, Configs.SignIcon.Size, Configs.SignIcon.Anchor);
+
+                        AddDrawAction(Configs.SignIcon.StrataLevel, () =>
+                        {
+                            DrawHelper.DrawInWindow(ID + "_signIcon", iconPos, Configs.SignIcon.Size, false, false, (drawList) =>
+                            {
+                                DrawHelper.DrawIcon(signIconId.Value, iconPos, Configs.SignIcon.Size, false, drawList);
+                            });
+                        });
+                    }
+                }
+
                 // labels
                 string? name = Config.Preview ? "Fake Name" : null;
                 AddDrawAction(Configs.HealthBar.NameLabel.StrataLevel, () =>
@@ -245,18 +265,21 @@ namespace DelvUI.Interface.EnemyList
                     _healthLabelHud.Draw(origin + pos, Configs.HealthBar.Size, character, name, currentHp, maxHp);
                 });
 
-                int letter = i;
-                if (!Config.Preview && _helper.EnemiesData.ElementAt(i).LetterIndex.HasValue)
+                if (!signIconId.HasValue || !Configs.SignIcon.ReplaceOrderLabel)
                 {
-                    letter = _helper.EnemiesData.ElementAt(i).LetterIndex!.Value;
-                }
+                    int letter = i;
+                    if (!Config.Preview && _helper.EnemiesData.ElementAt(i).LetterIndex.HasValue)
+                    {
+                        letter = _helper.EnemiesData.ElementAt(i).LetterIndex!.Value;
+                    }
 
-                string str = char.ConvertFromUtf32(0xE071 + letter).ToString();
-                AddDrawAction(Configs.HealthBar.OrderLabel.StrataLevel, () =>
-                {
-                    Configs.HealthBar.OrderLabel.SetText(str);
-                    _orderLabelHud.Draw(origin + pos, Configs.HealthBar.Size);
-                });
+                    string str = char.ConvertFromUtf32(0xE071 + letter).ToString();
+                    AddDrawAction(Configs.HealthBar.OrderLabel.StrataLevel, () =>
+                    {
+                        Configs.HealthBar.OrderLabel.SetText(str);
+                        _orderLabelHud.Draw(origin + pos, Configs.HealthBar.Size);
+                    });
+                }
 
                 // buffs / debuffs
                 var buffsPos = Utils.GetAnchoredPosition(origin + pos, -Configs.HealthBar.Size, Configs.Buffs.HealthBarAnchor);
@@ -365,6 +388,7 @@ namespace DelvUI.Interface.EnemyList
     {
         public EnemyListHealthBarConfig HealthBar;
         public EnemyListEnmityIconConfig EnmityIcon;
+        public EnemyListSignIconConfig SignIcon;
         public EnemyListCastbarConfig CastBar;
         public EnemyListBuffsConfig Buffs;
         public EnemyListDebuffsConfig Debuffs;
@@ -372,12 +396,14 @@ namespace DelvUI.Interface.EnemyList
         public EnemyListConfigs(
             EnemyListHealthBarConfig healthBar,
             EnemyListEnmityIconConfig enmityIcon,
+            EnemyListSignIconConfig signIcon,
             EnemyListCastbarConfig castBar,
             EnemyListBuffsConfig buffs,
             EnemyListDebuffsConfig debuffs)
         {
             HealthBar = healthBar;
             EnmityIcon = enmityIcon;
+            SignIcon = signIcon;
             CastBar = castBar;
             Buffs = buffs;
             Debuffs = debuffs;
@@ -388,6 +414,7 @@ namespace DelvUI.Interface.EnemyList
             return new EnemyListConfigs(
                 ConfigurationManager.Instance.GetConfigObject<EnemyListHealthBarConfig>(),
                 ConfigurationManager.Instance.GetConfigObject<EnemyListEnmityIconConfig>(),
+                ConfigurationManager.Instance.GetConfigObject<EnemyListSignIconConfig>(),
                 ConfigurationManager.Instance.GetConfigObject<EnemyListCastbarConfig>(),
                 ConfigurationManager.Instance.GetConfigObject<EnemyListBuffsConfig>(),
                 ConfigurationManager.Instance.GetConfigObject<EnemyListDebuffsConfig>()

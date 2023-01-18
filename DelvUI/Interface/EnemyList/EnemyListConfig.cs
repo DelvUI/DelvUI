@@ -178,6 +178,30 @@ namespace DelvUI.Interface.EnemyList
         }
     }
 
+    [DisableParentSettings("FrameAnchor")]
+    [Exportable(false)]
+    [Section("Enemy List", true)]
+    [SubSection("Sign Icon", 0)]
+    public class EnemyListSignIconConfig : SignIconConfig
+    {
+        [Anchor("Health Bar Anchor")]
+        [Order(16)]
+        public DrawAnchor HealthBarAnchor = DrawAnchor.TopLeft;
+
+        [Checkbox("Replace Order Label", help = "When enabled and if the enemy has a sign assigned, the sign icon will be drawn instead of the order label.")]
+        [Order(30)]
+        public bool ReplaceOrderLabel = true;
+
+        public new static EnemyListSignIconConfig DefaultConfig() =>
+            new EnemyListSignIconConfig(new Vector2(0), new Vector2(30), DrawAnchor.Center, DrawAnchor.Left);
+
+        public EnemyListSignIconConfig(Vector2 position, Vector2 size, DrawAnchor anchor, DrawAnchor frameAnchor)
+            : base(position, size, anchor, frameAnchor)
+        {
+            HealthBarAnchor = frameAnchor;
+        }
+    }
+
     [DisableParentSettings("AnchorToUnitFrame", "UnitFrameAnchor", "HideWhenInactive", "FillDirection")]
     [Exportable(false)]
     [Section("Enemy List", true)]

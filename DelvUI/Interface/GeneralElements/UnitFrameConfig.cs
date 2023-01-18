@@ -232,6 +232,14 @@ namespace DelvUI.Interface.GeneralElements
             DrawAnchor.Left
         );
 
+        [NestedConfig("Sign Icon", 136)]
+        public SignIconConfig SignIconConfig = new SignIconConfig(
+            new Vector2(0, 0),
+            new Vector2(30, 30),
+            DrawAnchor.Center,
+            DrawAnchor.Top
+        );
+
         [NestedConfig("Shields", 140)]
         public ShieldConfig ShieldConfig = new ShieldConfig();
 
@@ -257,6 +265,7 @@ namespace DelvUI.Interface.GeneralElements
             OptionalLabelConfig = optionalLabelConfig;
             BackgroundColor = new PluginConfigColor(new(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
             RoleIconConfig.Enabled = false;
+            SignIconConfig.Enabled = false;
             ColorByHealth.Enabled = false;
             MouseoverAreaConfig.Enabled = false;
         }

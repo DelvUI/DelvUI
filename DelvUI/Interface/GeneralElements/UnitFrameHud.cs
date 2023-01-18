@@ -14,6 +14,7 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using Dalamud.Game.ClientState.Objects.Enums;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -56,6 +57,7 @@ namespace DelvUI.Interface.GeneralElements
         public void StopPreview()
         {
             Config.MouseoverAreaConfig.Preview = false;
+            Config.SignIconConfig.Preview = false;
         }
 
         public void StopMouseover()
@@ -229,6 +231,26 @@ namespace DelvUI.Interface.GeneralElements
                         DrawHelper.DrawInWindow(ID + "_jobIcon", iconPos, Config.RoleIconConfig.Size, false, false, (drawList) =>
                         {
                             DrawHelper.DrawIcon(iconId, iconPos, Config.RoleIconConfig.Size, false, drawList);
+                        });
+                    });
+                }
+            }
+
+            // sign icon
+            if (Config.SignIconConfig.Enabled)
+            {
+                uint? iconId = Config.SignIconConfig.IconID(character);
+                if (iconId.HasValue)
+                {
+                    var barPos = Utils.GetAnchoredPosition(pos, Config.Size, Config.Anchor);
+                    var parentPos = Utils.GetAnchoredPosition(barPos + Config.Position, -Config.Size, Config.SignIconConfig.FrameAnchor);
+                    var iconPos = Utils.GetAnchoredPosition(parentPos + Config.SignIconConfig.Position, Config.SignIconConfig.Size, Config.SignIconConfig.Anchor);
+
+                    AddDrawAction(Config.SignIconConfig.StrataLevel, () =>
+                    {
+                        DrawHelper.DrawInWindow(ID + "_signIcon", iconPos, Config.SignIconConfig.Size, false, false, (drawList) =>
+                        {
+                            DrawHelper.DrawIcon(iconId.Value, iconPos, Config.SignIconConfig.Size, false, drawList);
                         });
                     });
                 }

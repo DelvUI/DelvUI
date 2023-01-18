@@ -1,6 +1,8 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Game.ClientState.Objects.Types;
+using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
+using DelvUI.Helpers;
 using DelvUI.Interface.Party;
 using System;
 using System.Collections.Generic;
@@ -12,7 +14,7 @@ namespace DelvUI.Interface.GeneralElements
     public class IconConfig : AnchorablePluginConfigObject
     {
         [Anchor("Frame Anchor")]
-        [Order(15)]
+        [Order(16)]
         public DrawAnchor FrameAnchor = DrawAnchor.Center;
 
         // don't remove (used by json converter)
@@ -63,6 +65,30 @@ namespace DelvUI.Interface.GeneralElements
         [Checkbox("Use Specific DPS Role Icons")]
         [Order(35, collapseWith = nameof(UseRoleIcons))]
         public bool UseSpecificDPSRoleIcons = false;
+    }
+
+    public class SignIconConfig : IconConfig
+    {
+        public SignIconConfig() : base() { }
+
+        public SignIconConfig(Vector2 position, Vector2 size, DrawAnchor anchor, DrawAnchor frameAnchor)
+            : base(position, size, anchor, frameAnchor)
+        {
+        }
+
+        [Checkbox("Preview")]
+        [Order(35)]
+        public bool Preview = false;
+
+        public uint? IconID(GameObject? actor)
+        {
+            if (Preview)
+            {
+                return 60701;
+            }
+
+            return Utils.SignIconIDForActor(actor);
+        }
     }
 
     public class PartyFramesIconsConverter : PluginConfigObjectConverter
