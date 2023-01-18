@@ -503,13 +503,13 @@ namespace DelvUI.Helpers
             AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_EnemyList", 1);
             if (addon != null && addon->IsVisible)
             {
-                if (addon->UldManager.NodeListCount < 11) { return true; }
+                if (addon->UldManager.NodeListCount < 12) { return true; }
 
                 AtkResNode* node = addon->UldManager.NodeList[11 - index];
                 if (node == null || !node->IsVisible) { return false; }
 
                 AtkComponentBase* component = node->GetComponent();
-                if (component == null || component->UldManager.NodeListCount < 12) { return true; }
+                if (component == null || component->UldManager.NodeListCount < 13) { return true; }
 
                 return component->UldManager.NodeList[12]->IsVisible;
             }

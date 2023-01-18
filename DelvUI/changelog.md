@@ -1,3 +1,6 @@
+# 1.5.0.2
+- Fixed Enemy List castbars not working properly.
+
 # 1.5.0.1
 - Added Machinist's Dismatle to Party Cooldowns.
 - Fixed Invulnerabilities and Raise Trackers' icons not being disableable.

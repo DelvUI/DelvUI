@@ -32,7 +32,7 @@ namespace DelvUI.Interface.EnemyList
         private LabelHud _nameLabelHud;
         private LabelHud _healthLabelHud;
         private LabelHud _orderLabelHud;
-        private EnemyListCastbarHud _castbarHud;
+        private List<EnemyListCastbarHud> _castbarHud;
         private StatusEffectsListHud _buffsListHud;
         private StatusEffectsListHud _debuffsListHud;
 
@@ -48,13 +48,14 @@ namespace DelvUI.Interface.EnemyList
             _healthLabelHud = new LabelHud(Configs.HealthBar.HealthLabel);
             _orderLabelHud = new LabelHud(Configs.HealthBar.OrderLabel);
 
-            _castbarHud = new EnemyListCastbarHud(Configs.CastBar);
+            _castbarHud = new List<EnemyListCastbarHud>();
             _buffsListHud = new StatusEffectsListHud(Configs.Buffs);
             _debuffsListHud = new StatusEffectsListHud(Configs.Debuffs);
 
             for (int i = 0; i < MaxEnemyCount; i++)
             {
                 _smoothHPHelpers.Add(new SmoothHPHelper());
+                _castbarHud.Add(new EnemyListCastbarHud(Configs.CastBar));
             }
 
             _iconsTexture = TexturesCache.Instance.GetTextureFromPath("ui/uld/enemylist_hr1.tex");
@@ -99,7 +100,11 @@ namespace DelvUI.Interface.EnemyList
         public void StopPreview()
         {
             Config.Preview = false;
-            _castbarHud.StopPreview();
+
+            foreach (EnemyListCastbarHud castbar in _castbarHud) {
+                castbar.StopPreview();
+            }
+
             _buffsListHud.StopPreview();
             _debuffsListHud.StopPreview();
             Configs.HealthBar.MouseoverAreaConfig.Preview = false;
@@ -271,13 +276,15 @@ namespace DelvUI.Interface.EnemyList
                 });
 
                 // castbar
-                _castbarHud.EnemyListIndex = i;
+                EnemyListCastbarHud castbar = _castbarHud[i];
+                castbar.EnemyListIndex = i;
+
                 var castbarPos = Utils.GetAnchoredPosition(origin + pos, -Configs.HealthBar.Size, Configs.CastBar.HealthBarAnchor);
                 AddDrawAction(Configs.CastBar.StrataLevel, () =>
                 {
-                    _castbarHud.Actor = character;
-                    _castbarHud.PrepareForDraw(castbarPos);
-                    _castbarHud.Draw(castbarPos);
+                    castbar.Actor = character;
+                    castbar.PrepareForDraw(castbarPos);
+                    castbar.Draw(castbarPos);
                 });
             }
 
