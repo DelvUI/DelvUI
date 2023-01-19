@@ -350,7 +350,7 @@ namespace DelvUI.Config.Attributes
             {
                 ImGui.SameLine();
                 ImGui.PushFont(UiBuilder.IconFont);
-                if (ImGui.Button(FontAwesomeIcon.Pen.ToIconString() + IDText(ID)))
+                if (ImGui.Button(FontAwesomeIcon.Pen.ToIconString() + "##" + ID))
                 {
                     ImGui.OpenPopup(popupId);
                 }

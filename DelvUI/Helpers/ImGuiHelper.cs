@@ -236,15 +236,15 @@ namespace DelvUI.Helpers
 
             ImGui.SetNextWindowSize(new(200, 300));
 
-            if (ImGui.BeginPopup(name))
+            if (ImGui.BeginPopup(name, ImGuiWindowFlags.NoMove))
             {
-                // search
-                ImGui.InputText("", ref searchText, 64);
-
-                if (!ImGui.IsAnyItemActive() && !ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                if (!ImGui.IsAnyItemActive() && !ImGui.IsAnyItemFocused() && !ImGui.IsMouseClicked(ImGuiMouseButton.Left))
                 {
                     ImGui.SetKeyboardFocusHere(0);
                 }
+
+                // search
+                ImGui.InputText("", ref searchText, 64);
 
                 List<string> keys = new List<string>();
                 keys.AddRange(TextTagsHelper.TextTags.Keys);

@@ -1,3 +1,6 @@
+# 1.5.1.1
+- Fixed Text Tags popup not scrolling properly.
+
 # 1.5.1.0
 Features:
 - Added Sign Icons to all Unit Frames, Party Frames and Enemy List.
