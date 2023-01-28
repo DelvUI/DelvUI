@@ -312,10 +312,14 @@ namespace DelvUI.Interface.EnemyList
             }
 
             // mouseover
+            bool ignoreMouseover = Configs.HealthBar.MouseoverAreaConfig.Enabled && Configs.HealthBar.MouseoverAreaConfig.Ignore;
             if (hovered && mouseoverTarget != null)
             {
-                InputsHelper.Instance.SetTarget(mouseoverTarget);
                 _wasHovering = true;
+                if (!ignoreMouseover)
+                {
+                    InputsHelper.Instance.SetTarget(mouseoverTarget);
+                }
 
                 // left click
                 if (InputsHelper.Instance.LeftButtonClicked)

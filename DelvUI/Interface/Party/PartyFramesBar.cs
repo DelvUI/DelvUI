@@ -143,12 +143,16 @@ namespace DelvUI.Interface.Party
             // click
             var (areaStart, areaEnd) = _configs.HealthBar.MouseoverAreaConfig.GetArea(Position, _configs.HealthBar.Size);
             bool isHovering = ImGui.IsMouseHoveringRect(areaStart, areaEnd);
+            bool ignoreMouseover = _configs.HealthBar.MouseoverAreaConfig.Enabled && _configs.HealthBar.MouseoverAreaConfig.Ignore;
             Character? character = Member.Character;
 
             if (isHovering)
             {
-                InputsHelper.Instance.SetTarget(character);
                 _wasHovering = true;
+                if (!ignoreMouseover)
+                {
+                    InputsHelper.Instance.SetTarget(character);
+                }
 
                 // left click
                 if (InputsHelper.Instance.LeftButtonClicked)

@@ -308,6 +308,10 @@ namespace DelvUI.Interface.GeneralElements
         [Order(5)]
         public bool Preview = false;
 
+        [Checkbox("Ignore Mouseover", help = "Enabling this will make it so this element is ignored by mouseover completely.\nThe area can still be defined for left and right clicks.")]
+        [Order(6)]
+        public bool Ignore = false;
+
         [DragInt2("Top Left Offset", min = -500, max = 500)]
         [Order(10)]
         public Vector2 TopLeftOffset = Vector2.Zero;

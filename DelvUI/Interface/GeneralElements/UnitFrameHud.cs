@@ -91,11 +91,17 @@ namespace DelvUI.Interface.GeneralElements
             // Check if mouse is hovering over the box properly
             var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
             var (areaStart, areaEnd) = Config.MouseoverAreaConfig.GetArea(startPos, Config.Size);
-            if (ImGui.IsMouseHoveringRect(areaStart, areaEnd) && !DraggingEnabled)
+            bool isHovering = ImGui.IsMouseHoveringRect(areaStart, areaEnd);
+            bool ignoreMouseover = Config.MouseoverAreaConfig.Enabled && Config.MouseoverAreaConfig.Ignore;
+            
+            if (isHovering && !DraggingEnabled)
             {
-                InputsHelper.Instance.SetTarget(Actor);
                 _wasHovering = true;
-
+                if (!ignoreMouseover)
+                {
+                    InputsHelper.Instance.SetTarget(Actor);
+                }
+                
                 if (InputsHelper.Instance.LeftButtonClicked)
                 {
                     Plugin.TargetManager.SetTarget(Actor);
