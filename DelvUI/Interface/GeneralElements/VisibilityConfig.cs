@@ -36,6 +36,10 @@ namespace DelvUI.Interface
         [Order(10)]
         public bool HideInIslandSanctuary = false;
 
+        [Checkbox("Hide in PvP")]
+        [Order(11)]
+        public bool HideInPvP = false;
+
         [Checkbox("Always show when in duty")]
         [Order(20)]
         public bool ShowInDuty = false;
@@ -59,6 +63,10 @@ namespace DelvUI.Interface
         [Checkbox("Always show while in Island Sanctuary")]
         [Order(25)]
         public bool ShowInIslandSanctuary = false;
+
+        [Checkbox("Always show while in PvP")]
+        [Order(26)]
+        public bool ShowInPvP = false;
 
 
         private bool IsInCombat() => Plugin.Condition[ConditionFlag.InCombat];
@@ -99,6 +107,8 @@ namespace DelvUI.Interface
 
             if (ShowInIslandSanctuary && isInIslandSanctuary) { return true; }
 
+            if (ShowInPvP && Plugin.ClientState.IsPvP) { return true; }
+
 
             if (HideOutsideOfCombat && !IsInCombat()) { return false; }
 
@@ -112,6 +122,8 @@ namespace DelvUI.Interface
             if (HideInDuty && isInDuty) { return false; }
 
             if (HideInIslandSanctuary && isInIslandSanctuary) { return false; }
+
+            if (HideInPvP && Plugin.ClientState.IsPvP) { return false; }
 
             return true;
         }
