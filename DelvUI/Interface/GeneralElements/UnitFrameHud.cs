@@ -97,10 +97,7 @@ namespace DelvUI.Interface.GeneralElements
             if (isHovering && !DraggingEnabled)
             {
                 _wasHovering = true;
-                if (!ignoreMouseover)
-                {
-                    InputsHelper.Instance.SetTarget(Actor);
-                }
+                InputsHelper.Instance.SetTarget(Actor, ignoreMouseover);
                 
                 if (InputsHelper.Instance.LeftButtonClicked)
                 {

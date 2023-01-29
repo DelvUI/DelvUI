@@ -316,10 +316,7 @@ namespace DelvUI.Interface.EnemyList
             if (hovered && mouseoverTarget != null)
             {
                 _wasHovering = true;
-                if (!ignoreMouseover)
-                {
-                    InputsHelper.Instance.SetTarget(mouseoverTarget);
-                }
+                InputsHelper.Instance.SetTarget(mouseoverTarget, ignoreMouseover);
 
                 // left click
                 if (InputsHelper.Instance.LeftButtonClicked)

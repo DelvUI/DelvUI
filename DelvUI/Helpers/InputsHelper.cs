@@ -132,13 +132,16 @@ namespace DelvUI.Helpers
         public bool HandlingMouseInputs { get; private set; } = false;
         private GameObject? _target = null;
 
-        public void SetTarget(GameObject? target)
+        public void SetTarget(GameObject? target, bool ignoreMouseover = false)
         {
             _target = target;
             HandlingMouseInputs = true;
 
-            long address = _target != null && _target.ObjectId != 0 ? (long)_target.Address : 0;
-            SetGameMouseoverTarget(address);
+            if (!ignoreMouseover)
+            {
+                long address = _target != null && _target.ObjectId != 0 ? (long)_target.Address : 0;
+                SetGameMouseoverTarget(address);
+            }
         }
 
         public void ClearTarget()

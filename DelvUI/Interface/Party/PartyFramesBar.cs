@@ -149,10 +149,7 @@ namespace DelvUI.Interface.Party
             if (isHovering)
             {
                 _wasHovering = true;
-                if (!ignoreMouseover)
-                {
-                    InputsHelper.Instance.SetTarget(character);
-                }
+                InputsHelper.Instance.SetTarget(character, ignoreMouseover);
 
                 // left click
                 if (InputsHelper.Instance.LeftButtonClicked)
