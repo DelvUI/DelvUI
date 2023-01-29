@@ -1,3 +1,8 @@
+# 1.5.2.0
+- Added visibility settings for PvP.
+- Added the ability to disable mouseover functionallity in individual frames.
+    + To use this you have to enable the Custom Mouseover Area and enable the Ignore setting.
+
 # 1.5.1.1
 - Fixed Text Tags popup not scrolling properly.
 
