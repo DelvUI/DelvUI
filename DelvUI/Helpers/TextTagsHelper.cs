@@ -1,5 +1,6 @@
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -170,8 +171,27 @@ namespace DelvUI.Helpers
             ["[level]"] = (chara) => chara.Level > 0 ? chara.Level.ToString() : "-",
 
             ["[job]"] = (chara) => JobsHelper.JobNames.TryGetValue(chara.ClassJob.Id, out var jobName) ? jobName : "",
-            
+
             ["[time-till-max-gp]"] = JobsHelper.TimeTillMaxGP,
+
+            ["[chocobo-time]"] = (chara) =>
+            {
+                unsafe
+                {
+                    if (chara is BattleNpc npc && npc.BattleNpcKind == BattleNpcSubKind.Chocobo)
+                    {
+                        float seconds = UIState.Instance()->Buddy.TimeLeft;
+                        if (seconds <= 0)
+                        {
+                            return "";
+                        }
+
+                        TimeSpan time = TimeSpan.FromSeconds(seconds);
+                        return time.ToString(@"mm\:ss");
+                    }
+                }
+                return "";
+            }
             #endregion
         };
 

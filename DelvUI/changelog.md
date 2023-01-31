@@ -1,4 +1,5 @@
 # 1.5.2.1
+- Added the '[chocobo-time]' text tag.
 - Fixed Ignore setting in the Custom Mouseover Areas.
 
 # 1.5.2.0
