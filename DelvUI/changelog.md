@@ -1,3 +1,6 @@
+# 1.5.2.1
+- Fixed Ignore setting in the Custom Mouseover Areas.
+
 # 1.5.2.0
 - Added visibility settings for PvP.
 - Added the ability to disable mouseover functionallity in individual frames.

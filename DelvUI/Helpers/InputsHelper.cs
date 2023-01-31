@@ -131,13 +131,15 @@ namespace DelvUI.Helpers
 
         public bool HandlingMouseInputs { get; private set; } = false;
         private GameObject? _target = null;
+        private bool _ignoringMouseover = false;
 
         public void SetTarget(GameObject? target, bool ignoreMouseover = false)
         {
             _target = target;
             HandlingMouseInputs = true;
+            _ignoringMouseover = ignoreMouseover;
 
-            if (!ignoreMouseover)
+            if (!_ignoringMouseover)
             {
                 long address = _target != null && _target.ObjectId != 0 ? (long)_target.Address : 0;
                 SetGameMouseoverTarget(address);
@@ -160,12 +162,13 @@ namespace DelvUI.Helpers
         public void StopHandlingInputs()
         {
             HandlingMouseInputs = false;
+            _ignoringMouseover = false;
         }
 
         private unsafe void SetGameMouseoverTarget(long address)
         {
             // set mouseover target in-game
-            if (_config.MouseoverEnabled && !_config.MouseoverAutomaticMode)
+            if (_config.MouseoverEnabled && !_config.MouseoverAutomaticMode && !_ignoringMouseover)
             {
                 long pronounModuleAddress = (long)Framework.Instance()->GetUiModule()->GetPronounModule();
 
@@ -190,7 +193,7 @@ namespace DelvUI.Helpers
         {
             if (_requestActionHook == null) { return false; }
 
-            if (_config.MouseoverEnabled && _config.MouseoverAutomaticMode && IsActionValid(actionId, _target))
+            if (_config.MouseoverEnabled && _config.MouseoverAutomaticMode && IsActionValid(actionId, _target) && !_ignoringMouseover)
             {
                 GameObjectID target = new() { ObjectID = _target!.ObjectId };
                 return _requestActionHook.Original(manager, actionType, actionId, target, a4, a5, a6, a7);
