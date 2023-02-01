@@ -8,6 +8,8 @@
     + Additionally you can now specify a cap for the length of the names by adding `.#` at the end.
         * Example: `[name.5]` would display `Tisch` for the name `Tischel`.
 
+- Disabled Sign Icons from unit frames for non-combat NPCs (until I find a better fix).
+
 # 1.5.2.1
 - Added the '[chocobo-time]' text tag.
 - Fixed Ignore setting in the Custom Mouseover Areas.

@@ -531,7 +531,7 @@ namespace DelvUI.Helpers
         public static unsafe uint? SignIconIDForObjectID(uint objectId)
         {
             MarkingController* markingController = MarkingController.Instance();
-            if (objectId == 0 || markingController == null)
+            if (objectId == 0 || objectId == 3758096384 || markingController == null)
             {
                 return null;
             }
