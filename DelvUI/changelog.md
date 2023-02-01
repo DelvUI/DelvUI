@@ -1,3 +1,13 @@
+# 1.5.3.0
+- Reworked name text tags:
+    + A lot of existing text tags have been removed.
+    + You can now specifiy the type of unit for a name text tag.
+        * This allows to display player names and npc names differently on the same label.
+        * Example: `[player_name:initials][npc_name]` would display the initials for a player, and the full name for an npc.
+        * You can still use tags that start with `[name:` that work for both types of units.
+    + Additionally you can now specify a cap for the length of the names by adding `.#` at the end.
+        * Example: `[name.5]` would display `Tisch` for the name `Tischel`.
+
 # 1.5.2.1
 - Added the '[chocobo-time]' text tag.
 - Fixed Ignore setting in the Custom Mouseover Areas.

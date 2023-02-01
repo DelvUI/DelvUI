@@ -1,6 +1,8 @@
 using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -24,64 +26,41 @@ namespace DelvUI.Helpers
             }
         }
 
-        public static Dictionary<string, Func<GameObject?, string?, string>> TextTags = new Dictionary<string, Func<GameObject?, string?, string>>()
+        public static Dictionary<string, Func<GameObject?, string?, int, string>> TextTags = new Dictionary<string, Func<GameObject?, string?, int, string>>()
         {
-            #region name
-            ["[name]"] = (actor, name) => ValidateName(actor, name).CheckForUpperCase(),
+            #region generic names
+            ["[name]"] = (actor, name, length) => ValidateName(actor, name, length).CheckForUpperCase(),
 
-            ["[name:first]"] = (actor, name) => ValidateName(actor, name).FirstName().CheckForUpperCase(),
+            ["[name:first]"] = (actor, name, length) => ValidateName(actor, name, length).FirstName().CheckForUpperCase(),
 
-            ["[name:first-initial]"] = (actor, name) =>
-            {
-                name = ValidateName(actor, name).FirstName().CheckForUpperCase();
-                return name.Length > 0 ? name[..1] : "";
-            },
+            ["[name:last]"] = (actor, name, length) => ValidateName(actor, name, length).LastName().CheckForUpperCase(),
 
-            ["[name:first-npcmedium]"] = (actor, name) =>
-            {
-                name = ValidateName(actor, name);
-                return actor?.ObjectKind == ObjectKind.Player ?
-                    name.FirstName().CheckForUpperCase() :
-                    name.Truncate(15).CheckForUpperCase();
-            },
-
-            ["[name:first-npclong]"] = (actor, name) =>
-            {
-                name = ValidateName(actor, name);
-                return actor?.ObjectKind == ObjectKind.Player ?
-                    name.FirstName().CheckForUpperCase() :
-                    name.Truncate(15).CheckForUpperCase();
-            },
-
-            ["[name:first-npcfull]"] = (actor, name) =>
-            {
-                name = ValidateName(actor, name);
-                return actor?.ObjectKind == ObjectKind.Player ?
-                    name.FirstName().CheckForUpperCase() :
-                    name.CheckForUpperCase();
-            },
-
-            ["[name:last]"] = (actor, name) => ValidateName(actor, name).LastName().CheckForUpperCase(),
-
-            ["[name:last-initial]"] = (actor, name) =>
-            {
-                name = ValidateName(actor, name).LastName().CheckForUpperCase();
-                return name.Length > 0 ? name[..1] : "";
-            },
-
-            ["[name:initials]"] = (actor, name) => ValidateName(actor, name).Initials().CheckForUpperCase(),
-
-            ["[name:abbreviate]"] = (actor, name) => ValidateName(actor, name).Abbreviate().CheckForUpperCase(),
-
-            ["[name:veryshort]"] = (actor, name) => ValidateName(actor, name).Truncate(5).CheckForUpperCase(),
-
-            ["[name:short]"] = (actor, name) => ValidateName(actor, name).Truncate(10).CheckForUpperCase(),
-
-            ["[name:medium]"] = (actor, name) => ValidateName(actor, name).Truncate(15).CheckForUpperCase(),
-
-            ["[name:long]"] = (actor, name) => ValidateName(actor, name).Truncate(20).CheckForUpperCase(),
+            ["[name:initials]"] = (actor, name, length) => ValidateName(actor, name, length).Initials().CheckForUpperCase(),
             #endregion
 
+            #region player names
+            ["[player_name]"] = (actor, name, length) => ValidatePlayerName(actor, name, length).CheckForUpperCase(),
+
+            ["[player_name:first]"] = (actor, name, length) => ValidatePlayerName(actor, name, length).FirstName().CheckForUpperCase(),
+
+            ["[player_name:last]"] = (actor, name, length) => ValidatePlayerName(actor, name, length).LastName().CheckForUpperCase(),
+
+            ["[player_name:initials]"] = (actor, name, length) => ValidatePlayerName(actor, name, length).Initials().CheckForUpperCase(),
+            #endregion
+
+            #region npc names
+            ["[npc_name]"] = (actor, name, length) => ValidateNPCName(actor, name, length).CheckForUpperCase(),
+
+            ["[npc_name:first]"] = (actor, name, length) => ValidateNPCName(actor, name, length).FirstName().CheckForUpperCase(),
+
+            ["[npc_name:last]"] = (actor, name, length) => ValidateNPCName(actor, name, length).LastName().CheckForUpperCase(),
+
+            ["[npc_name:initials]"] = (actor, name, length) => ValidateNPCName(actor, name, length).Initials().CheckForUpperCase(),
+            #endregion
+        };
+
+        public static Dictionary<string, Func<GameObject?, string?, string>> ExpTags = new Dictionary<string, Func<GameObject?, string?, string>>()
+        {
             #region experience
             ["[exp:current]"] = (actor, name) => ExperienceHelper.Instance.CurrentExp.ToString("N0", CultureInfo.InvariantCulture),
 
@@ -203,9 +182,30 @@ namespace DelvUI.Helpers
 
         private static string ReplaceTagWithString(string tag, GameObject? actor, string? name = null, uint? current = null, uint? max = null)
         {
-            if (TextTags.TryGetValue(tag, out Func<GameObject?, string?, string>? func) && func != null)
+            int length = 0;
+            if (tag.Contains("."))
             {
-                return func(actor, name);
+                int index = tag.IndexOf(".");
+                string lengthString = tag.Substring(index + 1);
+                lengthString = lengthString.Substring(0, lengthString.Length - 1);
+
+                try
+                {
+                    length = int.Parse(lengthString);
+                }
+                catch { }
+
+                tag = tag.Substring(0, tag.Length - lengthString.Length - 2) + "]";
+            }
+
+            if (TextTags.TryGetValue(tag, out Func<GameObject?, string?, int, string>? func) && func != null)
+            {
+                return func(actor, name, length);
+            }
+
+            if (ExpTags.TryGetValue(tag, out Func<GameObject?, string?, string>? expFunc) && expFunc != null)
+            {
+                return expFunc(actor, name);
             }
 
             if (actor is Character chara &&
@@ -237,9 +237,36 @@ namespace DelvUI.Helpers
             });
         }
 
-        private static string ValidateName(GameObject? actor, string? name)
+        private static string ValidateName(GameObject? actor, string? name, int length = 0)
         {
-            return actor != null ? actor.Name.ToString() : (name ?? "");
+            string str = actor != null ? actor.Name.ToString() : (name ?? "");
+
+            if (length > 0)
+            {
+                str = str.Substring(0, Math.Min(str.Length, length));
+            }
+
+            return str;
+        }
+
+        private static string ValidatePlayerName(GameObject? actor, string? name, int length = 0)
+        {
+            if (actor?.ObjectKind != ObjectKind.Player)
+            {
+                return "";
+            }
+
+            return ValidateName(actor, name, length);
+        }
+
+        private static string ValidateNPCName(GameObject? actor, string? name, int length = 0)
+        {
+            if (actor?.ObjectKind == ObjectKind.Player)
+            {
+                return "";
+            }
+
+            return ValidateName(actor, name, length);
         }
 
         private static string ConsistentDigitPercentage(float currentVal, float maxVal){
