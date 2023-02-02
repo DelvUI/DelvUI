@@ -540,7 +540,13 @@ namespace DelvUI.Interface.Party
             {
                 drawActions.Add((_configs.HealthBar.NameLabelConfig.StrataLevel, () =>
                 {
-                    _nameLabelHud.Draw(Position, _configs.HealthBar.Size, character, Member.Name);
+                    bool? playerName = null;
+                    if (character == null || character.ObjectKind == ObjectKind.Player)
+                    {
+                        playerName = true;
+                    }
+
+                    _nameLabelHud.Draw(Position, _configs.HealthBar.Size, character, Member.Name, isPlayerName: playerName);
                 }
                 ));
             }

@@ -26,36 +26,36 @@ namespace DelvUI.Helpers
             }
         }
 
-        public static Dictionary<string, Func<GameObject?, string?, int, string>> TextTags = new Dictionary<string, Func<GameObject?, string?, int, string>>()
+        public static Dictionary<string, Func<GameObject?, string?, int, bool?, string>> TextTags = new Dictionary<string, Func<GameObject?, string?, int, bool?, string>>()
         {
             #region generic names
-            ["[name]"] = (actor, name, length) => ValidateName(actor, name, length).CheckForUpperCase(),
+            ["[name]"] = (actor, name, length, isPlayerName) => ValidateName(actor, name, length).CheckForUpperCase(),
 
-            ["[name:first]"] = (actor, name, length) => ValidateName(actor, name, length).FirstName().CheckForUpperCase(),
+            ["[name:first]"] = (actor, name, length, isPlayerName) => ValidateName(actor, name, length).FirstName().CheckForUpperCase(),
 
-            ["[name:last]"] = (actor, name, length) => ValidateName(actor, name, length).LastName().CheckForUpperCase(),
+            ["[name:last]"] = (actor, name, length, isPlayerName) => ValidateName(actor, name, length).LastName().CheckForUpperCase(),
 
-            ["[name:initials]"] = (actor, name, length) => ValidateName(actor, name, length).Initials().CheckForUpperCase(),
+            ["[name:initials]"] = (actor, name, length, isPlayerName) => ValidateName(actor, name, length).Initials().CheckForUpperCase(),
             #endregion
 
             #region player names
-            ["[player_name]"] = (actor, name, length) => ValidatePlayerName(actor, name, length).CheckForUpperCase(),
+            ["[player_name]"] = (actor, name, length, isPlayerName) => ValidatePlayerName(actor, name, length, isPlayerName).CheckForUpperCase(),
 
-            ["[player_name:first]"] = (actor, name, length) => ValidatePlayerName(actor, name, length).FirstName().CheckForUpperCase(),
+            ["[player_name:first]"] = (actor, name, length, isPlayerName) => ValidatePlayerName(actor, name, length, isPlayerName).FirstName().CheckForUpperCase(),
 
-            ["[player_name:last]"] = (actor, name, length) => ValidatePlayerName(actor, name, length).LastName().CheckForUpperCase(),
+            ["[player_name:last]"] = (actor, name, length, isPlayerName) => ValidatePlayerName(actor, name, length, isPlayerName).LastName().CheckForUpperCase(),
 
-            ["[player_name:initials]"] = (actor, name, length) => ValidatePlayerName(actor, name, length).Initials().CheckForUpperCase(),
+            ["[player_name:initials]"] = (actor, name, length, isPlayerName) => ValidatePlayerName(actor, name, length, isPlayerName).Initials().CheckForUpperCase(),
             #endregion
 
             #region npc names
-            ["[npc_name]"] = (actor, name, length) => ValidateNPCName(actor, name, length).CheckForUpperCase(),
+            ["[npc_name]"] = (actor, name, length, isPlayerName) => ValidateNPCName(actor, name, length, isPlayerName).CheckForUpperCase(),
 
-            ["[npc_name:first]"] = (actor, name, length) => ValidateNPCName(actor, name, length).FirstName().CheckForUpperCase(),
+            ["[npc_name:first]"] = (actor, name, length, isPlayerName) => ValidateNPCName(actor, name, length, isPlayerName).FirstName().CheckForUpperCase(),
 
-            ["[npc_name:last]"] = (actor, name, length) => ValidateNPCName(actor, name, length).LastName().CheckForUpperCase(),
+            ["[npc_name:last]"] = (actor, name, length, isPlayerName) => ValidateNPCName(actor, name, length, isPlayerName).LastName().CheckForUpperCase(),
 
-            ["[npc_name:initials]"] = (actor, name, length) => ValidateNPCName(actor, name, length).Initials().CheckForUpperCase(),
+            ["[npc_name:initials]"] = (actor, name, length, isPlayerName) => ValidateNPCName(actor, name, length, isPlayerName).Initials().CheckForUpperCase(),
             #endregion
         };
 
@@ -180,7 +180,7 @@ namespace DelvUI.Helpers
             ManaTextTags
         };
 
-        private static string ReplaceTagWithString(string tag, GameObject? actor, string? name = null, uint? current = null, uint? max = null)
+        private static string ReplaceTagWithString(string tag, GameObject? actor, string? name = null, uint? current = null, uint? max = null, bool? isPlayerName = null)
         {
             int length = 0;
             if (tag.Contains("."))
@@ -198,9 +198,9 @@ namespace DelvUI.Helpers
                 tag = tag.Substring(0, tag.Length - lengthString.Length - 2) + "]";
             }
 
-            if (TextTags.TryGetValue(tag, out Func<GameObject?, string?, int, string>? func) && func != null)
+            if (TextTags.TryGetValue(tag, out Func<GameObject?, string?, int, bool?, string>? func) && func != null)
             {
-                return func(actor, name, length);
+                return func(actor, name, length, isPlayerName);
             }
 
             if (ExpTags.TryGetValue(tag, out Func<GameObject?, string?, string>? expFunc) && expFunc != null)
@@ -227,12 +227,12 @@ namespace DelvUI.Helpers
             return "";
         }
 
-        public static string FormattedText(string text, GameObject? actor, string? name = null, uint? current = null, uint? max = null)
+        public static string FormattedText(string text, GameObject? actor, string? name = null, uint? current = null, uint? max = null, bool? isPlayerName = null)
         {
             MatchCollection matches = Regex.Matches(text, @"\[(.*?)\]");
             return matches.Aggregate(text, (c, m) =>
             {
-                string formattedText = ReplaceTagWithString(m.Value, actor, name, current, max);
+                string formattedText = ReplaceTagWithString(m.Value, actor, name, current, max, isPlayerName);
                 return c.Replace(m.Value, formattedText);
             });
         }
@@ -249,9 +249,13 @@ namespace DelvUI.Helpers
             return str;
         }
 
-        private static string ValidatePlayerName(GameObject? actor, string? name, int length = 0)
+        private static string ValidatePlayerName(GameObject? actor, string? name, int length = 0, bool? isPlayerName = null)
         {
-            if (actor?.ObjectKind != ObjectKind.Player)
+            if (isPlayerName.HasValue && isPlayerName.Value == false)
+            {
+                return "";
+            }
+            else if (!isPlayerName.HasValue && actor?.ObjectKind != ObjectKind.Player)
             {
                 return "";
             }
@@ -259,9 +263,13 @@ namespace DelvUI.Helpers
             return ValidateName(actor, name, length);
         }
 
-        private static string ValidateNPCName(GameObject? actor, string? name, int length = 0)
+        private static string ValidateNPCName(GameObject? actor, string? name, int length = 0, bool? isPlayerName = null)
         {
-            if (actor?.ObjectKind == ObjectKind.Player)
+            if (isPlayerName.HasValue && isPlayerName.Value == true)
+            {
+                return "";
+            }
+            else if (!isPlayerName.HasValue && actor?.ObjectKind == ObjectKind.Player)
             {
                 return "";
             }

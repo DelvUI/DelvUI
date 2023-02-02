@@ -27,7 +27,7 @@ namespace DelvUI.Interface.GeneralElements
         }
 
         public virtual void Draw(Vector2 origin, Vector2? parentSize = null,
-            GameObject? actor = null, string? actorName = null, uint? actorCurrentHp = null, uint? actorMaxHp = null)
+            GameObject? actor = null, string? actorName = null, uint? actorCurrentHp = null, uint? actorMaxHp = null, bool? isPlayerName = null)
         {
             if (!Config.Enabled || Config.GetText() == null)
             {
@@ -36,7 +36,7 @@ namespace DelvUI.Interface.GeneralElements
 
             string? text = actor == null && actorName == null && actorCurrentHp == null && actorMaxHp == null ?
                 Config.GetText() :
-                TextTagsHelper.FormattedText(Config.GetText(), actor, actorName, actorCurrentHp, actorMaxHp);
+                TextTagsHelper.FormattedText(Config.GetText(), actor, actorName, actorCurrentHp, actorMaxHp, isPlayerName);
 
             DrawLabel(text, origin, parentSize ?? Vector2.Zero, actor);
         }
@@ -138,7 +138,7 @@ namespace DelvUI.Interface.GeneralElements
         }
 
         public override void Draw(Vector2 origin, Vector2? parentSize = null,
-            GameObject? actor = null, string? actorName = null, uint? actorCurrentHp = null, uint? actorMaxHp = null)
+            GameObject? actor = null, string? actorName = null, uint? actorCurrentHp = null, uint? actorMaxHp = null, bool? isPlayerName = null)
         {
             string? text = Config.GetText();
             if (!Config.Enabled || text == null)
