@@ -86,7 +86,7 @@ namespace DelvUI.Interface.Party
         public Vector2 Padding = new Vector2(0, 0);
 
         [NestedConfig("Name Label", 40)]
-        public EditableLabelConfig NameLabelConfig = new EditableLabelConfig(Vector2.Zero, "[name:first-initial]. [name:last-initial].", DrawAnchor.Center, DrawAnchor.Center);
+        public EditableLabelConfig NameLabelConfig = new EditableLabelConfig(Vector2.Zero, "[name:initials].", DrawAnchor.Center, DrawAnchor.Center);
 
         [NestedConfig("Health Label", 45)]
         public EditableLabelConfig HealthLabelConfig = new EditableLabelConfig(Vector2.Zero, "[health:current-short]", DrawAnchor.Right, DrawAnchor.Right);

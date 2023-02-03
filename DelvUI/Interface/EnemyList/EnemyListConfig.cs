@@ -50,7 +50,7 @@ namespace DelvUI.Interface.EnemyList
     public class EnemyListHealthBarConfig : BarConfig
     {
         [NestedConfig("Name Label", 70)]
-        public EditableLabelConfig NameLabel = new EditableLabelConfig(new Vector2(-5, 12), "[name:first-npcfull]", DrawAnchor.TopRight, DrawAnchor.BottomRight);
+        public EditableLabelConfig NameLabel = new EditableLabelConfig(new Vector2(-5, 12), "[name]", DrawAnchor.TopRight, DrawAnchor.BottomRight);
 
         [NestedConfig("Health Label", 80)]
         public EditableLabelConfig HealthLabel = new EditableLabelConfig(new Vector2(30, 0), "[health:percent]%", DrawAnchor.Left, DrawAnchor.Left);

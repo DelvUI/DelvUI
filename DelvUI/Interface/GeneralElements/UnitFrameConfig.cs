@@ -25,7 +25,7 @@ namespace DelvUI.Interface.GeneralElements
             var size = HUDConstants.DefaultBigUnitFrameSize;
             var pos = new Vector2(-HUDConstants.UnitFramesOffsetX - size.X / 2f, HUDConstants.BaseHUDOffsetY);
 
-            var leftLabelConfig = new EditableLabelConfig(new Vector2(5, 0), "[name:abbreviate]", DrawAnchor.TopLeft, DrawAnchor.BottomLeft);
+            var leftLabelConfig = new EditableLabelConfig(new Vector2(5, 0), "[name]", DrawAnchor.TopLeft, DrawAnchor.BottomLeft);
             var rightLabelConfig = new EditableLabelConfig(new Vector2(-5, 0), "[health:current-short] | [health:percent]", DrawAnchor.TopRight, DrawAnchor.BottomRight);
             var optionalLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "", DrawAnchor.Center, DrawAnchor.Center);
 
@@ -83,7 +83,7 @@ namespace DelvUI.Interface.GeneralElements
             var pos = new Vector2(HUDConstants.UnitFramesOffsetX + size.X / 2f, HUDConstants.BaseHUDOffsetY);
 
             var leftLabelConfig = new EditableLabelConfig(new Vector2(5, 0), "[health:current-short] | [health:percent]", DrawAnchor.TopLeft, DrawAnchor.BottomLeft);
-            var rightLabelConfig = new EditableLabelConfig(new Vector2(-5, 0), "[name:abbreviate]", DrawAnchor.TopRight, DrawAnchor.BottomRight);
+            var rightLabelConfig = new EditableLabelConfig(new Vector2(-5, 0), "[name]", DrawAnchor.TopRight, DrawAnchor.BottomRight);
             var optionalLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "", DrawAnchor.Center, DrawAnchor.Center);
 
             return new TargetUnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig, optionalLabelConfig);
@@ -108,7 +108,7 @@ namespace DelvUI.Interface.GeneralElements
                 HUDConstants.BaseHUDOffsetY - 15
             );
 
-            var leftLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "[name:abbreviate]", DrawAnchor.Top, DrawAnchor.Bottom);
+            var leftLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "[name]", DrawAnchor.Top, DrawAnchor.Bottom);
             var rightLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "", DrawAnchor.Center, DrawAnchor.TopLeft);
             var optionalLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "", DrawAnchor.Center, DrawAnchor.BottomLeft);
 
@@ -134,7 +134,7 @@ namespace DelvUI.Interface.GeneralElements
                 HUDConstants.BaseHUDOffsetY - 15
             );
 
-            var leftLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "[name:abbreviate]", DrawAnchor.Top, DrawAnchor.Bottom);
+            var leftLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "[name]", DrawAnchor.Top, DrawAnchor.Bottom);
             var rightLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "", DrawAnchor.Center, DrawAnchor.Center);
             var optionalLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "", DrawAnchor.Bottom, DrawAnchor.Bottom);
 
