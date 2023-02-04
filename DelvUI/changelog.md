@@ -1,3 +1,6 @@
+# 1.5.3.1
+- Fixed name tags length cap not working properly.
+
 # 1.5.3.0
 - Reworked name text tags:
     + A lot of existing text tags have been removed.

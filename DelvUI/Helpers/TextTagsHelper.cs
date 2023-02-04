@@ -29,33 +29,74 @@ namespace DelvUI.Helpers
         public static Dictionary<string, Func<GameObject?, string?, int, bool?, string>> TextTags = new Dictionary<string, Func<GameObject?, string?, int, bool?, string>>()
         {
             #region generic names
-            ["[name]"] = (actor, name, length, isPlayerName) => ValidateName(actor, name, length).CheckForUpperCase(),
+            ["[name]"] = (actor, name, length, isPlayerName) => 
+                ValidateName(actor, name).
+                Truncated(length).
+                CheckForUpperCase(),
 
-            ["[name:first]"] = (actor, name, length, isPlayerName) => ValidateName(actor, name, length).FirstName().CheckForUpperCase(),
+            ["[name:first]"] = (actor, name, length, isPlayerName) => 
+                ValidateName(actor, name).
+                FirstName().
+                Truncated(length).
+                CheckForUpperCase(),
 
-            ["[name:last]"] = (actor, name, length, isPlayerName) => ValidateName(actor, name, length).LastName().CheckForUpperCase(),
+            ["[name:last]"] = (actor, name, length, isPlayerName) => 
+                ValidateName(actor, name).
+                LastName().
+                Truncated(length).
+                CheckForUpperCase(),
 
-            ["[name:initials]"] = (actor, name, length, isPlayerName) => ValidateName(actor, name, length).Initials().CheckForUpperCase(),
+            ["[name:initials]"] = (actor, name, length, isPlayerName) => 
+                ValidateName(actor, name).
+                Initials().
+                Truncated(length).
+                CheckForUpperCase(),
             #endregion
 
             #region player names
-            ["[player_name]"] = (actor, name, length, isPlayerName) => ValidatePlayerName(actor, name, length, isPlayerName).CheckForUpperCase(),
+            ["[player_name]"] = (actor, name, length, isPlayerName) => 
+                ValidatePlayerName(actor, name, isPlayerName).
+                Truncated(length).
+                CheckForUpperCase(),
 
-            ["[player_name:first]"] = (actor, name, length, isPlayerName) => ValidatePlayerName(actor, name, length, isPlayerName).FirstName().CheckForUpperCase(),
+            ["[player_name:first]"] = (actor, name, length, isPlayerName) => 
+                ValidatePlayerName(actor, name, isPlayerName).
+                FirstName().
+                Truncated(length).
+                CheckForUpperCase(),
 
-            ["[player_name:last]"] = (actor, name, length, isPlayerName) => ValidatePlayerName(actor, name, length, isPlayerName).LastName().CheckForUpperCase(),
+            ["[player_name:last]"] = (actor, name, length, isPlayerName) => 
+                ValidatePlayerName(actor, name, isPlayerName).
+                LastName().
+                Truncated(length).
+                CheckForUpperCase(),
 
-            ["[player_name:initials]"] = (actor, name, length, isPlayerName) => ValidatePlayerName(actor, name, length, isPlayerName).Initials().CheckForUpperCase(),
+            ["[player_name:initials]"] = (actor, name, length, isPlayerName) => 
+                ValidatePlayerName(actor, name, isPlayerName).
+                Initials().
+                Truncated(length).
+                CheckForUpperCase(),
             #endregion
 
             #region npc names
-            ["[npc_name]"] = (actor, name, length, isPlayerName) => ValidateNPCName(actor, name, length, isPlayerName).CheckForUpperCase(),
+            ["[npc_name]"] = (actor, name, length, isPlayerName) => 
+                ValidateNPCName(actor, name, isPlayerName).
+                CheckForUpperCase(),
 
-            ["[npc_name:first]"] = (actor, name, length, isPlayerName) => ValidateNPCName(actor, name, length, isPlayerName).FirstName().CheckForUpperCase(),
+            ["[npc_name:first]"] = (actor, name, length, isPlayerName) => 
+                ValidateNPCName(actor, name, isPlayerName).
+                FirstName().
+                CheckForUpperCase(),
 
-            ["[npc_name:last]"] = (actor, name, length, isPlayerName) => ValidateNPCName(actor, name, length, isPlayerName).LastName().CheckForUpperCase(),
+            ["[npc_name:last]"] = (actor, name, length, isPlayerName) => 
+                ValidateNPCName(actor, name, isPlayerName).
+                LastName().
+                CheckForUpperCase(),
 
-            ["[npc_name:initials]"] = (actor, name, length, isPlayerName) => ValidateNPCName(actor, name, length, isPlayerName).Initials().CheckForUpperCase(),
+            ["[npc_name:initials]"] = (actor, name, length, isPlayerName) => 
+                ValidateNPCName(actor, name, isPlayerName).
+                Initials().
+                CheckForUpperCase(),
             #endregion
         };
 
@@ -237,19 +278,12 @@ namespace DelvUI.Helpers
             });
         }
 
-        private static string ValidateName(GameObject? actor, string? name, int length = 0)
+        private static string ValidateName(GameObject? actor, string? name)
         {
-            string str = actor != null ? actor.Name.ToString() : (name ?? "");
-
-            if (length > 0)
-            {
-                str = str.Substring(0, Math.Min(str.Length, length));
-            }
-
-            return str;
+           return actor != null ? actor.Name.ToString() : (name ?? "");
         }
 
-        private static string ValidatePlayerName(GameObject? actor, string? name, int length = 0, bool? isPlayerName = null)
+        private static string ValidatePlayerName(GameObject? actor, string? name, bool? isPlayerName = null)
         {
             if (isPlayerName.HasValue && isPlayerName.Value == false)
             {
@@ -260,10 +294,10 @@ namespace DelvUI.Helpers
                 return "";
             }
 
-            return ValidateName(actor, name, length);
+            return ValidateName(actor, name);
         }
 
-        private static string ValidateNPCName(GameObject? actor, string? name, int length = 0, bool? isPlayerName = null)
+        private static string ValidateNPCName(GameObject? actor, string? name, bool? isPlayerName = null)
         {
             if (isPlayerName.HasValue && isPlayerName.Value == true)
             {
@@ -274,7 +308,7 @@ namespace DelvUI.Helpers
                 return "";
             }
 
-            return ValidateName(actor, name, length);
+            return ValidateName(actor, name);
         }
 
         private static string ConsistentDigitPercentage(float currentVal, float maxVal){

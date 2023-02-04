@@ -54,14 +54,9 @@ namespace DelvUI
             return initials;
         }
 
-        public static string Truncate(this string str, int maxLength)
+        public static string Truncated(this string str, int length = 0)
         {
-            if (string.IsNullOrEmpty(str))
-            {
-                return str;
-            }
-
-            return str.Length <= maxLength ? str : str[..maxLength];
+            return length > 0 ? str.Substring(0, Math.Min(str.Length, length)) : str;
         }
 
         public static Vector4 AdjustColor(this Vector4 vec, float correctionFactor)
