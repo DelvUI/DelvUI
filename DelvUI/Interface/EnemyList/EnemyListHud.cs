@@ -108,6 +108,7 @@ namespace DelvUI.Interface.EnemyList
             _buffsListHud.StopPreview();
             _debuffsListHud.StopPreview();
             Configs.HealthBar.MouseoverAreaConfig.Preview = false;
+            Configs.SignIcon.Preview = false;
         }
 
         public void StopMouseover()

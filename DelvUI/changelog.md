@@ -1,5 +1,6 @@
 # 1.5.3.2
 - Fixed castbar dissappearing mid-cast for some enemy abilites.
+- Fixed Enemy List sign icons preview not being disabled automatically.
 
 # 1.5.3.1
 - Fixed name tags length cap not working properly.
