@@ -1,3 +1,6 @@
+# 1.5.3.2
+- Fixed castbar dissappearing mid-cast for some enemy abilites.
+
 # 1.5.3.1
 - Fixed name tags length cap not working properly.
 

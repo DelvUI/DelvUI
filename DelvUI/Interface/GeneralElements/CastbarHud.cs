@@ -1,20 +1,16 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.EnemyList;
 using FFXIVClientStructs.FFXIV.Client.Game;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
-using System.Runtime.InteropServices;
-using System.Text;
 using StructsBattleChara = FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara;
 
 namespace DelvUI.Interface.GeneralElements
@@ -156,26 +152,29 @@ namespace DelvUI.Interface.GeneralElements
 
         private unsafe void UpdateCurrentCast(out float currentCastTime, out float totalCastTime)
         {
-            currentCastTime = Config.Preview ? 0.5f : 0f;
-            totalCastTime = 1f;
-
             if (Config.Preview || Actor is not BattleChara battleChara)
             {
+                currentCastTime = Config.Preview ? 0.5f : 0f;
+                totalCastTime = 1f;
                 return;
             }
 
-            totalCastTime = 0;
-            if (!battleChara.IsCasting)
+            float current = battleChara.CurrentCastTime;
+            StructsBattleChara* chara = (StructsBattleChara*)battleChara.Address;
+            float total = chara->SpellCastInfo.AdjustedTotalCastTime;
+
+            if (!battleChara.IsCasting && current <= 0)
             {
+                currentCastTime = 0;
+                totalCastTime = 0;
                 return;
             }
+
+            currentCastTime = current;
+            totalCastTime = total;
 
             uint currentCastId = battleChara.CastActionId;
             ActionType currentCastType = (ActionType)battleChara.CastActionType;
-            currentCastTime = battleChara.CurrentCastTime;
-
-            StructsBattleChara* chara = (StructsBattleChara*)battleChara.Address;
-            totalCastTime = chara->SpellCastInfo.AdjustedTotalCastTime;
 
             if (LastUsedCast == null || LastUsedCast.CastId != currentCastId || LastUsedCast.ActionType != currentCastType)
             {
