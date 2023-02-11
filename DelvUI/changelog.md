@@ -1,7 +1,16 @@
 # 1.5.4.0
+- Implemented format groups for labels:
+    + This allows you to have entirely different formats for players and NPCs.
+    + The format is `{unitType=<text>}`. Anything inside the brackets will only be shown for units of that `unitType`.
+    + Valid unitTypes are `player` and `npc`.
+    + The text inside a group can have text tags.
+    + Example `{player=Lv [level]  [name:initials]}{npc=[distance]y  [name]}`:
+        * This will display "Lv 90  J. D." for a level 90 player named "John Doe".
+        * This will display "30y  Striking Dummy" for a Striking Dummy NPC that is 30 yalms away from you.
+
 - Removed some text tags: `[health:current-max]`, `[health:current-max-short]`, `[mana:current-max]`, `[mana:current-max-short]`.
     + These can easily be replaced by combining other existing tags.
-    + Example `[health:current] | [health:max]`
+    + Example: `[health:current] | [health:max]`.
 
 - Updated text tag `[time-till-max-gp]`:
     + New format is `mm:ss` (the parenthesis were removed).

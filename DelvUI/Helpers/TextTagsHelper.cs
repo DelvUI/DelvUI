@@ -1,5 +1,6 @@
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Logging;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using System;
 using System.Collections.Generic;
@@ -214,20 +215,7 @@ namespace DelvUI.Helpers
         private static string ReplaceTagWithString(string tag, GameObject? actor, string? name = null, uint? current = null, uint? max = null, bool? isPlayerName = null)
         {
             int length = 0;
-            if (tag.Contains("."))
-            {
-                int index = tag.IndexOf(".");
-                string lengthString = tag.Substring(index + 1);
-                lengthString = lengthString.Substring(0, lengthString.Length - 1);
-
-                try
-                {
-                    length = int.Parse(lengthString);
-                }
-                catch { }
-
-                tag = tag.Substring(0, tag.Length - lengthString.Length - 2) + "]";
-            }
+            ParseLength(ref tag, ref length);
 
             if (TextTags.TryGetValue(tag, out Func<GameObject?, string?, int, bool?, string>? func) && func != null)
             {
@@ -260,14 +248,125 @@ namespace DelvUI.Helpers
 
         public static string FormattedText(string text, GameObject? actor, string? name = null, uint? current = null, uint? max = null, bool? isPlayerName = null)
         {
-            MatchCollection matches = Regex.Matches(text, @"\[(.*?)\]");
-            return matches.Aggregate(text, (c, m) =>
+            bool isPlayer = (isPlayerName.HasValue && isPlayerName.Value == true) ||
+                            (actor != null && actor.ObjectKind == ObjectKind.Player);
+
+            try
             {
-                string formattedText = ReplaceTagWithString(m.Value, actor, name, current, max, isPlayerName);
-                return c.Replace(m.Value, formattedText);
-            });
+                // grouping
+                List<string> groups = ParseGroups(text);
+                string result = "";
+
+                foreach (string group in groups)
+                {
+                    // tags
+                    string groupText = ParseGroup(group, isPlayer);
+
+                    MatchCollection matches = Regex.Matches(groupText, @"\[(.*?)\]");
+                    string formattedGroupText = matches.Aggregate(groupText, (c, m) =>
+                    {
+                        string formattedText = ReplaceTagWithString(m.Value, actor, name, current, max, isPlayerName);
+                        return c.Replace(m.Value, formattedText);
+                    });
+
+                    result += formattedGroupText;
+                }
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                PluginLog.Error(e.Message);
+                return text;
+            }
         }
 
+        private static List<string> ParseGroups(string text)
+        {
+            MatchCollection matches = Regex.Matches(text, @"\{(.*?)\}");
+            if (matches.Count == 0)
+            {
+                return new List<string>() { text };
+            }
+
+            List<string> result = new List<string>();
+            int index = 0;
+
+            foreach (Match match in matches)
+            {
+                if (index < match.Index)
+                {
+                    result.Add(text.Substring(0, match.Index - index));
+                }
+
+                result.Add(text.Substring(match.Index, match.Length));
+                index = match.Index + match.Length;
+            }
+
+            if (index < text.Length)
+            {
+                result.Add(text.Substring(index));
+            }
+
+            return result;
+        }
+
+        private static string ParseGroup(string text, bool isPlayer)
+        {
+            if (!text.Contains("="))
+            {
+                return text;
+            }
+
+            if (isPlayer)
+            {
+                if (text.StartsWith("{player="))
+                {
+                    text = text.Substring(8);
+                }
+                else
+                {
+                    return "";
+                }
+            }
+            else
+            {
+                if (text.StartsWith("{npc="))
+                {
+                    text = text.Substring(5);
+                }
+                else
+                {
+                    return "";
+                }
+            }
+
+            int groupEndIndex = text.IndexOf("}");
+            if (groupEndIndex > 0)
+            {
+                text = text.Remove(groupEndIndex, 1);
+            }
+
+            return text;
+        }
+
+        private static void ParseLength(ref string tag, ref int length)
+        {
+            int index = tag.IndexOf(".");
+            if (index != -1)
+            {
+                string lengthString = tag.Substring(index + 1);
+                lengthString = lengthString.Substring(0, lengthString.Length - 1);
+
+                try
+                {
+                    length = int.Parse(lengthString);
+                }
+                catch { }
+
+                tag = tag.Substring(0, tag.Length - lengthString.Length - 2) + "]";
+            }
+        }
         private static string ValidateName(GameObject? actor, string? name)
         {
             return actor != null ? actor.Name.ToString() : (name ?? "");
