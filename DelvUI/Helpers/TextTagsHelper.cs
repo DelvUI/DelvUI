@@ -1,8 +1,6 @@
 using Dalamud.Game.ClientState.Objects.Enums;
-using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -29,24 +27,24 @@ namespace DelvUI.Helpers
         public static Dictionary<string, Func<GameObject?, string?, int, bool?, string>> TextTags = new Dictionary<string, Func<GameObject?, string?, int, bool?, string>>()
         {
             #region generic names
-            ["[name]"] = (actor, name, length, isPlayerName) => 
+            ["[name]"] = (actor, name, length, isPlayerName) =>
                 ValidateName(actor, name).
                 Truncated(length).
                 CheckForUpperCase(),
 
-            ["[name:first]"] = (actor, name, length, isPlayerName) => 
+            ["[name:first]"] = (actor, name, length, isPlayerName) =>
                 ValidateName(actor, name).
                 FirstName().
                 Truncated(length).
                 CheckForUpperCase(),
 
-            ["[name:last]"] = (actor, name, length, isPlayerName) => 
+            ["[name:last]"] = (actor, name, length, isPlayerName) =>
                 ValidateName(actor, name).
                 LastName().
                 Truncated(length).
                 CheckForUpperCase(),
 
-            ["[name:initials]"] = (actor, name, length, isPlayerName) => 
+            ["[name:initials]"] = (actor, name, length, isPlayerName) =>
                 ValidateName(actor, name).
                 Initials().
                 Truncated(length).
@@ -54,24 +52,24 @@ namespace DelvUI.Helpers
             #endregion
 
             #region player names
-            ["[player_name]"] = (actor, name, length, isPlayerName) => 
+            ["[player_name]"] = (actor, name, length, isPlayerName) =>
                 ValidatePlayerName(actor, name, isPlayerName).
                 Truncated(length).
                 CheckForUpperCase(),
 
-            ["[player_name:first]"] = (actor, name, length, isPlayerName) => 
+            ["[player_name:first]"] = (actor, name, length, isPlayerName) =>
                 ValidatePlayerName(actor, name, isPlayerName).
                 FirstName().
                 Truncated(length).
                 CheckForUpperCase(),
 
-            ["[player_name:last]"] = (actor, name, length, isPlayerName) => 
+            ["[player_name:last]"] = (actor, name, length, isPlayerName) =>
                 ValidatePlayerName(actor, name, isPlayerName).
                 LastName().
                 Truncated(length).
                 CheckForUpperCase(),
 
-            ["[player_name:initials]"] = (actor, name, length, isPlayerName) => 
+            ["[player_name:initials]"] = (actor, name, length, isPlayerName) =>
                 ValidatePlayerName(actor, name, isPlayerName).
                 Initials().
                 Truncated(length).
@@ -79,21 +77,21 @@ namespace DelvUI.Helpers
             #endregion
 
             #region npc names
-            ["[npc_name]"] = (actor, name, length, isPlayerName) => 
+            ["[npc_name]"] = (actor, name, length, isPlayerName) =>
                 ValidateNPCName(actor, name, isPlayerName).
                 CheckForUpperCase(),
 
-            ["[npc_name:first]"] = (actor, name, length, isPlayerName) => 
+            ["[npc_name:first]"] = (actor, name, length, isPlayerName) =>
                 ValidateNPCName(actor, name, isPlayerName).
                 FirstName().
                 CheckForUpperCase(),
 
-            ["[npc_name:last]"] = (actor, name, length, isPlayerName) => 
+            ["[npc_name:last]"] = (actor, name, length, isPlayerName) =>
                 ValidateNPCName(actor, name, isPlayerName).
                 LastName().
                 CheckForUpperCase(),
 
-            ["[npc_name:initials]"] = (actor, name, length, isPlayerName) => 
+            ["[npc_name:initials]"] = (actor, name, length, isPlayerName) =>
                 ValidateNPCName(actor, name, isPlayerName).
                 Initials().
                 CheckForUpperCase(),
@@ -126,13 +124,9 @@ namespace DelvUI.Helpers
 
             ["[health:current-short]"] = (currentHp, maxHp) => currentHp.KiloFormat(),
 
-            ["[health:current-percent]"] = (currentHp, maxHp) => currentHp == maxHp ? currentHp.ToString() : (100f * currentHp / Math.Max(1, maxHp)).ToString("N0"),
+            ["[health:current-percent]"] = (currentHp, maxHp) => currentHp == maxHp ? currentHp.ToString() : (100f * currentHp / Math.Max(1, maxHp)).ToString("N0") + "%",
 
-            ["[health:current-percent-short]"] = (currentHp, maxHp) => currentHp == maxHp ? currentHp.KiloFormat() : (100f * currentHp / Math.Max(1, maxHp)).ToString("N0"),
-
-            ["[health:current-max]"] = (currentHp, maxHp) => $"{currentHp}  |  {maxHp}",
-
-            ["[health:current-max-short]"] = (currentHp, maxHp) => $"{currentHp.KiloFormat()}  |  {maxHp.KiloFormat()}",
+            ["[health:current-percent-short]"] = (currentHp, maxHp) => currentHp == maxHp ? currentHp.KiloFormat() : (100f * currentHp / Math.Max(1, maxHp)).ToString("N0") + "%",
 
             ["[health:max]"] = (currentHp, maxHp) => maxHp.ToString(),
 
@@ -157,13 +151,9 @@ namespace DelvUI.Helpers
 
             ["[mana:current-short]"] = (currentMp, maxMp) => currentMp.KiloFormat(),
 
-            ["[mana:current-percent]"] = (currentMp, maxMp) => currentMp == maxMp ? currentMp.ToString() : (100f * currentMp / Math.Max(1, maxMp)).ToString("N0"),
+            ["[mana:current-percent]"] = (currentMp, maxMp) => currentMp == maxMp ? currentMp.ToString() : (100f * currentMp / Math.Max(1, maxMp)).ToString("N0") + "%",
 
-            ["[mana:current-percent-short]"] = (currentMp, maxMp) => currentMp == maxMp ? currentMp.KiloFormat() : (100f * currentMp / Math.Max(1, maxMp)).ToString("N0"),
-
-            ["[mana:current-max]"] = (currentMp, maxMp) => $"{currentMp}  |  {maxMp}",
-
-            ["[mana:current-max-short]"] = (currentMp, maxMp) => $"{currentMp.KiloFormat()}  |  {maxMp.KiloFormat()}",
+            ["[mana:current-percent-short]"] = (currentMp, maxMp) => currentMp == maxMp ? currentMp.KiloFormat() : (100f * currentMp / Math.Max(1, maxMp)).ToString("N0") + "%",
 
             ["[mana:max]"] = (currentMp, maxMp) => maxMp.ToString(),
 
@@ -280,7 +270,7 @@ namespace DelvUI.Helpers
 
         private static string ValidateName(GameObject? actor, string? name)
         {
-           return actor != null ? actor.Name.ToString() : (name ?? "");
+            return actor != null ? actor.Name.ToString() : (name ?? "");
         }
 
         private static string ValidatePlayerName(GameObject? actor, string? name, bool? isPlayerName = null)
@@ -311,7 +301,8 @@ namespace DelvUI.Helpers
             return ValidateName(actor, name);
         }
 
-        private static string ConsistentDigitPercentage(float currentVal, float maxVal){
+        private static string ConsistentDigitPercentage(float currentVal, float maxVal)
+        {
             var rawPercentage = 100f * currentVal / Math.Max(1f, maxVal);
             return rawPercentage >= 100 || rawPercentage <= 0 ? rawPercentage.ToString("N0") : rawPercentage.ToString("N1");
         }

@@ -1,5 +1,15 @@
+# 1.5.4.0
+- Removed some text tags: `[health:current-max]`, `[health:current-max-short]`, `[mana:current-max]`, `[mana:current-max-short]`.
+    + These can easily be replaced by combining other existing tags.
+    + Example `[health:current] | [health:max]`
+
+- Updated text tag `[time-till-max-gp]`:
+    + New format is `mm:ss` (the parenthesis were removed).
+
+- Fixed experience text tags not showing in the text tags list.
+
 # 1.5.3.2
-- Fixed castbar dissappearing mid-cast for some enemy abilites.
+- Fixed castbar disappearing mid-cast for some enemy abilities.
 - Fixed Enemy List sign icons preview not being disabled automatically.
 
 # 1.5.3.1
@@ -429,7 +439,7 @@ Features:
 
 Fixes:
 - Fixed Bard's Bloodletter Bar showing 2 charges instead of 3 with the level 84 trait.
-- Fixed "[time-till-max-gp]" text tag not working properly.
+- Fixed `[time-till-max-gp]` text tag not working properly.
 - Fixed Border Color on chunked bars.
 
 # 0.6.0.1

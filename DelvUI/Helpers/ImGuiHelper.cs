@@ -248,6 +248,7 @@ namespace DelvUI.Helpers
 
                 List<string> keys = new List<string>();
                 keys.AddRange(TextTagsHelper.TextTags.Keys);
+                keys.AddRange(TextTagsHelper.ExpTags.Keys);
                 keys.AddRange(TextTagsHelper.CharaTextTags.Keys);
 
                 foreach (string key in keys)
