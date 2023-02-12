@@ -2,10 +2,12 @@ using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Logging;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
 
 namespace DelvUI.Helpers
@@ -206,13 +208,33 @@ namespace DelvUI.Helpers
             #endregion
         };
 
+        public static Dictionary<string, Func<string, int, string>> TitleTextTags = new Dictionary<string, Func<string, int, string>>()
+        {
+            #region title
+            ["[title]"] = (title, length) => title.Truncated(length).CheckForUpperCase(),
+
+            ["[title:first]"] = (title, length) => title.FirstName().Truncated(length).CheckForUpperCase(),
+
+            ["[title:last]"] = (title, length) => title.LastName().Truncated(length).CheckForUpperCase(),
+
+            ["[title:initials]"] = (title, length) => title.Initials().Truncated(length).CheckForUpperCase(),
+            #endregion
+        };
+
         private static List<Dictionary<string, Func<uint, uint, string>>> NumericValuesTagMaps = new List<Dictionary<string, Func<uint, uint, string>>>()
         {
             HealthTextTags,
             ManaTextTags
         };
 
-        private static string ReplaceTagWithString(string tag, GameObject? actor, string? name = null, uint? current = null, uint? max = null, bool? isPlayerName = null)
+        private static string ReplaceTagWithString(
+            string tag, 
+            GameObject? actor, 
+            string? name = null, 
+            uint? current = null, 
+            uint? max = null, 
+            bool? isPlayerName = null,
+            string? title = null)
         {
             int length = 0;
             ParseLength(ref tag, ref length);
@@ -243,10 +265,23 @@ namespace DelvUI.Helpers
                 }
             }
 
+            if (title != null &&
+                TitleTextTags.TryGetValue(tag, out Func<string, int, string>? titlefunc) && titlefunc != null)
+            {
+                return titlefunc(title, length);
+            }
+
             return "";
         }
 
-        public static string FormattedText(string text, GameObject? actor, string? name = null, uint? current = null, uint? max = null, bool? isPlayerName = null)
+        public static string FormattedText(
+            string text, 
+            GameObject? actor, 
+            string? name = null, 
+            uint? current = null, 
+            uint? max = null, 
+            bool? isPlayerName = null,
+            string? title = null)
         {
             bool isPlayer = (isPlayerName.HasValue && isPlayerName.Value == true) ||
                             (actor != null && actor.ObjectKind == ObjectKind.Player);
@@ -265,7 +300,7 @@ namespace DelvUI.Helpers
                     MatchCollection matches = Regex.Matches(groupText, @"\[(.*?)\]");
                     string formattedGroupText = matches.Aggregate(groupText, (c, m) =>
                     {
-                        string formattedText = ReplaceTagWithString(m.Value, actor, name, current, max, isPlayerName);
+                        string formattedText = ReplaceTagWithString(m.Value, actor, name, current, max, isPlayerName, title);
                         return c.Replace(m.Value, formattedText);
                     });
 

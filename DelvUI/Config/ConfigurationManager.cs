@@ -511,6 +511,16 @@ namespace DelvUI.Config
             typeof(FocusTargetDebuffsListConfig),
             typeof(CustomEffectsListConfig),
 
+            typeof(NameplatesGeneralConfig),
+            typeof(PlayerNameplateConfig),
+            typeof(PartyMembersNameplateConfig),
+            typeof(AllianceMembersNameplateConfig),
+            typeof(FriendPlayerNameplateConfig),
+            typeof(OtherPlayerNameplateConfig),
+            typeof(NonCombatNPCNameplateConfig),
+            typeof(MinionNPCNameplateConfig),
+            typeof(ObjectsNameplateConfig),
+
             typeof(PartyFramesConfig),
             typeof(PartyFramesHealthBarsConfig),
             typeof(PartyFramesManaBarConfig),

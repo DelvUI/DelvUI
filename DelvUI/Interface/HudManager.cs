@@ -7,6 +7,7 @@ using DelvUI.Helpers;
 using DelvUI.Interface.EnemyList;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Jobs;
+using DelvUI.Interface.Nameplates;
 using DelvUI.Interface.Party;
 using DelvUI.Interface.PartyCooldowns;
 using DelvUI.Interface.StatusEffects;
@@ -44,6 +45,8 @@ namespace DelvUI.Interface
         private Dictionary<uint, JobHudTypes> _jobsMap = null!;
         private Dictionary<uint, Type> _unsupportedJobsMap = null!;
         private List<Type> _jobTypes = null!;
+
+        private NameplatesHud _nameplatesHud = null!;
 
         private double _occupiedInQuestStartTime = -1;
 
@@ -187,6 +190,8 @@ namespace DelvUI.Interface
             _hudElementsUsingTargetOfTarget = new List<IHudElementWithActor>();
             _hudElementsUsingFocusTarget = new List<IHudElementWithActor>();
             _hudElementsWithPreview = new List<IHudElementWithPreview>();
+
+            _nameplatesHud = new NameplatesHud(ConfigurationManager.Instance.GetConfigObject<NameplatesGeneralConfig>());
 
             CreateUnitFrames();
             CreateManaBars();
@@ -456,6 +461,13 @@ namespace DelvUI.Interface
                 DraggablesHelper.DrawElements(origin, _hudHelper, _hudElements.Values, _jobHud, _selectedElement);
             }
 
+            // nameplates
+            if (_nameplatesHud.GetConfig().Enabled)
+            {
+                _nameplatesHud.PrepareForDraw(origin);
+                _nameplatesHud.Draw(origin);
+            }
+
             // tooltip
             TooltipsHelper.Instance.Draw();
 
@@ -701,8 +713,12 @@ namespace DelvUI.Interface
         internal static int UnitFramesOffsetX = 160;
         internal static int PlayerCastbarY = BaseHUDOffsetY - 13;
         internal static int JobHudsBaseY = PlayerCastbarY - 14;
+
         internal static Vector2 DefaultBigUnitFrameSize = new Vector2(270, 50);
         internal static Vector2 DefaultSmallUnitFrameSize = new Vector2(120, 20);
         internal static Vector2 DefaultStatusEffectsListSize = new Vector2(292, 82);
+        
+        internal static Vector2 DefaultPlayerNameplateBarSize = new Vector2(120, 10);
+        internal static Vector2 DefaultEnemyNameplateBarSize = new Vector2(200, 18);
     }
 }

@@ -184,6 +184,16 @@ namespace DelvUI.Config
             Update();
         }
 
+        public static PluginConfigColor FromHex(uint hexColor)
+        {
+            // ARGB to ABGR
+            uint r = (hexColor >> 16) & 0xFF;
+            uint b = hexColor & 0xFF;
+            hexColor = (hexColor & 0xFF00FF00) | (b << 16) | r;
+
+            return new PluginConfigColor(ImGui.ColorConvertU32ToFloat4(hexColor));
+        }
+
         public Vector4 Vector
         {
             get => _vector;

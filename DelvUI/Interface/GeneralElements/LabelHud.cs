@@ -26,17 +26,24 @@ namespace DelvUI.Interface.GeneralElements
             Draw(origin);
         }
 
-        public virtual void Draw(Vector2 origin, Vector2? parentSize = null,
-            GameObject? actor = null, string? actorName = null, uint? actorCurrentHp = null, uint? actorMaxHp = null, bool? isPlayerName = null)
+        public virtual void Draw(
+            Vector2 origin, 
+            Vector2? parentSize = null,
+            GameObject? actor = null, 
+            string? actorName = null, 
+            uint? actorCurrentHp = null, 
+            uint? actorMaxHp = null, 
+            bool? isPlayerName = null,
+            string? title = null)
         {
             if (!Config.Enabled || Config.GetText() == null)
             {
                 return;
             }
 
-            string? text = actor == null && actorName == null && actorCurrentHp == null && actorMaxHp == null ?
+            string? text = actor == null && actorName == null && actorCurrentHp == null && actorMaxHp == null && title == null ?
                 Config.GetText() :
-                TextTagsHelper.FormattedText(Config.GetText(), actor, actorName, actorCurrentHp, actorMaxHp, isPlayerName);
+                TextTagsHelper.FormattedText(Config.GetText(), actor, actorName, actorCurrentHp, actorMaxHp, isPlayerName, title);
 
             DrawLabel(text, origin, parentSize ?? Vector2.Zero, actor);
         }
@@ -107,7 +114,7 @@ namespace DelvUI.Interface.GeneralElements
             switch (Config.UseJobColor)
             {
                 case true when (actor is Character || actor is BattleNpc battleNpc && battleNpc.ClassJob.Id > 0):
-                    return Utils.ColorForActor(actor);
+                    return ColorUtils.ColorForActor(actor);
                 case true when actor is not Character:
                     return GlobalColors.Instance.NPCFriendlyColor;
             }
@@ -119,7 +126,7 @@ namespace DelvUI.Interface.GeneralElements
                         Character? character = actor as Character;
                         return character != null && character.ClassJob.Id > 0 ?
                             GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id) :
-                            Utils.ColorForActor(character);
+                            ColorUtils.ColorForActor(character);
                     }
                 case true when actor is not Character:
                     return GlobalColors.Instance.NPCFriendlyColor;
@@ -137,8 +144,14 @@ namespace DelvUI.Interface.GeneralElements
         {
         }
 
-        public override void Draw(Vector2 origin, Vector2? parentSize = null,
-            GameObject? actor = null, string? actorName = null, uint? actorCurrentHp = null, uint? actorMaxHp = null, bool? isPlayerName = null)
+        public override void Draw(Vector2 origin, 
+            Vector2? parentSize = null,
+            GameObject? actor = null, 
+            string? actorName = null, 
+            uint? actorCurrentHp = null, 
+            uint? actorMaxHp = null, 
+            bool? isPlayerName = null,
+            string? title = null)
         {
             string? text = Config.GetText();
             if (!Config.Enabled || text == null)

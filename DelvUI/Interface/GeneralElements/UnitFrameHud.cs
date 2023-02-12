@@ -1,20 +1,22 @@
-﻿using Dalamud.Game.ClientState.Objects.SubKinds;
+﻿using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using Dalamud.Game.ClientState.Objects.Enums;
-using FFXIVClientStructs.FFXIV.Component.GUI;
-using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using BattleChara = Dalamud.Game.ClientState.Objects.Types.BattleChara;
+using Character = Dalamud.Game.ClientState.Objects.Types.Character;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -93,12 +95,12 @@ namespace DelvUI.Interface.GeneralElements
             var (areaStart, areaEnd) = Config.MouseoverAreaConfig.GetArea(startPos, Config.Size);
             bool isHovering = ImGui.IsMouseHoveringRect(areaStart, areaEnd);
             bool ignoreMouseover = Config.MouseoverAreaConfig.Enabled && Config.MouseoverAreaConfig.Ignore;
-            
+
             if (isHovering && !DraggingEnabled)
             {
                 _wasHovering = true;
                 InputsHelper.Instance.SetTarget(Actor, ignoreMouseover);
-                
+
                 if (InputsHelper.Instance.LeftButtonClicked)
                 {
                     Plugin.TargetManager.SetTarget(Actor);
@@ -131,7 +133,15 @@ namespace DelvUI.Interface.GeneralElements
                 currentHp = _smoothHPHelper.GetNextHp((int)currentHp, (int)maxHp, Config.SmoothHealthConfig.Velocity);
             }
 
-            PluginConfigColor fillColor = GetColor(character, currentHp, maxHp);
+            PluginConfigColor fillColor = ColorUtils.ColorForCharacter(
+                character,
+                currentHp,
+                maxHp,
+                Config.UseJobColor,
+                Config.UseRoleColor,
+                Config.ColorByHealth
+            ) ?? Config.FillColor;
+
             Rect background = new Rect(Config.Position, Config.Size, BackgroundColor(character));
             if (Config.RangeConfig.Enabled || Config.EnemyRangeConfig.Enabled)
             {
@@ -299,36 +309,6 @@ namespace DelvUI.Interface.GeneralElements
             return config.GetText().Contains("[health");
         }
 
-        private PluginConfigColor GetColor(GameObject? actor, uint currentHp = 0, uint maxHp = 0)
-        {
-            Character? character = actor as Character;
-
-            if (Config.UseJobColor && character != null)
-            {
-                return Utils.ColorForActor(character);
-            }
-            else if (Config.UseRoleColor)
-            {
-                return character is PlayerCharacter ?
-                    GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id) :
-                    Utils.ColorForActor(character);
-            }
-            else if (Config.ColorByHealth.Enabled && character != null)
-            {
-                var scale = (float)currentHp / Math.Max(1, maxHp);
-                if (Config.ColorByHealth.UseJobColorAsMaxHealth)
-                {
-                    return Utils.GetColorByScale(scale, Config.ColorByHealth.LowHealthColorThreshold / 100f, Config.ColorByHealth.FullHealthColorThreshold / 100f, Config.ColorByHealth.LowHealthColor, Config.ColorByHealth.FullHealthColor, Utils.ColorForActor(character), Config.ColorByHealth.UseMaxHealthColor, Config.ColorByHealth.BlendMode);
-                }
-                else if (Config.ColorByHealth.UseRoleColorAsMaxHealth)
-                {
-                    return Utils.GetColorByScale(scale, Config.ColorByHealth.LowHealthColorThreshold / 100f, Config.ColorByHealth.FullHealthColorThreshold / 100f, Config.ColorByHealth.LowHealthColor, Config.ColorByHealth.FullHealthColor, character is PlayerCharacter ? GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id) : Utils.ColorForActor(character), Config.ColorByHealth.UseMaxHealthColor, Config.ColorByHealth.BlendMode);
-                }
-                return Utils.GetColorByScale(scale, Config.ColorByHealth);
-            }
-            return Config.FillColor;
-        }
-
         private PluginConfigColor GetDistanceColor(Character? character, PluginConfigColor color)
         {
             byte distance = character != null ? character.YalmDistanceX : byte.MaxValue;
@@ -384,7 +364,7 @@ namespace DelvUI.Interface.GeneralElements
 
             if (maxHp == 0)
             {
-                bar.AddForegrounds(new Rect(Config.Position, Config.Size, GetColor(actor)));
+                bar.AddForegrounds(new Rect(Config.Position, Config.Size, ColorUtils.ColorForActor(actor)));
             }
             else
             {
@@ -393,7 +373,13 @@ namespace DelvUI.Interface.GeneralElements
                     currentHp = _smoothHPHelper.GetNextHp((int)currentHp, (int)maxHp, Config.SmoothHealthConfig.Velocity);
                 }
 
-                PluginConfigColor fillColor = GetColor(actor);
+                PluginConfigColor fillColor = ColorUtils.ColorForCharacter(
+                    actor,
+                    currentHp,
+                    maxHp,
+                    colorByHealthConfig: Config.ColorByHealth
+                ) ?? Config.FillColor;
+
                 Rect background = new Rect(Config.Position, Config.Size, Config.BackgroundColor);
                 Rect healthFill = BarUtilities.GetFillRect(Config.Position, Config.Size, Config.FillDirection, fillColor, currentHp, maxHp);
 

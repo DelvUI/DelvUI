@@ -41,7 +41,7 @@ namespace DelvUI.Interface.GeneralElements
             uint rested = Config.ShowRestedExp ? ExperienceHelper.Instance.RestedExp : 0;
 
             // Exp progress bar
-            PluginConfigColor expFillColor = Config.UseJobColor ? Utils.ColorForActor(Actor) : Config.FillColor;
+            PluginConfigColor expFillColor = Config.UseJobColor ? ColorUtils.ColorForActor(Actor) : Config.FillColor;
             Rect expBar = BarUtilities.GetFillRect(Config.Position, Config.Size, Config.FillDirection, expFillColor, current, required);
 
             // Rested exp bar

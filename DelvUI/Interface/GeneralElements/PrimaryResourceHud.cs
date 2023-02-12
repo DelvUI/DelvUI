@@ -128,7 +128,7 @@ namespace DelvUI.Interface.GeneralElements
                 return GlobalColors.Instance.SafeColorForJobId(PartyMember.JobId);
             }
 
-            return Utils.ColorForActor(Actor);
+            return ColorUtils.ColorForActor(Actor);
         }
     }
 }

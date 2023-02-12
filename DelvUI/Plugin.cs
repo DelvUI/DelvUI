@@ -19,6 +19,7 @@ using DelvUI.Config.Profiles;
 using DelvUI.Helpers;
 using DelvUI.Interface;
 using DelvUI.Interface.GeneralElements;
+using DelvUI.Interface.Nameplates;
 using DelvUI.Interface.Party;
 using DelvUI.Interface.PartyCooldowns;
 using ImGuiNET;
@@ -115,6 +116,7 @@ namespace DelvUI
             GlobalColors.Initialize();
             LimitBreakHelper.Initialize();
             InputsHelper.Initialize();
+            NameplatesManager.Initialize();
             PartyManager.Initialize();
             PartyCooldownsManager.Initialize();
             PullTimerHelper.Initialize();
@@ -327,6 +329,7 @@ namespace DelvUI
             GlobalColors.Instance?.Dispose();
             LimitBreakHelper.Instance?.Dispose();
             InputsHelper.Instance?.Dispose();
+            NameplatesManager.Instance?.Dispose();
             PartyCooldownsManager.Instance?.Dispose();
             PartyManager.Instance?.Dispose();
             PullTimerHelper.Instance?.Dispose();

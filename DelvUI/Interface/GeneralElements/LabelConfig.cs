@@ -32,6 +32,27 @@ namespace DelvUI.Interface.GeneralElements
     }
 
     [Exportable(false)]
+    public class EditableNonFormattableLabelConfig : LabelConfig
+    {
+        [InputText("Text", formattable = false)]
+        [Order(10)]
+        public string Text;
+
+        public EditableNonFormattableLabelConfig(Vector2 position, string text, DrawAnchor frameAnchor, DrawAnchor textAnchor)
+            : base(position, text, frameAnchor, textAnchor)
+        {
+            Text = text;
+        }
+
+        public override string GetText() => Text;
+
+        public override void SetText(string text)
+        {
+            Text = text;
+        }
+    }
+
+    [Exportable(false)]
     public class NumericLabelConfig : LabelConfig
     {
         [Combo("Number Format", "No Decimals (i.e. \"12\")", "One Decimal (i.e. \"12.3\")", "Two Decimals (i.e. \"12.34\")")]

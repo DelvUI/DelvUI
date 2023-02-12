@@ -42,8 +42,8 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            PluginConfigColor? fillColor = Config.UseJobColor ? Utils.ColorForActor(Actor) : null;
-
+            PluginConfigColor? fillColor = Config.UseJobColor ? ColorUtils.ColorForActor(Actor) : null;
+             
             BarHud bar = BarUtilities.GetProgressBar(Config,
                 helper.CountDownValue,
                 helper.CountDownMax, 0F, Actor, fillColor);
