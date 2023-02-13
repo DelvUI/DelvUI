@@ -21,7 +21,7 @@ namespace DelvUI.Interface.Nameplates
         private NameplateWithPlayerBar _allianceMemberHud;
         private NameplateWithPlayerBar _friendsHud;
         private NameplateWithPlayerBar _otherPlayersHud;
-        private NameplateWithNPCBar _petHud;
+        private NameplateWithBar _petHud;
         private Nameplate _nonCombatNPCHud;
         private Nameplate _minionNPCHud;
         private Nameplate _objectHud;
@@ -34,7 +34,7 @@ namespace DelvUI.Interface.Nameplates
             _allianceMemberHud = new NameplateWithPlayerBar(manager.GetConfigObject<AllianceMembersNameplateConfig>());
             _friendsHud = new NameplateWithPlayerBar(manager.GetConfigObject<FriendPlayerNameplateConfig>());
             _otherPlayersHud = new NameplateWithPlayerBar(manager.GetConfigObject<OtherPlayerNameplateConfig>());
-            _petHud = new NameplateWithNPCBar(manager.GetConfigObject<PetNameplateConfig>());
+            _petHud = new NameplateWithBar(manager.GetConfigObject<PetNameplateConfig>());
             _nonCombatNPCHud = new Nameplate(manager.GetConfigObject<NonCombatNPCNameplateConfig>());
             _minionNPCHud = new Nameplate(manager.GetConfigObject<MinionNPCNameplateConfig>());
             _objectHud = new Nameplate(manager.GetConfigObject<ObjectsNameplateConfig>());

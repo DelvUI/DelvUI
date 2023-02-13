@@ -191,25 +191,10 @@ namespace DelvUI.Interface.GeneralElements
                 bar.AddForegrounds(new Rect(healthMissingPos, healthMissingSize, missingHealthColor));
             }
 
-            if (Config.ShieldConfig.Enabled)
-            {
-                float shield = Utils.ActorShieldValue(Actor);
-                if (shield > 0f)
-                {
-                    bar.AddForegrounds(
-                        BarUtilities.GetShieldForeground(
-                            Config.ShieldConfig,
-                            Config.Position,
-                            Config.Size,
-                            healthFill.Size,
-                            Config.FillDirection,
-                            shield,
-                            character.CurrentHp,
-                            character.MaxHp)
-                    );
-                }
-            }
+            // shield
+            BarUtilities.AddShield(bar, Config, Config.ShieldConfig, character, healthFill.Size);
 
+            // draw action
             AddDrawActions(bar.GetDrawActions(pos, Config.StrataLevel));
 
             // mouseover area
@@ -274,22 +259,19 @@ namespace DelvUI.Interface.GeneralElements
         {
             List<LabelConfig> labels = new List<LabelConfig>();
 
-            if (Config.HideHealthIfPossible)
+            if (Config.HideHealthIfPossible && maxHp <= 0)
             {
-                bool isHealthLabel = IsHealthLabel(Config.LeftLabelConfig);
-                if (!isHealthLabel || maxHp > 0)
+                if (!Utils.IsHealthLabel(Config.LeftLabelConfig))
                 {
                     labels.Add(Config.LeftLabelConfig);
                 }
 
-                isHealthLabel = IsHealthLabel(Config.RightLabelConfig);
-                if (!isHealthLabel || maxHp > 0)
+                if (!Utils.IsHealthLabel(Config.RightLabelConfig))
                 {
                     labels.Add(Config.RightLabelConfig);
                 }
 
-                isHealthLabel = IsHealthLabel(Config.OptionalLabelConfig);
-                if (!isHealthLabel || maxHp > 0)
+                if (!Utils.IsHealthLabel(Config.OptionalLabelConfig))
                 {
                     labels.Add(Config.OptionalLabelConfig);
                 }
@@ -304,10 +286,7 @@ namespace DelvUI.Interface.GeneralElements
             return labels.ToArray();
         }
 
-        private bool IsHealthLabel(LabelConfig config)
-        {
-            return config.GetText().Contains("[health");
-        }
+        
 
         private PluginConfigColor GetDistanceColor(Character? character, PluginConfigColor color)
         {

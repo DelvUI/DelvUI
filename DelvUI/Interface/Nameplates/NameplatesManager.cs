@@ -4,16 +4,14 @@ using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
 using FFXIVClientStructs.FFXIV.Client.UI;
-using Lumina.Excel;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using static FFXIVClientStructs.FFXIV.Client.UI.AddonNamePlate;
 using static FFXIVClientStructs.FFXIV.Client.UI.RaptureAtkModule;
 using static FFXIVClientStructs.FFXIV.Client.UI.UI3DModule;
 using StructsFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework;
-using Title = Lumina.Excel.GeneratedSheets.Title;
 
 namespace DelvUI.Interface.Nameplates
 {
@@ -23,17 +21,19 @@ namespace DelvUI.Interface.Nameplates
         public string Name;
         public string Title;
         public bool IsTitlePrefix;
+        public int NamePlateIconId;
         public ObjectKind Kind;
         public byte SubKind;
         public Vector2 ScreenPosition;
         public Vector3 WorldPosition;
 
-        public NameplateData(GameObject? gameObject, string name, string title, bool isTitlePrefix, ObjectKind kind, byte subKind, Vector2 screenPosition, Vector3 worldPosition)
+        public NameplateData(GameObject? gameObject, string name, string title, bool isTitlePrefix, int namePlateIconId, ObjectKind kind, byte subKind, Vector2 screenPosition, Vector3 worldPosition)
         {
             GameObject = gameObject;
             Name = name;
             Title = title;
             IsTitlePrefix = isTitlePrefix;
+            NamePlateIconId = namePlateIconId;
             Kind = kind;
             SubKind = subKind;
             ScreenPosition = screenPosition;
@@ -136,7 +136,6 @@ namespace DelvUI.Interface.Nameplates
                     nameplateObject.RootNode->AtkResNode.X + nameplateObject.RootNode->AtkResNode.Width / 2f,
                     nameplateObject.RootNode->AtkResNode.Y + nameplateObject.RootNode->AtkResNode.Height
                 );
-
                 Vector3 worldPos = new Vector3(obj->Position.X, obj->Position.Y + obj->Height * 2.2f, obj->Position.Z);
 
                 // name
@@ -147,7 +146,15 @@ namespace DelvUI.Interface.Nameplates
                 string title = info.Title.ToString();
                 bool isTitlePrefix = info.IsPrefixTitle;
 
-                _data.Add(new NameplateData(gameObject, name, title, isTitlePrefix, (ObjectKind)obj->ObjectKind, obj->SubKind, screenPos, worldPos));
+                // state icon
+                int iconId = 0;
+                AtkUldAsset* textureInfo = nameplateObject.IconImageNode->PartsList->Parts[nameplateObject.IconImageNode->PartId].UldAsset;
+                if (textureInfo != null && textureInfo->AtkTexture.Resource != null)
+                {
+                    iconId = textureInfo->AtkTexture.Resource->IconID;
+                }
+
+                _data.Add(new NameplateData(gameObject, name, title, isTitlePrefix, iconId, (ObjectKind)obj->ObjectKind, obj->SubKind, screenPos, worldPos));
             }
 
             _data.Reverse();

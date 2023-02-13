@@ -394,5 +394,27 @@ namespace DelvUI.Interface.Bars
                 ChangeColor = true,
                 ShowMarker = false
             };
+
+        public static void AddShield(BarHud bar, BarConfig config, ShieldConfig shieldConfig, Character character, Vector2 fillSize)
+        {
+            if (shieldConfig.Enabled)
+            {
+                float shield = Utils.ActorShieldValue(character);
+                if (shield > 0f)
+                {
+                    bar.AddForegrounds(
+                        GetShieldForeground(
+                            shieldConfig,
+                            config.Position,
+                            config.Size,
+                            fillSize,
+                            config.FillDirection,
+                            shield,
+                            character.CurrentHp,
+                            character.MaxHp)
+                    );
+                }
+            }
+        }
     }
 }

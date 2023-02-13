@@ -66,11 +66,16 @@ namespace DelvUI.Interface.GeneralElements
 
         public new static PartyMembersNameplateConfig DefaultConfig()
         {
-            return NameplatesHelper.GetNameplateWithPlayerBarConfig<PartyMembersNameplateConfig>(
+            PartyMembersNameplateConfig config = NameplatesHelper.GetNameplateWithPlayerBarConfig<PartyMembersNameplateConfig>(
                 0xFFD0E5E0, 
                 0xFF30444A,
                 HUDConstants.DefaultPlayerNameplateBarSize
             );
+
+            config.BarConfig.UseRoleColor = true;
+            config.NameLabelConfig.UseRoleColor = true;
+            config.TitleLabelConfig.UseRoleColor = true;
+            return config;
         }
     }
 
@@ -149,7 +154,7 @@ namespace DelvUI.Interface.GeneralElements
     [DisableParentSettings("HideWhenInactive")]
     [Section("Nameplates")]
     [SubSection("Pets", 0)]
-    public class PetNameplateConfig : NameplateWithPlayerBarConfig
+    public class PetNameplateConfig : NameplateWithNPCBarConfig
     {
         public PetNameplateConfig(
             Vector2 position,
@@ -167,6 +172,7 @@ namespace DelvUI.Interface.GeneralElements
                 0xFF2A2F28,
                 HUDConstants.DefaultPlayerNameplateBarSize
             );
+            config.OnlyShowWhenTargeted = true;
             config.SwapLabelsWhenNeeded = false;
             config.NameLabelConfig.Text = "Lv[level] [name]";
             config.NameLabelConfig.FontID = FontsConfig.DefaultSmallFontKey;
@@ -216,6 +222,7 @@ namespace DelvUI.Interface.GeneralElements
         public new static MinionNPCNameplateConfig DefaultConfig()
         {
             MinionNPCNameplateConfig config = NameplatesHelper.GetNameplateConfig<MinionNPCNameplateConfig>(0xFFFFFFFF, 0xFF000000);
+            config.OnlyShowWhenTargeted = true;
             config.SwapLabelsWhenNeeded = false;
             config.NameLabelConfig.Position = new Vector2(0, -17);
             config.NameLabelConfig.FontID = FontsConfig.DefaultSmallFontKey;
@@ -281,12 +288,19 @@ namespace DelvUI.Interface.GeneralElements
         public NameplateConfig() : base() { } // don't remove
     }
 
-    public class NameplateWithBarConfig : NameplateConfig
+    public interface NameplateWithBarConfig
+    {
+        public NameplateBarConfig GetBarConfig();
+    }
+
+    public class NameplateWithNPCBarConfig : NameplateConfig, NameplateWithBarConfig
     {
         [NestedConfig("Health Bar", 40)]
         public NameplateBarConfig BarConfig = null!;
 
-        public NameplateWithBarConfig(
+        public NameplateBarConfig GetBarConfig() => BarConfig;
+
+        public NameplateWithNPCBarConfig(
             Vector2 position,
             EditableLabelConfig nameLabel,
             EditableNonFormattableLabelConfig titleLabelConfig,
@@ -296,13 +310,15 @@ namespace DelvUI.Interface.GeneralElements
             BarConfig = barConfig;
         }
 
-        public NameplateWithBarConfig() : base() { } // don't remove
+        public NameplateWithNPCBarConfig() : base() { } // don't remove
     }
 
-    public class NameplateWithPlayerBarConfig : NameplateConfig
+    public class NameplateWithPlayerBarConfig : NameplateConfig, NameplateWithBarConfig
     {
         [NestedConfig("Health Bar", 40)]
         public NameplatePlayerBarConfig BarConfig = null!;
+
+        public NameplateBarConfig GetBarConfig() => BarConfig;
 
         public NameplateWithPlayerBarConfig(
             Vector2 position,
@@ -317,6 +333,26 @@ namespace DelvUI.Interface.GeneralElements
         public NameplateWithPlayerBarConfig() : base() { } // don't remove
     }
 
+    public class NameplateWithEnemyBarConfig : NameplateConfig, NameplateWithBarConfig
+    {
+        [NestedConfig("Health Bar", 40)]
+        public NameplateEnemyBarConfig BarConfig = null!;
+
+        public NameplateBarConfig GetBarConfig() => BarConfig;
+
+        public NameplateWithEnemyBarConfig(
+            Vector2 position,
+            EditableLabelConfig nameLabel,
+            EditableNonFormattableLabelConfig titleLabelConfig,
+            NameplateEnemyBarConfig barConfig)
+            : base(position, nameLabel, titleLabelConfig)
+        {
+            BarConfig = barConfig;
+        }
+
+        public NameplateWithEnemyBarConfig() : base() { } // don't remove
+    }
+
     [DisableParentSettings("HideWhenInactive")]
     public class NameplateBarConfig : BarConfig
     {
@@ -326,22 +362,6 @@ namespace DelvUI.Interface.GeneralElements
 
         [NestedConfig("Color Based On Health Value", 50, collapsingHeader = false)]
         public ColorByHealthValueConfig ColorByHealth = new ColorByHealthValueConfig();
-
-        [Checkbox("Missing Health Color")]
-        [Order(55)]
-        public bool UseMissingHealthBar = false;
-
-        [ColorEdit4("Color" + "##MissingHealth")]
-        [Order(60, collapseWith = nameof(UseMissingHealthBar))]
-        public PluginConfigColor HealthMissingColor = new PluginConfigColor(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
-
-        [Checkbox("Death Indicator Background Color", spacing = true)]
-        [Order(61)]
-        public bool UseDeathIndicatorBackgroundColor = false;
-
-        [ColorEdit4("Color" + "##DeathIndicator")]
-        [Order(62, collapseWith = nameof(UseDeathIndicatorBackgroundColor))]
-        public PluginConfigColor DeathIndicatorBackgroundColor = new PluginConfigColor(new Vector4(204f / 255f, 3f / 255f, 3f / 255f, 50f / 100f));
 
         [Checkbox("Hide Health if Possible", spacing = true, help = "This will hide any label that has a health tag if the character doesn't have health (ie minions, friendly npcs, etc)")]
         [Order(121)]
@@ -401,39 +421,11 @@ namespace DelvUI.Interface.GeneralElements
         [Order(51)]
         public bool UseRoleColorAsBackgroundColor = false;
 
-        [Checkbox("Job Color As Missing Health Color")]
-        [Order(56, collapseWith = nameof(UseMissingHealthBar))]
-        public bool UseJobColorAsMissingHealthColor = false;
-
-        [Checkbox("Role Color As Missing Health Color")]
-        [Order(57, collapseWith = nameof(UseMissingHealthBar))]
-        public bool UseRoleColorAsMissingHealthColor = false;
-
-        [Checkbox("Tank Invulnerability", spacing = true)]
-        [Order(95)]
-        public bool ShowTankInvulnerability = false;
-
-        [Checkbox("Tank Invulnerability Custom Color")]
-        [Order(100, collapseWith = nameof(ShowTankInvulnerability))]
-        public bool UseCustomInvulnerabilityColor = true;
-
-        [ColorEdit4("Tank Invulnerability Color ##TankInvulnerabilityCustom")]
-        [Order(105, collapseWith = nameof(UseCustomInvulnerabilityColor))]
-        public PluginConfigColor CustomInvulnerabilityColor = new PluginConfigColor(new Vector4(211f / 255f, 235f / 255f, 215f / 245f, 50f / 100f));
-
-        [Checkbox("Walking Dead Custom Color")]
-        [Order(110, collapseWith = nameof(ShowTankInvulnerability))]
-        public bool UseCustomWalkingDeadColor = true;
-
-        [ColorEdit4("Walking Dead Color ##TankWalkingDeadCustom")]
-        [Order(115, collapseWith = nameof(UseCustomWalkingDeadColor))]
-        public PluginConfigColor CustomWalkingDeadColor = new PluginConfigColor(new Vector4(158f / 255f, 158f / 255f, 158f / 255f, 50f / 100f));
-
         [NestedConfig("Role/Job Icon", 135)]
         public RoleJobIconConfig RoleIconConfig = new RoleJobIconConfig(
-            new Vector2(5, 0),
+            new Vector2(-5, 0),
             new Vector2(30, 30),
-            DrawAnchor.Left,
+            DrawAnchor.Right,
             DrawAnchor.Left
         );
 
@@ -442,13 +434,22 @@ namespace DelvUI.Interface.GeneralElements
             new Vector2(5, 0),
             new Vector2(30, 30),
             DrawAnchor.Left,
-            DrawAnchor.Left
+            DrawAnchor.Right
         );
 
         public NameplatePlayerBarConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig, EditableLabelConfig optionalLabelConfig)
             : base(position, size, leftLabelConfig, rightLabelConfig, optionalLabelConfig)
         {
             RoleIconConfig.Enabled = false;
+        }
+    }
+
+    public class NameplateEnemyBarConfig : NameplateBarConfig
+    {
+        public NameplateEnemyBarConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig, EditableLabelConfig optionalLabelConfig)
+            : base(position, size, leftLabelConfig, rightLabelConfig, optionalLabelConfig)
+        {
+
         }
     }
 

@@ -1,10 +1,11 @@
-﻿using System;
-using System.Numerics;
-using Dalamud.Game.ClientState.Objects.Types;
+﻿using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using ImGuiNET;
+using Lumina.Excel.GeneratedSheets;
+using System;
+using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -27,12 +28,12 @@ namespace DelvUI.Interface.GeneralElements
         }
 
         public virtual void Draw(
-            Vector2 origin, 
+            Vector2 origin,
             Vector2? parentSize = null,
-            GameObject? actor = null, 
-            string? actorName = null, 
-            uint? actorCurrentHp = null, 
-            uint? actorMaxHp = null, 
+            GameObject? actor = null,
+            string? actorName = null,
+            uint? actorCurrentHp = null,
+            uint? actorMaxHp = null,
             bool? isPlayerName = null,
             string? title = null)
         {
@@ -69,10 +70,13 @@ namespace DelvUI.Interface.GeneralElements
                 }
             }
 
+            DrawLabel(text, pos, size, Color(actor));
+        }
+
+        public void DrawLabel(string text, Vector2 pos, Vector2 size, PluginConfigColor color)
+        {
             Action<ImDrawListPtr> action = (ImDrawListPtr drawList) =>
             {
-                PluginConfigColor? color = Color(actor);
-
                 if (Config.ShadowConfig.Enabled)
                 {
                     DrawHelper.DrawShadowText(text, pos, color.Base, Config.ShadowConfig.Color.Base, drawList, Config.ShadowConfig.Offset, Config.ShadowConfig.Thickness);
@@ -134,6 +138,48 @@ namespace DelvUI.Interface.GeneralElements
                     return Config.Color;
             }
         }
+
+        public virtual (string, Vector2, Vector2, PluginConfigColor) PreCalculate(
+            Vector2 origin,
+            Vector2? parentSize = null,
+            GameObject? actor = null,
+            string? actorName = null,
+            uint? actorCurrentHp = null,
+            uint? actorMaxHp = null,
+            bool? isPlayerName = null,
+            string? title = null)
+        {
+            if (!Config.Enabled || Config.GetText() == null)
+            {
+                return ("", Vector2.Zero, Vector2.Zero, Color(null));
+            }
+
+            string? text = actor == null && actorName == null && actorCurrentHp == null && actorMaxHp == null && title == null ?
+                Config.GetText() :
+                TextTagsHelper.FormattedText(Config.GetText(), actor, actorName, actorCurrentHp, actorMaxHp, isPlayerName, title);
+
+            Vector2 pSize = parentSize ?? Vector2.Zero;
+            Vector2 size;
+            Vector2 pos;
+
+            if (Config.UseSystemFont())
+            {
+                ImGui.PushFont(UiBuilder.DefaultFont);
+                size = ImGui.CalcTextSize(text) * Config.GetFontScale();
+                pos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(origin + Config.Position, -pSize, Config.FrameAnchor), size, Config.TextAnchor);
+                ImGui.PopFont();
+            }
+            else
+            {
+                using (FontsManager.Instance.PushFont(Config.FontID))
+                {
+                    size = ImGui.CalcTextSize(text) * Config.GetFontScale();
+                    pos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(origin + Config.Position, -pSize, Config.FrameAnchor), size, Config.TextAnchor);
+                }
+            }
+
+            return (text, pos, size, Color(actor));
+        }
     }
 
     public class IconLabelHud : LabelHud
@@ -144,12 +190,12 @@ namespace DelvUI.Interface.GeneralElements
         {
         }
 
-        public override void Draw(Vector2 origin, 
+        public override void Draw(Vector2 origin,
             Vector2? parentSize = null,
-            GameObject? actor = null, 
-            string? actorName = null, 
-            uint? actorCurrentHp = null, 
-            uint? actorMaxHp = null, 
+            GameObject? actor = null,
+            string? actorName = null,
+            uint? actorCurrentHp = null,
+            uint? actorMaxHp = null,
             bool? isPlayerName = null,
             string? title = null)
         {
@@ -159,7 +205,7 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            DrawLabel(text, origin, parentSize ?? Vector2.Zero, null);
+            DrawLabel(text, origin, parentSize ?? Vector2.Zero, actor);
         }
 
         protected override void DrawLabel(string text, Vector2 parentPos, Vector2 parentSize, GameObject? actor = null)

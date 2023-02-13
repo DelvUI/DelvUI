@@ -311,5 +311,10 @@ namespace DelvUI.Helpers
 
             return null;
         }
+
+        public static bool IsHealthLabel(LabelConfig config)
+        {
+            return config.GetText().Contains("[health");
+        }
     }
 }
