@@ -272,7 +272,7 @@ namespace DelvUI.Interface.GeneralElements
         public EditableNonFormattableLabelConfig TitleLabelConfig = null!;
 
         [NestedConfig("Change Alpha Based on Range", 145)]
-        public UnitFramesRangeConfig RangeConfig = new();
+        public NameplateRangeConfig RangeConfig = new();
 
         [NestedConfig("Visibility", 200)]
         public VisibilityConfig VisibilityConfig = new VisibilityConfig();
@@ -463,21 +463,16 @@ namespace DelvUI.Interface.GeneralElements
         [Order(10)]
         public int EndRange = 50;
 
-        public float AlphaForDistance(int distance, float alpha = 100f)
+        public float AlphaForDistance(float distance, float maxAlpha = 1f)
         {
-            distance = distance - StartRange;
-            if (!Enabled || distance <= 0)
+            float diff = distance - StartRange;
+            if (!Enabled || diff <= 0)
             {
-                return 100f;
+                return maxAlpha;
             }
 
-            float diff = EndRange - distance;
-            if (diff <= 0)
-            {
-                return 0f;
-            }
-
-            return diff * 100f / (EndRange - StartRange);
+            float a = diff / (EndRange - StartRange);
+            return Math.Max(0, Math.Min(maxAlpha, 1 - a));
         }
     }
 

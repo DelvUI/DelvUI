@@ -3,6 +3,8 @@ using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
+using FFXIVClientStructs.FFXIV.Client.Game.Control;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
@@ -11,36 +13,11 @@ using System.Numerics;
 using static FFXIVClientStructs.FFXIV.Client.UI.AddonNamePlate;
 using static FFXIVClientStructs.FFXIV.Client.UI.RaptureAtkModule;
 using static FFXIVClientStructs.FFXIV.Client.UI.UI3DModule;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using StructsFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework;
 
 namespace DelvUI.Interface.Nameplates
 {
-    public struct NameplateData
-    {
-        public GameObject? GameObject;
-        public string Name;
-        public string Title;
-        public bool IsTitlePrefix;
-        public int NamePlateIconId;
-        public ObjectKind Kind;
-        public byte SubKind;
-        public Vector2 ScreenPosition;
-        public Vector3 WorldPosition;
-
-        public NameplateData(GameObject? gameObject, string name, string title, bool isTitlePrefix, int namePlateIconId, ObjectKind kind, byte subKind, Vector2 screenPosition, Vector3 worldPosition)
-        {
-            GameObject = gameObject;
-            Name = name;
-            Title = title;
-            IsTitlePrefix = isTitlePrefix;
-            NamePlateIconId = namePlateIconId;
-            Kind = kind;
-            SubKind = subKind;
-            ScreenPosition = screenPosition;
-            WorldPosition = worldPosition;
-        }
-    }
-
     internal class NameplatesManager : IDisposable
     {
         #region Singleton
@@ -112,6 +89,7 @@ namespace DelvUI.Interface.Nameplates
             if (atkModule == null || atkModule->AtkModule.AtkArrayDataHolder.StringArrayCount <= NameplateDataArrayIndex) { return; }
 
             NamePlateInfo* infoArray = &atkModule->NamePlateInfoArray;
+            Camera camera = Control.Instance()->CameraManager.Camera->CameraBase.SceneCamera;
 
             _data = new List<NameplateData>();
             int activeCount = ui3DModule->NamePlateObjectInfoCount;
@@ -138,6 +116,9 @@ namespace DelvUI.Interface.Nameplates
                 );
                 Vector3 worldPos = new Vector3(obj->Position.X, obj->Position.Y + obj->Height * 2.2f, obj->Position.Z);
 
+                // distance
+                float distance = Vector3.Distance(camera.Object.Position, worldPos);
+
                 // name
                 NamePlateInfo info = infoArray[objectInfo->NamePlateIndex];
                 string name = info.Name.ToString();
@@ -154,10 +135,49 @@ namespace DelvUI.Interface.Nameplates
                     iconId = textureInfo->AtkTexture.Resource->IconID;
                 }
 
-                _data.Add(new NameplateData(gameObject, name, title, isTitlePrefix, iconId, (ObjectKind)obj->ObjectKind, obj->SubKind, screenPos, worldPos));
+                _data.Add(new NameplateData(
+                    gameObject,
+                    name,
+                    title,
+                    isTitlePrefix,
+                    iconId,
+                    (ObjectKind)obj->ObjectKind,
+                    obj->SubKind,
+                    screenPos,
+                    worldPos,
+                    distance
+                ));
             }
 
             _data.Reverse();
+        }
+    }
+
+    public struct NameplateData
+    {
+        public GameObject? GameObject;
+        public string Name;
+        public string Title;
+        public bool IsTitlePrefix;
+        public int NamePlateIconId;
+        public ObjectKind Kind;
+        public byte SubKind;
+        public Vector2 ScreenPosition;
+        public Vector3 WorldPosition;
+        public float Distance;
+
+        public NameplateData(GameObject? gameObject, string name, string title, bool isTitlePrefix, int namePlateIconId, ObjectKind kind, byte subKind, Vector2 screenPosition, Vector3 worldPosition, float distance)
+        {
+            GameObject = gameObject;
+            Name = name;
+            Title = title;
+            IsTitlePrefix = isTitlePrefix;
+            NamePlateIconId = namePlateIconId;
+            Kind = kind;
+            SubKind = subKind;
+            ScreenPosition = screenPosition;
+            WorldPosition = worldPosition;
+            Distance = distance;
         }
     }
 }

@@ -381,7 +381,7 @@ namespace DelvUI.Interface.EnemyList
             float currentAlpha = color.Vector.W * 100f;
             float alpha = Configs.HealthBar.RangeConfig.AlphaForDistance(distance, currentAlpha) / 100f;
 
-            return new PluginConfigColor(color.Vector.WithNewAlpha(alpha));
+            return color.WithAlpha(alpha);
         }
     }
 

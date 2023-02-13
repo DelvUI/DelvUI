@@ -115,7 +115,6 @@ namespace DelvUI.Interface.Nameplates
 
             Camera camera = Control.Instance()->CameraManager.Camera->CameraBase.SceneCamera;
             Vector3 cameraPos = camera.Object.Position;
-            float distance = Vector3.Distance(cameraPos, data.WorldPosition);
 
             BGCollisionModule* collisionModule = Framework.Instance()->BGCollisionModule;
             int* flags = stackalloc int[] { 0x2000 };
@@ -126,7 +125,7 @@ namespace DelvUI.Interface.Nameplates
             {
                 Vector3 direction = Vector3.Normalize(data.WorldPosition - cameraPos);
                 RaycastHit hit;
-                obstructed = collisionModule->RaycastEx(&hit, cameraPos, direction, distance, 1, flags);
+                obstructed = collisionModule->RaycastEx(&hit, cameraPos, direction, data.Distance, 1, flags);
             }
             // full mode
             else
@@ -142,9 +141,9 @@ namespace DelvUI.Interface.Nameplates
 
                 foreach (Vector2 point in points) {
                     Ray ray = camera.ScreenPointToRay(point);
-                    collisionModule->RaycastEx(&hit, ray.Origin, ray.Direction, distance, 1, flags);
+                    collisionModule->RaycastEx(&hit, ray.Origin, ray.Direction, data.Distance, 1, flags);
 
-                    if (hit.Distance <= distance * 0.95f)
+                    if (hit.Distance <= data.Distance * 0.95f)
                     {
                         obstructionCount++;
                     }

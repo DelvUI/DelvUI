@@ -194,6 +194,13 @@ namespace DelvUI.Config
             return new PluginConfigColor(ImGui.ColorConvertU32ToFloat4(hexColor));
         }
 
+        public PluginConfigColor WithAlpha(float alpha)
+        {
+            if (alpha == Vector.W) { return this; }
+
+            return new PluginConfigColor(Vector.WithNewAlpha(alpha));
+        }
+
         public Vector4 Vector
         {
             get => _vector;

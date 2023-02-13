@@ -299,7 +299,7 @@ namespace DelvUI.Interface.GeneralElements
                 alpha = Config.EnemyRangeConfig.AlphaForDistance(distance, currentAlpha) / 100f;
             }
 
-            return new PluginConfigColor(color.Vector.WithNewAlpha(alpha));
+            return color.WithAlpha(alpha);
         }
 
         private unsafe void GetNPCHpValues(GameObject? actor, out uint currentHp, out uint maxHp)

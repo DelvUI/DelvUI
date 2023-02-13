@@ -1,11 +1,13 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
+using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using System.Collections.Generic;
 using System.Numerics;
 using Action = System.Action;
@@ -58,18 +60,22 @@ namespace DelvUI.Interface.Nameplates
             }
 
             // name
+            float nameAlpha = _config.RangeConfig.AlphaForDistance(data.Distance, _config.NameLabelConfig.Color.Vector.W);
+            var (nameText, namePos, nameSize, nameColor) = _nameLabelHud.PreCalculate(origin + swapOffset, barAnchor?.Size, data.GameObject, data.Name, isPlayerName: data.Kind == ObjectKind.Player);
             drawActions.Add((_config.NameLabelConfig.StrataLevel, () =>
             {
-                _nameLabelHud.Draw(data.ScreenPosition + swapOffset, barAnchor?.Size, data.GameObject, data.Name, isPlayerName: data.Kind == ObjectKind.Player);
+                _nameLabelHud.DrawLabel(nameText, namePos, nameSize, nameColor, nameAlpha);
             }
             ));
 
             // title
+            float titleAlpha = _config.RangeConfig.AlphaForDistance(data.Distance, _config.TitleLabelConfig.Color.Vector.W);
+            var (titleText, titlePos, titleSize, titleColor) = _titleLabelHud.PreCalculate(origin - swapOffset, barAnchor?.Size, data.GameObject, title: data.Title);
             if (data.Title.Length > 0)
             {
                 drawActions.Add((_config.TitleLabelConfig.StrataLevel, () =>
                 {
-                    _titleLabelHud.Draw(data.ScreenPosition - swapOffset, barAnchor?.Size, data.GameObject, title: data.Title);
+                    _titleLabelHud.DrawLabel(titleText, titlePos, titleSize, titleColor, titleAlpha);
                 }
                 ));
             }
@@ -88,7 +94,7 @@ namespace DelvUI.Interface.Nameplates
         {
         }
 
-        public List<(StrataLevel, Action)> GetBarDrawActions(NameplateData data)
+        public unsafe List<(StrataLevel, Action)> GetBarDrawActions(NameplateData data)
         {
             List<(StrataLevel, Action)> drawActions = new List<(StrataLevel, Action)>();
             if (!IsVisible(data.GameObject)) { return drawActions; }
@@ -102,26 +108,42 @@ namespace DelvUI.Interface.Nameplates
 
             // colors
             PluginConfigColor fillColor = GetFillColor(character, currentHp, maxHp);
+            fillColor = fillColor.WithAlpha(_config.RangeConfig.AlphaForDistance(data.Distance, fillColor.Vector.W));
+
             PluginConfigColor bgColor = GetFillColor(character, currentHp, maxHp);
+            bgColor = bgColor.WithAlpha(_config.RangeConfig.AlphaForDistance(data.Distance, bgColor.Vector.W));
 
-            //if (Config.RangeConfig.Enabled || Config.EnemyRangeConfig.Enabled)
-            //{
-            //    fillColor = GetDistanceColor(character, fillColor);
-            //    background.Color = GetDistanceColor(character, background.Color);
-            //}
-
+            PluginConfigColor borderColor = BarConfig.BorderColor.WithAlpha(
+                _config.RangeConfig.AlphaForDistance(data.Distance, BarConfig.BorderColor.Vector.W)
+            );
 
             // bar
             Rect background = new Rect(BarConfig.Position, BarConfig.Size, bgColor);
             Rect healthFill = BarUtilities.GetFillRect(BarConfig.Position, BarConfig.Size, BarConfig.FillDirection, fillColor, currentHp, maxHp);
 
-            BarHud bar = new BarHud(BarConfig, character);
+            //BarHud bar = new BarHud(BarConfig, character);
+            BarHud bar = new BarHud(
+                BarConfig.ID,
+                BarConfig.DrawBorder,
+                borderColor,
+                BarConfig.BorderThickness,
+                BarConfig.Anchor,
+                character,
+                current: currentHp,
+                max: maxHp,
+                shadowConfig: BarConfig.ShadowConfig
+            );
+
             bar.SetBackground(background);
             bar.AddForegrounds(healthFill);
             bar.AddLabels(GetLabels(maxHp));
 
             // shield
-            BarUtilities.AddShield(bar, BarConfig, BarConfig.ShieldConfig, character, healthFill.Size);
+            PluginConfigColor shieldColor = BarConfig.ShieldConfig.Color.WithAlpha(
+                _config.RangeConfig.AlphaForDistance(data.Distance, BarConfig.ShieldConfig.Color.Vector.W)
+            );
+
+            BarUtilities.AddShield(bar, BarConfig, BarConfig.ShieldConfig, character, healthFill.Size, shieldColor);
 
             Vector2 origin = _config.Position + data.ScreenPosition;
             drawActions.AddRange(bar.GetDrawActions(origin, _config.StrataLevel));
@@ -238,20 +260,22 @@ namespace DelvUI.Interface.Nameplates
             }
 
             // name
+            float nameAlpha = _config.RangeConfig.AlphaForDistance(data.Distance, _config.NameLabelConfig.Color.Vector.W);
             var (nameText, namePos, nameSize, nameColor) = _nameLabelHud.PreCalculate(origin + swapOffset, barAnchor?.Size, data.GameObject, data.Name, isPlayerName: data.Kind == ObjectKind.Player);
             drawActions.Add((_config.NameLabelConfig.StrataLevel, () =>
             {
-                _nameLabelHud.DrawLabel(nameText, namePos, nameSize, nameColor);
+                _nameLabelHud.DrawLabel(nameText, namePos, nameSize, nameColor, nameAlpha);
             }
             ));
 
             // title
+            float titleAlpha = _config.RangeConfig.AlphaForDistance(data.Distance, _config.TitleLabelConfig.Color.Vector.W);
             var (titleText, titlePos, titleSize, titleColor) = _titleLabelHud.PreCalculate(origin - swapOffset, barAnchor?.Size, data.GameObject, title: data.Title);
             if (data.Title.Length > 0)
             {
                 drawActions.Add((_config.TitleLabelConfig.StrataLevel, () =>
                 {
-                    _titleLabelHud.DrawLabel(titleText, titlePos, titleSize, titleColor);
+                    _titleLabelHud.DrawLabel(titleText, titlePos, titleSize, titleColor, titleAlpha);
                 }
                 ));
             }
@@ -288,6 +312,8 @@ namespace DelvUI.Interface.Nameplates
             List<(StrataLevel, Action)> drawActions = new List<(StrataLevel, Action)>();
             if (data.GameObject is not Character character) { return drawActions; }
 
+            float alpha = _config.RangeConfig.AlphaForDistance(data.Distance);
+
             // role/job icon
             if (Config.RoleIconConfig.Enabled && character is PlayerCharacter)
             {
@@ -308,7 +334,7 @@ namespace DelvUI.Interface.Nameplates
                     {
                         DrawHelper.DrawInWindow(_config.ID + "_jobIcon", iconPos, Config.RoleIconConfig.Size, false, false, (drawList) =>
                         {
-                            DrawHelper.DrawIcon(iconId, iconPos, Config.RoleIconConfig.Size, false, drawList);
+                            DrawHelper.DrawIcon(iconId, iconPos, Config.RoleIconConfig.Size, false, alpha, drawList);
                         });
                     }
                     ));
@@ -330,7 +356,7 @@ namespace DelvUI.Interface.Nameplates
                     {
                         DrawHelper.DrawInWindow(_config.ID + "_stateIcon", iconPos, Config.StateIconConfig.Size, false, false, (drawList) =>
                         {
-                            DrawHelper.DrawIcon((uint)data.NamePlateIconId, iconPos, Config.StateIconConfig.Size, false, drawList);
+                            DrawHelper.DrawIcon((uint)data.NamePlateIconId, iconPos, Config.StateIconConfig.Size, false, alpha, drawList);
                         });
                     }
                     ));

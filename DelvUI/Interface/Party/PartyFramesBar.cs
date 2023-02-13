@@ -332,7 +332,7 @@ namespace DelvUI.Interface.Party
             float currentAlpha = color.Vector.W * 100f;
             float alpha = _configs.HealthBar.RangeConfig.AlphaForDistance(distance, currentAlpha) / 100f;
 
-            return new PluginConfigColor(color.Vector.WithNewAlpha(alpha));
+            return color.WithAlpha(alpha);
         }
 
         // need to separate elements that have their own window so clipping doesn't get messy

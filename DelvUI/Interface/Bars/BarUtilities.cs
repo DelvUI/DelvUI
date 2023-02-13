@@ -307,11 +307,13 @@ namespace DelvUI.Interface.Bars
             BarDirection fillDirection,
             float shieldPercent,
             float currentHp,
-            float maxHp)
+            float maxHp,
+            PluginConfigColor? color = null)
         {
             float shieldValue = shieldPercent * maxHp;
             float overshield = shieldConfig.FillHealthFirst ? Math.Max(shieldValue + currentHp - maxHp, 0f) : shieldValue;
             float shieldSize = shieldConfig.Height;
+            PluginConfigColor c = color ?? shieldConfig.Color;
 
             if (!shieldConfig.HeightInPixels)
             {
@@ -322,17 +324,17 @@ namespace DelvUI.Interface.Bars
                 ? new Vector2(size.X, Math.Min(shieldSize, size.Y))
                 : new Vector2(Math.Min(shieldSize, size.X), size.Y);
 
-            Rect overshieldFill = GetFillRect(pos, overshieldSize, fillDirection, shieldConfig.Color, overshield, maxHp);
+            Rect overshieldFill = GetFillRect(pos, overshieldSize, fillDirection, c, overshield, maxHp);
 
             if (shieldConfig.FillHealthFirst && currentHp < maxHp)
             {
-                var shieldPos = fillDirection.IsInverted() ? pos : pos + BarUtilities.GetFillDirectionOffset(healthFillSize, fillDirection);
+                var shieldPos = fillDirection.IsInverted() ? pos : pos + GetFillDirectionOffset(healthFillSize, fillDirection);
                 var shieldFillSize = size - GetFillDirectionOffset(healthFillSize, fillDirection);
                 var healthFillShieldSize = fillDirection.IsHorizontal()
                     ? new Vector2(shieldFillSize.X, Math.Min(shieldSize, size.Y))
                     : new Vector2(Math.Min(shieldSize, size.X), shieldFillSize.Y);
 
-                Rect shieldFill = GetFillRect(shieldPos, healthFillShieldSize, fillDirection, shieldConfig.Color, shieldValue - overshield, maxHp - currentHp, 0f);
+                Rect shieldFill = GetFillRect(shieldPos, healthFillShieldSize, fillDirection, c, shieldValue - overshield, maxHp - currentHp, 0f);
                 return new[] { overshieldFill, shieldFill };
             }
 
@@ -395,7 +397,7 @@ namespace DelvUI.Interface.Bars
                 ShowMarker = false
             };
 
-        public static void AddShield(BarHud bar, BarConfig config, ShieldConfig shieldConfig, Character character, Vector2 fillSize)
+        public static void AddShield(BarHud bar, BarConfig config, ShieldConfig shieldConfig, Character character, Vector2 fillSize, PluginConfigColor? color = null)
         {
             if (shieldConfig.Enabled)
             {
@@ -411,7 +413,8 @@ namespace DelvUI.Interface.Bars
                             config.FillDirection,
                             shield,
                             character.CurrentHp,
-                            character.MaxHp)
+                            character.MaxHp,
+                            color)
                     );
                 }
             }

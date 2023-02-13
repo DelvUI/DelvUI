@@ -100,7 +100,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [Combo("Nameplate Label Anchor", new string[] { "Name", "Title", "Highest", "Lowest" }, spacing = true)]
         [Order(17)]
-        public NameplateLabelAnchor NameplateLabelAnchor = NameplateLabelAnchor.Highest;
+        public NameplateLabelAnchor NameplateLabelAnchor = NameplateLabelAnchor.Name;
 
         [Checkbox("Prioritize Health Bar as Anchor when visible", help = "When enabled, the icon will anchor to the Health Bar if it's visible.\nIf the Health Bar disappears, it will anchor back to the desired label.")]
         [Order(18)]

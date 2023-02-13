@@ -141,6 +141,14 @@ namespace DelvUI.Helpers
             DrawIcon(iconId, position, size, drawBorder, 0xFFFFFFFF, drawList);
         }
 
+        public static void DrawIcon(uint iconId, Vector2 position, Vector2 size, bool drawBorder, float alpha, ImDrawListPtr drawList)
+        {
+            uint a = (uint)(alpha * 255);
+            uint color = 0xFFFFFF + (a << 24);
+            DrawIcon(iconId, position, size, drawBorder, color, drawList);
+        }
+
+
         public static void DrawIcon(uint iconId, Vector2 position, Vector2 size, bool drawBorder, uint color, ImDrawListPtr drawList)
         {
             TextureWrap? texture = TexturesCache.Instance.GetTextureFromIconId(iconId);
