@@ -5,8 +5,6 @@ using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Party;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
@@ -91,6 +89,42 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
+    public class NameplateIconConfig : IconConfig
+    {
+        public NameplateIconConfig() : base() { }
+
+        public NameplateIconConfig(Vector2 position, Vector2 size, DrawAnchor anchor, DrawAnchor frameAnchor)
+            : base(position, size, anchor, frameAnchor)
+        {
+        }
+
+        [Combo("Nameplate Label Anchor", new string[] { "Name", "Title", "Highest", "Lowest" }, spacing = true)]
+        [Order(17)]
+        public NameplateLabelAnchor NameplateLabelAnchor = NameplateLabelAnchor.Highest;
+
+        [Checkbox("Prioritize Health Bar as Anchor when visible", help = "When enabled, the icon will anchor to the Health Bar if it's visible.\nIf the Health Bar disappears, it will anchor back to the desired label.")]
+        [Order(18)]
+        public bool PrioritizeHealthBarAnchor = false;
+    }
+
+    public class NameplateRoleJobIconConfig : RoleJobIconConfig
+    {
+        public NameplateRoleJobIconConfig() : base() { }
+
+        public NameplateRoleJobIconConfig(Vector2 position, Vector2 size, DrawAnchor anchor, DrawAnchor frameAnchor)
+            : base(position, size, anchor, frameAnchor)
+        {
+        }
+
+        [Combo("Nameplate Label Anchor", new string[] { "Name", "Title", "Highest", "Lowest" }, spacing = true)]
+        [Order(17)]
+        public NameplateLabelAnchor NameplateLabelAnchor = NameplateLabelAnchor.Name;
+
+        [Checkbox("Prioritize Health Bar as Anchor when visible", help = "When enabled, the icon will anchor to the Health Bar if it's visible.\nIf the Health Bar disappears, it will anchor back to the desired label.")]
+        [Order(18)]
+        public bool PrioritizeHealthBarAnchor = false;
+    }
+
     public class PartyFramesIconsConverter : PluginConfigObjectConverter
     {
         public PartyFramesIconsConverter()
@@ -104,5 +138,13 @@ namespace DelvUI.Interface.GeneralElements
             return objectType == typeof(PartyFramesRoleIconConfig) ||
                    objectType == typeof(PartyFramesLeaderIconConfig);
         }
+    }
+
+    public enum NameplateLabelAnchor
+    {
+        Name = 0,
+        Title = 1,
+        Highest = 2,
+        Lowest = 3
     }
 }

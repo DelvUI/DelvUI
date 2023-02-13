@@ -46,10 +46,10 @@ namespace DelvUI.Interface.Nameplates
             return drawActions;
         }
 
-        protected List<(StrataLevel, Action)> GetMainLabelDrawActions(NameplateData data, Vector2? parentPos = null, Vector2? parentSize = null)
+        protected List<(StrataLevel, Action)> GetMainLabelDrawActions(NameplateData data, NameplateAnchor? barAnchor = null)
         {
             List<(StrataLevel, Action)> drawActions = new List<(StrataLevel, Action)>();
-            Vector2 origin = parentPos ?? data.ScreenPosition;
+            Vector2 origin = barAnchor?.Position ?? data.ScreenPosition;
 
             Vector2 swapOffset = Vector2.Zero;
             if (_config.SwapLabelsWhenNeeded && (data.IsTitlePrefix || data.Title.Length == 0))
@@ -60,7 +60,7 @@ namespace DelvUI.Interface.Nameplates
             // name
             drawActions.Add((_config.NameLabelConfig.StrataLevel, () =>
             {
-                _nameLabelHud.Draw(data.ScreenPosition + swapOffset, parentSize, data.GameObject, data.Name, isPlayerName: data.Kind == ObjectKind.Player);
+                _nameLabelHud.Draw(data.ScreenPosition + swapOffset, barAnchor?.Size, data.GameObject, data.Name, isPlayerName: data.Kind == ObjectKind.Player);
             }
             ));
 
@@ -69,7 +69,7 @@ namespace DelvUI.Interface.Nameplates
             {
                 drawActions.Add((_config.TitleLabelConfig.StrataLevel, () =>
                 {
-                    _titleLabelHud.Draw(data.ScreenPosition - swapOffset, parentSize, data.GameObject, title: data.Title);
+                    _titleLabelHud.Draw(data.ScreenPosition - swapOffset, barAnchor?.Size, data.GameObject, title: data.Title);
                 }
                 ));
             }
@@ -147,25 +147,24 @@ namespace DelvUI.Interface.Nameplates
             List<(StrataLevel, Action)> drawActions = new List<(StrataLevel, Action)>();
             if (!IsVisible(data.GameObject)) { return drawActions; }
 
-            var (barPos, barSize) = GetBarAnchorFrame(data);
-            drawActions.AddRange(GetMainLabelDrawActions(data, barPos, barSize));
+            NameplateAnchor? barAnchor = GetBarAnchor(data);
+            drawActions.AddRange(GetMainLabelDrawActions(data, barAnchor));
 
             return drawActions;
         }
 
-        protected virtual (Vector2?, Vector2?) GetBarAnchorFrame(NameplateData data)
+        protected virtual NameplateAnchor? GetBarAnchor(NameplateData data)
         {
-            Vector2? pos = null;
-            Vector2? size = null;
-
             if (data.GameObject is Character chara &&
                 BarConfig.IsVisible(chara.CurrentHp, chara.MaxHp))
             {
-                pos = Utils.GetAnchoredPosition(data.ScreenPosition + BarConfig.Position, BarConfig.Size, BarConfig.Anchor);
-                size = BarConfig.Size;
+                Vector2 pos = Utils.GetAnchoredPosition(data.ScreenPosition + BarConfig.Position, BarConfig.Size, BarConfig.Anchor);
+                Vector2 size = BarConfig.Size;
+
+                return new NameplateAnchor(pos, size);
             }
 
-            return (pos, size);
+            return null;
         }
 
         private LabelConfig[] GetLabels(uint maxHp)
@@ -229,19 +228,17 @@ namespace DelvUI.Interface.Nameplates
             List<(StrataLevel, Action)> drawActions = new List<(StrataLevel, Action)>();
             if (!IsVisible(data.GameObject)) { return drawActions; }
 
-            var (barPos, barSize) = GetBarAnchorFrame(data);
-            Vector2 origin = barPos ?? data.ScreenPosition;
+            NameplateAnchor? barAnchor = GetBarAnchor(data);
+            Vector2 origin = barAnchor?.Position ?? data.ScreenPosition;
 
             Vector2 swapOffset = Vector2.Zero;
-            bool swapped = false;
             if (_config.SwapLabelsWhenNeeded && (data.IsTitlePrefix || data.Title.Length == 0))
             {
                 swapOffset = _config.TitleLabelConfig.Position - _config.NameLabelConfig.Position;
-                swapped = data.Title.Length > 0;
             }
 
             // name
-            var (nameText, namePos, nameSize, nameColor) = _nameLabelHud.PreCalculate(origin + swapOffset, barSize, data.GameObject, data.Name, isPlayerName: data.Kind == ObjectKind.Player);
+            var (nameText, namePos, nameSize, nameColor) = _nameLabelHud.PreCalculate(origin + swapOffset, barAnchor?.Size, data.GameObject, data.Name, isPlayerName: data.Kind == ObjectKind.Player);
             drawActions.Add((_config.NameLabelConfig.StrataLevel, () =>
             {
                 _nameLabelHud.DrawLabel(nameText, namePos, nameSize, nameColor);
@@ -249,7 +246,7 @@ namespace DelvUI.Interface.Nameplates
             ));
 
             // title
-            var (titleText, titlePos, titleSize, titleColor) = _titleLabelHud.PreCalculate(origin - swapOffset, barSize, data.GameObject, title: data.Title);
+            var (titleText, titlePos, titleSize, titleColor) = _titleLabelHud.PreCalculate(origin - swapOffset, barAnchor?.Size, data.GameObject, title: data.Title);
             if (data.Title.Length > 0)
             {
                 drawActions.Add((_config.TitleLabelConfig.StrataLevel, () =>
@@ -259,15 +256,19 @@ namespace DelvUI.Interface.Nameplates
                 ));
             }
 
-            // extras
-            Vector2 parentPos = barPos ?? (swapped ? titlePos : namePos);
-            Vector2 parentSize = barSize ?? (swapped ? titleSize : nameSize);
-            drawActions.AddRange(GetExtrasDrawActions(data, parentPos, parentSize));
+            // extras anchor
+            NameplateExtrasAnchors extrasAnchors = new NameplateExtrasAnchors(
+                barAnchor,
+                _config.NameLabelConfig.Enabled ? new NameplateAnchor(namePos, nameSize) : null,
+                _config.TitleLabelConfig.Enabled && data.Title.Length > 0 ? new NameplateAnchor(titlePos, titleSize) : null
+            );
+
+            drawActions.AddRange(GetExtrasDrawActions(data, extrasAnchors));
 
             return drawActions;
         }
 
-        protected virtual List<(StrataLevel, Action)> GetExtrasDrawActions(NameplateData data, Vector2 parentPos, Vector2 parentSize)
+        protected virtual List<(StrataLevel, Action)> GetExtrasDrawActions(NameplateData data, NameplateExtrasAnchors anchors)
         {
             // override
             return new List<(StrataLevel, Action)>();
@@ -276,35 +277,38 @@ namespace DelvUI.Interface.Nameplates
 
     public class NameplateWithPlayerBar : NameplateWithBarAndExtras
     {
+        private NameplateWithPlayerBarConfig Config => (NameplateWithPlayerBarConfig)_config;
+
         public NameplateWithPlayerBar(NameplateWithPlayerBarConfig config) : base(config)
         {
         }
 
-        protected override List<(StrataLevel, Action)> GetExtrasDrawActions(NameplateData data, Vector2 parentPos, Vector2 parentSize)
+        protected override List<(StrataLevel, Action)> GetExtrasDrawActions(NameplateData data, NameplateExtrasAnchors anchors)
         {
             List<(StrataLevel, Action)> drawActions = new List<(StrataLevel, Action)>();
             if (data.GameObject is not Character character) { return drawActions; }
 
-            NameplatePlayerBarConfig config = (NameplatePlayerBarConfig)BarConfig;
-
             // role/job icon
-            if (config.RoleIconConfig.Enabled && character is PlayerCharacter)
+            if (Config.RoleIconConfig.Enabled && character is PlayerCharacter)
             {
+                NameplateAnchor? anchor = anchors.GetAnchor(Config.RoleIconConfig.NameplateLabelAnchor, Config.RoleIconConfig.PrioritizeHealthBarAnchor);
+                anchor = anchor ?? new NameplateAnchor(data.ScreenPosition, Vector2.Zero);
+
                 uint jobId = character.ClassJob.Id;
-                uint iconId = config.RoleIconConfig.UseRoleIcons ?
-                        JobsHelper.RoleIconIDForJob(jobId, config.RoleIconConfig.UseSpecificDPSRoleIcons) :
-                        JobsHelper.IconIDForJob(jobId) + (uint)config.RoleIconConfig.Style * 100;
+                uint iconId = Config.RoleIconConfig.UseRoleIcons ?
+                        JobsHelper.RoleIconIDForJob(jobId, Config.RoleIconConfig.UseSpecificDPSRoleIcons) :
+                        JobsHelper.IconIDForJob(jobId) + (uint)Config.RoleIconConfig.Style * 100;
 
                 if (iconId > 0)
                 {
-                    var pos = Utils.GetAnchoredPosition(parentPos, -parentSize, config.RoleIconConfig.FrameAnchor);
-                    var iconPos = Utils.GetAnchoredPosition(pos + config.RoleIconConfig.Position, config.RoleIconConfig.Size, config.RoleIconConfig.Anchor);
+                    var pos = Utils.GetAnchoredPosition(anchor.Value.Position, -anchor.Value.Size, Config.RoleIconConfig.FrameAnchor);
+                    var iconPos = Utils.GetAnchoredPosition(pos + Config.RoleIconConfig.Position, Config.RoleIconConfig.Size, Config.RoleIconConfig.Anchor);
 
-                    drawActions.Add((config.RoleIconConfig.StrataLevel, () =>
+                    drawActions.Add((Config.RoleIconConfig.StrataLevel, () =>
                     {
-                        DrawHelper.DrawInWindow(_config.ID + "_jobIcon", iconPos, config.RoleIconConfig.Size, false, false, (drawList) =>
+                        DrawHelper.DrawInWindow(_config.ID + "_jobIcon", iconPos, Config.RoleIconConfig.Size, false, false, (drawList) =>
                         {
-                            DrawHelper.DrawIcon(iconId, iconPos, config.RoleIconConfig.Size, false, drawList);
+                            DrawHelper.DrawIcon(iconId, iconPos, Config.RoleIconConfig.Size, false, drawList);
                         });
                     }
                     ));
@@ -312,18 +316,21 @@ namespace DelvUI.Interface.Nameplates
             }
 
             // state icon
-            if (config.StateIconConfig.Enabled && character is PlayerCharacter)
+            if (Config.StateIconConfig.Enabled && character is PlayerCharacter)
             {
+                NameplateAnchor? anchor = anchors.GetAnchor(Config.StateIconConfig.NameplateLabelAnchor, Config.StateIconConfig.PrioritizeHealthBarAnchor);
+                anchor = anchor ?? new NameplateAnchor(data.ScreenPosition, Vector2.Zero);
+
                 if (data.NamePlateIconId > 0)
                 {
-                    var pos = Utils.GetAnchoredPosition(parentPos, -parentSize, config.StateIconConfig.FrameAnchor);
-                    var iconPos = Utils.GetAnchoredPosition(pos + config.StateIconConfig.Position, config.StateIconConfig.Size, config.StateIconConfig.Anchor);
+                    var pos = Utils.GetAnchoredPosition(anchor.Value.Position, -anchor.Value.Size, Config.StateIconConfig.FrameAnchor);
+                    var iconPos = Utils.GetAnchoredPosition(pos + Config.StateIconConfig.Position, Config.StateIconConfig.Size, Config.StateIconConfig.Anchor);
 
-                    drawActions.Add((config.StateIconConfig.StrataLevel, () =>
+                    drawActions.Add((Config.StateIconConfig.StrataLevel, () =>
                     {
-                        DrawHelper.DrawInWindow(_config.ID + "_stateIcon", iconPos, config.StateIconConfig.Size, false, false, (drawList) =>
+                        DrawHelper.DrawInWindow(_config.ID + "_stateIcon", iconPos, Config.StateIconConfig.Size, false, false, (drawList) =>
                         {
-                            DrawHelper.DrawIcon((uint)data.NamePlateIconId, iconPos, config.StateIconConfig.Size, false, drawList);
+                            DrawHelper.DrawIcon((uint)data.NamePlateIconId, iconPos, Config.StateIconConfig.Size, false, drawList);
                         });
                     }
                     ));
@@ -362,5 +369,81 @@ namespace DelvUI.Interface.Nameplates
 
             return config.BackgroundColor;
         }
+    }
+
+    #region utils
+    public struct NameplateAnchor
+    {
+        public Vector2 Position;
+        public Vector2 Size;
+
+        internal NameplateAnchor(Vector2 position, Vector2 size)
+        {
+            Position = position;
+            Size = size;
+        }
+    }
+
+    public struct NameplateExtrasAnchors
+    {
+        public NameplateAnchor? BarAnchor;
+        public NameplateAnchor? NameLabelAnchor;
+        public NameplateAnchor? TitleLabelAnchor;
+        public NameplateAnchor? HighestLabelAnchor;
+        public NameplateAnchor? LowestLabelAnchor;
+        private NameplateAnchor? DefaultLabelAnchor;
+
+        internal NameplateExtrasAnchors(NameplateAnchor? barAnchor, NameplateAnchor? nameLabelAnchor, NameplateAnchor? titleLabelAnchor)
+        {
+            BarAnchor = barAnchor;
+            NameLabelAnchor = nameLabelAnchor;
+            TitleLabelAnchor = titleLabelAnchor;
+            DefaultLabelAnchor = nameLabelAnchor;
+
+            float nameY = -1;
+            if (nameLabelAnchor.HasValue)
+            {
+                nameY = nameLabelAnchor.Value.Position.Y;
+            }
+
+            float titleY = -1;
+            if (titleLabelAnchor.HasValue)
+            {
+                titleY = titleLabelAnchor.Value.Position.Y;
+            }
+
+            if (nameY == -1)
+            {
+                DefaultLabelAnchor = titleLabelAnchor;
+            }            
+            else if (nameY < titleY)
+            {
+                HighestLabelAnchor = nameLabelAnchor;
+                LowestLabelAnchor = titleLabelAnchor;
+            }
+            else if (nameY > titleY)
+            {
+                HighestLabelAnchor = titleLabelAnchor;
+                LowestLabelAnchor = nameLabelAnchor;
+            }
+        }
+
+        internal NameplateAnchor? GetAnchor(NameplateLabelAnchor label, bool prioritizeHealthBar)
+        {
+            if (prioritizeHealthBar && BarAnchor != null) { return BarAnchor; }
+
+            NameplateAnchor? labelAnchor = null;
+
+            switch(label)
+            {
+                case NameplateLabelAnchor.Name: labelAnchor = NameLabelAnchor; break;
+                case NameplateLabelAnchor.Title: labelAnchor = TitleLabelAnchor; break;
+                case NameplateLabelAnchor.Highest: labelAnchor = HighestLabelAnchor; break;
+                case NameplateLabelAnchor.Lowest: labelAnchor = LowestLabelAnchor; break;
+            }
+
+            return labelAnchor ?? DefaultLabelAnchor;
+        }
+        #endregion
     }
 }

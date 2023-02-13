@@ -318,6 +318,22 @@ namespace DelvUI.Interface.GeneralElements
         [NestedConfig("Health Bar", 40)]
         public NameplatePlayerBarConfig BarConfig = null!;
 
+        [NestedConfig("Role/Job Icon", 50)]
+        public NameplateRoleJobIconConfig RoleIconConfig = new NameplateRoleJobIconConfig(
+            new Vector2(-5, 0),
+            new Vector2(30, 30),
+            DrawAnchor.Right,
+            DrawAnchor.Left
+        );
+
+        [NestedConfig("Player State Icon", 55)]
+        public NameplateIconConfig StateIconConfig = new NameplateIconConfig(
+            new Vector2(5, 0),
+            new Vector2(30, 30),
+            DrawAnchor.Left,
+            DrawAnchor.Right
+        );
+
         public NameplateBarConfig GetBarConfig() => BarConfig;
 
         public NameplateWithPlayerBarConfig(
@@ -421,26 +437,9 @@ namespace DelvUI.Interface.GeneralElements
         [Order(51)]
         public bool UseRoleColorAsBackgroundColor = false;
 
-        [NestedConfig("Role/Job Icon", 135)]
-        public RoleJobIconConfig RoleIconConfig = new RoleJobIconConfig(
-            new Vector2(-5, 0),
-            new Vector2(30, 30),
-            DrawAnchor.Right,
-            DrawAnchor.Left
-        );
-
-        [NestedConfig("Player State Icon", 135)]
-        public IconConfig StateIconConfig = new IconConfig(
-            new Vector2(5, 0),
-            new Vector2(30, 30),
-            DrawAnchor.Left,
-            DrawAnchor.Right
-        );
-
         public NameplatePlayerBarConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig, EditableLabelConfig optionalLabelConfig)
             : base(position, size, leftLabelConfig, rightLabelConfig, optionalLabelConfig)
         {
-            RoleIconConfig.Enabled = false;
         }
     }
 
