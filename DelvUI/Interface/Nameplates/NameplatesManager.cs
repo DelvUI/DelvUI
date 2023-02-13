@@ -1,23 +1,19 @@
 ﻿using Dalamud.Game;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Memory;
 using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
 using FFXIVClientStructs.FFXIV.Client.UI;
-using FFXIVClientStructs.FFXIV.Component.GUI;
+using Lumina.Excel;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
-using Lumina.Excel;
-using Title = Lumina.Excel.GeneratedSheets.Title;
 using static FFXIVClientStructs.FFXIV.Client.UI.AddonNamePlate;
+using static FFXIVClientStructs.FFXIV.Client.UI.RaptureAtkModule;
 using static FFXIVClientStructs.FFXIV.Client.UI.UI3DModule;
 using StructsFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework;
-using StructsCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
-using System.Linq;
-using Dalamud.Logging;
-using FFXIVClientStructs.FFXIV.Client.Game.Control;
+using Title = Lumina.Excel.GeneratedSheets.Title;
 
 namespace DelvUI.Interface.Nameplates
 {
@@ -26,18 +22,22 @@ namespace DelvUI.Interface.Nameplates
         public GameObject? GameObject;
         public string Name;
         public string Title;
+        public bool IsTitlePrefix;
         public ObjectKind Kind;
         public byte SubKind;
-        public Vector2 Position;
+        public Vector2 ScreenPosition;
+        public Vector3 WorldPosition;
 
-        public NameplateData(GameObject? gameObject, string name, string title, ObjectKind kind, byte subKind, Vector2 position)
+        public NameplateData(GameObject? gameObject, string name, string title, bool isTitlePrefix, ObjectKind kind, byte subKind, Vector2 screenPosition, Vector3 worldPosition)
         {
             GameObject = gameObject;
             Name = name;
             Title = title;
+            IsTitlePrefix = isTitlePrefix;
             Kind = kind;
             SubKind = subKind;
-            Position = position;
+            ScreenPosition = screenPosition;
+            WorldPosition = worldPosition;
         }
     }
 
@@ -53,8 +53,6 @@ namespace DelvUI.Interface.Nameplates
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
 
             OnConfigReset(ConfigurationManager.Instance);
-
-            _sheet = Plugin.DataManager.GetExcelSheet<Title>();
         }
 
         public static void Initialize()
@@ -97,27 +95,9 @@ namespace DelvUI.Interface.Nameplates
         private List<NameplateData> _data = new List<NameplateData>();
         public IReadOnlyCollection<NameplateData> Data => _data.AsReadOnly();
 
-        private ExcelSheet<Title>? _sheet;
-        private Dictionary<string, bool> _titlePositionCache = new Dictionary<string, bool>();
-
-
         private unsafe void FrameworkOnOnUpdateEvent(Framework framework)
         {
             if (!_config.Enabled) { return; }
-
-            //Character? target = Plugin.ClientState.LocalPlayer?.TargetObject as Character;
-            //if (target != null)
-            //{
-            //    PluginLog.Log(target.StatusFlags.ToString());
-
-            //    StructsCharacter* chara = (StructsCharacter*)target.Address;
-
-            //    PluginLog.Log(chara->EventState.ToString());
-            //    PluginLog.Log(chara->Mode.ToString());
-            //    PluginLog.Log(chara->StatusFlags.ToString());
-            //    PluginLog.Log(" ");
-
-            //}
 
             UIModule* uiModule = StructsFramework.Instance()->GetUiModule();
             if (uiModule == null) { return; }
@@ -131,7 +111,7 @@ namespace DelvUI.Interface.Nameplates
             RaptureAtkModule* atkModule = uiModule->GetRaptureAtkModule();
             if (atkModule == null || atkModule->AtkModule.AtkArrayDataHolder.StringArrayCount <= NameplateDataArrayIndex) { return; }
 
-            StringArrayData* stringArrayData = atkModule->AtkModule.AtkArrayDataHolder.StringArrays[NameplateDataArrayIndex];
+            NamePlateInfo* infoArray = &atkModule->NamePlateInfoArray;
 
             _data = new List<NameplateData>();
             int activeCount = ui3DModule->NamePlateObjectInfoCount;
@@ -149,63 +129,28 @@ namespace DelvUI.Interface.Nameplates
                 // ui nameplate
                 NamePlateObject nameplateObject = addon->NamePlateObjectArray[objectInfo->NamePlateIndex];
                 int arrayIndex = activeCount - nameplateObject.Priority - 1;
-                if (arrayIndex < 0) { continue; }
+                if (arrayIndex < 0 || arrayIndex > NameplateCount) { continue; }
 
                 // position
-                Vector2 position = new Vector2(
+                Vector2 screenPos = new Vector2(
                     nameplateObject.RootNode->AtkResNode.X + nameplateObject.RootNode->AtkResNode.Width / 2f,
                     nameplateObject.RootNode->AtkResNode.Y + nameplateObject.RootNode->AtkResNode.Height
                 );
 
-                // name
-                string name = "";
-                if (stringArrayData != null && stringArrayData->AtkArrayData.Size > arrayIndex)
-                {
-                    name = MemoryHelper.ReadSeStringNullTerminated(new IntPtr(stringArrayData->StringArray[arrayIndex])).ToString();
-                }
+                Vector3 worldPos = new Vector3(obj->Position.X, obj->Position.Y + obj->Height * 2.2f, obj->Position.Z);
 
-                //name += " " + Control.Instance()->TargetSystem.IsObjectInViewRange(obj).ToString();
-                //name += " " + objectInfo->Unk_50.ToString() + " " + objectInfo->SortPriority.ToString();
-                //name += " " + nameplateObject.Priority + " " + arrayIndex + " " + ui3DModule->NamePlateObjectIdList[arrayIndex];
+                // name
+                NamePlateInfo info = infoArray[objectInfo->NamePlateIndex];
+                string name = info.Name.ToString();
 
                 // title
-                string title = "";
-                if (stringArrayData != null && stringArrayData->AtkArrayData.Size > arrayIndex + NameplateCount)
-                {
-                    title = MemoryHelper.ReadSeStringNullTerminated(new IntPtr(stringArrayData->StringArray[arrayIndex + NameplateCount])).ToString();
-                    if (title.Length > 2)
-                    {
-                        title = title[1..^1];
-                    }
-                }
+                string title = info.Title.ToString();
+                bool isTitlePrefix = info.IsPrefixTitle;
 
-                _data.Add(new NameplateData(gameObject, name, title, (ObjectKind)obj->ObjectKind, obj->SubKind, position));
+                _data.Add(new NameplateData(gameObject, name, title, isTitlePrefix, (ObjectKind)obj->ObjectKind, obj->SubKind, screenPos, worldPos));
             }
 
             _data.Reverse();
-        }
-
-        public bool IsTitleInFront(string title)
-        {
-            if (title.Length == 0)
-            {
-                return true;
-            }
-
-            if (_titlePositionCache.TryGetValue(title, out bool inFront))
-            {
-                return inFront;
-            }
-
-            inFront = true;
-            Title? data = _sheet?.FirstOrDefault(row => row.Masculine == title || row.Feminine == title);
-            if (data != null)
-            {
-                inFront = data.IsPrefix;
-            }
-
-            _titlePositionCache.Add(title, inFront);
-            return inFront;
         }
     }
 }

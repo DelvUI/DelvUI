@@ -1,16 +1,18 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
-using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Game.ClientState.Statuses;
+using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
+using FFXIVClientStructs.FFXIV.Client.Game.Control;
+using FFXIVClientStructs.FFXIV.Client.Graphics;
+using FFXIVClientStructs.FFXIV.Common.Component.BGCollision;
+using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using Action = System.Action;
 
 namespace DelvUI.Interface.Nameplates
@@ -43,10 +45,10 @@ namespace DelvUI.Interface.Nameplates
             List<(StrataLevel, Action)> drawActions = new List<(StrataLevel, Action)>();
             if (!IsVisible(data.GameObject)) { return drawActions; }
 
-            Vector2 origin = parentPos ?? data.Position;
+            Vector2 origin = parentPos ?? data.ScreenPosition;
 
             Vector2 swapOffset = Vector2.Zero;
-            if (_config.SwapLabelsWhenNeeded && NameplatesManager.Instance?.IsTitleInFront(data.Title) == true)
+            if (_config.SwapLabelsWhenNeeded && data.IsTitlePrefix)
             {
                 swapOffset = _config.TitleLabelConfig.Position - _config.NameLabelConfig.Position;
             }
@@ -54,7 +56,7 @@ namespace DelvUI.Interface.Nameplates
             // name
             drawActions.Add((_config.NameLabelConfig.StrataLevel, () =>
             {
-                _nameLabelHud.Draw(origin + swapOffset, parentSize, null, data.Name, isPlayerName: data.Kind == ObjectKind.Player);
+                _nameLabelHud.Draw(origin + swapOffset, parentSize, null/*data.GameObject*/, data.Name, isPlayerName: data.Kind == ObjectKind.Player);
             }
             ));
 
@@ -69,6 +71,15 @@ namespace DelvUI.Interface.Nameplates
             }
 
             return drawActions;
+        }
+    }
+
+    public class NameplateWithNPCBar : NameplateWithPlayerBar, NameplateWithBar
+    {
+        private NameplateWithBarConfig Config => (NameplateWithBarConfig)_config;
+
+        public NameplateWithNPCBar(NameplateConfig config) : base(config)
+        {
         }
     }
 
@@ -89,12 +100,12 @@ namespace DelvUI.Interface.Nameplates
 
             NameplatePlayerBarConfig config = Config.BarConfig;
             if (data.GameObject is not Character character) { return drawActions; }
-            
+
             uint currentHp = character.CurrentHp;
             uint maxHp = character.MaxHp;
 
             if (!config.IsVisible(currentHp, maxHp)) { return drawActions; }
-            
+
             PluginConfigColor fillColor = ColorUtils.ColorForCharacter(
                 character,
                 currentHp,
@@ -172,7 +183,7 @@ namespace DelvUI.Interface.Nameplates
                 }
             }
 
-            drawActions.AddRange(bar.GetDrawActions(Config.Position + data.Position, Config.StrataLevel));
+            drawActions.AddRange(bar.GetDrawActions(Config.Position + data.ScreenPosition, Config.StrataLevel));
 
             return drawActions;
         }
@@ -189,7 +200,7 @@ namespace DelvUI.Interface.Nameplates
             if (data.GameObject is Character chara &&
                 config.IsVisible(chara.CurrentHp, chara.MaxHp))
             {
-                barPos = Utils.GetAnchoredPosition(data.Position + config.Position, config.Size, config.Anchor);
+                barPos = Utils.GetAnchoredPosition(data.ScreenPosition + config.Position, config.Size, config.Anchor);
                 barSize = config.Size;
             }
 
@@ -200,31 +211,31 @@ namespace DelvUI.Interface.Nameplates
 
         private PluginConfigColor BackgroundColor(Character? chara)
         {
-            if (Config.BarConfig.ShowTankInvulnerability &&
-                !Config.BarConfig.UseMissingHealthBar &&
-                chara is BattleChara battleChara)
-            {
-                Status? tankInvuln = Utils.GetTankInvulnerabilityID(battleChara);
+            //if (Config.BarConfig.ShowTankInvulnerability &&
+            //    !Config.BarConfig.UseMissingHealthBar &&
+            //    chara is BattleChara battleChara)
+            //{
+            //    Status? tankInvuln = Utils.GetTankInvulnerabilityID(battleChara);
 
-                if (tankInvuln != null)
-                {
-                    PluginConfigColor color;
-                    if (Config.BarConfig.UseCustomInvulnerabilityColor)
-                    {
-                        color = Config.BarConfig.CustomInvulnerabilityColor;
-                    }
-                    else if (tankInvuln.StatusId == 811 && Config.BarConfig.UseCustomWalkingDeadColor)
-                    {
-                        color = Config.BarConfig.CustomWalkingDeadColor;
-                    }
-                    else
-                    {
-                        color = new PluginConfigColor(GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id).Vector.AdjustColor(-.8f));
-                    }
+            //    if (tankInvuln != null)
+            //    {
+            //        PluginConfigColor color;
+            //        if (Config.BarConfig.UseCustomInvulnerabilityColor)
+            //        {
+            //            color = Config.BarConfig.CustomInvulnerabilityColor;
+            //        }
+            //        else if (tankInvuln.StatusId == 811 && Config.BarConfig.UseCustomWalkingDeadColor)
+            //        {
+            //            color = Config.BarConfig.CustomWalkingDeadColor;
+            //        }
+            //        else
+            //        {
+            //            color = new PluginConfigColor(GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id).Vector.AdjustColor(-.8f));
+            //        }
 
-                    return color;
-                }
-            }
+            //        return color;
+            //    }
+            //}
 
             if (chara is BattleChara)
             {

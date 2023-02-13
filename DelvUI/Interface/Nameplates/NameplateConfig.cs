@@ -7,12 +7,23 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
+    public enum NameplatesOcclusionMode
+    {
+        None = 0,
+        Simple = 1,
+        Full
+    };
+
     [DisableParentSettings("Strata", "Position")]
     [Section("Nameplates")]
     [SubSection("General", 0)]
     public class NameplatesGeneralConfig : MovablePluginConfigObject
     {
         public new static NameplatesGeneralConfig DefaultConfig() => new NameplatesGeneralConfig();
+
+        [Combo("Occlusion Mode", new string[] { "Disabled", "Simple", "Full" }, help = "This controls wheter you'll see nameplates through walls and objects.\n\nDisabled: Nameplates will always be seen for units in range.\nSimple: Uses simple calculations to check if a nameplate is being covered by walls or objects. Use this for better performance.\nFull: Uses more complex calculations to check if a nameplate is being covered by walls or objects. Use this for better results.")]
+        [Order(10)]
+        public NameplatesOcclusionMode OcclusionMode = NameplatesOcclusionMode.Full;
     }
 
     [DisableParentSettings("HideWhenInactive")]
@@ -135,9 +146,39 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
+    [DisableParentSettings("HideWhenInactive")]
+    [Section("Nameplates")]
+    [SubSection("Pets", 0)]
+    public class PetNameplateConfig : NameplateWithPlayerBarConfig
+    {
+        public PetNameplateConfig(
+            Vector2 position,
+            EditableLabelConfig nameLabel,
+            EditableNonFormattableLabelConfig titleLabelConfig,
+            NameplatePlayerBarConfig barConfig)
+            : base(position, nameLabel, titleLabelConfig, barConfig)
+        {
+        }
+
+        public new static PetNameplateConfig DefaultConfig()
+        {
+            PetNameplateConfig config = NameplatesHelper.GetNameplateWithPlayerBarConfig<PetNameplateConfig>(
+                0xFFD1E5C8,
+                0xFF2A2F28,
+                HUDConstants.DefaultPlayerNameplateBarSize
+            );
+            config.SwapLabelsWhenNeeded = false;
+            config.NameLabelConfig.Text = "Lv[level] [name]";
+            config.NameLabelConfig.FontID = FontsConfig.DefaultSmallFontKey;
+            config.TitleLabelConfig.FontID = FontsConfig.DefaultSmallFontKey;
+
+            return config;
+        }
+    }
+
     [DisableParentSettings("HideWhenInactive", "SwapLabelsWhenNeeded")]
     [Section("Nameplates")]
-    [SubSection("NPC", 0)]
+    [SubSection("NPCs", 0)]
     public class NonCombatNPCNameplateConfig : NameplateConfig
     {
         public NonCombatNPCNameplateConfig(

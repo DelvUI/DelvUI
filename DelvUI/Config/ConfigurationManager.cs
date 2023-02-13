@@ -517,6 +517,7 @@ namespace DelvUI.Config
             typeof(AllianceMembersNameplateConfig),
             typeof(FriendPlayerNameplateConfig),
             typeof(OtherPlayerNameplateConfig),
+            typeof(PetNameplateConfig),
             typeof(NonCombatNPCNameplateConfig),
             typeof(MinionNPCNameplateConfig),
             typeof(ObjectsNameplateConfig),

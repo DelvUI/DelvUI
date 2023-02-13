@@ -1,8 +1,13 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
-using FFXIVClientStructs.FFXIV.Client.Game.Group;
+using FFXIVClientStructs.FFXIV.Client.Game.Control;
+using FFXIVClientStructs.FFXIV.Client.Graphics;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
+using FFXIVClientStructs.FFXIV.Client.System.Framework;
+using FFXIVClientStructs.FFXIV.Common.Component.BGCollision;
 using System.Numerics;
 
 namespace DelvUI.Interface.Nameplates
@@ -16,6 +21,7 @@ namespace DelvUI.Interface.Nameplates
         private NameplateWithPlayerBar _allianceMemberHud;
         private NameplateWithPlayerBar _friendsHud;
         private NameplateWithPlayerBar _otherPlayersHud;
+        private NameplateWithNPCBar _petHud;
         private Nameplate _nonCombatNPCHud;
         private Nameplate _minionNPCHud;
         private Nameplate _objectHud;
@@ -23,14 +29,15 @@ namespace DelvUI.Interface.Nameplates
         public NameplatesHud(NameplatesGeneralConfig config) : base(config)
         {
             ConfigurationManager manager = ConfigurationManager.Instance;
-            _playerHud =         new NameplateWithPlayerBar(manager.GetConfigObject<PlayerNameplateConfig>());
-            _partyMemberHud =    new NameplateWithPlayerBar(manager.GetConfigObject<PartyMembersNameplateConfig>());
+            _playerHud = new NameplateWithPlayerBar(manager.GetConfigObject<PlayerNameplateConfig>());
+            _partyMemberHud = new NameplateWithPlayerBar(manager.GetConfigObject<PartyMembersNameplateConfig>());
             _allianceMemberHud = new NameplateWithPlayerBar(manager.GetConfigObject<AllianceMembersNameplateConfig>());
-            _friendsHud =        new NameplateWithPlayerBar(manager.GetConfigObject<FriendPlayerNameplateConfig>());
-            _otherPlayersHud =   new NameplateWithPlayerBar(manager.GetConfigObject<OtherPlayerNameplateConfig>());
-            _nonCombatNPCHud =   new Nameplate(manager.GetConfigObject<NonCombatNPCNameplateConfig>());
-            _minionNPCHud =      new Nameplate(manager.GetConfigObject<MinionNPCNameplateConfig>());
-            _objectHud =         new Nameplate(manager.GetConfigObject<ObjectsNameplateConfig>());
+            _friendsHud = new NameplateWithPlayerBar(manager.GetConfigObject<FriendPlayerNameplateConfig>());
+            _otherPlayersHud = new NameplateWithPlayerBar(manager.GetConfigObject<OtherPlayerNameplateConfig>());
+            _petHud = new NameplateWithNPCBar(manager.GetConfigObject<PetNameplateConfig>());
+            _nonCombatNPCHud = new Nameplate(manager.GetConfigObject<NonCombatNPCNameplateConfig>());
+            _minionNPCHud = new Nameplate(manager.GetConfigObject<MinionNPCNameplateConfig>());
+            _objectHud = new Nameplate(manager.GetConfigObject<ObjectsNameplateConfig>());
         }
 
         protected override void CreateDrawActions(Vector2 origin)
@@ -41,6 +48,8 @@ namespace DelvUI.Interface.Nameplates
             {
                 Nameplate? nameplate = GetNameplate(data);
                 if (nameplate == null) { continue; }
+
+                if (IsPointObstructed(data)) { continue; }
 
                 if (nameplate is NameplateWithBar nameplateWithBar)
                 {
@@ -63,7 +72,7 @@ namespace DelvUI.Interface.Nameplates
 
                     if (data.GameObject is Character character)
                     {
-                         
+
                         if ((character.StatusFlags & (StatusFlags)0x20) != 0) // StatusFlags.PartyMember is wrong
                         {
                             return _partyMemberHud;
@@ -80,10 +89,71 @@ namespace DelvUI.Interface.Nameplates
 
                     return _otherPlayersHud;
 
+                case ObjectKind.BattleNpc:
+                    if (data.GameObject is BattleNpc battleNpc)
+                    {
+                        if ((BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.Pet ||
+                            (BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.Chocobo)
+                        {
+                            return _petHud;
+                        }
+                    }
+                    break;
+
                 case ObjectKind.EventNpc: return _nonCombatNPCHud;
                 case ObjectKind.Companion: return _minionNPCHud;
                 default: return _objectHud;
             }
+
+            return null;
+        }
+
+        private unsafe bool IsPointObstructed(NameplateData data)
+        {
+            if (data.GameObject == null) { return true; }
+            if (Config.OcclusionMode == NameplatesOcclusionMode.None) { return false; }
+
+            Camera camera = Control.Instance()->CameraManager.Camera->CameraBase.SceneCamera;
+            Vector3 cameraPos = camera.Object.Position;
+            float distance = Vector3.Distance(cameraPos, data.WorldPosition);
+
+            BGCollisionModule* collisionModule = Framework.Instance()->BGCollisionModule;
+            int* flags = stackalloc int[] { 0x2000 };
+            bool obstructed = false;
+
+            // simple mode
+            if (Config.OcclusionMode == NameplatesOcclusionMode.Simple)
+            {
+                Vector3 direction = Vector3.Normalize(data.WorldPosition - cameraPos);
+                RaycastHit hit;
+                obstructed = collisionModule->RaycastEx(&hit, cameraPos, direction, distance, 1, flags);
+            }
+            // full mode
+            else
+            {
+                int obstructionCount = 0;
+                RaycastHit hit;
+
+                Vector2[] points = new Vector2[]
+                {
+                    data.ScreenPosition + new Vector2(-30, 0), // left
+                    data.ScreenPosition + new Vector2(30, 0), // right
+                };
+
+                foreach (Vector2 point in points) {
+                    Ray ray = camera.ScreenPointToRay(point);
+                    collisionModule->RaycastEx(&hit, ray.Origin, ray.Direction, distance, 1, flags);
+
+                    if (hit.Distance <= distance * 0.95f)
+                    {
+                        obstructionCount++;
+                    }
+                }
+
+                obstructed = obstructionCount == points.Length;
+            }
+
+            return obstructed;
         }
     }
 }
