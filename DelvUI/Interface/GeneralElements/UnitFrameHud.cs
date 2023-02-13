@@ -216,7 +216,7 @@ namespace DelvUI.Interface.GeneralElements
                 uint jobId = character.ClassJob.Id;
                 uint iconId = Config.RoleIconConfig.UseRoleIcons ?
                         JobsHelper.RoleIconIDForJob(jobId, Config.RoleIconConfig.UseSpecificDPSRoleIcons) :
-                        JobsHelper.IconIDForJob(jobId) + (uint)Config.RoleIconConfig.Style * 100;
+                        JobsHelper.IconIDForJob(jobId, (uint)Config.RoleIconConfig.Style);
 
                 if (iconId > 0)
                 {

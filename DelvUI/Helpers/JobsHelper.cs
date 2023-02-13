@@ -243,6 +243,17 @@ namespace DelvUI.Helpers
             return jobId + 62000;
         }
 
+        public static uint IconIDForJob(uint jobId, uint style)
+        {
+            if (style < 2)
+            {
+                return IconIDForJob(jobId) + style * 100;
+            }
+
+            ColorizedIconIDs.TryGetValue(jobId, out var iconID);
+            return iconID;
+        }
+
         public static uint RoleIconIDForJob(uint jobId, bool specificDPSIcons = false)
         {
             var role = RoleForJob(jobId);
@@ -504,6 +515,63 @@ namespace DelvUI.Helpers
             [JobIDs.SMN] = 62587,
             [JobIDs.RDM] = 62587,
             [JobIDs.BLU] = 62587
+        };
+
+        public static Dictionary<uint, uint> ColorizedIconIDs = new Dictionary<uint, uint>()
+        {
+            // tanks
+            [JobIDs.GLA] = 94022,
+            [JobIDs.MRD] = 94024,
+            [JobIDs.PLD] = 94079,
+            [JobIDs.WAR] = 94079,
+            [JobIDs.DRK] = 94123,
+            [JobIDs.GNB] = 94130,
+
+            // melee dps
+            [JobIDs.PGL] = 92523,
+            [JobIDs.LNC] = 92525,
+            [JobIDs.ROG] = 92621,
+            [JobIDs.MNK] = 92580,
+            [JobIDs.DRG] = 92582,
+            [JobIDs.NIN] = 92622,
+            [JobIDs.SAM] = 92627,
+            [JobIDs.RPR] = 92632,
+
+            // ranged phys dps
+            [JobIDs.ARC] = 92526,
+            [JobIDs.BRD] = 92583,
+            [JobIDs.MCH] = 92625,
+            [JobIDs.DNC] = 92631,
+
+            // ranged magic dps
+            [JobIDs.THM] = 92529,
+            [JobIDs.ACN] = 92530,
+            [JobIDs.BLM] = 92585,
+            [JobIDs.SMN] = 92586,
+            [JobIDs.RDM] = 92628,
+            [JobIDs.BLU] = 92629,
+
+            // healers
+            [JobIDs.CNJ] = 94528,
+            [JobIDs.WHM] = 94584,
+            [JobIDs.SCH] = 94587,
+            [JobIDs.SGE] = 94633,
+            [JobIDs.AST] = 94624,
+
+            // crafters
+            [JobIDs.CRP] = 91031,
+            [JobIDs.BSM] = 91032,
+            [JobIDs.ARM] = 91033,
+            [JobIDs.GSM] = 91034,
+            [JobIDs.LTW] = 91034,
+            [JobIDs.WVR] = 91036,
+            [JobIDs.ALC] = 91037,
+            [JobIDs.CUL] = 91038,
+
+            // gatherers
+            [JobIDs.MIN] = 91039,
+            [JobIDs.BOT] = 91039,
+            [JobIDs.FSH] = 91041,
         };
 
         public static Dictionary<JobRoles, PrimaryResourceTypes> PrimaryResourceTypesByRole = new Dictionary<JobRoles, PrimaryResourceTypes>()

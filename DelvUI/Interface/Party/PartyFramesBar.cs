@@ -364,7 +364,7 @@ namespace DelvUI.Interface.Party
                 {
                     iconId = RoleIcon.UseRoleIcons ?
                         JobsHelper.RoleIconIDForJob(Member.JobId, RoleIcon.UseSpecificDPSRoleIcons) :
-                        JobsHelper.IconIDForJob(Member.JobId) + (uint)RoleIcon.Style * 100;
+                        JobsHelper.IconIDForJob(Member.JobId, (uint)RoleIcon.Style);
                 }
 
                 if (iconId > 0)

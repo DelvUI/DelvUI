@@ -52,7 +52,7 @@ namespace DelvUI.Interface.GeneralElements
         {
         }
 
-        [Combo("Style", "Style 1", "Style 2", spacing = true)]
+        [Combo("Style", "Style 1", "Style 2", "Style 3", spacing = true)]
         [Order(25)]
         public int Style = 0;
 
