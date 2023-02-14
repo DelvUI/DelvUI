@@ -29,6 +29,10 @@ namespace DelvUI.Interface.GeneralElements
         [Checkbox("Try to keep nameplates on screen", help = "Disclaimer: DelvUI relies heavily on the the game's default nameplates so this setting won't be a huge improvement.\nThis setting tries to prevent nameplates from being cutoff in the border of the screen, but it won't keep showing nameplates that the game wouldn't.")]
         [Order(20)]
         public bool ClampToScreen = true;
+
+        [Checkbox("Always show nameplate for target")]
+        [Order(21)]
+        public bool AlwaysShowTargetNameplate = true;
     }
 
     [DisableParentSettings("HideWhenInactive")]
@@ -260,23 +264,27 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [DisableParentSettings("HideWhenInactive", "SwapLabelsWhenNeeded")]
+    [DisableParentSettings("HideWhenInactive")]
     [Section("Nameplates")]
     [SubSection("NPCs", 0)]
-    public class NonCombatNPCNameplateConfig : NameplateConfig
+    public class NPCNameplateConfig : NameplateWithNPCBarConfig
     {
-        public NonCombatNPCNameplateConfig(
+        public NPCNameplateConfig(
             Vector2 position,
             EditableLabelConfig nameLabel,
-            EditableNonFormattableLabelConfig titleLabelConfig)
-            : base(position, nameLabel, titleLabelConfig)
+            EditableNonFormattableLabelConfig titleLabelConfig,
+            NameplateBarConfig barConfig)
+            : base(position, nameLabel, titleLabelConfig, barConfig)
         {
         }
 
-        public new static NonCombatNPCNameplateConfig DefaultConfig()
+        public new static NPCNameplateConfig DefaultConfig()
         {
-            NonCombatNPCNameplateConfig config = NameplatesHelper.GetNameplateConfig<NonCombatNPCNameplateConfig>(0xFFD1E5C8, 0xFF3A4b1E);
-            config.SwapLabelsWhenNeeded = true;
+            NPCNameplateConfig config = NameplatesHelper.GetNameplateWithBarConfig<NPCNameplateConfig, NameplateBarConfig>(
+                0xFFD1E5C8, 
+                0xFF3A4b1E,
+                HUDConstants.DefaultPlayerNameplateBarSize
+            );
             config.NameLabelConfig.Position = new Vector2(0, -20);
             config.TitleLabelConfig.Position = Vector2.Zero;
 

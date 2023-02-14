@@ -519,7 +519,7 @@ namespace DelvUI.Config
             typeof(FriendPlayerNameplateConfig),
             typeof(OtherPlayerNameplateConfig),
             typeof(PetNameplateConfig),
-            typeof(NonCombatNPCNameplateConfig),
+            typeof(NPCNameplateConfig),
             typeof(MinionNPCNameplateConfig),
             typeof(ObjectsNameplateConfig),
 

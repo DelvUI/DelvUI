@@ -233,20 +233,27 @@ namespace DelvUI.Helpers
                 return GlobalColors.Instance.NPCNeutralColor;
             }
 
-            if (character.ObjectKind == ObjectKind.Player)
+            if (character.ObjectKind == ObjectKind.Player ||
+                character.SubKind == 9 && character.ClassJob.Id > 0)
             {
                 return GlobalColors.Instance.SafeColorForJobId(character.ClassJob.Id);
             }
 
-            return character switch
+            bool isHostile = Utils.IsHostile(character);
+
+            if (character is BattleNpc npc)
             {
-                BattleNpc { SubKind: 9 } battleNpc when battleNpc.ClassJob.Id > 0 => GlobalColors.Instance.SafeColorForJobId(character.ClassJob.Id), // Trust/Squadron NPCs
-                BattleNpc battleNpc when battleNpc.BattleNpcKind == BattleNpcSubKind.Enemy || (battleNpc.StatusFlags & StatusFlags.InCombat) == StatusFlags.InCombat => GlobalColors
-                    .Instance.NPCHostileColor, // I still don't think we should be defaulting to "in combat = hostile", but whatever
-                BattleNpc battleNpc when battleNpc.BattleNpcKind is BattleNpcSubKind.Chocobo or BattleNpcSubKind.Pet || !Utils.IsHostileMemory(battleNpc) => GlobalColors.Instance
-                    .NPCFriendlyColor,
-                _ => GlobalColors.Instance.NPCNeutralColor
-            };
+                if (npc.BattleNpcKind == BattleNpcSubKind.Enemy && isHostile)
+                {
+                    return GlobalColors.Instance.NPCHostileColor;
+                }
+                else
+                {
+                    return GlobalColors.Instance.NPCFriendlyColor;
+                }
+            }
+
+            return isHostile ? GlobalColors.Instance.NPCNeutralColor : GlobalColors.Instance.NPCFriendlyColor;
         }
 
         public static PluginConfigColor? ColorForCharacter(

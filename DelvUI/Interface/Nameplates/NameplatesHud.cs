@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
@@ -11,6 +12,7 @@ using FFXIVClientStructs.FFXIV.Common.Component.BGCollision;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using StructsCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 
 namespace DelvUI.Interface.Nameplates
 {
@@ -25,7 +27,7 @@ namespace DelvUI.Interface.Nameplates
         private NameplateWithPlayerBar _friendsHud;
         private NameplateWithPlayerBar _otherPlayersHud;
         private NameplateWithBar _petHud;
-        private Nameplate _nonCombatNPCHud;
+        private NameplateWithBar _npcHud;
         private Nameplate _minionNPCHud;
         private Nameplate _objectHud;
 
@@ -41,7 +43,7 @@ namespace DelvUI.Interface.Nameplates
             _friendsHud = new NameplateWithPlayerBar(manager.GetConfigObject<FriendPlayerNameplateConfig>());
             _otherPlayersHud = new NameplateWithPlayerBar(manager.GetConfigObject<OtherPlayerNameplateConfig>());
             _petHud = new NameplateWithBar(manager.GetConfigObject<PetNameplateConfig>());
-            _nonCombatNPCHud = new Nameplate(manager.GetConfigObject<NonCombatNPCNameplateConfig>());
+            _npcHud = new NameplateWithBar(manager.GetConfigObject<NPCNameplateConfig>());
             _minionNPCHud = new Nameplate(manager.GetConfigObject<MinionNPCNameplateConfig>());
             _objectHud = new Nameplate(manager.GetConfigObject<ObjectsNameplateConfig>());
         }
@@ -154,12 +156,12 @@ namespace DelvUI.Interface.Nameplates
                         }
                         else if ((BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.Enemy)
                         {
-                            return _enemyHud;
+                            return Utils.IsHostile(battleNpc) ? _enemyHud : _npcHud;
                         }
                     }
                     break;
 
-                case ObjectKind.EventNpc: return _nonCombatNPCHud;
+                case ObjectKind.EventNpc: return _npcHud;
                 case ObjectKind.Companion: return _minionNPCHud;
                 default: return _objectHud;
             }
@@ -170,7 +172,7 @@ namespace DelvUI.Interface.Nameplates
         private unsafe bool IsPointObstructed(NameplateData data)
         {
             if (data.GameObject == null) { return true; }
-            if (Config.OcclusionMode == NameplatesOcclusionMode.None) { return false; }
+            if (Config.OcclusionMode == NameplatesOcclusionMode.None || data.IgnoreOcclusion) { return false; }
 
             Camera camera = Control.Instance()->CameraManager.Camera->CameraBase.SceneCamera;
             Vector3 cameraPos = camera.Object.Position;

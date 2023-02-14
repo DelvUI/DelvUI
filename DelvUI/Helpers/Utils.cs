@@ -76,11 +76,13 @@ namespace DelvUI.Helpers
             return null;
         }
 
-        public static unsafe bool IsHostileMemory(BattleNpc npc)
+        public static unsafe bool IsHostile(Character character)
         {
-            return npc != null
-                && ((npc.BattleNpcKind == BattleNpcSubKind.Enemy || (int)npc.BattleNpcKind == 1)
-                && *(byte*)(npc.Address + 0x19C3) != 0);
+            StructsCharacter* chara = (StructsCharacter*)character.Address;
+
+            return character != null
+                && ((character.SubKind == (byte)BattleNpcSubKind.Enemy || (int)character.SubKind == 1)
+                && chara->Battalion != 0);
         }
 
         public static unsafe float ActorShieldValue(GameObject? actor)

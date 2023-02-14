@@ -259,7 +259,7 @@ namespace DelvUI.Interface.GeneralElements
         {
             List<LabelConfig> labels = new List<LabelConfig>();
 
-            if (Config.HideHealthIfPossible && maxHp <= 0)
+            if (Config.HideHealthIfPossible && maxHp <= 1)
             {
                 if (!Utils.IsHealthLabel(Config.LeftLabelConfig))
                 {
