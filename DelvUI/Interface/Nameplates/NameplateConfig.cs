@@ -2,6 +2,7 @@
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Interface.Bars;
+using DelvUI.Interface.StatusEffects;
 using System;
 using System.Numerics;
 
@@ -42,11 +43,77 @@ namespace DelvUI.Interface.GeneralElements
 
         public new static PlayerNameplateConfig DefaultConfig()
         {
-            return NameplatesHelper.GetNameplateWithPlayerBarConfig<PlayerNameplateConfig>(
-                0xFFD0E5E0, 
+            return NameplatesHelper.GetNameplateWithBarConfig<PlayerNameplateConfig, NameplatePlayerBarConfig>(
+                0xFFD0E5E0,
                 0xFF30444A,
                 HUDConstants.DefaultPlayerNameplateBarSize
             );
+        }
+    }
+
+    [DisableParentSettings("HideWhenInactive", "TitleLabelConfig", "SwapLabelsWhenNeeded")]
+    [Section("Nameplates")]
+    [SubSection("Enemies", 0)]
+    public class EnemyNameplateConfig : NameplateWithEnemyBarConfig
+    {
+        public EnemyNameplateConfig(
+            Vector2 position,
+            EditableLabelConfig nameLabel,
+            EditableNonFormattableLabelConfig titleLabelConfig,
+            NameplateEnemyBarConfig barConfig)
+            : base(position, nameLabel, titleLabelConfig, barConfig)
+        {
+        }
+
+        public new static EnemyNameplateConfig DefaultConfig()
+        {
+            EnemyNameplateConfig config = NameplatesHelper.GetNameplateWithBarConfig<EnemyNameplateConfig, NameplateEnemyBarConfig> (
+                0xFF993535,
+                0xFF000000,
+                HUDConstants.DefaultEnemyNameplateBarSize
+            );
+
+            config.SwapLabelsWhenNeeded = false;
+
+            config.NameLabelConfig.Position = new Vector2(-8, 0);
+            config.NameLabelConfig.Text = "Lv[level] [name]";
+            config.NameLabelConfig.FrameAnchor = DrawAnchor.TopRight;
+            config.NameLabelConfig.TextAnchor = DrawAnchor.Right;
+            config.NameLabelConfig.Color = PluginConfigColor.FromHex(0xFFFFFFFF);
+            
+            config.BarConfig.LeftLabelConfig.Enabled = true;
+            config.BarConfig.OnlyShowWhenNotFull = false;
+
+            // debuffs
+            LabelConfig durationConfig = new LabelConfig(new Vector2(0, -4), "", DrawAnchor.Bottom, DrawAnchor.Center);
+            LabelConfig stacksConfig = new LabelConfig(new Vector2(-3, 4), "", DrawAnchor.TopRight, DrawAnchor.Center);
+            stacksConfig.Color = new(Vector4.UnitW);
+            stacksConfig.OutlineColor = new(Vector4.One);
+
+            StatusEffectIconConfig iconConfig = new StatusEffectIconConfig(durationConfig, stacksConfig);
+            iconConfig.Size = new Vector2(40, 40);
+            iconConfig.DispellableBorderConfig.Enabled = false;
+
+            Vector2 pos = new Vector2(0, -10);
+            Vector2 size = new Vector2(iconConfig.Size.X * 8 + 6, iconConfig.Size.Y);
+
+            EnemyNameplateStatusEffectsListConfig debuffs = new EnemyNameplateStatusEffectsListConfig(
+                DrawAnchor.TopLeft,
+                pos,
+                size,
+                false,
+                true,
+                false,
+                GrowthDirections.Right | GrowthDirections.Up,
+                iconConfig
+            );
+            debuffs.Limit = 8;
+            debuffs.ShowPermanentEffects = true;
+            debuffs.IconConfig.DispellableBorderConfig.Enabled = false;
+
+            config.DebuffsConfig = debuffs;
+
+            return config;
         }
     }
 
@@ -66,8 +133,8 @@ namespace DelvUI.Interface.GeneralElements
 
         public new static PartyMembersNameplateConfig DefaultConfig()
         {
-            PartyMembersNameplateConfig config = NameplatesHelper.GetNameplateWithPlayerBarConfig<PartyMembersNameplateConfig>(
-                0xFFD0E5E0, 
+            PartyMembersNameplateConfig config = NameplatesHelper.GetNameplateWithBarConfig<PartyMembersNameplateConfig, NameplatePlayerBarConfig>(
+                0xFFD0E5E0,
                 0xFF30444A,
                 HUDConstants.DefaultPlayerNameplateBarSize
             );
@@ -95,8 +162,8 @@ namespace DelvUI.Interface.GeneralElements
 
         public new static AllianceMembersNameplateConfig DefaultConfig()
         {
-            return NameplatesHelper.GetNameplateWithPlayerBarConfig<AllianceMembersNameplateConfig>(
-                0xFF99BE46, 
+            return NameplatesHelper.GetNameplateWithBarConfig<AllianceMembersNameplateConfig, NameplatePlayerBarConfig>(
+                0xFF99BE46,
                 0xFF3D4C1C,
                 HUDConstants.DefaultPlayerNameplateBarSize
             );
@@ -119,7 +186,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public new static FriendPlayerNameplateConfig DefaultConfig()
         {
-            return NameplatesHelper.GetNameplateWithPlayerBarConfig<FriendPlayerNameplateConfig>(
+            return NameplatesHelper.GetNameplateWithBarConfig<FriendPlayerNameplateConfig, NameplatePlayerBarConfig>(
                 0xFFEB6211,
                 0xFF4A2008,
                 HUDConstants.DefaultPlayerNameplateBarSize
@@ -143,7 +210,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public new static OtherPlayerNameplateConfig DefaultConfig()
         {
-            return NameplatesHelper.GetNameplateWithPlayerBarConfig<OtherPlayerNameplateConfig>(
+            return NameplatesHelper.GetNameplateWithBarConfig<OtherPlayerNameplateConfig, NameplatePlayerBarConfig>(
                 0xFF91BBD8,
                 0xFF33434E,
                 HUDConstants.DefaultPlayerNameplateBarSize
@@ -160,14 +227,14 @@ namespace DelvUI.Interface.GeneralElements
             Vector2 position,
             EditableLabelConfig nameLabel,
             EditableNonFormattableLabelConfig titleLabelConfig,
-            NameplatePlayerBarConfig barConfig)
+            NameplateBarConfig barConfig)
             : base(position, nameLabel, titleLabelConfig, barConfig)
         {
         }
 
         public new static PetNameplateConfig DefaultConfig()
         {
-            PetNameplateConfig config = NameplatesHelper.GetNameplateWithPlayerBarConfig<PetNameplateConfig>(
+            PetNameplateConfig config = NameplatesHelper.GetNameplateWithBarConfig<PetNameplateConfig, NameplateBarConfig>(
                 0xFFD1E5C8,
                 0xFF2A2F28,
                 HUDConstants.DefaultPlayerNameplateBarSize
@@ -198,7 +265,7 @@ namespace DelvUI.Interface.GeneralElements
         public new static NonCombatNPCNameplateConfig DefaultConfig()
         {
             NonCombatNPCNameplateConfig config = NameplatesHelper.GetNameplateConfig<NonCombatNPCNameplateConfig>(0xFFD1E5C8, 0xFF3A4b1E);
-            config.SwapLabelsWhenNeeded = false;
+            config.SwapLabelsWhenNeeded = true;
             config.NameLabelConfig.Position = new Vector2(0, -20);
             config.TitleLabelConfig.Position = Vector2.Zero;
 
@@ -245,7 +312,7 @@ namespace DelvUI.Interface.GeneralElements
             : base(position, nameLabel, titleLabelConfig)
         {
         }
-    
+
         public new static ObjectsNameplateConfig DefaultConfig()
         {
             ObjectsNameplateConfig config = NameplatesHelper.GetNameplateConfig<ObjectsNameplateConfig>(0xFFFFFFFF, 0xFF000000);
@@ -354,6 +421,17 @@ namespace DelvUI.Interface.GeneralElements
         [NestedConfig("Health Bar", 40)]
         public NameplateEnemyBarConfig BarConfig = null!;
 
+        [NestedConfig("Icon", 45)]
+        public NameplateIconConfig StateIconConfig = new NameplateIconConfig(
+            new Vector2(-5, 0),
+            new Vector2(30, 30),
+            DrawAnchor.Right,
+            DrawAnchor.Left
+        );
+
+        [NestedConfig("Debuffs", 50)]
+        public EnemyNameplateStatusEffectsListConfig DebuffsConfig = null!;
+
         public NameplateBarConfig GetBarConfig() => BarConfig;
 
         public NameplateWithEnemyBarConfig(
@@ -375,6 +453,14 @@ namespace DelvUI.Interface.GeneralElements
         [Checkbox("Only Show when not at full Health")]
         [Order(1)]
         public bool OnlyShowWhenNotFull = true;
+
+        [ColorEdit4("Targeted Border Color")]
+        [Order(38, collapseWith = nameof(DrawBorder))]
+        public PluginConfigColor TargetedBorderColor = PluginConfigColor.FromHex(0xFFFFFFFF);
+
+        [DragInt("Targeted Border Thickness", min = 1, max = 10)]
+        [Order(39, collapseWith = nameof(DrawBorder))]
+        public int TargetedBorderThickness = 2;
 
         [NestedConfig("Color Based On Health Value", 50, collapsingHeader = false)]
         public ColorByHealthValueConfig ColorByHealth = new ColorByHealthValueConfig();
@@ -445,6 +531,28 @@ namespace DelvUI.Interface.GeneralElements
 
     public class NameplateEnemyBarConfig : NameplateBarConfig
     {
+        [Checkbox("Use State Colorw", spacing = true)]
+        [Order(45)]
+        public bool UseStateColor = false;
+
+        [ColorEdit4("Out of Combat")]
+        [Order(46, collapseWith = nameof(UseStateColor))]
+        public PluginConfigColor OutOfCombatColor = PluginConfigColor.FromHex(0xFFDA9D2E);
+
+        [ColorEdit4("Out of Combat (Hostile)")]
+        [Order(46, collapseWith = nameof(UseStateColor))]
+        public PluginConfigColor OutOfCombatHostileColor = PluginConfigColor.FromHex(0xFF994B35);
+
+        [ColorEdit4("In Combat")]
+        [Order(46, collapseWith = nameof(UseStateColor))]
+        public PluginConfigColor InCombatColor = PluginConfigColor.FromHex(0xFF993535);
+
+        [NestedConfig("Order Label", 132)]
+        public DefaultFontLabelConfig OrderLabelConfig = new DefaultFontLabelConfig(new Vector2(5, 0), "", DrawAnchor.Right, DrawAnchor.Left)
+        {
+            Strata = StrataLevel.LOWEST
+        };
+
         public NameplateEnemyBarConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig, EditableLabelConfig optionalLabelConfig)
             : base(position, size, leftLabelConfig, rightLabelConfig, optionalLabelConfig)
         {
@@ -457,11 +565,11 @@ namespace DelvUI.Interface.GeneralElements
     {
         [DragInt("Fade start range (yalms)", min = 1, max = 500)]
         [Order(5)]
-        public int StartRange = 30;
+        public int StartRange = 50;
 
         [DragInt("Fade end range (yalms)", min = 1, max = 500)]
         [Order(10)]
-        public int EndRange = 50;
+        public int EndRange = 64;
 
         public float AlphaForDistance(float distance, float maxAlpha = 1f)
         {
@@ -473,6 +581,20 @@ namespace DelvUI.Interface.GeneralElements
 
             float a = diff / (EndRange - StartRange);
             return Math.Max(0, Math.Min(maxAlpha, 1 - a));
+        }
+    }
+
+    public class EnemyNameplateStatusEffectsListConfig : StatusEffectsListConfig
+    {
+        [Anchor("Health Bar Anchor")]
+        [Order(4)]
+        public DrawAnchor HealthBarAnchor = DrawAnchor.BottomLeft;
+
+        public EnemyNameplateStatusEffectsListConfig(DrawAnchor anchor, Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
+            GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
+            : base(position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)
+        {
+            HealthBarAnchor = anchor;
         }
     }
 
@@ -497,40 +619,49 @@ namespace DelvUI.Interface.GeneralElements
             return (T)Activator.CreateInstance(typeof(T), Vector2.Zero, nameLabelConfig, titleLabelConfig)!;
         }
 
-        internal static T GetNameplateWithPlayerBarConfig<T>(uint bgColor, uint borderColor, Vector2 barSize) where T : NameplateConfig
+        internal static T GetNameplateWithBarConfig<T, B>(uint bgColor, uint borderColor, Vector2 barSize) 
+            where T : NameplateConfig
+            where B : NameplateBarConfig
         {
-            EditableLabelConfig leftLabelConfig = new EditableLabelConfig(new Vector2(5, 0), "Lv[level]", DrawAnchor.Left, DrawAnchor.Left)
+            EditableLabelConfig leftLabelConfig = new EditableLabelConfig(new Vector2(5, 0), "[health:current-short]", DrawAnchor.Left, DrawAnchor.Left)
             {
                 Enabled = false,
-                FontID = FontsConfig.DefaultMediumFontKey
+                FontID = FontsConfig.DefaultMediumFontKey,
+                Strata = StrataLevel.LOWEST
             };
-            EditableLabelConfig rightLabelConfig = new EditableLabelConfig(new Vector2(-5, 0), "[health:current-short]", DrawAnchor.Right, DrawAnchor.Right)
+            EditableLabelConfig rightLabelConfig = new EditableLabelConfig(new Vector2(-5, 0), "", DrawAnchor.Right, DrawAnchor.Right)
             {
                 Enabled = false,
-                FontID = FontsConfig.DefaultMediumFontKey
+                FontID = FontsConfig.DefaultMediumFontKey,
+                Strata = StrataLevel.LOWEST
             };
             EditableLabelConfig optionalLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "", DrawAnchor.Center, DrawAnchor.Center)
             {
                 Enabled = false,
-                FontID = FontsConfig.DefaultMediumFontKey
+                FontID = FontsConfig.DefaultSmallFontKey,
+                Strata = StrataLevel.LOWEST
             };
-            NameplatePlayerBarConfig barConfig = new NameplatePlayerBarConfig(new Vector2(0, -5), barSize, leftLabelConfig, rightLabelConfig, optionalLabelConfig)
+
+            var barConfig = Activator.CreateInstance(typeof(B), new Vector2(0, -5), barSize, leftLabelConfig, rightLabelConfig, optionalLabelConfig)!;
+            if (barConfig is BarConfig bar)
             {
-                FillColor = PluginConfigColor.FromHex(bgColor),
-                BackgroundColor = PluginConfigColor.FromHex(0xAA000000)
-            };
+                bar.FillColor = PluginConfigColor.FromHex(bgColor);
+                bar.BackgroundColor = PluginConfigColor.FromHex(0xAA000000);
+            }
 
             EditableLabelConfig nameLabelConfig = new EditableLabelConfig(new Vector2(0, -20), "[name]", DrawAnchor.Top, DrawAnchor.Bottom)
             {
                 Color = PluginConfigColor.FromHex(bgColor),
                 OutlineColor = PluginConfigColor.FromHex(borderColor),
-                FontID = FontsConfig.DefaultMediumFontKey
+                FontID = FontsConfig.DefaultMediumFontKey,
+                Strata = StrataLevel.LOWEST
             };
             EditableNonFormattableLabelConfig titleLabelConfig = new EditableNonFormattableLabelConfig(new Vector2(0, 0), "<[title]>", DrawAnchor.Top, DrawAnchor.Bottom)
             {
                 Color = PluginConfigColor.FromHex(bgColor),
                 OutlineColor = PluginConfigColor.FromHex(borderColor),
-                FontID = FontsConfig.DefaultMediumFontKey
+                FontID = FontsConfig.DefaultMediumFontKey,
+                Strata = StrataLevel.LOWEST
             };
 
             return (T)Activator.CreateInstance(typeof(T), Vector2.Zero, nameLabelConfig, titleLabelConfig, barConfig)!;

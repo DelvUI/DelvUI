@@ -32,11 +32,11 @@ namespace DelvUI.Interface.Bars
         [Order(37, collapseWith = nameof(DrawBorder))]
         public int BorderThickness = 1;
 
-        [NestedConfig("Shadow", 38, spacing = true)]
+        [NestedConfig("Shadow", 40, spacing = true)]
         public ShadowConfig ShadowConfig = new ShadowConfig() { Enabled = false };
 
         [Checkbox("Hide When Inactive", spacing = true)]
-        [Order(40)]
+        [Order(41)]
         public bool HideWhenInactive = false;
 
         public BarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor, BarDirection fillDirection = BarDirection.Right)

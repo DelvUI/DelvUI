@@ -2,7 +2,6 @@ using Dalamud.Interface;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
-using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Globalization;

@@ -719,6 +719,6 @@ namespace DelvUI.Interface
         internal static Vector2 DefaultStatusEffectsListSize = new Vector2(292, 82);
         
         internal static Vector2 DefaultPlayerNameplateBarSize = new Vector2(120, 10);
-        internal static Vector2 DefaultEnemyNameplateBarSize = new Vector2(200, 18);
+        internal static Vector2 DefaultEnemyNameplateBarSize = new Vector2(220, 26);
     }
 }

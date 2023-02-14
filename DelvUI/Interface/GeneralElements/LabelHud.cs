@@ -75,6 +75,8 @@ namespace DelvUI.Interface.GeneralElements
 
         public void DrawLabel(string text, Vector2 pos, Vector2 size, PluginConfigColor color, float? alpha = null)
         {
+            if (!Config.Enabled) { return; }
+
             PluginConfigColor fillColor = color;
             PluginConfigColor shadowColor = Config.ShadowConfig.Color;
             PluginConfigColor outlineColor = Config.OutlineColor;

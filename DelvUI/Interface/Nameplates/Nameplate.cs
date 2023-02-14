@@ -1,13 +1,11 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
-using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using System.Collections.Generic;
 using System.Numerics;
 using Action = System.Action;
@@ -88,10 +86,17 @@ namespace DelvUI.Interface.Nameplates
     {
         protected NameplateBarConfig BarConfig => ((NameplateWithBarConfig)_config).GetBarConfig();
 
+        private LabelHud _leftLabelHud;
+        private LabelHud _rightLabelHud;
+        private LabelHud _optionalLabelHud;
+
         //private bool _wasHovering = false;
 
         public NameplateWithBar(NameplateConfig config) : base(config)
         {
+            _leftLabelHud = new LabelHud(BarConfig.LeftLabelConfig);
+            _rightLabelHud = new LabelHud(BarConfig.RightLabelConfig);
+            _optionalLabelHud = new LabelHud(BarConfig.OptionalLabelConfig);
         }
 
         public unsafe List<(StrataLevel, Action)> GetBarDrawActions(NameplateData data)
@@ -113,7 +118,9 @@ namespace DelvUI.Interface.Nameplates
             PluginConfigColor bgColor = GetFillColor(character, currentHp, maxHp);
             bgColor = bgColor.WithAlpha(_config.RangeConfig.AlphaForDistance(data.Distance, bgColor.Vector.W));
 
-            PluginConfigColor borderColor = BarConfig.BorderColor.WithAlpha(
+            bool targeted = character.Address == Plugin.TargetManager.Target?.Address;
+            PluginConfigColor borderColor = targeted ? BarConfig.TargetedBorderColor : BarConfig.BorderColor;
+            borderColor = borderColor.WithAlpha(
                 _config.RangeConfig.AlphaForDistance(data.Distance, BarConfig.BorderColor.Vector.W)
             );
 
@@ -126,7 +133,7 @@ namespace DelvUI.Interface.Nameplates
                 BarConfig.ID,
                 BarConfig.DrawBorder,
                 borderColor,
-                BarConfig.BorderThickness,
+                targeted ? BarConfig.TargetedBorderThickness : BarConfig.BorderThickness,
                 BarConfig.Anchor,
                 character,
                 current: currentHp,
@@ -136,7 +143,6 @@ namespace DelvUI.Interface.Nameplates
 
             bar.SetBackground(background);
             bar.AddForegrounds(healthFill);
-            bar.AddLabels(GetLabels(maxHp));
 
             // shield
             PluginConfigColor shieldColor = BarConfig.ShieldConfig.Color.WithAlpha(
@@ -159,6 +165,22 @@ namespace DelvUI.Interface.Nameplates
             if (mouseoverAreaBar != null)
             {
                 drawActions.AddRange(mouseoverAreaBar.GetDrawActions(origin, StrataLevel.HIGHEST));
+            }
+
+            // labels
+            Vector2 barPos = Utils.GetAnchoredPosition(origin, BarConfig.Size, BarConfig.Anchor) + BarConfig.Position;
+            LabelHud[] labels = GetLabels(maxHp);
+            foreach (LabelHud label in labels)
+            {
+                LabelConfig labelConfig = (LabelConfig)label.GetConfig();
+                float alpha = _config.RangeConfig.AlphaForDistance(data.Distance, labelConfig.Color.Vector.W);
+                var (labelText, labelPos, labelSize, labelColor) = label.PreCalculate(barPos, BarConfig.Size, data.GameObject, data.Name, currentHp, maxHp, data.Kind == ObjectKind.Player);
+
+                drawActions.Add((labelConfig.StrataLevel, () =>
+                {
+                    label.DrawLabel(labelText, labelPos, labelSize, labelColor, alpha);
+                }
+                ));
             }
 
             return drawActions;
@@ -189,32 +211,32 @@ namespace DelvUI.Interface.Nameplates
             return null;
         }
 
-        private LabelConfig[] GetLabels(uint maxHp)
+        private LabelHud[] GetLabels(uint maxHp)
         {
-            List<LabelConfig> labels = new List<LabelConfig>();
+            List<LabelHud> labels = new List<LabelHud>();
 
             if (BarConfig.HideHealthIfPossible && maxHp <= 0)
             {
                 if (!Utils.IsHealthLabel(BarConfig.LeftLabelConfig))
                 {
-                    labels.Add(BarConfig.LeftLabelConfig);
+                    labels.Add(_leftLabelHud);
                 }
 
                 if (!Utils.IsHealthLabel(BarConfig.RightLabelConfig))
                 {
-                    labels.Add(BarConfig.RightLabelConfig);
+                    labels.Add(_rightLabelHud);
                 }
 
                 if (!Utils.IsHealthLabel(BarConfig.OptionalLabelConfig))
                 {
-                    labels.Add(BarConfig.OptionalLabelConfig);
+                    labels.Add(_optionalLabelHud);
                 }
             }
             else
             {
-                labels.Add(BarConfig.LeftLabelConfig);
-                labels.Add(BarConfig.RightLabelConfig);
-                labels.Add(BarConfig.OptionalLabelConfig);
+                labels.Add(_leftLabelHud);
+                labels.Add(_rightLabelHud);
+                labels.Add(_optionalLabelHud);
             }
 
             return labels.ToArray();
@@ -243,7 +265,6 @@ namespace DelvUI.Interface.Nameplates
         public NameplateWithBarAndExtras(NameplateConfig config) : base(config)
         {
         }
-
 
         public override List<(StrataLevel, Action)> GetElementsDrawActions(NameplateData data)
         {
@@ -397,6 +418,41 @@ namespace DelvUI.Interface.Nameplates
         }
     }
 
+    public class NameplateWithEnemyBar : NameplateWithBarAndExtras
+    {
+        private NameplateWithEnemyBarConfig Config => (NameplateWithEnemyBarConfig)_config;
+
+        private LabelHud _orderLabelHud;
+
+        public NameplateWithEnemyBar(NameplateWithEnemyBarConfig config) : base(config)
+        {
+            _orderLabelHud = new LabelHud(config.BarConfig.OrderLabelConfig);
+        }
+
+        protected override List<(StrataLevel, Action)> GetExtrasDrawActions(NameplateData data, NameplateExtrasAnchors anchors)
+        {
+            List<(StrataLevel, Action)> drawActions = new List<(StrataLevel, Action)>();
+            if (data.GameObject is not Character character) { return drawActions; }
+
+            NameplateEnemyBarConfig config = Config.BarConfig;
+
+            // order label
+            Vector2 origin = _config.Position + data.ScreenPosition;
+            Vector2 barPos = Utils.GetAnchoredPosition(origin, config.Size, config.Anchor) + config.Position;
+            float alpha = _config.RangeConfig.AlphaForDistance(data.Distance, config.OrderLabelConfig.Color.Vector.W);
+
+            config.OrderLabelConfig.SetText(data.Order);
+            var (labelText, labelPos, labelSize, labelColor) = _orderLabelHud.PreCalculate(barPos, config.Size, data.GameObject);
+            drawActions.Add((config.OrderLabelConfig.StrataLevel, () =>
+            {
+                _orderLabelHud.DrawLabel(labelText, labelPos, labelSize, labelColor, alpha);
+            }
+            ));
+
+            return drawActions;
+        }
+    }
+
     #region utils
     public struct NameplateAnchor
     {
@@ -441,7 +497,7 @@ namespace DelvUI.Interface.Nameplates
             if (nameY == -1)
             {
                 DefaultLabelAnchor = titleLabelAnchor;
-            }            
+            }
             else if (nameY < titleY)
             {
                 HighestLabelAnchor = nameLabelAnchor;
@@ -460,7 +516,7 @@ namespace DelvUI.Interface.Nameplates
 
             NameplateAnchor? labelAnchor = null;
 
-            switch(label)
+            switch (label)
             {
                 case NameplateLabelAnchor.Name: labelAnchor = NameLabelAnchor; break;
                 case NameplateLabelAnchor.Title: labelAnchor = TitleLabelAnchor; break;

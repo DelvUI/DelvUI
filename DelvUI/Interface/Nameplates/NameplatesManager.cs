@@ -1,6 +1,8 @@
 ﻿using Dalamud.Game;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Logging;
+using Dalamud.Memory;
 using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
@@ -13,7 +15,6 @@ using System.Numerics;
 using static FFXIVClientStructs.FFXIV.Client.UI.AddonNamePlate;
 using static FFXIVClientStructs.FFXIV.Client.UI.RaptureAtkModule;
 using static FFXIVClientStructs.FFXIV.Client.UI.UI3DModule;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using StructsFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework;
 
 namespace DelvUI.Interface.Nameplates
@@ -88,6 +89,7 @@ namespace DelvUI.Interface.Nameplates
             RaptureAtkModule* atkModule = uiModule->GetRaptureAtkModule();
             if (atkModule == null || atkModule->AtkModule.AtkArrayDataHolder.StringArrayCount <= NameplateDataArrayIndex) { return; }
 
+            StringArrayData* stringArray = atkModule->AtkModule.AtkArrayDataHolder.StringArrays[NameplateDataArrayIndex];
             NamePlateInfo* infoArray = &atkModule->NamePlateInfoArray;
             Camera camera = Control.Instance()->CameraManager.Camera->CameraBase.SceneCamera;
 
@@ -106,8 +108,6 @@ namespace DelvUI.Interface.Nameplates
 
                 // ui nameplate
                 NamePlateObject nameplateObject = addon->NamePlateObjectArray[objectInfo->NamePlateIndex];
-                int arrayIndex = activeCount - nameplateObject.Priority - 1;
-                if (arrayIndex < 0 || arrayIndex > NameplateCount) { continue; }
 
                 // position
                 Vector2 screenPos = new Vector2(
@@ -135,12 +135,21 @@ namespace DelvUI.Interface.Nameplates
                     iconId = textureInfo->AtkTexture.Resource->IconID;
                 }
 
+                // order
+                int arrayIndex = 150 + (activeCount - nameplateObject.Priority - 1);
+                string order = "";
+                if (stringArray->AtkArrayData.Size > arrayIndex)
+                {
+                    order = MemoryHelper.ReadSeStringNullTerminated(new IntPtr(stringArray->StringArray[arrayIndex])).ToString();
+                }
+
                 _data.Add(new NameplateData(
                     gameObject,
                     name,
                     title,
                     isTitlePrefix,
                     iconId,
+                    order,
                     (ObjectKind)obj->ObjectKind,
                     obj->SubKind,
                     screenPos,
@@ -160,19 +169,21 @@ namespace DelvUI.Interface.Nameplates
         public string Title;
         public bool IsTitlePrefix;
         public int NamePlateIconId;
+        public string Order;
         public ObjectKind Kind;
         public byte SubKind;
         public Vector2 ScreenPosition;
         public Vector3 WorldPosition;
         public float Distance;
 
-        public NameplateData(GameObject? gameObject, string name, string title, bool isTitlePrefix, int namePlateIconId, ObjectKind kind, byte subKind, Vector2 screenPosition, Vector3 worldPosition, float distance)
+        public NameplateData(GameObject? gameObject, string name, string title, bool isTitlePrefix, int namePlateIconId, string order, ObjectKind kind, byte subKind, Vector2 screenPosition, Vector3 worldPosition, float distance)
         {
             GameObject = gameObject;
             Name = name;
             Title = title;
             IsTitlePrefix = isTitlePrefix;
             NamePlateIconId = namePlateIconId;
+            Order = order;
             Kind = kind;
             SubKind = subKind;
             ScreenPosition = screenPosition;

@@ -513,6 +513,7 @@ namespace DelvUI.Config
 
             typeof(NameplatesGeneralConfig),
             typeof(PlayerNameplateConfig),
+            typeof(EnemyNameplateConfig),
             typeof(PartyMembersNameplateConfig),
             typeof(AllianceMembersNameplateConfig),
             typeof(FriendPlayerNameplateConfig),

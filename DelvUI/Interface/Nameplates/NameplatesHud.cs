@@ -17,6 +17,7 @@ namespace DelvUI.Interface.Nameplates
         private NameplatesGeneralConfig Config => (NameplatesGeneralConfig)_config;
 
         private NameplateWithPlayerBar _playerHud;
+        private NameplateWithEnemyBar _enemyHud;
         private NameplateWithPlayerBar _partyMemberHud;
         private NameplateWithPlayerBar _allianceMemberHud;
         private NameplateWithPlayerBar _friendsHud;
@@ -30,6 +31,7 @@ namespace DelvUI.Interface.Nameplates
         {
             ConfigurationManager manager = ConfigurationManager.Instance;
             _playerHud = new NameplateWithPlayerBar(manager.GetConfigObject<PlayerNameplateConfig>());
+            _enemyHud = new NameplateWithEnemyBar(manager.GetConfigObject<EnemyNameplateConfig>()); 
             _partyMemberHud = new NameplateWithPlayerBar(manager.GetConfigObject<PartyMembersNameplateConfig>());
             _allianceMemberHud = new NameplateWithPlayerBar(manager.GetConfigObject<AllianceMembersNameplateConfig>());
             _friendsHud = new NameplateWithPlayerBar(manager.GetConfigObject<FriendPlayerNameplateConfig>());
@@ -96,6 +98,10 @@ namespace DelvUI.Interface.Nameplates
                             (BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.Chocobo)
                         {
                             return _petHud;
+                        }
+                        else if ((BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.Enemy)
+                        {
+                            return _enemyHud;
                         }
                     }
                     break;
