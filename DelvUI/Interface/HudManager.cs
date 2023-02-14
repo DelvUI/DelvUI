@@ -457,17 +457,17 @@ namespace DelvUI.Interface
                 DraggablesHelper.DrawGrid(_gridConfig, _hudOptions, _selectedElement);
             }
 
-            // draw elements
-            lock (_hudElements)
-            {
-                DraggablesHelper.DrawElements(origin, _hudHelper, _hudElements.Values, _jobHud, _selectedElement);
-            }
-
             // nameplates
             if (_nameplatesHud.GetConfig().Enabled)
             {
                 _nameplatesHud.PrepareForDraw(origin);
                 _nameplatesHud.Draw(origin);
+            }
+
+            // draw elements
+            lock (_hudElements)
+            {
+                DraggablesHelper.DrawElements(origin, _hudHelper, _hudElements.Values, _jobHud, _selectedElement);
             }
 
             // tooltip
