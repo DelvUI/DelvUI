@@ -133,6 +133,8 @@ namespace DelvUI.Interface
             {
                 element.StopPreview();
             }
+
+            _nameplatesHud.StopPreview();
         }
 
         private void OnStrataLevelsChanged(ConfigurationManager sender, PluginConfigObject config)

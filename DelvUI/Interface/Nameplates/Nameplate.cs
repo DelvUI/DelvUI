@@ -6,6 +6,7 @@ using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
+using DelvUI.Interface.StatusEffects;
 using System.Collections.Generic;
 using System.Numerics;
 using Action = System.Action;
@@ -30,8 +31,13 @@ namespace DelvUI.Interface.Nameplates
 
         protected bool IsVisible(GameObject? actor)
         {
-            if (!_config.Enabled || actor == null) { return false; }
-            if (_config.OnlyShowWhenTargeted && actor.Address != Plugin.TargetManager.Target?.Address) { return false; }
+            if (!_config.Enabled || 
+                actor == null ||
+                !_config.VisibilityConfig.IsElementVisible(null) ||
+                (_config.OnlyShowWhenTargeted && actor.Address != Plugin.TargetManager.Target?.Address))
+            {
+                return false; 
+            }
 
             return true;
         }
@@ -49,7 +55,7 @@ namespace DelvUI.Interface.Nameplates
         protected List<(StrataLevel, Action)> GetMainLabelDrawActions(NameplateData data, NameplateAnchor? barAnchor = null)
         {
             List<(StrataLevel, Action)> drawActions = new List<(StrataLevel, Action)>();
-            Vector2 origin = barAnchor?.Position ?? data.ScreenPosition;
+            Vector2 origin = _config.Position + (barAnchor?.Position ?? data.ScreenPosition);
 
             Vector2 swapOffset = Vector2.Zero;
             if (_config.SwapLabelsWhenNeeded && (data.IsTitlePrefix || data.Title.Length == 0))
@@ -115,7 +121,7 @@ namespace DelvUI.Interface.Nameplates
             PluginConfigColor fillColor = GetFillColor(character, currentHp, maxHp);
             fillColor = fillColor.WithAlpha(_config.RangeConfig.AlphaForDistance(data.Distance, fillColor.Vector.W));
 
-            PluginConfigColor bgColor = GetFillColor(character, currentHp, maxHp);
+            PluginConfigColor bgColor = GetBackgroundColor(character);
             bgColor = bgColor.WithAlpha(_config.RangeConfig.AlphaForDistance(data.Distance, bgColor.Vector.W));
 
             bool targeted = character.Address == Plugin.TargetManager.Target?.Address;
@@ -272,7 +278,7 @@ namespace DelvUI.Interface.Nameplates
             if (!IsVisible(data.GameObject)) { return drawActions; }
 
             NameplateAnchor? barAnchor = GetBarAnchor(data);
-            Vector2 origin = barAnchor?.Position ?? data.ScreenPosition;
+            Vector2 origin = _config.Position + (barAnchor?.Position ?? data.ScreenPosition);
 
             Vector2 swapOffset = Vector2.Zero;
             if (_config.SwapLabelsWhenNeeded && (data.IsTitlePrefix || data.Title.Length == 0))
@@ -363,25 +369,22 @@ namespace DelvUI.Interface.Nameplates
             }
 
             // state icon
-            if (Config.StateIconConfig.Enabled && character is PlayerCharacter)
+            if (Config.StateIconConfig.Enabled && data.NamePlateIconId > 0 && character is PlayerCharacter)
             {
                 NameplateAnchor? anchor = anchors.GetAnchor(Config.StateIconConfig.NameplateLabelAnchor, Config.StateIconConfig.PrioritizeHealthBarAnchor);
                 anchor = anchor ?? new NameplateAnchor(data.ScreenPosition, Vector2.Zero);
 
-                if (data.NamePlateIconId > 0)
-                {
-                    var pos = Utils.GetAnchoredPosition(anchor.Value.Position, -anchor.Value.Size, Config.StateIconConfig.FrameAnchor);
-                    var iconPos = Utils.GetAnchoredPosition(pos + Config.StateIconConfig.Position, Config.StateIconConfig.Size, Config.StateIconConfig.Anchor);
+                var pos = Utils.GetAnchoredPosition(anchor.Value.Position, -anchor.Value.Size, Config.StateIconConfig.FrameAnchor);
+                var iconPos = Utils.GetAnchoredPosition(pos + Config.StateIconConfig.Position, Config.StateIconConfig.Size, Config.StateIconConfig.Anchor);
 
-                    drawActions.Add((Config.StateIconConfig.StrataLevel, () =>
+                drawActions.Add((Config.StateIconConfig.StrataLevel, () =>
+                {
+                    DrawHelper.DrawInWindow(_config.ID + "_stateIcon", iconPos, Config.StateIconConfig.Size, false, false, (drawList) =>
                     {
-                        DrawHelper.DrawInWindow(_config.ID + "_stateIcon", iconPos, Config.StateIconConfig.Size, false, false, (drawList) =>
-                        {
-                            DrawHelper.DrawIcon((uint)data.NamePlateIconId, iconPos, Config.StateIconConfig.Size, false, alpha, drawList);
-                        });
-                    }
-                    ));
+                        DrawHelper.DrawIcon((uint)data.NamePlateIconId, iconPos, Config.StateIconConfig.Size, false, alpha, drawList);
+                    });
                 }
+                ));
             }
 
             return drawActions;
@@ -423,10 +426,17 @@ namespace DelvUI.Interface.Nameplates
         private NameplateWithEnemyBarConfig Config => (NameplateWithEnemyBarConfig)_config;
 
         private LabelHud _orderLabelHud;
+        private StatusEffectsListHud _debuffsHud;
 
         public NameplateWithEnemyBar(NameplateWithEnemyBarConfig config) : base(config)
         {
             _orderLabelHud = new LabelHud(config.BarConfig.OrderLabelConfig);
+            _debuffsHud = new StatusEffectsListHud(config.DebuffsConfig);
+        }
+
+        public void StopPreview()
+        {
+            _debuffsHud.StopPreview();
         }
 
         protected override List<(StrataLevel, Action)> GetExtrasDrawActions(NameplateData data, NameplateExtrasAnchors anchors)
@@ -434,22 +444,71 @@ namespace DelvUI.Interface.Nameplates
             List<(StrataLevel, Action)> drawActions = new List<(StrataLevel, Action)>();
             if (data.GameObject is not Character character) { return drawActions; }
 
-            NameplateEnemyBarConfig config = Config.BarConfig;
+            NameplateEnemyBarConfig barConfig = Config.BarConfig;
 
             // order label
             Vector2 origin = _config.Position + data.ScreenPosition;
-            Vector2 barPos = Utils.GetAnchoredPosition(origin, config.Size, config.Anchor) + config.Position;
-            float alpha = _config.RangeConfig.AlphaForDistance(data.Distance, config.OrderLabelConfig.Color.Vector.W);
+            Vector2 barPos = Utils.GetAnchoredPosition(origin, barConfig.Size, barConfig.Anchor) + barConfig.Position;
+            float alpha = _config.RangeConfig.AlphaForDistance(data.Distance, barConfig.OrderLabelConfig.Color.Vector.W);
 
-            config.OrderLabelConfig.SetText(data.Order);
-            var (labelText, labelPos, labelSize, labelColor) = _orderLabelHud.PreCalculate(barPos, config.Size, data.GameObject);
-            drawActions.Add((config.OrderLabelConfig.StrataLevel, () =>
+            barConfig.OrderLabelConfig.SetText(data.Order);
+            var (labelText, labelPos, labelSize, labelColor) = _orderLabelHud.PreCalculate(barPos, barConfig.Size, data.GameObject);
+            drawActions.Add((barConfig.OrderLabelConfig.StrataLevel, () =>
             {
                 _orderLabelHud.DrawLabel(labelText, labelPos, labelSize, labelColor, alpha);
             }
             ));
 
+            // icon
+            if (Config.IconConfig.Enabled && data.NamePlateIconId > 0)
+            {
+                NameplateAnchor? anchor = anchors.GetAnchor(Config.IconConfig.NameplateLabelAnchor, Config.IconConfig.PrioritizeHealthBarAnchor);
+                anchor = anchor ?? new NameplateAnchor(data.ScreenPosition, Vector2.Zero);
+
+                var pos = Utils.GetAnchoredPosition(_config.Position + anchor.Value.Position, -anchor.Value.Size, Config.IconConfig.FrameAnchor);
+                var iconPos = Utils.GetAnchoredPosition(pos + Config.IconConfig.Position, Config.IconConfig.Size, Config.IconConfig.Anchor);
+
+                drawActions.Add((Config.IconConfig.StrataLevel, () =>
+                {
+                    DrawHelper.DrawInWindow(_config.ID + "_enemyIcon", iconPos, Config.IconConfig.Size, false, false, (drawList) =>
+                    {
+                        DrawHelper.DrawIcon((uint)data.NamePlateIconId, iconPos, Config.IconConfig.Size, false, alpha, drawList);
+                    });
+                }
+                ));
+
+            }
+
+            Vector2 buffsPos = Utils.GetAnchoredPosition(barPos, -barConfig.Size, Config.DebuffsConfig.HealthBarAnchor);
+            drawActions.Add((Config.DebuffsConfig.StrataLevel, () =>
+            {
+                _debuffsHud.Actor = character;
+                _debuffsHud.PrepareForDraw(buffsPos);
+                _debuffsHud.Draw(buffsPos);
+            }
+            ));
+
             return drawActions;
+        }
+
+        protected override PluginConfigColor GetFillColor(Character character, uint currentHp, uint maxHp)
+        {
+            NameplateEnemyBarConfig config = (NameplateEnemyBarConfig)BarConfig;
+
+            if (config.UseStateColor)
+            {
+                bool inCombat = (character.StatusFlags & StatusFlags.InCombat) != 0;
+                if (inCombat && !config.ColorByHealth.Enabled)
+                {
+                    return config.InCombatColor;
+                }
+                else if (!inCombat)
+                {
+                    return (character.StatusFlags & StatusFlags.Hostile) != 0 ? config.OutOfCombatHostileColor : config.OutOfCombatColor;
+                }
+            }
+
+            return base.GetFillColor(character, currentHp, maxHp);
         }
     }
 

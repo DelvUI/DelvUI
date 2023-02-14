@@ -67,7 +67,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public new static EnemyNameplateConfig DefaultConfig()
         {
-            EnemyNameplateConfig config = NameplatesHelper.GetNameplateWithBarConfig<EnemyNameplateConfig, NameplateEnemyBarConfig> (
+            EnemyNameplateConfig config = NameplatesHelper.GetNameplateWithBarConfig<EnemyNameplateConfig, NameplateEnemyBarConfig>(
                 0xFF993535,
                 0xFF000000,
                 HUDConstants.DefaultEnemyNameplateBarSize
@@ -80,22 +80,25 @@ namespace DelvUI.Interface.GeneralElements
             config.NameLabelConfig.FrameAnchor = DrawAnchor.TopRight;
             config.NameLabelConfig.TextAnchor = DrawAnchor.Right;
             config.NameLabelConfig.Color = PluginConfigColor.FromHex(0xFFFFFFFF);
-            
+
             config.BarConfig.LeftLabelConfig.Enabled = true;
             config.BarConfig.OnlyShowWhenNotFull = false;
 
             // debuffs
             LabelConfig durationConfig = new LabelConfig(new Vector2(0, -4), "", DrawAnchor.Bottom, DrawAnchor.Center);
+            durationConfig.FontID = FontsConfig.DefaultMediumFontKey;
+
             LabelConfig stacksConfig = new LabelConfig(new Vector2(-3, 4), "", DrawAnchor.TopRight, DrawAnchor.Center);
+            durationConfig.FontID = FontsConfig.DefaultMediumFontKey;
             stacksConfig.Color = new(Vector4.UnitW);
             stacksConfig.OutlineColor = new(Vector4.One);
 
             StatusEffectIconConfig iconConfig = new StatusEffectIconConfig(durationConfig, stacksConfig);
-            iconConfig.Size = new Vector2(40, 40);
+            iconConfig.Size = new Vector2(30, 30);
             iconConfig.DispellableBorderConfig.Enabled = false;
 
-            Vector2 pos = new Vector2(0, -10);
-            Vector2 size = new Vector2(iconConfig.Size.X * 8 + 6, iconConfig.Size.Y);
+            Vector2 pos = new Vector2(2, -20);
+            Vector2 size = new Vector2(230, 70);
 
             EnemyNameplateStatusEffectsListConfig debuffs = new EnemyNameplateStatusEffectsListConfig(
                 DrawAnchor.TopLeft,
@@ -107,9 +110,13 @@ namespace DelvUI.Interface.GeneralElements
                 GrowthDirections.Right | GrowthDirections.Up,
                 iconConfig
             );
-            debuffs.Limit = 8;
+            debuffs.Limit = 7;
             debuffs.ShowPermanentEffects = true;
             debuffs.IconConfig.DispellableBorderConfig.Enabled = false;
+            debuffs.IconPadding = new Vector2(1, 6);
+            debuffs.ShowOnlyMine = true;
+            debuffs.ShowTooltips = false;
+            debuffs.DisableInteraction = true;
 
             config.DebuffsConfig = debuffs;
 
@@ -391,7 +398,8 @@ namespace DelvUI.Interface.GeneralElements
             new Vector2(30, 30),
             DrawAnchor.Right,
             DrawAnchor.Left
-        );
+        )
+        { Strata = StrataLevel.LOWEST };
 
         [NestedConfig("Player State Icon", 55)]
         public NameplateIconConfig StateIconConfig = new NameplateIconConfig(
@@ -399,7 +407,8 @@ namespace DelvUI.Interface.GeneralElements
             new Vector2(30, 30),
             DrawAnchor.Left,
             DrawAnchor.Right
-        );
+        )
+        { Strata = StrataLevel.LOWEST };
 
         public NameplateBarConfig GetBarConfig() => BarConfig;
 
@@ -422,12 +431,13 @@ namespace DelvUI.Interface.GeneralElements
         public NameplateEnemyBarConfig BarConfig = null!;
 
         [NestedConfig("Icon", 45)]
-        public NameplateIconConfig StateIconConfig = new NameplateIconConfig(
-            new Vector2(-5, 0),
-            new Vector2(30, 30),
+        public NameplateIconConfig IconConfig = new NameplateIconConfig(
+            new Vector2(0, 0),
+            new Vector2(40, 40),
             DrawAnchor.Right,
             DrawAnchor.Left
-        );
+        )
+        { PrioritizeHealthBarAnchor = true, Strata = StrataLevel.LOWEST };
 
         [NestedConfig("Debuffs", 50)]
         public EnemyNameplateStatusEffectsListConfig DebuffsConfig = null!;
@@ -531,9 +541,9 @@ namespace DelvUI.Interface.GeneralElements
 
     public class NameplateEnemyBarConfig : NameplateBarConfig
     {
-        [Checkbox("Use State Colorw", spacing = true)]
+        [Checkbox("Use State Colors", spacing = true)]
         [Order(45)]
-        public bool UseStateColor = false;
+        public bool UseStateColor = true;
 
         [ColorEdit4("Out of Combat")]
         [Order(46, collapseWith = nameof(UseStateColor))]
@@ -619,7 +629,7 @@ namespace DelvUI.Interface.GeneralElements
             return (T)Activator.CreateInstance(typeof(T), Vector2.Zero, nameLabelConfig, titleLabelConfig)!;
         }
 
-        internal static T GetNameplateWithBarConfig<T, B>(uint bgColor, uint borderColor, Vector2 barSize) 
+        internal static T GetNameplateWithBarConfig<T, B>(uint bgColor, uint borderColor, Vector2 barSize)
             where T : NameplateConfig
             where B : NameplateBarConfig
         {

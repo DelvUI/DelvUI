@@ -42,6 +42,11 @@ namespace DelvUI.Interface.Nameplates
             _objectHud = new Nameplate(manager.GetConfigObject<ObjectsNameplateConfig>());
         }
 
+        public void StopPreview()
+        {
+            _enemyHud.StopPreview();
+        }
+
         protected override void CreateDrawActions(Vector2 origin)
         {
             if (NameplatesManager.Instance == null) { return; }
