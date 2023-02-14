@@ -125,8 +125,24 @@ namespace DelvUI.Interface.GeneralElements
             debuffs.ShowOnlyMine = true;
             debuffs.ShowTooltips = false;
             debuffs.DisableInteraction = true;
-
             config.DebuffsConfig = debuffs;
+
+            // castbar
+            Vector2 castbarSize = new Vector2(config.BarConfig.Size.X, 10);
+            
+            LabelConfig castNameConfig = new LabelConfig(new Vector2(0, -1), "", DrawAnchor.Center, DrawAnchor.Center);
+            castNameConfig.FontID = FontsConfig.DefaultSmallFontKey;
+
+            NumericLabelConfig castTimeConfig = new NumericLabelConfig(new Vector2(-5, 0), "", DrawAnchor.Right, DrawAnchor.Right);
+            castTimeConfig.Enabled = false;
+            castTimeConfig.FontID = FontsConfig.DefaultSmallFontKey;
+            castTimeConfig.NumberFormat = 1;
+
+            NameplateCastbarConfig castbarConfig = new NameplateCastbarConfig(Vector2.Zero, castbarSize, castNameConfig, castTimeConfig);
+            castbarConfig.HealthBarAnchor = DrawAnchor.BottomLeft;
+            castbarConfig.Anchor = DrawAnchor.TopLeft;
+            castbarConfig.ShowIcon = false;
+            config.CastbarConfig = castbarConfig;          
 
             return config;
         }
@@ -454,6 +470,9 @@ namespace DelvUI.Interface.GeneralElements
         [NestedConfig("Debuffs", 50)]
         public EnemyNameplateStatusEffectsListConfig DebuffsConfig = null!;
 
+        [NestedConfig("Castbar", 55)]
+        public NameplateCastbarConfig CastbarConfig = null!;
+
         public NameplateBarConfig GetBarConfig() => BarConfig;
 
         public NameplateWithEnemyBarConfig(
@@ -621,6 +640,20 @@ namespace DelvUI.Interface.GeneralElements
             : base(position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)
         {
             HealthBarAnchor = anchor;
+        }
+    }
+
+    [DisableParentSettings("AnchorToUnitFrame", "UnitFrameAnchor", "HideWhenInactive", "FillDirection")]
+    public class NameplateCastbarConfig : TargetCastbarConfig
+    {
+        [Anchor("Health Bar Anchor")]
+        [Order(16)]
+        public DrawAnchor HealthBarAnchor = DrawAnchor.BottomLeft;
+
+        public NameplateCastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, NumericLabelConfig castTimeConfig)
+            : base(position, size, castNameConfig, castTimeConfig)
+        {
+
         }
     }
 

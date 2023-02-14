@@ -437,16 +437,19 @@ namespace DelvUI.Interface.Nameplates
 
         private LabelHud _orderLabelHud;
         private StatusEffectsListHud _debuffsHud;
+        private NameplateCastbarHud _castbarHud;
 
         public NameplateWithEnemyBar(NameplateWithEnemyBarConfig config) : base(config)
         {
             _orderLabelHud = new LabelHud(config.BarConfig.OrderLabelConfig);
             _debuffsHud = new StatusEffectsListHud(config.DebuffsConfig);
+            _castbarHud = new NameplateCastbarHud(config.CastbarConfig);
         }
 
         public void StopPreview()
         {
             _debuffsHud.StopPreview();
+            _castbarHud.StopPreview();
         }
 
         protected override List<(StrataLevel, Action)> GetExtrasDrawActions(NameplateData data, NameplateExtrasAnchors anchors)
@@ -489,12 +492,23 @@ namespace DelvUI.Interface.Nameplates
 
             }
 
+            // debuffs
             Vector2 buffsPos = Utils.GetAnchoredPosition(barPos, -barConfig.Size, Config.DebuffsConfig.HealthBarAnchor);
             drawActions.Add((Config.DebuffsConfig.StrataLevel, () =>
             {
                 _debuffsHud.Actor = character;
                 _debuffsHud.PrepareForDraw(buffsPos);
                 _debuffsHud.Draw(buffsPos);
+            }
+            ));
+
+            // castbar
+            Vector2 castbarPos = Utils.GetAnchoredPosition(barPos, -barConfig.Size, Config.CastbarConfig.HealthBarAnchor);
+            drawActions.Add((Config.CastbarConfig.StrataLevel, () =>
+            {
+                _castbarHud.Actor = character;
+                _castbarHud.PrepareForDraw(castbarPos);
+                _castbarHud.Draw(castbarPos);
             }
             ));
 

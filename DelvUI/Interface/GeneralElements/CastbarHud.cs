@@ -367,4 +367,14 @@ namespace DelvUI.Interface.GeneralElements
             return true;
         }
     }
+
+    public class NameplateCastbarHud : TargetOfTargetCastbarHud
+    {
+        private NameplateCastbarConfig Config => (NameplateCastbarConfig)_config;
+
+        public NameplateCastbarHud(NameplateCastbarConfig config, string? displayName = null) : base(config, displayName)
+        {
+
+        }
+    }
 }
