@@ -142,10 +142,13 @@ namespace DelvUI.Interface.Nameplates
                 // order
                 int arrayIndex = 150 + (activeCount - nameplateObject.Priority - 1);
                 string order = "";
-                if (stringArray->AtkArrayData.Size > arrayIndex)
+                try
                 {
-                    order = MemoryHelper.ReadSeStringNullTerminated(new IntPtr(stringArray->StringArray[arrayIndex])).ToString();
-                }
+                    if (stringArray->AtkArrayData.Size > arrayIndex && stringArray->StringArray[arrayIndex] != null)
+                    {
+                        order = MemoryHelper.ReadSeStringNullTerminated(new IntPtr(stringArray->StringArray[arrayIndex])).ToString();
+                    }
+                } catch { }
 
                 _data.Add(new NameplateData(
                     gameObject,

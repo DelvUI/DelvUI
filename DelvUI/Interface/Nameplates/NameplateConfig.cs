@@ -146,7 +146,7 @@ namespace DelvUI.Interface.GeneralElements
         {
             PartyMembersNameplateConfig config = NameplatesHelper.GetNameplateWithBarConfig<PartyMembersNameplateConfig, NameplatePlayerBarConfig>(
                 0xFFD0E5E0,
-                0xFF30444A,
+                0xFF000000,
                 HUDConstants.DefaultPlayerNameplateBarSize
             );
 
