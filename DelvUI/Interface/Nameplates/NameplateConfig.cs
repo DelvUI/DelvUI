@@ -467,6 +467,10 @@ namespace DelvUI.Interface.GeneralElements
         [Checkbox("Only Show when not at full Health")]
         [Order(1)]
         public bool OnlyShowWhenNotFull = true;
+        
+        [Checkbox("Hide Health when fully depleted", help = "This will hide the healthbar when the characters HP has been brought to zero")]
+        [Order(2)]
+        public bool HideHealthAtZero = true;
 
         [ColorEdit4("Targeted Border Color")]
         [Order(38, collapseWith = nameof(DrawBorder))]
@@ -513,7 +517,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public bool IsVisible(uint hp, uint maxHp)
         {
-            return Enabled && (!OnlyShowWhenNotFull || hp < maxHp);
+            return Enabled && (!OnlyShowWhenNotFull || hp < maxHp) && !(HideHealthAtZero && hp <= 0);
         }
 
         public NameplateBarConfig() : base(Vector2.Zero, Vector2.Zero, new(Vector4.Zero)) { } // don't remove
