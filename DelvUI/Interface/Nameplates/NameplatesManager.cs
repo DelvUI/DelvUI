@@ -9,6 +9,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -69,6 +70,7 @@ namespace DelvUI.Interface.Nameplates
 
         private const int NameplateCount = 50;
         private const int NameplateDataArrayIndex = 4;
+        private Vector2 _averageNameplateSize = new Vector2(250, 100);
 
         private List<NameplateData> _data = new List<NameplateData>();
         public IReadOnlyCollection<NameplateData> Data => _data.AsReadOnly();
@@ -114,6 +116,8 @@ namespace DelvUI.Interface.Nameplates
                     nameplateObject.RootNode->AtkResNode.X + nameplateObject.RootNode->AtkResNode.Width / 2f,
                     nameplateObject.RootNode->AtkResNode.Y + nameplateObject.RootNode->AtkResNode.Height
                 );
+                screenPos = ClampScreenPosition(screenPos);
+
                 Vector3 worldPos = new Vector3(obj->Position.X, obj->Position.Y + obj->Height * 2.2f, obj->Position.Z);
 
                 // distance
@@ -159,6 +163,35 @@ namespace DelvUI.Interface.Nameplates
             }
 
             _data.Reverse();
+        }
+
+        private Vector2 ClampScreenPosition(Vector2 pos)
+        {
+            if (!_config.ClampToScreen) { return pos; }
+
+            Vector2 screenSize = ImGui.GetMainViewport().Size;
+            Vector2 nameplateSize = _averageNameplateSize / 2f;
+            float margin = 20;
+
+            if (pos.X + nameplateSize.X > screenSize.X)
+            {
+                pos.X = screenSize.X - nameplateSize.X - margin;
+            }
+            else if (pos.X - nameplateSize.X < 0)
+            {
+                pos.X = nameplateSize.X + margin;
+            }
+
+            if (pos.Y + nameplateSize.Y > screenSize.Y)
+            {
+                pos.Y = screenSize.Y - nameplateSize.Y - margin;
+            }
+            else if (pos.Y - nameplateSize.Y < 0)
+            {
+                pos.Y = nameplateSize.Y + margin;
+            }
+
+            return pos;
         }
     }
 

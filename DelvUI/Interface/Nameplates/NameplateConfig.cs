@@ -25,6 +25,10 @@ namespace DelvUI.Interface.GeneralElements
         [Combo("Occlusion Mode", new string[] { "Disabled", "Simple", "Full" }, help = "This controls wheter you'll see nameplates through walls and objects.\n\nDisabled: Nameplates will always be seen for units in range.\nSimple: Uses simple calculations to check if a nameplate is being covered by walls or objects. Use this for better performance.\nFull: Uses more complex calculations to check if a nameplate is being covered by walls or objects. Use this for better results.")]
         [Order(10)]
         public NameplatesOcclusionMode OcclusionMode = NameplatesOcclusionMode.Full;
+
+        [Checkbox("Try to keep nameplates on screen", help = "Disclaimer: DelvUI relies heavily on the the game's default nameplates so this setting won't be a huge improvement.\nThis setting tries to prevent nameplates from being cutoff in the border of the screen, but it won't keep showing nameplates that the game wouldn't.")]
+        [Order(20)]
+        public bool ClampToScreen = true;
     }
 
     [DisableParentSettings("HideWhenInactive")]
