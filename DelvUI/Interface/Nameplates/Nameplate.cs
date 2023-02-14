@@ -7,6 +7,7 @@ using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
+using ImGuiNET;
 using System.Collections.Generic;
 using System.Numerics;
 using Action = System.Action;
@@ -31,12 +32,12 @@ namespace DelvUI.Interface.Nameplates
 
         protected bool IsVisible(GameObject? actor)
         {
-            if (!_config.Enabled || 
+            if (!_config.Enabled ||
                 actor == null ||
                 !_config.VisibilityConfig.IsElementVisible(null) ||
                 (_config.OnlyShowWhenTargeted && actor.Address != Plugin.TargetManager.Target?.Address))
             {
-                return false; 
+                return false;
             }
 
             return true;
@@ -96,8 +97,6 @@ namespace DelvUI.Interface.Nameplates
         private LabelHud _rightLabelHud;
         private LabelHud _optionalLabelHud;
 
-        //private bool _wasHovering = false;
-
         public NameplateWithBar(NameplateConfig config) : base(config)
         {
             _leftLabelHud = new LabelHud(BarConfig.LeftLabelConfig);
@@ -105,11 +104,22 @@ namespace DelvUI.Interface.Nameplates
             _optionalLabelHud = new LabelHud(BarConfig.OptionalLabelConfig);
         }
 
+        public (bool, bool) GetMouseoverState(NameplateData data)
+        {
+            Vector2 origin = _config.Position + data.ScreenPosition;
+            Vector2 barPos = Utils.GetAnchoredPosition(origin, BarConfig.Size, BarConfig.Anchor) + BarConfig.Position;
+            var (areaStart, areaEnd) = BarConfig.MouseoverAreaConfig.GetArea(barPos, BarConfig.Size);
+
+            bool isHovering = ImGui.IsMouseHoveringRect(areaStart, areaEnd);
+            bool ignoreMouseover = BarConfig.MouseoverAreaConfig.Enabled && BarConfig.MouseoverAreaConfig.Ignore;
+
+            return (isHovering, ignoreMouseover);
+        }
+
         public unsafe List<(StrataLevel, Action)> GetBarDrawActions(NameplateData data)
         {
             List<(StrataLevel, Action)> drawActions = new List<(StrataLevel, Action)>();
             if (!IsVisible(data.GameObject)) { return drawActions; }
-
             if (data.GameObject is not Character character) { return drawActions; }
 
             uint currentHp = character.CurrentHp;
@@ -154,9 +164,9 @@ namespace DelvUI.Interface.Nameplates
             PluginConfigColor shieldColor = BarConfig.ShieldConfig.Color.WithAlpha(
                 _config.RangeConfig.AlphaForDistance(data.Distance, BarConfig.ShieldConfig.Color.Vector.W)
             );
-
             BarUtilities.AddShield(bar, BarConfig, BarConfig.ShieldConfig, character, healthFill.Size, shieldColor);
 
+            // draw bar
             Vector2 origin = _config.Position + data.ScreenPosition;
             drawActions.AddRange(bar.GetDrawActions(origin, _config.StrataLevel));
 

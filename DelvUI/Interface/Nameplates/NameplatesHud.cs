@@ -1,13 +1,15 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Logging;
 using DelvUI.Config;
+using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Graphics;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Common.Component.BGCollision;
+using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace DelvUI.Interface.Nameplates
@@ -27,11 +29,13 @@ namespace DelvUI.Interface.Nameplates
         private Nameplate _minionNPCHud;
         private Nameplate _objectHud;
 
+        private bool _wasHovering;
+
         public NameplatesHud(NameplatesGeneralConfig config) : base(config)
         {
             ConfigurationManager manager = ConfigurationManager.Instance;
             _playerHud = new NameplateWithPlayerBar(manager.GetConfigObject<PlayerNameplateConfig>());
-            _enemyHud = new NameplateWithEnemyBar(manager.GetConfigObject<EnemyNameplateConfig>()); 
+            _enemyHud = new NameplateWithEnemyBar(manager.GetConfigObject<EnemyNameplateConfig>());
             _partyMemberHud = new NameplateWithPlayerBar(manager.GetConfigObject<PartyMembersNameplateConfig>());
             _allianceMemberHud = new NameplateWithPlayerBar(manager.GetConfigObject<AllianceMembersNameplateConfig>());
             _friendsHud = new NameplateWithPlayerBar(manager.GetConfigObject<FriendPlayerNameplateConfig>());
@@ -47,23 +51,67 @@ namespace DelvUI.Interface.Nameplates
             _enemyHud.StopPreview();
         }
 
+        public void StopMouseover()
+        {
+            if (_wasHovering)
+            {
+                InputsHelper.Instance.ClearTarget();
+                _wasHovering = false;
+            }
+        }
+
         protected override void CreateDrawActions(Vector2 origin)
         {
-            if (NameplatesManager.Instance == null) { return; }
+            if (!_config.Enabled || NameplatesManager.Instance == null)
+            {
+                StopMouseover();
+                return; 
+            }
+
+            GameObject? mouseoveredActor = null;
+            bool ignoreMouseover = false;
 
             foreach (NameplateData data in NameplatesManager.Instance.Data)
             {
                 Nameplate? nameplate = GetNameplate(data);
                 if (nameplate == null) { continue; }
 
+                // raycasting
                 if (IsPointObstructed(data)) { continue; }
 
                 if (nameplate is NameplateWithBar nameplateWithBar)
                 {
+                    // draw bar
                     AddDrawActions(nameplateWithBar.GetBarDrawActions(data));
+
+                    // find mouseovered nameplate
+                    var (isHovering, ignore) = nameplateWithBar.GetMouseoverState(data);
+                    if (isHovering)
+                    {
+                        mouseoveredActor = data.GameObject;
+                        ignoreMouseover = ignore;
+                    }
                 }
 
+                // draw elements
                 AddDrawActions(nameplate.GetElementsDrawActions(data));
+            }
+
+            // mouseover
+            if (mouseoveredActor != null)
+            {
+                _wasHovering = true;
+                InputsHelper.Instance.SetTarget(mouseoveredActor, ignoreMouseover);
+
+                if (InputsHelper.Instance.LeftButtonClicked)
+                {
+                    Plugin.TargetManager.SetTarget(mouseoveredActor);
+                }
+            }
+            else if (_wasHovering)
+            {
+                InputsHelper.Instance.ClearTarget();
+                _wasHovering = false;
             }
         }
 
@@ -150,7 +198,8 @@ namespace DelvUI.Interface.Nameplates
                     data.ScreenPosition + new Vector2(30, 0), // right
                 };
 
-                foreach (Vector2 point in points) {
+                foreach (Vector2 point in points)
+                {
                     Ray ray = camera.ScreenPointToRay(point);
                     collisionModule->RaycastEx(&hit, ray.Origin, ray.Direction, data.Distance, 1, flags);
 
