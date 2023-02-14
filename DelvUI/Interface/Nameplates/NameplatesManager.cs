@@ -17,6 +17,7 @@ using static FFXIVClientStructs.FFXIV.Client.UI.AddonNamePlate;
 using static FFXIVClientStructs.FFXIV.Client.UI.RaptureAtkModule;
 using static FFXIVClientStructs.FFXIV.Client.UI.UI3DModule;
 using StructsFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework;
+using StructsGameObject = FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject;
 
 namespace DelvUI.Interface.Nameplates
 {
@@ -29,6 +30,7 @@ namespace DelvUI.Interface.Nameplates
         private NameplatesManager()
         {
             Plugin.Framework.Update += FrameworkOnOnUpdateEvent;
+            Plugin.ClientState.TerritoryChanged -= ClientStateOnTerritoryChangedEvent;
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
 
             OnConfigReset(ConfigurationManager.Instance);
@@ -58,6 +60,7 @@ namespace DelvUI.Interface.Nameplates
             }
 
             Plugin.Framework.Update -= FrameworkOnOnUpdateEvent;
+            Plugin.ClientState.TerritoryChanged -= ClientStateOnTerritoryChangedEvent;
 
             Instance = null!;
         }
@@ -70,10 +73,17 @@ namespace DelvUI.Interface.Nameplates
 
         private const int NameplateCount = 50;
         private const int NameplateDataArrayIndex = 4;
-        private Vector2 _averageNameplateSize = new Vector2(250, 100);
+        private Vector2 _averageNameplateSize = new Vector2(250, 150);
 
         private List<NameplateData> _data = new List<NameplateData>();
         public IReadOnlyCollection<NameplateData> Data => _data.AsReadOnly();
+
+        private NameplatesCache _cache = new NameplatesCache(50);
+
+        private void ClientStateOnTerritoryChangedEvent(object? sender, ushort territoryId)
+        {
+            _cache.Clear();
+        }
 
         private unsafe void FrameworkOnOnUpdateEvent(Framework framework)
         {
@@ -95,6 +105,9 @@ namespace DelvUI.Interface.Nameplates
             NamePlateInfo* infoArray = &atkModule->NamePlateInfoArray;
             Camera camera = Control.Instance()->CameraManager.Camera->CameraBase.SceneCamera;
 
+            GameObject? target = Plugin.TargetManager.Target;
+            bool foundTarget = false;
+
             _data = new List<NameplateData>();
             int activeCount = ui3DModule->NamePlateObjectInfoCount;
 
@@ -104,9 +117,14 @@ namespace DelvUI.Interface.Nameplates
                 if (objectInfo == null || objectInfo->NamePlateIndex >= NameplateCount) { continue; }
 
                 // actor
-                FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject* obj = objectInfo->GameObject;
+                StructsGameObject* obj = objectInfo->GameObject;
                 if (obj == null) { continue; }
+
                 GameObject? gameObject = Plugin.ObjectTable.CreateObjectReference(new IntPtr(obj));
+                if (target != null && new IntPtr(obj) == target.Address)
+                {
+                    foundTarget = true;
+                }
 
                 // ui nameplate
                 NamePlateObject nameplateObject = addon->NamePlateObjectArray[objectInfo->NamePlateIndex];
@@ -148,9 +166,10 @@ namespace DelvUI.Interface.Nameplates
                     {
                         order = MemoryHelper.ReadSeStringNullTerminated(new IntPtr(stringArray->StringArray[arrayIndex])).ToString();
                     }
-                } catch { }
+                }
+                catch { }
 
-                _data.Add(new NameplateData(
+                NameplateData data = new NameplateData(
                     gameObject,
                     name,
                     title,
@@ -162,10 +181,43 @@ namespace DelvUI.Interface.Nameplates
                     screenPos,
                     worldPos,
                     distance
-                ));
+                );
+
+                _data.Add(data);
+                _cache.Add(obj->ObjectID, data);
             }
 
             _data.Reverse();
+
+            // create nameplate for target?
+            if (_config.AlwaysShowTargetNameplate && target != null && !foundTarget)
+            {
+                StructsGameObject* obj = (StructsGameObject*)target.Address;
+                NameplateData? cachedData = _cache[target.ObjectId];
+
+                Vector3 worldPos = new Vector3(target.Position.X, target.Position.Y + obj->Height * 2.2f, target.Position.Z);
+                float distance = Vector3.Distance(camera.Object.Position, worldPos);
+
+                Plugin.GameGui.WorldToScreen(worldPos, out Vector2 screenPos);
+                screenPos = ClampScreenPosition(screenPos);
+
+                NameplateData targetData = new NameplateData(
+                    target,
+                    target.Name.ToString(),
+                    cachedData?.Title ?? "",
+                    cachedData?.IsTitlePrefix ?? true,
+                    cachedData?.NamePlateIconId ?? 0,
+                    cachedData?.Order ?? "",
+                    target.ObjectKind,
+                    target.SubKind,
+                    screenPos,
+                    worldPos,
+                    distance,
+                    true
+                );
+
+                _data.Add(targetData);
+            }
         }
 
         private Vector2 ClampScreenPosition(Vector2 pos)
@@ -198,6 +250,62 @@ namespace DelvUI.Interface.Nameplates
         }
     }
 
+    #region utils
+    public class NameplatesCache
+    {
+
+        private int _limit;
+        private Dictionary<uint, NameplateData> _dict;
+        private Queue<uint> _queue;
+
+        public NameplatesCache(int limit)
+        {
+            _limit = limit;
+            _dict = new Dictionary<uint, NameplateData>(limit);
+            _queue = new Queue<uint>(limit);
+        }
+
+        public void Add(uint key, NameplateData data)
+        {
+            if (key == 0 || key == GameObject.InvalidGameObjectId) { return; }
+
+            if (_dict.Count == _limit)
+            {
+                uint oldestKey = _queue.Dequeue();
+                _dict.Remove(oldestKey);
+            }
+
+            if (_dict.ContainsKey(key))
+            {
+                _dict[key] = data;
+            }
+            else
+            {
+                _dict.Add(key, data);
+                _queue.Enqueue(key);
+            }
+        }
+
+        public void Clear()
+        {
+            _dict.Clear();
+            _queue.Clear();
+        }
+
+        public NameplateData? this[uint key]
+        {
+            get
+            {
+                if (_dict.TryGetValue(key, out NameplateData data))
+                {
+                    return data;
+                }
+
+                return null;
+            }
+        }
+    }
+
     public struct NameplateData
     {
         public GameObject? GameObject;
@@ -211,8 +319,9 @@ namespace DelvUI.Interface.Nameplates
         public Vector2 ScreenPosition;
         public Vector3 WorldPosition;
         public float Distance;
+        public bool IgnoreOcclusion;
 
-        public NameplateData(GameObject? gameObject, string name, string title, bool isTitlePrefix, int namePlateIconId, string order, ObjectKind kind, byte subKind, Vector2 screenPosition, Vector3 worldPosition, float distance)
+        public NameplateData(GameObject? gameObject, string name, string title, bool isTitlePrefix, int namePlateIconId, string order, ObjectKind kind, byte subKind, Vector2 screenPosition, Vector3 worldPosition, float distance, bool ignoreOcclusion = false)
         {
             GameObject = gameObject;
             Name = name;
@@ -225,6 +334,8 @@ namespace DelvUI.Interface.Nameplates
             ScreenPosition = screenPosition;
             WorldPosition = worldPosition;
             Distance = distance;
+            IgnoreOcclusion = ignoreOcclusion;
         }
     }
+    #endregion
 }
