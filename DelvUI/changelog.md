@@ -1,3 +1,11 @@
+# 1.6.0.0
+- Added custom Nameplates:
+    + Like other DelvUI components, enabling this feature won't automatically disable the game's counterpart.
+    + You are supposed to manually hide the types of nameplates you don't want from either the game or DelvUI.
+
+- Unit frames for NPCs with 1 max health points wont show health values if the "Hide Health if Possible" setting is enabled for the label (previously it only did it for units with no health points).
+- Fixed issues with colors in unit frames for NPCs.
+
 # 1.5.4.0
 - Implemented format groups for labels:
     + This allows you to have entirely different formats for players and NPCs.
