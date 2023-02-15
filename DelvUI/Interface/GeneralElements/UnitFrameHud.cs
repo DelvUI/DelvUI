@@ -128,13 +128,12 @@ namespace DelvUI.Interface.GeneralElements
             uint currentHp = character.CurrentHp;
             uint maxHp = character.MaxHp;
 
-            // fixes weird bugs with npcs
-            if (maxHp == 1 && currentHp == 0)
+            // fixes weird bug with npcs
+            if (maxHp == 1)
             {
                 currentHp = 1;
             }
-
-            if (Config.SmoothHealthConfig.Enabled)
+            else if (Config.SmoothHealthConfig.Enabled)
             {
                 currentHp = _smoothHPHelper.GetNextHp((int)currentHp, (int)maxHp, Config.SmoothHealthConfig.Velocity);
             }
