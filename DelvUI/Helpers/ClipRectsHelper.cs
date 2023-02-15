@@ -188,7 +188,8 @@ namespace DelvUI.Helpers
             "ColorPicker",
             "PlayGuide",
             "SelectYesno",
-            "AddonContextMenuTitle"
+            "AddonContextMenuTitle",
+            "_TargetInfoCastBar"
         };
 
         private List<ClipRect> _clipRects = new List<ClipRect>();

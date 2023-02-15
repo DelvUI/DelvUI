@@ -78,8 +78,6 @@ namespace DelvUI.Interface.Party
             _onReadyCheckStartHook?.Original(ptr);
             _readyCheckData = ptr;
             _readyCheckOngoing = true;
-
-            PluginLog.Log(_readyCheckData.ToString("X"));
         }
 
         private void OnReadycheckEnd(IntPtr ptr)
