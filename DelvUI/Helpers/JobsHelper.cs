@@ -523,7 +523,7 @@ namespace DelvUI.Helpers
             [JobIDs.GLA] = 94022,
             [JobIDs.MRD] = 94024,
             [JobIDs.PLD] = 94079,
-            [JobIDs.WAR] = 94079,
+            [JobIDs.WAR] = 94081,
             [JobIDs.DRK] = 94123,
             [JobIDs.GNB] = 94130,
 
