@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
@@ -464,24 +465,44 @@ namespace DelvUI.Interface.Nameplates
             if (data.GameObject is not Character character) { return drawActions; }
 
             NameplateEnemyBarConfig barConfig = Config.BarConfig;
+            NameplateAnchor? anchor = barConfig.IsVisible(character.CurrentHp, character.MaxHp) ? anchors.BarAnchor : anchors.NameLabelAnchor;
+            anchor = anchor ?? new NameplateAnchor(Vector2.Zero, Vector2.Zero);
 
             // order label
-            Vector2 origin = _config.Position + data.ScreenPosition;
-            Vector2 barPos = Utils.GetAnchoredPosition(origin, barConfig.Size, barConfig.Anchor) + barConfig.Position;
             float alpha = _config.RangeConfig.AlphaForDistance(data.Distance, barConfig.OrderLabelConfig.Color.Vector.W);
 
             barConfig.OrderLabelConfig.SetText(data.Order);
-            var (labelText, labelPos, labelSize, labelColor) = _orderLabelHud.PreCalculate(barPos, barConfig.Size, data.GameObject);
+            var (labelText, labelPos, labelSize, labelColor) = _orderLabelHud.PreCalculate(anchor.Value.Position, anchor.Value.Size, data.GameObject);
             drawActions.Add((barConfig.OrderLabelConfig.StrataLevel, () =>
             {
                 _orderLabelHud.DrawLabel(labelText, labelPos, labelSize, labelColor, alpha);
             }
             ));
 
+            // debuffs
+            Vector2 buffsPos = Utils.GetAnchoredPosition(anchor.Value.Position, -anchor.Value.Size, Config.DebuffsConfig.HealthBarAnchor);
+            drawActions.Add((Config.DebuffsConfig.StrataLevel, () =>
+            {
+                _debuffsHud.Actor = character;
+                _debuffsHud.PrepareForDraw(buffsPos);
+                _debuffsHud.Draw(buffsPos);
+            }
+            ));
+
+            // castbar
+            Vector2 castbarPos = Utils.GetAnchoredPosition(anchor.Value.Position, -anchor.Value.Size, Config.CastbarConfig.HealthBarAnchor);
+            drawActions.Add((Config.CastbarConfig.StrataLevel, () =>
+            {
+                _castbarHud.Actor = character;
+                _castbarHud.PrepareForDraw(castbarPos);
+                _castbarHud.Draw(castbarPos);
+            }
+            ));
+
             // icon
             if (Config.IconConfig.Enabled && data.NamePlateIconId > 0)
             {
-                NameplateAnchor? anchor = anchors.GetAnchor(Config.IconConfig.NameplateLabelAnchor, Config.IconConfig.PrioritizeHealthBarAnchor);
+                anchor = anchors.GetAnchor(Config.IconConfig.NameplateLabelAnchor, Config.IconConfig.PrioritizeHealthBarAnchor);
                 anchor = anchor ?? new NameplateAnchor(data.ScreenPosition, Vector2.Zero);
 
                 var pos = Utils.GetAnchoredPosition(_config.Position + anchor.Value.Position, -anchor.Value.Size, Config.IconConfig.FrameAnchor);
@@ -497,26 +518,6 @@ namespace DelvUI.Interface.Nameplates
                 ));
 
             }
-
-            // debuffs
-            Vector2 buffsPos = Utils.GetAnchoredPosition(barPos, -barConfig.Size, Config.DebuffsConfig.HealthBarAnchor);
-            drawActions.Add((Config.DebuffsConfig.StrataLevel, () =>
-            {
-                _debuffsHud.Actor = character;
-                _debuffsHud.PrepareForDraw(buffsPos);
-                _debuffsHud.Draw(buffsPos);
-            }
-            ));
-
-            // castbar
-            Vector2 castbarPos = Utils.GetAnchoredPosition(barPos, -barConfig.Size, Config.CastbarConfig.HealthBarAnchor);
-            drawActions.Add((Config.CastbarConfig.StrataLevel, () =>
-            {
-                _castbarHud.Actor = character;
-                _castbarHud.PrepareForDraw(castbarPos);
-                _castbarHud.Draw(castbarPos);
-            }
-            ));
 
             return drawActions;
         }
