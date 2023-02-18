@@ -3,6 +3,7 @@
 - Fixed Nameplates eating mouse inputs even when their Health Bars are not visible.
 - Fixed Nameplates Occlusion not working for some players.
 - Fixed some elements not anchoring properly to enemy Nameplates when the Health Bar is not visible.
+- Fixed some object names showing as "?" in their Nameplates.
 
 # 1.6.0.0
 - Added custom Nameplates:

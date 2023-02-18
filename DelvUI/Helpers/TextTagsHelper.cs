@@ -1,4 +1,4 @@
-using Dalamud.Game.ClientState.Objects.Enums;
+﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Logging;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
@@ -404,7 +404,8 @@ namespace DelvUI.Helpers
         }
         private static string ValidateName(GameObject? actor, string? name)
         {
-            return actor != null ? actor.Name.ToString() : (name ?? "");
+            string? n = actor?.Name.ToString() ?? name;
+            return (n == null || n == "") ? "" : n;
         }
 
         private static string ValidatePlayerName(GameObject? actor, string? name, bool? isPlayerName = null)
