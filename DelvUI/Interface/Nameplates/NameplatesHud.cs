@@ -178,7 +178,7 @@ namespace DelvUI.Interface.Nameplates
             Vector3 cameraPos = camera.Object.Position;
 
             BGCollisionModule* collisionModule = Framework.Instance()->BGCollisionModule;
-            int* flags = stackalloc int[] { 0x2000 };
+            int* flags = stackalloc int[] { 0x2000, 0, 0x2000, 0 };
             bool obstructed = false;
 
             // simple mode

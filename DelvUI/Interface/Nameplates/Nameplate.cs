@@ -106,6 +106,12 @@ namespace DelvUI.Interface.Nameplates
 
         public (bool, bool) GetMouseoverState(NameplateData data)
         {
+            if (data.GameObject is not Character character) { return (false, false);  }
+            if (!BarConfig.IsVisible(character.CurrentHp, character.MaxHp) || BarConfig.DisableInteraction)
+            {
+                return (false, false);
+            }
+
             Vector2 origin = _config.Position + data.ScreenPosition;
             Vector2 barPos = Utils.GetAnchoredPosition(origin, BarConfig.Size, BarConfig.Anchor) + BarConfig.Position;
             var (areaStart, areaEnd) = BarConfig.MouseoverAreaConfig.GetArea(barPos, BarConfig.Size);

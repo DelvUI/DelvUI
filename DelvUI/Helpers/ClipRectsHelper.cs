@@ -84,6 +84,7 @@ namespace DelvUI.Helpers
             "RetainerSellList",
             "RetainerSell",
             "SelectString",
+            "SelectIconString",
             "Shop",
             "ShopExchangeCurrency",
             "ShopExchangeItem",
@@ -173,6 +174,7 @@ namespace DelvUI.Helpers
             "ContentsFinder",
             "ContentsFinderSetting",
             "ContentsFinderMenu",
+            "ContentsFinderConfirm",
             "ContentsInfo",
             "WeeklyBingo",
             "Dawn",
@@ -188,8 +190,7 @@ namespace DelvUI.Helpers
             "ColorPicker",
             "PlayGuide",
             "SelectYesno",
-            "AddonContextMenuTitle",
-            "_TargetInfoCastBar"
+            "AddonContextMenuTitle"
         };
 
         private List<ClipRect> _clipRects = new List<ClipRect>();

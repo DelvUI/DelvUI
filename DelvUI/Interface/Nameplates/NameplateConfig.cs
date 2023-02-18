@@ -499,6 +499,10 @@ namespace DelvUI.Interface.GeneralElements
         [Order(2)]
         public bool HideHealthAtZero = true;
 
+        [Checkbox("Disable Interaction")]
+        [Order(3)]
+        public bool DisableInteraction = false;
+
         [ColorEdit4("Targeted Border Color")]
         [Order(38, collapseWith = nameof(DrawBorder))]
         public PluginConfigColor TargetedBorderColor = PluginConfigColor.FromHex(0xFFFFFFFF);

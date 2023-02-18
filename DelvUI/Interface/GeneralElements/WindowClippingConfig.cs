@@ -106,11 +106,11 @@ namespace DelvUI.Interface.GeneralElements
                     break;
 
                 case WindowClippingMode.Performance:
-                    ImGui.Text("Window Clipping functionallity will be reduced in favor of performance.\nOnly one game window will be clipped at a time. This might yield unexpected / ugly results.");
+                    ImGui.Text("Window Clipping functionallity will be reduced in favor of performance.\nOnly one game window will be clipped at a time. This might yield unexpected / ugly results.\n\nNote: This mode won't work well with Nameplates.");
                     break;
             }
 
-            ImGuiHelper.Tab();
+            ImGuiHelper.NewLineAndTab();
             ImGui.Text("If you're exepriencing random crashes or bad performance, we recommend you try a different mode\nor disable Window Clipping alltogether");
 
             return false;

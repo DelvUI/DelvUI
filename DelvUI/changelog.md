@@ -1,3 +1,8 @@
+# 1.6.0.1
+- Added "Disable Interaction" setting to Nameplates' Health Bars.
+- Fixed Nameplates eating mouse inputs even when their Health Bars are not visible.
+- Fixed Nameplates Occlusion not working for some players.
+
 # 1.6.0.0
 - Added custom Nameplates:
     + Like other DelvUI components, enabling this feature won't automatically disable the game's counterpart.
