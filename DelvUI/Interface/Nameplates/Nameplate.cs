@@ -466,7 +466,7 @@ namespace DelvUI.Interface.Nameplates
 
             NameplateEnemyBarConfig barConfig = Config.BarConfig;
             NameplateAnchor? anchor = barConfig.IsVisible(character.CurrentHp, character.MaxHp) ? anchors.BarAnchor : anchors.NameLabelAnchor;
-            anchor = anchor ?? new NameplateAnchor(Vector2.Zero, Vector2.Zero);
+            anchor = anchor ?? new NameplateAnchor(_config.Position + data.ScreenPosition, Vector2.Zero);
 
             // order label
             float alpha = _config.RangeConfig.AlphaForDistance(data.Distance, barConfig.OrderLabelConfig.Color.Vector.W);

@@ -5,6 +5,7 @@
     + In previous versions, the default was "Walls and Objects" which was causing a lot of unexpected behaviors.
 
 - Fixed released minions in the Island Sanctuary not having a nameplate.
+- Fixed elements in the enemies nameplates not being visible if both the Health Bar and Name Label were hidden.
 
 # 1.6.0.1
 - Added "Disable Interaction" setting to Nameplates' Health Bars.
