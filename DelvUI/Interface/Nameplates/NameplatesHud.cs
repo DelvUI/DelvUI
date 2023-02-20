@@ -158,6 +158,10 @@ namespace DelvUI.Interface.Nameplates
                         {
                             return Utils.IsHostile(battleNpc) ? _enemyHud : _npcHud;
                         }
+                        else if (battleNpc.SubKind == 10) // island released minions
+                        {
+                            return _npcHud;
+                        }
                     }
                     break;
 

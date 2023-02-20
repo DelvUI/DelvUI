@@ -1,3 +1,6 @@
+# 1.6.1.0
+- Fixed released minions in the Island Sanctuary not having a nameplate.
+
 # 1.6.0.1
 - Added "Disable Interaction" setting to Nameplates' Health Bars.
 - Fixed Nameplates eating mouse inputs even when their Health Bars are not visible.
