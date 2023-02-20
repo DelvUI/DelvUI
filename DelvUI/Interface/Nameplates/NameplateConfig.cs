@@ -15,6 +15,12 @@ namespace DelvUI.Interface.GeneralElements
         Full
     };
 
+    public enum NameplatesOcclusionType
+    {
+        Walls = 0,
+        WallsAndObjects = 1
+    };
+
     [DisableParentSettings("Strata", "Position")]
     [Section("Nameplates")]
     [SubSection("General", 0)]
@@ -26,13 +32,19 @@ namespace DelvUI.Interface.GeneralElements
         [Order(10)]
         public NameplatesOcclusionMode OcclusionMode = NameplatesOcclusionMode.Full;
 
-        [Checkbox("Try to keep nameplates on screen", help = "Disclaimer: DelvUI relies heavily on the the game's default nameplates so this setting won't be a huge improvement.\nThis setting tries to prevent nameplates from being cutoff in the border of the screen, but it won't keep showing nameplates that the game wouldn't.")]
+        [Combo("Occlusion Type", new string[] { "Walls", "Walls and Objects" }, help = "This controls which kind of objects will cover nameplates.\n\n\nWalls: Default setting. Only walls will cover nameplates.\n\nWalls and Objects: Some objects like columns and trees will also cover nameplates.\nThis Occlusion Type can yield some unexpected results like nameplates for NPCs behind counters not being visible.")]
+        [Order(11)]
+        public NameplatesOcclusionType OcclusionType = NameplatesOcclusionType.Walls;
+
+        [Checkbox("Try to keep nameplates on screen", spacing = true, help = "Disclaimer: DelvUI relies heavily on the the game's default nameplates so this setting won't be a huge improvement.\nThis setting tries to prevent nameplates from being cutoff in the border of the screen, but it won't keep showing nameplates that the game wouldn't.")]
         [Order(20)]
         public bool ClampToScreen = true;
 
         [Checkbox("Always show nameplate for target")]
         [Order(21)]
         public bool AlwaysShowTargetNameplate = true;
+
+        public int RaycastFlag() => OcclusionType == NameplatesOcclusionType.WallsAndObjects ? 0x2000 : 0x4000;
     }
 
     [DisableParentSettings("HideWhenInactive")]
@@ -129,7 +141,7 @@ namespace DelvUI.Interface.GeneralElements
 
             // castbar
             Vector2 castbarSize = new Vector2(config.BarConfig.Size.X, 10);
-            
+
             LabelConfig castNameConfig = new LabelConfig(new Vector2(0, -1), "", DrawAnchor.Center, DrawAnchor.Center);
             castNameConfig.FontID = FontsConfig.DefaultSmallFontKey;
 
@@ -142,7 +154,7 @@ namespace DelvUI.Interface.GeneralElements
             castbarConfig.HealthBarAnchor = DrawAnchor.BottomLeft;
             castbarConfig.Anchor = DrawAnchor.TopLeft;
             castbarConfig.ShowIcon = false;
-            config.CastbarConfig = castbarConfig;          
+            config.CastbarConfig = castbarConfig;
 
             return config;
         }
@@ -297,7 +309,7 @@ namespace DelvUI.Interface.GeneralElements
         public new static NPCNameplateConfig DefaultConfig()
         {
             NPCNameplateConfig config = NameplatesHelper.GetNameplateWithBarConfig<NPCNameplateConfig, NameplateBarConfig>(
-                0xFFD1E5C8, 
+                0xFFD1E5C8,
                 0xFF3A4b1E,
                 HUDConstants.DefaultPlayerNameplateBarSize
             );
@@ -494,7 +506,7 @@ namespace DelvUI.Interface.GeneralElements
         [Checkbox("Only Show when not at full Health")]
         [Order(1)]
         public bool OnlyShowWhenNotFull = true;
-        
+
         [Checkbox("Hide Health when fully depleted", help = "This will hide the healthbar when the characters HP has been brought to zero")]
         [Order(2)]
         public bool HideHealthAtZero = true;

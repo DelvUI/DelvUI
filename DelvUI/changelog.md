@@ -1,4 +1,9 @@
 # 1.6.1.0
+- Added a new "Occlusion Type" setting for Nameplates:
+    + This lets you control which kind of objects in the world will cover nameplates.
+    + This setting's default value is "Walls".
+    + In previous versions, the default was "Walls and Objects" which was causing a lot of unexpected behaviors.
+
 - Fixed released minions in the Island Sanctuary not having a nameplate.
 
 # 1.6.0.1
