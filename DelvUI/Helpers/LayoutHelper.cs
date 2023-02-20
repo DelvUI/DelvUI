@@ -51,7 +51,13 @@ namespace DelvUI.Helpers
             {
                 if (fillRowsFirst)
                 {
-                    colCount = (uint)(maxSize.X / itemSize.X);
+                    float remainingWidth = maxSize.X;
+                    colCount = 0;
+                    while (remainingWidth > 0)
+                    {
+                        remainingWidth -= (itemSize.X + padding.X);
+                        colCount++;
+                    }
 
                     if (itemSize.X * colCount + padding.X * (colCount - 1) > maxSize.X)
                     {
@@ -71,7 +77,13 @@ namespace DelvUI.Helpers
                 }
                 else
                 {
-                    rowCount = (uint)(maxSize.Y / itemSize.Y);
+                    float remainingHeight = maxSize.Y;
+                    rowCount = 0;
+                    while (remainingHeight > 0)
+                    {
+                        remainingHeight -= (itemSize.Y + padding.Y);
+                        rowCount++;
+                    }
 
                     if (itemSize.Y * rowCount + padding.Y * (rowCount - 1) > maxSize.Y)
                     {

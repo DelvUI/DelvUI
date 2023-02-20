@@ -181,7 +181,7 @@ namespace DelvUI.Interface.StatusEffects
         [Order(15)]
         public Vector2 Size;
 
-        [DragInt2("Icon Padding", min = 0, max = 100)]
+        [DragInt2("Icon Padding", min = 0, max = 500)]
         [Order(19)]
         public Vector2 IconPadding = new(2, 2);
 
