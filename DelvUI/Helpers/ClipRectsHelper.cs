@@ -58,141 +58,6 @@ namespace DelvUI.Helpers
         public bool Enabled => _config.Enabled;
         public WindowClippingMode? Mode => _config.Enabled ? _config.Mode : null;
 
-        // these are ordered by priority, if 2 game windows are on top of a DelvUI element
-        // the one that comes first in this list is the one that will be clipped around
-        internal static List<string> AddonNames = new List<string>()
-        {
-            "ContextMenu",
-            "ItemDetail", // tooltip
-            "ActionDetail", // tooltip
-            "AreaMap",
-            "JournalAccept",
-            "Talk",
-            "Teleport",
-            "ActionMenu",
-            "Character",
-            "CharacterInspect",
-            "CharacterTitle",
-            "Tryon",
-            "ArmouryBoard",
-            "RecommendList",
-            "GearSetList",
-            "MiragePrismMiragePlate",
-            "ItemSearch",
-            "RetainerList",
-            "Bank",
-            "RetainerSellList",
-            "RetainerSell",
-            "SelectString",
-            "SelectIconString",
-            "Shop",
-            "ShopExchangeCurrency",
-            "ShopExchangeItem",
-            "CollectablesShop",
-            "MateriaAttach",
-            "Repair",
-            "Inventory",
-            "InventoryLarge",
-            "InventoryExpansion",
-            "InventoryEvent",
-            "InventoryBuddy",
-            "Buddy",
-            "BuddyEquipList",
-            "BuddyInspect",
-            "Currency",
-            "Macro",
-            "PcSearchDetail",
-            "Social",
-            "SocialDetailA",
-            "SocialDetailB",
-            "NeedGreed",
-            "BannerMIP",
-            "LookingForGroupSearch",
-            "LookingForGroupCondition",
-            "LookingForGroupDetail",
-            "LookingForGroup",
-            "VVDFinder",
-            "VVDNotebook",
-            "ReadyCheck",
-            "Marker",
-            "FieldMarker",
-            "CountdownSettingDialog",
-            "CircleFinder",
-            "CircleList",
-            "CircleNameInputString",
-            "Emote",
-            "FreeCompany",
-            "FreeCompanyProfile",
-            "HousingSubmenu",
-            "HousingSignBoard",
-            "HousingMenu",
-            "CharaCard",
-            "CharaCardDesignSetting",
-            "CharaCardProfileSetting",
-            "CharaCardPermissionSetting",
-            "BannerList",
-            "BannerEditor",
-            "SelectString",
-            "Description",
-            "McGuffin",
-            "AkatsukiNote",
-            "DescriptionYTC",
-            "MYCWarResultNoteBook",
-            "CrossWorldLinkshell",
-            "ContactList",
-            "CircleBookInputString",
-            "CircleBookQuestion",
-            "CircleBookGroupSetting",
-            "MultipleHelpWindow",
-            "CircleFinderSetting",
-            "CircleBook",
-            "CircleBookWriteMessage",
-            "ColorantColoring",
-            "MonsterNote",
-            "RecipeNote",
-            "GatheringNote",
-            "ContentsNote",
-            "SpearFishing",
-            "Orchestrion",
-            "MountNoteBook",
-            "MinionNoteBook",
-            "AetherCurrent",
-            "MountSpeed",
-            "FateProgress",
-            "SystemMenu",
-            "ConfigCharacter",
-            "ConfigSystem",
-            "ConfigKeybind",
-            "AOZNotebook",
-            "AOZActiveSetInputString",
-            "PvpProfile",
-            "GoldSaucerInfo",
-            "Achievement",
-            "RecommendList",
-            "JournalDetail",
-            "Journal",
-            "ContentsFinder",
-            "ContentsFinderSetting",
-            "ContentsFinderMenu",
-            "ContentsFinderConfirm",
-            "ContentsInfo",
-            "WeeklyBingo",
-            "Dawn",
-            "DawnStory",
-            "DawnStoryMemberSelect",
-            "BeginnersMansionProblem",
-            "BeginnersMansionProblemCompList",
-            "SupportDesk",
-            "HowToList",
-            "HudLayout",
-            "LinkShell",
-            "ChatConfig",
-            "ColorPicker",
-            "PlayGuide",
-            "SelectYesno",
-            "AddonContextMenuTitle"
-        };
-
         private List<ClipRect> _clipRects = new List<ClipRect>();
 
         public unsafe void Update()
@@ -213,7 +78,7 @@ namespace DelvUI.Helpers
             AtkUnitBase** addonList = &loadedUnitsList->AtkUnitEntries;
             if (addonList == null) { return; }
 
-            for (var i = 0; i < loadedUnitsList->Count; i++)
+            for (int i = 0; i < loadedUnitsList->Count; i++)
             {
                 try
                 {
@@ -223,16 +88,10 @@ namespace DelvUI.Helpers
                         continue;
                     }
 
-                    string? name = Marshal.PtrToStringAnsi(new IntPtr(addon->Name));
-                    if (name == null || !AddonNames.Contains(name))
-                    {
-                        continue;
-                    }
+                    float margin = 5 * addon->Scale;
+                    float bottomMargin = 13 * addon->Scale;
 
-                    var margin = 5 * addon->Scale;
-                    var bottomMargin = 13 * addon->Scale;
-
-                    var clipRect = new ClipRect(
+                    ClipRect clipRect = new ClipRect(
                         new Vector2(addon->X + margin, addon->Y + margin),
                         new Vector2(
                             addon->X + addon->WindowNode->AtkResNode.Width * addon->Scale - margin,
@@ -258,7 +117,7 @@ namespace DelvUI.Helpers
 
             foreach (ClipRect clipRect in _clipRects)
             {
-                var area = new ClipRect(pos, pos + size);
+                ClipRect area = new ClipRect(pos, pos + size);
                 if (clipRect.IntersectsWith(area))
                 {
                     return clipRect;
@@ -270,18 +129,18 @@ namespace DelvUI.Helpers
 
         public static ClipRect[] GetInvertedClipRects(ClipRect clipRect)
         {
-            var maxX = ImGui.GetMainViewport().Size.X;
-            var maxY = ImGui.GetMainViewport().Size.Y;
+            float maxX = ImGui.GetMainViewport().Size.X;
+            float maxY = ImGui.GetMainViewport().Size.Y;
 
-            var aboveMin = new Vector2(0, 0);
-            var aboveMax = new Vector2(maxX, clipRect.Min.Y);
-            var leftMin = new Vector2(0, clipRect.Min.Y);
-            var leftMax = new Vector2(clipRect.Min.X, maxY);
+            Vector2 aboveMin = new Vector2(0, 0);
+            Vector2 aboveMax = new Vector2(maxX, clipRect.Min.Y);
+            Vector2 leftMin = new Vector2(0, clipRect.Min.Y);
+            Vector2 leftMax = new Vector2(clipRect.Min.X, maxY);
 
-            var rightMin = new Vector2(clipRect.Max.X, clipRect.Min.Y);
-            var rightMax = new Vector2(maxX, clipRect.Max.Y);
-            var belowMin = new Vector2(clipRect.Min.X, clipRect.Max.Y);
-            var belowMax = new Vector2(maxX, maxY);
+            Vector2 rightMin = new Vector2(clipRect.Max.X, clipRect.Min.Y);
+            Vector2 rightMax = new Vector2(maxX, clipRect.Max.Y);
+            Vector2 belowMin = new Vector2(clipRect.Min.X, clipRect.Max.Y);
+            Vector2 belowMax = new Vector2(maxX, maxY);
 
             ClipRect[] invertedClipRects = new ClipRect[4];
             invertedClipRects[0] = new ClipRect(aboveMin, aboveMax);
@@ -317,12 +176,12 @@ namespace DelvUI.Helpers
 
         public ClipRect(Vector2 min, Vector2 max)
         {
-            var screenSize = ImGui.GetMainViewport().Size;
+            Vector2 screenSize = ImGui.GetMainViewport().Size;
 
             Min = Clamp(min, Vector2.Zero, screenSize);
             Max = Clamp(max, Vector2.Zero, screenSize);
 
-            var size = Max - Min;
+            Vector2 size = Max - Min;
 
             Rectangle = new Rectangle((int)Min.X, (int)Min.Y, (int)size.X, (int)size.Y);
         }

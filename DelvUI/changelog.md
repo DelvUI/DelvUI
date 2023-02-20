@@ -6,6 +6,7 @@
 
 - Fixed released minions in the Island Sanctuary not having a nameplate.
 - Fixed elements in the enemies nameplates not being visible if both the Health Bar and Name Label were hidden.
+- Fixed some game windows not covering DelvUI elements.
 
 # 1.6.0.1
 - Added "Disable Interaction" setting to Nameplates' Health Bars.
