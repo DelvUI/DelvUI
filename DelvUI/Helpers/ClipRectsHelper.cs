@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using Dalamud.Logging;
 
 namespace DelvUI.Helpers
 {
@@ -84,43 +83,11 @@ namespace DelvUI.Helpers
                 try
                 {
                     AtkUnitBase* addon = addonList[i];
-                    if (addon == null || !addon->IsVisible || addon->Scale == 0)
+                    if (addon == null || !addon->IsVisible || addon->WindowNode == null || addon->Scale == 0)
                     {
                         continue;
                     }
 
-                    string? name = Marshal.PtrToStringAnsi(new IntPtr(addon->Name));
-
-                    if (name == "_MiniTalk")
-                    {
-                        for (uint j = 2; j <= 2; j++)
-                        {
-                            AtkResNode* child = addon->GetNodeById(j);
-                            float x = child->X;
-                            float y = child->Y;
-
-                            var gridNine = child->GetComponent()->UldManager.SearchNodeById(5);
-
-                            x += gridNine->X;
-                            y += gridNine->Y;
-
-                            ClipRect cR = new ClipRect(
-                                new Vector2(x, y),
-                                new Vector2(
-                                    x + gridNine->Width * addon->Scale,
-                                    y + gridNine->Height * addon->Scale
-                                )
-                            );
-                            
-                            _clipRects.Add(cR);
-                        }
-                    }
-                    
-                    if (addon->WindowNode == null)
-                    {
-                        continue;
-                    }
-                    
                     float margin = 5 * addon->Scale;
                     float bottomMargin = 13 * addon->Scale;
 
@@ -139,7 +106,6 @@ namespace DelvUI.Helpers
                     }
 
                     _clipRects.Add(clipRect);
-                    
                 }
                 catch { }
             }
