@@ -149,6 +149,9 @@ namespace DelvUI.Helpers
 
             // hotbars
             _extraClipRects.AddRange(GetHotbarsClipRects());
+
+            // chat bubbles
+            _extraClipRects.AddRange(GetChatBubbleClipRect());
         }
 
         public void RemoveNameplatesClipRects()
@@ -160,7 +163,7 @@ namespace DelvUI.Helpers
         {
             if (!_config.TargetCastbarClipRectEnabled) { return null; }
 
-            AtkUnitBase *addon = (AtkUnitBase *)Plugin.GameGui.GetAddonByName("_TargetInfoCastBar", 1);
+            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_TargetInfoCastBar", 1);
             if (addon == null) { return null; }
 
             if (addon->UldManager.NodeListCount < 2) { return null; }
@@ -168,10 +171,16 @@ namespace DelvUI.Helpers
             AtkResNode* baseNode = addon->UldManager.NodeList[1];
             AtkResNode* imageNode = addon->UldManager.NodeList[2];
 
-            if (baseNode == null ||imageNode == null || !imageNode->IsVisible) { return null; }
+            if (baseNode == null || imageNode == null || !imageNode->IsVisible) { return null; }
 
-            Vector2 pos = new Vector2(addon->X + (baseNode->X * addon->Scale), addon->Y + (baseNode->Y * addon->Scale));
-            Vector2 size = new Vector2(imageNode->Width * addon->Scale, imageNode->Height * addon->Scale);
+            Vector2 pos = new Vector2(
+                addon->X + (baseNode->X * addon->Scale),
+                addon->Y + (baseNode->Y * addon->Scale)
+            );
+            Vector2 size = new Vector2(
+                imageNode->Width * addon->Scale,
+                imageNode->Height * addon->Scale
+            );
 
             return new ClipRect(pos, pos + size);
         }
@@ -203,8 +212,42 @@ namespace DelvUI.Helpers
                     addon->X + (lastNode->X * addon->Scale) + (lastNode->Width * addon->Scale) - margin,
                     addon->Y + (lastNode->Y * addon->Scale) + (lastNode->Height * addon->Scale) - margin
                 );
-                
+
                 rects.Add(new ClipRect(min, max));
+            }
+
+            return rects;
+        }
+
+        private unsafe List<ClipRect> GetChatBubbleClipRect()
+        {
+            List<ClipRect> rects = new List<ClipRect>();
+            if (!_config.ChatBubblesClipRectsEnabled) { return rects; }
+
+            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_MiniTalk", 1);
+            if (addon == null || !addon->IsVisible) { return rects; }
+            if (addon->UldManager.NodeListCount < 10) { return rects; }
+
+            for (int i = 1; i <= 10; i++)
+            {
+                AtkResNode* node = addon->UldManager.NodeList[i];
+                if (node == null || !node->IsVisible) { continue; }
+
+                AtkComponentNode* component = node->GetAsAtkComponentNode();
+                if (component == null) { continue; }
+                if (component->Component->UldManager.NodeListCount < 1) { continue; }
+
+                AtkResNode* bubble = component->Component->UldManager.NodeList[1];
+                Vector2 pos = new Vector2(
+                    node->X + (bubble->X * addon->Scale),
+                    node->Y + (bubble->Y * addon->Scale)
+                );
+                Vector2 size = new Vector2(
+                    bubble->Width * addon->Scale,
+                    bubble->Height * addon->Scale
+                );
+
+                rects.Add(new ClipRect(pos, pos + size));
             }
 
             return rects;

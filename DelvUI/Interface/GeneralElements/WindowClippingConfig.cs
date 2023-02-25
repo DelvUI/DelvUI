@@ -28,9 +28,10 @@ namespace DelvUI.Interface.GeneralElements
 
         public WindowClippingMode Mode = WindowClippingMode.Performance;
 
-        public bool NameplatesClipRectsEnabled = false;
+        public bool NameplatesClipRectsEnabled = true;
         public bool TargetCastbarClipRectEnabled = false;
         public bool HotbarsClipRectsEnabled = false;
+        public bool ChatBubblesClipRectsEnabled = true;
 
         private bool _showConfirmationDialog = false;
 
@@ -110,6 +111,9 @@ namespace DelvUI.Interface.GeneralElements
                 ImGuiHelper.Tab(); ImGuiHelper.Tab();
                 changed |= ImGui.Checkbox("Hotbars", ref HotbarsClipRectsEnabled);
                 ImGuiHelper.SetTooltip("When enabled, active hotbar will not be covered by DelvUI Nameplates.\nNote that the way this is calculated is not perfect and it might not work well for hotbars that have empty slots.");
+
+                ImGuiHelper.Tab(); ImGuiHelper.Tab();
+                changed |= ImGui.Checkbox("Chat Bubbles", ref ChatBubblesClipRectsEnabled);
             }
 
             // text
