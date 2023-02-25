@@ -1,6 +1,7 @@
 # 1.6.2.0
 - Added Window Clipping settings to enable some special behaviors for Nameplates.
 - Fixed the game's focus target UI clipping DelvUI elements.
+- Fixed Duty Finder window not clipping DelvUI elements properly.
 
 # 1.6.1.0
 - Added a new "Occlusion Type" setting for Nameplates:
