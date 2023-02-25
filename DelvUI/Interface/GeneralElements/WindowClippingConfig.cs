@@ -27,6 +27,11 @@ namespace DelvUI.Interface.GeneralElements
         }
 
         public WindowClippingMode Mode = WindowClippingMode.Performance;
+
+        public bool NameplatesClipRectsEnabled = false;
+        public bool TargetCastbarClipRectEnabled = false;
+        public bool HotbarsClipRectsEnabled = false;
+
         private bool _showConfirmationDialog = false;
 
         [ManualDraw]
@@ -88,6 +93,23 @@ namespace DelvUI.Interface.GeneralElements
             if (ImGui.RadioButton("Performance", Mode == WindowClippingMode.Performance))
             {
                 Mode = WindowClippingMode.Performance;
+            }
+
+            // nameplates
+            ImGui.NewLine();
+            ImGuiHelper.NewLineAndTab();
+            changed |= ImGui.Checkbox("Enable special clipping for Nameplates", ref NameplatesClipRectsEnabled);
+            ImGuiHelper.SetTooltip("When enabled, Nameplates will get covered by game UI elements that wouldn't normally cover DelvUI elements.");
+
+            if (NameplatesClipRectsEnabled)
+            {
+                ImGuiHelper.Tab(); ImGuiHelper.Tab();
+                changed |= ImGui.Checkbox("Default Target Castbar", ref TargetCastbarClipRectEnabled);
+                ImGuiHelper.SetTooltip("When enabled, the game's target castbar will not be covered by DelvUI Nameplates.\nFor players that prefer to use the default target cast bar over DelvUI's.");
+
+                ImGuiHelper.Tab(); ImGuiHelper.Tab();
+                changed |= ImGui.Checkbox("Hotbars", ref HotbarsClipRectsEnabled);
+                ImGuiHelper.SetTooltip("When enabled, active hotbar will not be covered by DelvUI Nameplates.\nNote that the way this is calculated is not perfect and it might not work well for hotbars that have empty slots.");
             }
 
             // text

@@ -59,12 +59,22 @@ namespace DelvUI.Helpers
         public WindowClippingMode? Mode => _config.Enabled ? _config.Mode : null;
 
         private List<ClipRect> _clipRects = new List<ClipRect>();
+        private List<ClipRect> _extraClipRects = new List<ClipRect>();
+
+
+        private static List<string> _ignoredAddonNames = new List<string>()
+        {
+            "_FocusTargetInfo",
+        };
+
+        private readonly string[] _hotbarAddonNames = { "_ActionBar", "_ActionBar01", "_ActionBar02", "_ActionBar03", "_ActionBar04", "_ActionBar05", "_ActionBar06", "_ActionBar07", "_ActionBar08", "_ActionBar09" };
 
         public unsafe void Update()
         {
             if (!_config.Enabled) { return; }
 
             _clipRects.Clear();
+            _extraClipRects.Clear();
 
             AtkStage* stage = AtkStage.GetSingleton();
             if (stage == null) { return; }
@@ -84,6 +94,12 @@ namespace DelvUI.Helpers
                 {
                     AtkUnitBase* addon = addonList[i];
                     if (addon == null || !addon->IsVisible || addon->WindowNode == null || addon->Scale == 0)
+                    {
+                        continue;
+                    }
+
+                    string? name = Marshal.PtrToStringAnsi(new IntPtr(addon->Name));
+                    if (name != null && _ignoredAddonNames.Contains(name))
                     {
                         continue;
                     }
@@ -111,11 +127,96 @@ namespace DelvUI.Helpers
             }
         }
 
+        private List<ClipRect> ActiveClipRects()
+        {
+            List<ClipRect> rects = new List<ClipRect>();
+            rects.AddRange(_clipRects);
+            rects.AddRange(_extraClipRects);
+
+            return rects;
+        }
+
+        public void AddNameplatesClipRects()
+        {
+            if (!_config.NameplatesClipRectsEnabled) { return; }
+
+            // target cast bar
+            ClipRect? targetCastbarClipRect = GetTargetCastbarClipRect();
+            if (targetCastbarClipRect.HasValue)
+            {
+                _extraClipRects.Add(targetCastbarClipRect.Value);
+            }
+
+            // hotbars
+            _extraClipRects.AddRange(GetHotbarsClipRects());
+        }
+
+        public void RemoveNameplatesClipRects()
+        {
+            _extraClipRects.Clear();
+        }
+
+        private unsafe ClipRect? GetTargetCastbarClipRect()
+        {
+            if (!_config.TargetCastbarClipRectEnabled) { return null; }
+
+            AtkUnitBase *addon = (AtkUnitBase *)Plugin.GameGui.GetAddonByName("_TargetInfoCastBar", 1);
+            if (addon == null) { return null; }
+
+            if (addon->UldManager.NodeListCount < 2) { return null; }
+
+            AtkResNode* baseNode = addon->UldManager.NodeList[1];
+            AtkResNode* imageNode = addon->UldManager.NodeList[2];
+
+            if (baseNode == null ||imageNode == null || !imageNode->IsVisible) { return null; }
+
+            Vector2 pos = new Vector2(addon->X + (baseNode->X * addon->Scale), addon->Y + (baseNode->Y * addon->Scale));
+            Vector2 size = new Vector2(imageNode->Width * addon->Scale, imageNode->Height * addon->Scale);
+
+            return new ClipRect(pos, pos + size);
+        }
+
+        private unsafe List<ClipRect> GetHotbarsClipRects()
+        {
+            List<ClipRect> rects = new List<ClipRect>();
+            if (!_config.HotbarsClipRectsEnabled) { return rects; }
+
+            foreach (string addonName in _hotbarAddonNames)
+            {
+                AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName(addonName, 1);
+                if (addon == null || !addon->IsVisible) { continue; }
+
+                if (addon->UldManager.NodeListCount < 20) { continue; }
+
+                AtkResNode* firstNode = addon->UldManager.NodeList[20];
+                AtkResNode* lastNode = addon->UldManager.NodeList[9];
+
+                if (firstNode == null || lastNode == null) { continue; }
+
+                float margin = 10f * addon->Scale;
+
+                Vector2 min = new Vector2(
+                    addon->X + (firstNode->X * addon->Scale) + margin,
+                    addon->Y + (firstNode->Y * addon->Scale) + margin
+                );
+                Vector2 max = new Vector2(
+                    addon->X + (lastNode->X * addon->Scale) + (lastNode->Width * addon->Scale) - margin,
+                    addon->Y + (lastNode->Y * addon->Scale) + (lastNode->Height * addon->Scale) - margin
+                );
+                
+                rects.Add(new ClipRect(min, max));
+            }
+
+            return rects;
+        }
+
         public ClipRect? GetClipRectForArea(Vector2 pos, Vector2 size)
         {
             if (!_config.Enabled) { return null; }
 
-            foreach (ClipRect clipRect in _clipRects)
+            List<ClipRect> rects = ActiveClipRects();
+
+            foreach (ClipRect clipRect in rects)
             {
                 ClipRect area = new ClipRect(pos, pos + size);
                 if (clipRect.IntersectsWith(area))
@@ -155,7 +256,9 @@ namespace DelvUI.Helpers
         {
             if (!_config.Enabled) { return false; }
 
-            foreach (ClipRect clipRect in _clipRects)
+            List<ClipRect> rects = ActiveClipRects();
+
+            foreach (ClipRect clipRect in rects)
             {
                 if (clipRect.Contains(point))
                 {

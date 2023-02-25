@@ -460,8 +460,12 @@ namespace DelvUI.Interface
             // nameplates
             if (_nameplatesHud.GetConfig().Enabled)
             {
+                ClipRectsHelper.Instance?.AddNameplatesClipRects();
+
                 _nameplatesHud.PrepareForDraw(origin);
                 _nameplatesHud.Draw(origin);
+
+                ClipRectsHelper.Instance?.AddNameplatesClipRects();
             }
 
             // draw elements
