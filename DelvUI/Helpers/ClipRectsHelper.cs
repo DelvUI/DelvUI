@@ -170,7 +170,7 @@ namespace DelvUI.Helpers
             if (!_config.TargetCastbarClipRectEnabled) { return null; }
 
             AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_TargetInfoCastBar", 1);
-            if (addon == null) { return null; }
+            if (addon == null || !addon->IsVisible) { return null; }
 
             if (addon->UldManager.NodeListCount < 2) { return null; }
 

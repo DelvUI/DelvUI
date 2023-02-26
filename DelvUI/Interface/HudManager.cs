@@ -465,7 +465,7 @@ namespace DelvUI.Interface
                 _nameplatesHud.PrepareForDraw(origin);
                 _nameplatesHud.Draw(origin);
 
-                ClipRectsHelper.Instance?.AddNameplatesClipRects();
+                ClipRectsHelper.Instance?.RemoveNameplatesClipRects();
             }
 
             // draw elements
