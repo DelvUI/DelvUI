@@ -177,7 +177,8 @@ namespace DelvUI.Helpers
             AtkResNode* baseNode = addon->UldManager.NodeList[1];
             AtkResNode* imageNode = addon->UldManager.NodeList[2];
 
-            if (baseNode == null || imageNode == null || !imageNode->IsVisible) { return null; }
+            if (baseNode == null || !baseNode->IsVisible) { return null; }
+            if (imageNode == null || !imageNode->IsVisible) { return null; }
 
             Vector2 pos = new Vector2(
                 addon->X + (baseNode->X * addon->Scale),
