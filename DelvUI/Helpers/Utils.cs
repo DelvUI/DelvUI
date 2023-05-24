@@ -78,11 +78,11 @@ namespace DelvUI.Helpers
 
         public static unsafe bool IsHostile(Character character)
         {
-            StructsCharacter* chara = (StructsCharacter*)character.Address;
+            byte* unk = (byte*)(new IntPtr(character.Address) + 0x1F0);
 
             return character != null
                 && ((character.SubKind == (byte)BattleNpcSubKind.Enemy || (int)character.SubKind == 1)
-                && chara->Battalion != 0);
+                && *unk != 0);
         }
 
         public static unsafe float ActorShieldValue(GameObject? actor)
