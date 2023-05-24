@@ -9,6 +9,7 @@ using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using Action = System.Action;
@@ -526,16 +527,24 @@ namespace DelvUI.Interface.Nameplates
         {
             NameplateEnemyBarConfig config = (NameplateEnemyBarConfig)BarConfig;
 
+
             if (config.UseStateColor)
             {
-                bool inCombat = (character.StatusFlags & StatusFlags.InCombat) != 0;
-                if (inCombat && !config.ColorByHealth.Enabled)
+                unsafe
                 {
-                    return config.InCombatColor;
-                }
-                else if (!inCombat)
-                {
-                    return (character.StatusFlags & StatusFlags.Hostile) != 0 ? config.OutOfCombatHostileColor : config.OutOfCombatColor;
+                    // TODO: replace with actual status flags when CS gets updated
+                    byte* statusFlags = (byte*)(new IntPtr(character.Address) + 0x1F2);
+
+                    bool inCombat = (*statusFlags & 0x20) != 0;
+                    if (inCombat && !config.ColorByHealth.Enabled)
+                    {
+                        return config.InCombatColor;
+                    }
+                    else if (!inCombat)
+                    {
+                        bool isHostile = (*statusFlags & 0x10) != 0;
+                        return isHostile ? config.OutOfCombatHostileColor : config.OutOfCombatColor;
+                    }
                 }
             }
 
