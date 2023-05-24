@@ -129,16 +129,18 @@ namespace DelvUI.Interface.Nameplates
 
                     if (data.GameObject is Character character)
                     {
+                        // TODO: replace with actual status flags when CS gets updated
+                        byte* statusFlags = (byte *)(new IntPtr(character.Address) + 0x1F3);
 
-                        if ((character.StatusFlags & (StatusFlags)0x20) != 0) // StatusFlags.PartyMember is wrong
+                        if ((*statusFlags & 0x8) != 0) // PartyMember
                         {
                             return _partyMemberHud;
                         }
-                        else if ((character.StatusFlags & (StatusFlags)0x40) != 0) // StatusFlags.AllianceMember is wrong
+                        else if ((*statusFlags & 0x10) != 0) // AllianceMember
                         {
                             return _allianceMemberHud;
                         }
-                        else if ((character.StatusFlags & (StatusFlags)0x80) != 0) // StatusFlags.Friend is wrong
+                        else if ((*statusFlags & 0x20) != 0) // Friend
                         {
                             return _friendsHud;
                         }
