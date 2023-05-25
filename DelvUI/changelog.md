@@ -1,3 +1,7 @@
+# 1.7.1.0
+- Added "Different Size when targeted" setting for Nameplates.
+- Fixed "Full" Occlusion Mode for Nameplates.
+
 # 1.7.0.0
 - Added support for Patch 6.4.
 

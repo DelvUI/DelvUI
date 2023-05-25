@@ -113,9 +113,12 @@ namespace DelvUI.Interface.Nameplates
                 return (false, false);
             }
 
+            bool targeted = Plugin.TargetManager.Target?.Address == character.Address;
+            Vector2 barSize = BarConfig.GetSize(targeted);
+
             Vector2 origin = _config.Position + data.ScreenPosition;
-            Vector2 barPos = Utils.GetAnchoredPosition(origin, BarConfig.Size, BarConfig.Anchor) + BarConfig.Position;
-            var (areaStart, areaEnd) = BarConfig.MouseoverAreaConfig.GetArea(barPos, BarConfig.Size);
+            Vector2 barPos = Utils.GetAnchoredPosition(origin, barSize, BarConfig.Anchor) + BarConfig.Position;
+            var (areaStart, areaEnd) = BarConfig.MouseoverAreaConfig.GetArea(barPos, barSize);
 
             bool isHovering = ImGui.IsMouseHoveringRect(areaStart, areaEnd);
             bool ignoreMouseover = BarConfig.MouseoverAreaConfig.Enabled && BarConfig.MouseoverAreaConfig.Ignore;
@@ -148,8 +151,9 @@ namespace DelvUI.Interface.Nameplates
             );
 
             // bar
-            Rect background = new Rect(BarConfig.Position, BarConfig.Size, bgColor);
-            Rect healthFill = BarUtilities.GetFillRect(BarConfig.Position, BarConfig.Size, BarConfig.FillDirection, fillColor, currentHp, maxHp);
+            Vector2 barSize = BarConfig.GetSize(targeted);
+            Rect background = new Rect(BarConfig.Position, barSize, bgColor);
+            Rect healthFill = BarUtilities.GetFillRect(BarConfig.Position, barSize, BarConfig.FillDirection, fillColor, currentHp, maxHp);
 
             //BarHud bar = new BarHud(BarConfig, character);
             BarHud bar = new BarHud(
@@ -180,7 +184,7 @@ namespace DelvUI.Interface.Nameplates
             // mouseover area
             BarHud? mouseoverAreaBar = BarConfig.MouseoverAreaConfig.GetBar(
                 BarConfig.Position,
-                BarConfig.Size,
+                barSize,
                 BarConfig.ID + "_mouseoverArea",
                 BarConfig.Anchor
             );
@@ -191,13 +195,13 @@ namespace DelvUI.Interface.Nameplates
             }
 
             // labels
-            Vector2 barPos = Utils.GetAnchoredPosition(origin, BarConfig.Size, BarConfig.Anchor) + BarConfig.Position;
+            Vector2 barPos = Utils.GetAnchoredPosition(origin, barSize, BarConfig.Anchor) + BarConfig.Position;
             LabelHud[] labels = GetLabels(maxHp);
             foreach (LabelHud label in labels)
             {
                 LabelConfig labelConfig = (LabelConfig)label.GetConfig();
                 float alpha = _config.RangeConfig.AlphaForDistance(data.Distance, labelConfig.Color.Vector.W);
-                var (labelText, labelPos, labelSize, labelColor) = label.PreCalculate(barPos, BarConfig.Size, data.GameObject, data.Name, currentHp, maxHp, data.Kind == ObjectKind.Player);
+                var (labelText, labelPos, labelSize, labelColor) = label.PreCalculate(barPos, barSize, data.GameObject, data.Name, currentHp, maxHp, data.Kind == ObjectKind.Player);
 
                 drawActions.Add((labelConfig.StrataLevel, () =>
                 {
@@ -225,8 +229,9 @@ namespace DelvUI.Interface.Nameplates
             if (data.GameObject is Character chara &&
                 BarConfig.IsVisible(chara.CurrentHp, chara.MaxHp))
             {
-                Vector2 pos = Utils.GetAnchoredPosition(data.ScreenPosition + BarConfig.Position, BarConfig.Size, BarConfig.Anchor);
-                Vector2 size = BarConfig.Size;
+                bool targeted = Plugin.TargetManager.Target?.Address == data.GameObject.Address;
+                Vector2 size = BarConfig.GetSize(targeted);
+                Vector2 pos = Utils.GetAnchoredPosition(data.ScreenPosition + BarConfig.Position, size, BarConfig.Anchor);
 
                 return new NameplateAnchor(pos, size);
             }
