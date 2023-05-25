@@ -128,15 +128,15 @@ namespace DelvUI.Interface.Nameplates
                     {
                         StructsCharacter* chara = (StructsCharacter*)character.Address;
 
-                        if ((chara->StatusFlags & (byte)StatusFlags.PartyMember) != 0)
+                        if ((chara->StatusFlags & 0x8) != 0) // PartyMember
                         {
                             return _partyMemberHud;
                         }
-                        else if ((chara->StatusFlags & (byte)StatusFlags.AllianceMember) != 0)
+                        else if ((chara->StatusFlags & 0x10) != 0) // AllianceMember
                         {
                             return _allianceMemberHud;
                         }
-                        else if ((chara->StatusFlags & (byte)StatusFlags.Friend) != 0)
+                        else if ((chara->StatusFlags & 0x20) != 0) // Friend
                         {
                             return _friendsHud;
                         }
