@@ -1,3 +1,6 @@
+# 1.7.0.0
+- Added support for Patch 6.4.
+
 # 1.6.2.1
 - Fixed Nameplates special Window Clipping settings affecting other elements.
 - Fixed Default Target Castbar setting not working properly.
