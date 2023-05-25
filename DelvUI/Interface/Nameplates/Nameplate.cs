@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using Action = System.Action;
 using Character = Dalamud.Game.ClientState.Objects.Types.Character;
+using StructsCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 
 namespace DelvUI.Interface.Nameplates
 {
@@ -521,20 +522,22 @@ namespace DelvUI.Interface.Nameplates
             return drawActions;
         }
 
-        protected override PluginConfigColor GetFillColor(Character character, uint currentHp, uint maxHp)
+        protected override unsafe PluginConfigColor GetFillColor(Character character, uint currentHp, uint maxHp)
         {
             NameplateEnemyBarConfig config = (NameplateEnemyBarConfig)BarConfig;
 
             if (config.UseStateColor)
             {
-                bool inCombat = (character.StatusFlags & StatusFlags.InCombat) != 0;
+                StructsCharacter* chara = (StructsCharacter*)character.Address;
+
+                bool inCombat = (chara->StatusFlags & (byte)StatusFlags.InCombat) != 0;
                 if (inCombat && !config.ColorByHealth.Enabled)
                 {
                     return config.InCombatColor;
                 }
                 else if (!inCombat)
                 {
-                    bool isHostile = (character.StatusFlags & StatusFlags.Hostile) != 0;
+                    bool isHostile = (chara->StatusFlags & (byte)StatusFlags.Hostile) != 0;
                     return isHostile ? config.OutOfCombatHostileColor : config.OutOfCombatColor;
                 }
             }

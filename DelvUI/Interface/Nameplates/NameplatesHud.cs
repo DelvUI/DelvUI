@@ -9,6 +9,7 @@ using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Common.Component.BGCollision;
 using System.Numerics;
+using StructsCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 
 namespace DelvUI.Interface.Nameplates
 {
@@ -125,15 +126,17 @@ namespace DelvUI.Interface.Nameplates
 
                     if (data.GameObject is Character character)
                     {
-                        if ((character.StatusFlags & StatusFlags.PartyMember) != 0)
+                        StructsCharacter* chara = (StructsCharacter*)character.Address;
+
+                        if ((chara->StatusFlags & (byte)StatusFlags.PartyMember) != 0)
                         {
                             return _partyMemberHud;
                         }
-                        else if ((character.StatusFlags & StatusFlags.AllianceMember) != 0)
+                        else if ((chara->StatusFlags & (byte)StatusFlags.AllianceMember) != 0)
                         {
                             return _allianceMemberHud;
                         }
-                        else if ((character.StatusFlags & StatusFlags.Friend) != 0)
+                        else if ((chara->StatusFlags & (byte)StatusFlags.Friend) != 0)
                         {
                             return _friendsHud;
                         }
