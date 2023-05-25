@@ -1,7 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
@@ -9,7 +8,6 @@ using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
-using System;
 using System.Collections.Generic;
 using System.Numerics;
 using Action = System.Action;
@@ -108,7 +106,7 @@ namespace DelvUI.Interface.Nameplates
 
         public (bool, bool) GetMouseoverState(NameplateData data)
         {
-            if (data.GameObject is not Character character) { return (false, false);  }
+            if (data.GameObject is not Character character) { return (false, false); }
             if (!BarConfig.IsVisible(character.CurrentHp, character.MaxHp) || BarConfig.DisableInteraction)
             {
                 return (false, false);
@@ -527,24 +525,17 @@ namespace DelvUI.Interface.Nameplates
         {
             NameplateEnemyBarConfig config = (NameplateEnemyBarConfig)BarConfig;
 
-
             if (config.UseStateColor)
             {
-                unsafe
+                bool inCombat = (character.StatusFlags & StatusFlags.InCombat) != 0;
+                if (inCombat && !config.ColorByHealth.Enabled)
                 {
-                    // TODO: replace with actual status flags when CS gets updated
-                    byte* statusFlags = (byte*)(new IntPtr(character.Address) + 0x1F2);
-
-                    bool inCombat = (*statusFlags & 0x20) != 0;
-                    if (inCombat && !config.ColorByHealth.Enabled)
-                    {
-                        return config.InCombatColor;
-                    }
-                    else if (!inCombat)
-                    {
-                        bool isHostile = (*statusFlags & 0x10) != 0;
-                        return isHostile ? config.OutOfCombatHostileColor : config.OutOfCombatColor;
-                    }
+                    return config.InCombatColor;
+                }
+                else if (!inCombat)
+                {
+                    bool isHostile = (character.StatusFlags & StatusFlags.Hostile) != 0;
+                    return isHostile ? config.OutOfCombatHostileColor : config.OutOfCombatColor;
                 }
             }
 

@@ -1,6 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
@@ -9,10 +8,7 @@ using FFXIVClientStructs.FFXIV.Client.Graphics;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Common.Component.BGCollision;
-using System;
-using System.Collections.Generic;
 using System.Numerics;
-using StructsCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 
 namespace DelvUI.Interface.Nameplates
 {
@@ -67,7 +63,7 @@ namespace DelvUI.Interface.Nameplates
             if (!_config.Enabled || NameplatesManager.Instance == null)
             {
                 StopMouseover();
-                return; 
+                return;
             }
 
             GameObject? mouseoveredActor = null;
@@ -129,18 +125,15 @@ namespace DelvUI.Interface.Nameplates
 
                     if (data.GameObject is Character character)
                     {
-                        // TODO: replace with actual status flags when CS gets updated
-                        byte* statusFlags = (byte *)(new IntPtr(character.Address) + 0x1F3);
-
-                        if ((*statusFlags & 0x8) != 0) // PartyMember
+                        if ((character.StatusFlags & StatusFlags.PartyMember) != 0)
                         {
                             return _partyMemberHud;
                         }
-                        else if ((*statusFlags & 0x10) != 0) // AllianceMember
+                        else if ((character.StatusFlags & StatusFlags.AllianceMember) != 0)
                         {
                             return _allianceMemberHud;
                         }
-                        else if ((*statusFlags & 0x20) != 0) // Friend
+                        else if ((character.StatusFlags & StatusFlags.Friend) != 0)
                         {
                             return _friendsHud;
                         }
