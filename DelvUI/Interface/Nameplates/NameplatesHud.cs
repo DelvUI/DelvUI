@@ -192,8 +192,6 @@ namespace DelvUI.Interface.Nameplates
             else
             {
                 int obstructionCount = 0;
-                RaycastHit hit;
-
                 Vector2[] points = new Vector2[]
                 {
                     data.ScreenPosition + new Vector2(-30, 0), // left
@@ -203,9 +201,9 @@ namespace DelvUI.Interface.Nameplates
                 foreach (Vector2 point in points)
                 {
                     Ray ray = camera.ScreenPointToRay(point);
-                    collisionModule->RaycastEx(&hit, ray.Origin, ray.Direction, data.Distance, 1, flags);
-
-                    if (hit.Distance <= data.Distance * 0.95f)
+                    RaycastHit hit;
+                   
+                    if (collisionModule->RaycastEx(&hit, ray.Origin, ray.Direction, data.Distance, 1, flags))
                     {
                         obstructionCount++;
                     }
