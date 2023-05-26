@@ -614,12 +614,20 @@ namespace DelvUI.Interface.GeneralElements
         public PluginConfigColor OutOfCombatColor = PluginConfigColor.FromHex(0xFFDA9D2E);
 
         [ColorEdit4("Out of Combat (Hostile)")]
-        [Order(46, collapseWith = nameof(UseStateColor))]
+        [Order(47, collapseWith = nameof(UseStateColor))]
         public PluginConfigColor OutOfCombatHostileColor = PluginConfigColor.FromHex(0xFF994B35);
 
         [ColorEdit4("In Combat")]
-        [Order(46, collapseWith = nameof(UseStateColor))]
+        [Order(48, collapseWith = nameof(UseStateColor))]
         public PluginConfigColor InCombatColor = PluginConfigColor.FromHex(0xFF993535);
+
+        [Checkbox("Use Custom Color when being targeted", spacing = true, help = "This will change the color of the bar when the enemy is targeting the player.")]
+        [Order(49)]
+        public bool UseCustomColorWhenBeingTargeted = false;
+
+        [ColorEdit4("Custom Color when being targeted")]
+        [Order(50, collapseWith = nameof(UseCustomColorWhenBeingTargeted))]
+        public PluginConfigColor CustomColorWhenBeingTargeted = PluginConfigColor.FromHex(0xFFC4216D);
 
         [NestedConfig("Order Label", 132)]
         public DefaultFontLabelConfig OrderLabelConfig = new DefaultFontLabelConfig(new Vector2(5, 0), "", DrawAnchor.Right, DrawAnchor.Left)

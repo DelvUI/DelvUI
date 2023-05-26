@@ -531,6 +531,12 @@ namespace DelvUI.Interface.Nameplates
         {
             NameplateEnemyBarConfig config = (NameplateEnemyBarConfig)BarConfig;
 
+            bool targetingPlayer = character.TargetObjectId == Plugin.ClientState.LocalPlayer?.ObjectId;
+            if (targetingPlayer && config.UseCustomColorWhenBeingTargeted)
+            {
+                return config.CustomColorWhenBeingTargeted;
+            }
+
             if (config.UseStateColor)
             {
                 StructsCharacter* chara = (StructsCharacter*)character.Address;
