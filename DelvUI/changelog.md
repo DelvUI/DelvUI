@@ -1,3 +1,6 @@
+# 1.7.1.1
+- Fixed Scholar's Fairy Gauge Bar not working.
+
 # 1.7.1.0
 - Added "Different Size when targeted" setting for Nameplates.
 - Added "Custom Color when being targeted" setting for Enemy Nameplates.

@@ -274,11 +274,11 @@ namespace DelvUI.Config.Tree
                     ImGui.SetCursorPos(new Vector2(106 * _scale, y));
                     if (ImGui.Button(FontAwesomeIcon.MugHot.ToIconString(), new Vector2(24 * _scale, 24 * _scale)))
                     {
-                        Utils.OpenUrl("https://ko-fi.com/DelvUI");
+                        Utils.OpenUrl("https://ko-fi.com/Tischel");
                     }
                     ImGui.PopStyleColor(2);
                     ImGui.PopFont();
-                    ImGuiHelper.SetTooltip("Tip the developers at ko-fi.com");
+                    ImGuiHelper.SetTooltip("Tip the developer at ko-fi.com");
 
                     ImGui.EndChild();
                 }
