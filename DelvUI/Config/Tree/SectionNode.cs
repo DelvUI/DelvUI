@@ -88,11 +88,11 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        public override void Load(string path, string currentVersion, string? previousVersion = null)
+        public override void Load(string path)
         {
             foreach (SubSectionNode child in _children)
             {
-                child.Load(Path.Combine(path, Name), currentVersion, previousVersion);
+                child.Load(Path.Combine(path, Name));
             }
         }
 

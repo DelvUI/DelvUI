@@ -89,15 +89,9 @@ namespace DelvUI.Config
             return null!;
         }
 
-        public T? Load<T>(FileInfo fileInfo, string currentVersion, string? previousVersion) where T : PluginConfigObject
+        public T? Load<T>(FileInfo fileInfo) where T : PluginConfigObject
         {
-            PluginConfigObject? config = InternalLoad(fileInfo, currentVersion, previousVersion);
-            return (T?)config ?? LoadFromJson<T>(fileInfo.FullName);
-        }
-
-        protected virtual PluginConfigObject? InternalLoad(FileInfo fileInfo, string currentVersion, string? previousVersion)
-        {
-            return null; // override
+            return LoadFromJson<T>(fileInfo.FullName);
         }
 
         public static T? LoadFromJson<T>(string path) where T : PluginConfigObject
@@ -113,11 +107,6 @@ namespace DelvUI.Config
             settings.ContractResolver = new PluginConfigObjectsContractResolver();
 
             return JsonConvert.DeserializeObject<T>(jsonString, settings);
-        }
-
-        public virtual void ImportFromOldVersion(Dictionary<Type, PluginConfigObject> oldConfigObjects, string currentVersion, string? previousVersion)
-        {
-            return; // override
         }
 
         #region IOnChangeEventArgs

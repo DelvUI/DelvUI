@@ -1,3 +1,7 @@
+# 2.0.0.0
+- Moved "Experience Bar", "GCD Indicator", "Pull Timer", "Limit Break" and "MP Ticker" from "Misc" to the new "Other Elements" section.
+- Moved "Fonts" from "Misc" to the new "Customization" section.
+
 # 1.7.1.1
 - Fixed Scholar's Fairy Gauge Bar not working.
 

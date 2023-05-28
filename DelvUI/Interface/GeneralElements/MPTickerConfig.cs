@@ -6,7 +6,7 @@ using System.Numerics;
 namespace DelvUI.Interface.GeneralElements
 {
     [DisableParentSettings("Position")]
-    [Section("Misc")]
+    [Section("Other Elements")]
     [SubSection("MP Ticker", 0)]
     public class MPTickerConfig : MovablePluginConfigObject
     {

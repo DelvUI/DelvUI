@@ -250,7 +250,7 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        public override void Load(string path, string currentVersion, string? previousVersion = null)
+        public override void Load(string path)
         {
             if (ConfigObject is not PluginConfigObject) { return; }
 
@@ -263,7 +263,7 @@ namespace DelvUI.Config.Tree
             MethodInfo? methodInfo = ConfigObject.GetType().GetMethod("Load");
             MethodInfo? function = methodInfo?.MakeGenericMethod(ConfigObject.GetType());
 
-            object?[] args = new object?[] { finalPath, currentVersion, previousVersion };
+            object?[] args = new object?[] { finalPath };
             PluginConfigObject? config = (PluginConfigObject?)function?.Invoke(ConfigObject, args);
 
             ConfigObject = config ?? ConfigObject;
