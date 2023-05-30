@@ -107,6 +107,7 @@ namespace DelvUI.Interface.Nameplates
 
             GameObject? target = Plugin.TargetManager.Target;
             bool foundTarget = false;
+            NameplateData? targetData = null;
 
             _data = new List<NameplateData>();
             int activeCount = ui3DModule->NamePlateObjectInfoCount;
@@ -120,9 +121,11 @@ namespace DelvUI.Interface.Nameplates
                 StructsGameObject* obj = objectInfo->GameObject;
                 if (obj == null) { continue; }
 
+                bool isTarget = false;
                 GameObject? gameObject = Plugin.ObjectTable.CreateObjectReference(new IntPtr(obj));
                 if (target != null && new IntPtr(obj) == target.Address)
                 {
+                    isTarget = true;
                     foundTarget = true;
                 }
 
@@ -183,14 +186,27 @@ namespace DelvUI.Interface.Nameplates
                     distance
                 );
 
-                _data.Add(data);
+                if (isTarget)
+                {
+                    targetData = data;
+                }
+                else
+                { 
+                    _data.Add(data);
+                }
+
                 _cache.Add(obj->ObjectID, data);
             }
 
             _data.Reverse();
 
+            // add target nameplate last
+            if (foundTarget && targetData.HasValue)
+            {
+                _data.Add(targetData.Value);
+            }
             // create nameplate for target?
-            if (_config.AlwaysShowTargetNameplate && target != null && !foundTarget)
+            else if (_config.AlwaysShowTargetNameplate && target != null && !foundTarget)
             {
                 StructsGameObject* obj = (StructsGameObject*)target.Address;
                 NameplateData? cachedData = _cache[target.ObjectId];
@@ -201,7 +217,7 @@ namespace DelvUI.Interface.Nameplates
                 Plugin.GameGui.WorldToScreen(worldPos, out Vector2 screenPos);
                 screenPos = ClampScreenPosition(screenPos);
 
-                NameplateData targetData = new NameplateData(
+                targetData = new NameplateData(
                     target,
                     target.Name.ToString(),
                     cachedData?.Title ?? "",
@@ -216,7 +232,7 @@ namespace DelvUI.Interface.Nameplates
                     true
                 );
 
-                _data.Add(targetData);
+                _data.Add(targetData.Value);
             }
         }
 
