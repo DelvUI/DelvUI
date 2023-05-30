@@ -191,7 +191,9 @@ namespace DelvUI.Interface.PartyCooldowns
                             _barConfig.BorderThickness,
                             DrawAnchor.TopLeft,
                             current: current,
-                            max: max
+                            max: max,
+                            barTextureName: _barConfig.BarTextureName,
+                            barTextureDrawMode: _barConfig.BarTextureDrawMode
                         );
 
                         bar.SetBackground(background);

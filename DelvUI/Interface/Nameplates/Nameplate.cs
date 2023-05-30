@@ -155,7 +155,6 @@ namespace DelvUI.Interface.Nameplates
             Rect background = new Rect(BarConfig.Position, barSize, bgColor);
             Rect healthFill = BarUtilities.GetFillRect(BarConfig.Position, barSize, BarConfig.FillDirection, fillColor, currentHp, maxHp);
 
-            //BarHud bar = new BarHud(BarConfig, character);
             BarHud bar = new BarHud(
                 BarConfig.ID,
                 BarConfig.DrawBorder,
@@ -165,7 +164,9 @@ namespace DelvUI.Interface.Nameplates
                 character,
                 current: currentHp,
                 max: maxHp,
-                shadowConfig: BarConfig.ShadowConfig
+                shadowConfig: BarConfig.ShadowConfig,
+                barTextureName: BarConfig.BarTextureName,
+                barTextureDrawMode: BarConfig.BarTextureDrawMode
             );
 
             bar.SetBackground(background);

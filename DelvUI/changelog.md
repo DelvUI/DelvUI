@@ -1,4 +1,12 @@
 # 2.0.0.0
+- Added a Bar Texture setting for all bars:
+    + Each bar can use a different Bar Texture and Draw Mode.
+    + Supported Draw Modes are: Strech, Repeat Horizontal, Repeat Vertical and Repeat.
+    + DelvUI comes with several textures to choose from.
+    + There's a new section under Customization > Bar Textures where custom textures can be added.
+    + Textures can be previewed in Customization > Bar Textures.
+    + Also in this section it is possible to apply a particular Bar Texture and Draw Mode to all bars with one click.
+    
 - Moved "Experience Bar", "GCD Indicator", "Pull Timer", "Limit Break" and "MP Ticker" from "Misc" to the new "Other Elements" section.
 - Moved "Fonts" from "Misc" to the new "Customization" section.
 

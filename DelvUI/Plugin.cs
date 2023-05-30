@@ -101,6 +101,7 @@ namespace DelvUI
             Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.0.0.0";
 
             FontsManager.Initialize(AssemblyLocation);
+            BarTexturesManager.Initialize(AssemblyLocation);
             LoadBanner();
 
             // initialize a not-necessarily-defaults configuration
@@ -109,7 +110,7 @@ namespace DelvUI
             ConfigurationManager.Instance.LoadOrInitializeFiles();
 
             FontsManager.Instance.LoadConfig();
-
+            BarTexturesManager.Instance.LoadConfig();
 
             ChatHelper.Initialize();
             ClipRectsHelper.Initialize();
@@ -322,6 +323,7 @@ namespace DelvUI
             UiBuilder.OpenConfigUi -= OpenConfigUi;
             UiBuilder.RebuildFonts();
 
+            BarTexturesManager.Instance?.Dispose();
             ChatHelper.Instance?.Dispose();
             ClipRectsHelper.Instance?.Dispose();
             ExperienceHelper.Instance?.Dispose();

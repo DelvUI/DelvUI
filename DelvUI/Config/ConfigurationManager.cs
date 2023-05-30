@@ -309,6 +309,8 @@ namespace DelvUI.Config
         public ConfigPageNode GetConfigPageNode<T>() where T : PluginConfigObject => ConfigBaseNode.GetConfigPageNode<T>()!;
 
         public void SetConfigObject(PluginConfigObject configObject) => ConfigBaseNode.SetConfigObject(configObject);
+
+        public List<T> GetObjects<T>() => ConfigBaseNode.GetObjects<T>();
         #endregion
 
         #region load / save / profiles
@@ -616,6 +618,7 @@ namespace DelvUI.Config
 
             // Customization
             typeof(FontsConfig),
+            typeof(BarTexturesConfig),
 
             // Visibility
             typeof(GlobalVisibilityConfig),

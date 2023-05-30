@@ -170,7 +170,9 @@ namespace DelvUI.Interface.EnemyList
                     DrawAnchor.TopLeft,
                     current: currentHp,
                     max: maxHp,
-                    shadowConfig: Configs.HealthBar.ShadowConfig
+                    shadowConfig: Configs.HealthBar.ShadowConfig,
+                    barTextureName: Configs.HealthBar.BarTextureName,
+                    barTextureDrawMode: Configs.HealthBar.BarTextureDrawMode
                 );
 
                 bar.SetBackground(background);

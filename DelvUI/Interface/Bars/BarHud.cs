@@ -39,6 +39,9 @@ namespace DelvUI.Interface.Bars
 
         private ShadowConfig? ShadowConfig { get; set; }
 
+        private string? BarTextureName { get; set; }
+        private BarTextureDrawMode BarTextureDrawMode { get; set; }
+
         public BarHud(
             string id,
             bool drawBorder = true,
@@ -50,7 +53,9 @@ namespace DelvUI.Interface.Bars
             int? glowSize = 1,
             float? current = null,
             float? max = null,
-            ShadowConfig? shadowConfig = null)
+            ShadowConfig? shadowConfig = null,
+            string? barTextureName = null,
+            BarTextureDrawMode barTextureDrawMode = BarTextureDrawMode.Stretch)
         {
             ID = id;
             DrawBorder = drawBorder;
@@ -63,10 +68,24 @@ namespace DelvUI.Interface.Bars
             Current = current;
             Max = max;
             ShadowConfig = shadowConfig;
+            BarTextureName = barTextureName;
+            BarTextureDrawMode = barTextureDrawMode;
         }
 
         public BarHud(BarConfig config, GameObject? actor = null, BarGlowConfig? glowConfig = null, float? current = null, float? max = null)
-            : this(config.ID, config.DrawBorder, config.BorderColor, config.BorderThickness, config.Anchor, actor, glowConfig?.Color, glowConfig?.Size, current, max)
+            : this(config.ID, 
+                  config.DrawBorder, 
+                  config.BorderColor, 
+                  config.BorderThickness, 
+                  config.Anchor, 
+                  actor, 
+                  glowConfig?.Color, 
+                  glowConfig?.Size, 
+                  current, 
+                  max, 
+                  null, 
+                  config.BarTextureName, 
+                  config.BarTextureDrawMode)
         {
             BackgroundRect = new Rect(config.Position, config.Size, config.BackgroundColor);
             ShadowConfig = config.ShadowConfig;
@@ -166,7 +185,7 @@ namespace DelvUI.Interface.Bars
                 // Draw foregrounds
                 foreach (Rect rect in ForegroundRects)
                 {
-                    DrawHelper.DrawGradientFilledRect(barPos + rect.Position, rect.Size, rect.Color, drawList);
+                    DrawHelper.DrawBarTexture(barPos + rect.Position, rect.Size, rect.Color, BarTextureName, BarTextureDrawMode, drawList);
                 }
 
                 // Draw Border

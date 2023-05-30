@@ -16,6 +16,18 @@ namespace DelvUI.Config.Tree
         protected Node? _nodeToReset = null;
         protected string? _nodeToResetName = null;
 
+        public virtual List<T> GetObjects<T>()
+        {
+            List<T> list = new List<T>();
+
+            foreach (Node node in _children)
+            {
+                list.AddRange(node.GetObjects<T>());
+            }
+
+            return list;
+        }
+
         protected void DrawExportResetContextMenu(Node node, string name)
         {
             if (_nodeToReset != null)
