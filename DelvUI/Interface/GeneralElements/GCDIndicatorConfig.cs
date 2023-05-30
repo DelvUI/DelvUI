@@ -7,7 +7,7 @@ using System.Numerics;
 namespace DelvUI.Interface.GeneralElements
 {
     [DisableParentSettings("Size")]
-    [Section("Misc")]
+    [Section("Other Elements")]
     [SubSection("GCD Indicator", 0)]
     public class GCDIndicatorConfig : AnchorablePluginConfigObject
     {

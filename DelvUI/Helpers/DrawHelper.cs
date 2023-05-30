@@ -1,5 +1,6 @@
 using Dalamud.Interface;
 using DelvUI.Config;
+using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using ImGuiScene;
@@ -31,6 +32,31 @@ namespace DelvUI.Helpers
                 GradientDirection.Up => new[] { color.BottomGradient, color.BottomGradient, color.TopGradient, color.TopGradient },
                 _ => new[] { color.TopGradient, color.TopGradient, color.BottomGradient, color.BottomGradient }
             };
+        }
+        
+        private static Vector2 GetBarTextureUV1Vector(Vector2 size, int textureWidth, int textureHeight, BarTextureDrawMode drawMode)
+        {
+            if (drawMode == BarTextureDrawMode.Stretch) { return new Vector2(1); }
+
+            float x = drawMode == BarTextureDrawMode.RepeatVertical ? 1 : (float)size.X / textureWidth;
+            float y = drawMode == BarTextureDrawMode.RepeatHorizontal ? 1 : (float)size.Y / textureHeight;
+
+            return new Vector2(x, y);
+        }
+
+        public static void DrawBarTexture(Vector2 position, Vector2 size, PluginConfigColor color, string? name, BarTextureDrawMode drawMode, ImDrawListPtr drawList)
+        {
+            TextureWrap? texture = BarTexturesManager.Instance?.GetBarTexture(name);
+            if (texture == null)
+            {
+                DrawGradientFilledRect(position, size, color, drawList);
+                return;
+            }
+
+            Vector2 uv0 = new Vector2(0);
+            Vector2 uv1 = GetBarTextureUV1Vector(size, texture.Width, texture.Height, drawMode);
+
+            drawList.AddImage(texture.ImGuiHandle, position, position + size, uv0, uv1, color.Base);
         }
 
         public static void DrawGradientFilledRect(Vector2 position, Vector2 size, PluginConfigColor color, ImDrawListPtr drawList)

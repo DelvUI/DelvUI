@@ -2,6 +2,7 @@
 using DelvUI.Config.Attributes;
 using System.Numerics;
 using DelvUI.Interface.GeneralElements;
+using DelvUI.Enums;
 
 namespace DelvUI.Interface.Bars
 {
@@ -19,6 +20,14 @@ namespace DelvUI.Interface.Bars
         [Combo("Fill Direction", new string[] { "Left", "Right", "Up", "Down" })]
         [Order(30)]
         public BarDirection FillDirection;
+
+        [BarTexture("Bar Texture", spacing = true, help = "Default means the bar will be drawn using the global gradient configuration for bars found in Colors > Misc.")]
+        [Order(31)]
+        public string BarTextureName = "";
+
+        [BarTextureDrawMode("Draw Mode")]
+        [Order(32)]
+        public BarTextureDrawMode BarTextureDrawMode = BarTextureDrawMode.Stretch;
 
         [Checkbox("Show Border", spacing = true)]
         [Order(35)]

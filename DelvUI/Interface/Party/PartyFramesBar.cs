@@ -234,7 +234,9 @@ namespace DelvUI.Interface.Party
                 actor: character,
                 current: currentHp,
                 max: maxHp,
-                shadowConfig: _configs.HealthBar.ShadowConfig
+                shadowConfig: _configs.HealthBar.ShadowConfig,
+                barTextureName: _configs.HealthBar.BarTextureName,
+                barTextureDrawMode: _configs.HealthBar.BarTextureDrawMode
             );
 
             bar.SetBackground(background);

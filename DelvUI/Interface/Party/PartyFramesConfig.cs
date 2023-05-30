@@ -113,33 +113,6 @@ namespace DelvUI.Interface.Party
             : base(position, size, fillColor, fillDirection)
         {
         }
-
-        protected override PluginConfigObject? InternalLoad(FileInfo fileInfo, string currentVersion, string? previousVersion)
-        {
-            if (previousVersion == null) { return null; }
-
-            // change introduced in 0.6.2.0
-            Version previous = new Version(previousVersion);
-            if (previous.Major > 0 || previous.Minor > 6 || previous.Minor == 6 && previous.Build >= 2) { return null; }
-
-            PartyFramesHealthBarsConfig? config = LoadFromJson<PartyFramesHealthBarsConfig>(fileInfo.FullName);
-            if (config == null) { return null; }
-
-            config.FillDirection = BarDirection.Right;
-
-            return config;
-        }
-
-        public override void ImportFromOldVersion(Dictionary<Type, PluginConfigObject> oldConfigObjects, string currentVersion, string? previousVersion)
-        {
-            if (previousVersion == null) { return; }
-
-            // change introduced in 0.6.2.0
-            Version previous = new Version(previousVersion);
-            if (previous.Major > 0 || previous.Minor > 6 || previous.Minor == 6 && previous.Build >= 2) { return; }
-
-            FillDirection = BarDirection.Right;
-        }
     }
 
     [Disableable(false)]
@@ -421,59 +394,6 @@ namespace DelvUI.Interface.Party
 
         [NestedConfig("Ready Check Status", 14)]
         public PartyFramesReadyCheckStatusConfig ReadyCheckStatus = new PartyFramesReadyCheckStatusConfig();
-
-        protected override PluginConfigObject? InternalLoad(FileInfo fileInfo, string currentVersion, string? previousVersion)
-        {
-            if (previousVersion == null) { return null; }
-
-            // change introduced in 0.4.0.0
-            Version previous = new Version(previousVersion);
-            if (previous.Major > 0 || previous.Minor > 3) { return null; }
-
-            string? path = fileInfo.DirectoryName;
-            if (path == null) { return null; }
-
-            PartyFramesIconsConfig config = new PartyFramesIconsConfig();
-
-            // role / job icon
-            try
-            {
-                string nestedConfigPath = Path.Combine(path, "Role-Job Icon.json");
-                config.Role = LoadFromJson<PartyFramesRoleIconConfig>(nestedConfigPath) ?? config.Role;
-            }
-            catch (Exception e)
-            {
-                PluginLog.Error("Error while merging role-job icon configs: " + e.Message);
-            }
-
-            // party leader
-            try
-            {
-                string nestedConfigPath = Path.Combine(path, "Party Leader Icon.json");
-                config.Leader = LoadFromJson<PartyFramesLeaderIconConfig>(nestedConfigPath) ?? config.Leader;
-            }
-            catch (Exception e)
-            {
-                PluginLog.Error("Error while merging invuln tracker configs: " + e.Message);
-            }
-
-            return config;
-        }
-
-        public override void ImportFromOldVersion(Dictionary<Type, PluginConfigObject> oldConfigObjects, string currentVersion, string? previousVersion)
-        {
-            if (oldConfigObjects.TryGetValue(typeof(PartyFramesRoleIconConfig), out PluginConfigObject? roleObj)
-                && roleObj is PartyFramesRoleIconConfig role)
-            {
-                Role = role;
-            }
-
-            if (oldConfigObjects.TryGetValue(typeof(PartyFramesLeaderIconConfig), out PluginConfigObject? leaderObj)
-                && leaderObj is PartyFramesLeaderIconConfig leader)
-            {
-                Leader = leader;
-            }
-        }
     }
 
     [Exportable(false)]
@@ -640,76 +560,6 @@ namespace DelvUI.Interface.Party
 
         [NestedConfig("Cleanse Tracker", 15)]
         public PartyFramesCleanseTrackerConfig Cleanse = new PartyFramesCleanseTrackerConfig();
-
-        protected override PluginConfigObject? InternalLoad(FileInfo fileInfo, string currentVersion, string? previousVersion)
-        {
-            if (previousVersion == null) { return null; }
-
-            // change introduced in 0.4.0.0
-            Version previous = new Version(previousVersion);
-            if (previous.Major > 0 || previous.Minor > 3) { return null; }
-
-            string? path = fileInfo.DirectoryName;
-            if (path == null) { return null; }
-
-            PartyFramesTrackersConfig config = new PartyFramesTrackersConfig();
-
-            // raise tracker
-            try
-            {
-                string nestedConfigPath = Path.Combine(path, "Raise Tracker.json");
-                config.Raise = LoadFromJson<PartyFramesRaiseTrackerConfig>(nestedConfigPath) ?? config.Raise;
-            }
-            catch (Exception e)
-            {
-                PluginLog.Error("Error while merging raise tracker configs: " + e.Message);
-            }
-
-            // invuln tracker
-            try
-            {
-                string nestedConfigPath = Path.Combine(path, "Invuln Tracker.json");
-                config.Invuln = LoadFromJson<PartyFramesInvulnTrackerConfig>(nestedConfigPath) ?? config.Invuln;
-            }
-            catch (Exception e)
-            {
-                PluginLog.Error("Error while merging invuln tracker configs: " + e.Message);
-            }
-
-            // cleanse tracker
-            try
-            {
-                string nestedConfigPath = Path.Combine(path, "Cleanse Tracker.json");
-                config.Cleanse = LoadFromJson<PartyFramesCleanseTrackerConfig>(nestedConfigPath) ?? config.Cleanse;
-            }
-            catch (Exception e)
-            {
-                PluginLog.Error("Error while merging cleanse tracker configs: " + e.Message);
-            }
-
-            return config;
-        }
-
-        public override void ImportFromOldVersion(Dictionary<Type, PluginConfigObject> oldConfigObjects, string currentVersion, string? previousVersion)
-        {
-            if (oldConfigObjects.TryGetValue(typeof(PartyFramesRaiseTrackerConfig), out PluginConfigObject? raiseObj)
-                && raiseObj is PartyFramesRaiseTrackerConfig raise)
-            {
-                Raise = raise;
-            }
-
-            if (oldConfigObjects.TryGetValue(typeof(PartyFramesInvulnTrackerConfig), out PluginConfigObject? invulvObj)
-                && invulvObj is PartyFramesInvulnTrackerConfig invuln)
-            {
-                Invuln = invuln;
-            }
-
-            if (oldConfigObjects.TryGetValue(typeof(PartyFramesCleanseTrackerConfig), out PluginConfigObject? cleanseObj)
-                && cleanseObj is PartyFramesCleanseTrackerConfig cleanse)
-            {
-                Cleanse = cleanse;
-            }
-        }
     }
 
     [Exportable(false)]
