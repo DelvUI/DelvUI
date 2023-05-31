@@ -683,6 +683,14 @@ namespace DelvUI.Interface.GeneralElements
     [DisableParentSettings("AnchorToUnitFrame", "UnitFrameAnchor", "HideWhenInactive", "FillDirection")]
     public class NameplateCastbarConfig : TargetCastbarConfig
     {
+        [Checkbox("Match Width with Health Bar")]
+        [Order(11)]
+        public bool MatchWidth = false;
+
+        [Checkbox("Match Height with Health Bar")]
+        [Order(12)]
+        public bool MatchHeight = false;
+
         [Anchor("Health Bar Anchor")]
         [Order(16)]
         public DrawAnchor HealthBarAnchor = DrawAnchor.BottomLeft;

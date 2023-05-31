@@ -65,19 +65,20 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
+            Vector2 size = GetSize();
             bool validIcon = LastUsedCast?.IconTexture is not null;
-            Vector2 iconSize = Config.ShowIcon && validIcon ? new Vector2(Config.Size.Y, Config.Size.Y) : Vector2.Zero;
+            Vector2 iconSize = Config.ShowIcon && validIcon ? new Vector2(size.Y, size.Y) : Vector2.Zero;
 
             PluginConfigColor fillColor = GetColor();
-            Rect background = new(Config.Position, Config.Size, Config.BackgroundColor);
-            Rect progress = BarUtilities.GetFillRect(Config.Position, Config.Size, Config.FillDirection, fillColor, currentCastTime, totalCastTime);
+            Rect background = new(Config.Position, size, Config.BackgroundColor);
+            Rect progress = BarUtilities.GetFillRect(Config.Position, size, Config.FillDirection, fillColor, currentCastTime, totalCastTime);
 
             BarHud bar = new(Config, Actor);
             bar.SetBackground(background);
 
             if (Config.UseReverseFill)
             {
-                Vector2 reverseFillSize = Config.Size - BarUtilities.GetFillDirectionOffset(progress.Size, Config.FillDirection);
+                Vector2 reverseFillSize = size - BarUtilities.GetFillDirectionOffset(progress.Size, Config.FillDirection);
                 Vector2 reverseFillPos = Config.FillDirection.IsInverted()
                     ? Config.Position
                     : Config.Position + BarUtilities.GetFillDirectionOffset(progress.Size, Config.FillDirection);
@@ -94,12 +95,12 @@ namespace DelvUI.Interface.GeneralElements
             AddDrawActions(bar.GetDrawActions(pos, Config.StrataLevel));
 
             // icon
-            Vector2 startPos = Config.Position + Utils.GetAnchoredPosition(pos, Config.Size, Config.Anchor);
+            Vector2 startPos = Config.Position + Utils.GetAnchoredPosition(pos, size, Config.Anchor);
             if (Config.ShowIcon)
             {
                 AddDrawAction(Config.StrataLevel, () =>
                 {
-                    DrawHelper.DrawInWindow(ID + "_icon", startPos, Config.Size, false, false, (drawList) =>
+                    DrawHelper.DrawInWindow(ID + "_icon", startPos, size, false, false, (drawList) =>
                     {
                         if (validIcon)
                         {
@@ -125,7 +126,7 @@ namespace DelvUI.Interface.GeneralElements
 
             AddDrawAction(Config.CastNameLabel.StrataLevel, () =>
             {
-                _castNameLabel.Draw(namePos, Config.Size, Actor);
+                _castNameLabel.Draw(namePos, size, Actor);
             });
 
             // cast time
@@ -146,7 +147,7 @@ namespace DelvUI.Interface.GeneralElements
 
             AddDrawAction(Config.CastTimeLabel.StrataLevel, () =>
             {
-                _castTimeLabel.Draw(timePos, Config.Size, Actor);
+                _castTimeLabel.Draw(timePos, size, Actor);
             });
         }
 
@@ -188,6 +189,7 @@ namespace DelvUI.Interface.GeneralElements
         }
 
         public virtual PluginConfigColor GetColor() => Config.FillColor;
+        public virtual Vector2 GetSize() => Config.Size;
 
         public virtual bool ShouldShow() => true;
     }
@@ -371,10 +373,26 @@ namespace DelvUI.Interface.GeneralElements
     public class NameplateCastbarHud : TargetOfTargetCastbarHud
     {
         private NameplateCastbarConfig Config => (NameplateCastbarConfig)_config;
+        
+        private Vector2 _customSize = new Vector2(0);
+        public Vector2 ParentSize { get; set; } = new Vector2(0);
 
         public NameplateCastbarHud(NameplateCastbarConfig config, string? displayName = null) : base(config, displayName)
         {
-
+            _customSize = Config.Size;
         }
+
+        public override void DrawChildren(Vector2 origin)
+        {
+            // calculate size
+            float x = Config.MatchWidth ? ParentSize.X : Config.Size.X;
+            float y = Config.MatchHeight ? ParentSize.Y : Config.Size.Y;
+            _customSize = new Vector2(x, y);
+
+            // draw
+            base.DrawChildren(origin);
+        }
+
+        public override Vector2 GetSize() => _customSize;
     }
 }

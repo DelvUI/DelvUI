@@ -499,6 +499,7 @@ namespace DelvUI.Interface.Nameplates
             Vector2 castbarPos = Utils.GetAnchoredPosition(anchor.Value.Position, -anchor.Value.Size, Config.CastbarConfig.HealthBarAnchor);
             drawActions.Add((Config.CastbarConfig.StrataLevel, () =>
             {
+                _castbarHud.ParentSize = anchor.Value.Size;
                 _castbarHud.Actor = character;
                 _castbarHud.PrepareForDraw(castbarPos);
                 _castbarHud.Draw(castbarPos);
