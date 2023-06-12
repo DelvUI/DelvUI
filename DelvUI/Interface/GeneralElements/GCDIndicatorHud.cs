@@ -77,7 +77,7 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            if (_lastTotalCastTime == 0 && ((BattleChara)Actor).IsCasting)
+            if (_lastTotalCastTime == 0 && Utils.IsActorCasting(Actor))
             {
                 _lastTotalCastTime = ((BattleChara)Actor).TotalCastTime;
             }

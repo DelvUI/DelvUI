@@ -1,3 +1,6 @@
+# 1.7.1.2
+- Attempt to fix DelvUI exception that causes ImGUI's fonts to be broken.
+
 # 1.7.1.1
 - Fixed Scholar's Fairy Gauge Bar not working.
 

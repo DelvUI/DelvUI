@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
+using DelvUI.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -72,7 +73,7 @@ namespace DelvUI.Interface.Party
                 }
 
                 // check raise casts
-                if (battleChara.IsCasting)
+                if (Utils.IsActorCasting(battleChara))
                 {
                     var remaining = Math.Max(0, battleChara.TotalCastTime - battleChara.CurrentCastTime);
 
