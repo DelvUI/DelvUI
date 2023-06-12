@@ -164,7 +164,7 @@ namespace DelvUI.Interface.GeneralElements
             StructsBattleChara* chara = (StructsBattleChara*)battleChara.Address;
             float total = chara->SpellCastInfo.AdjustedTotalCastTime;
 
-            if (!battleChara.IsCasting && current <= 0)
+            if (!Utils.IsActorCasting(battleChara) && current <= 0)
             {
                 currentCastTime = 0;
                 totalCastTime = 0;

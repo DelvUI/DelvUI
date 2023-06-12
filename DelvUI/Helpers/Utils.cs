@@ -96,6 +96,22 @@ namespace DelvUI.Helpers
             return Math.Min((float)chara->ShieldValue, 100f) / 100f;
         }
 
+        public static bool IsActorCasting(GameObject? actor)
+        {
+            if (actor is not BattleChara chara)
+            {
+                return false;
+            }
+
+            try
+            {
+                return chara.IsCasting;
+            }
+            catch { }
+
+            return false;
+        }
+
         public static string DurationToString(double duration)
         {
             if (duration == 0)
