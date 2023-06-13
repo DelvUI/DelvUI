@@ -98,7 +98,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.7.1.2";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.7.1.3";
 
             FontsManager.Initialize(AssemblyLocation);
             LoadBanner();
@@ -282,8 +282,9 @@ namespace DelvUI
             UiBuilder.OverrideGameCursor = false;
 
             ConfigurationManager.Instance.Draw();
+            PartyManager.Instance?.Update();
 
-            var fontPushed = FontsManager.Instance.PushDefaultFont();
+            bool fontPushed = FontsManager.Instance.PushDefaultFont();
 
             if (!hudState)
             {

@@ -34,7 +34,6 @@ namespace DelvUI.Interface.Party
             _invulnTracker = new PartyFramesInvulnTracker();
             _cleanseTracker = new PartyFramesCleanseTracker();
 
-            Plugin.Framework.Update += FrameworkOnOnUpdateEvent;
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
 
             OnConfigReset(ConfigurationManager.Instance);
@@ -69,7 +68,6 @@ namespace DelvUI.Interface.Party
             _invulnTracker.Dispose();
             _cleanseTracker.Dispose();
 
-            Plugin.Framework.Update -= FrameworkOnOnUpdateEvent;
             _config.ValueChangeEvent -= OnConfigPropertyChanged;
 
             Instance = null!;
@@ -138,7 +136,7 @@ namespace DelvUI.Interface.Party
                 _groupMembers[1].Character is BattleNpc npc && npc.BattleNpcKind == BattleNpcSubKind.Chocobo);
         }
 
-        private void FrameworkOnOnUpdateEvent(Framework framework)
+        public void Update()
         {
             // find party list hud agent
             PartyListAddon = (AddonPartyList*)Plugin.GameGui.GetAddonByName("_PartyList", 1);
@@ -166,10 +164,10 @@ namespace DelvUI.Interface.Party
                 return;
             }
 
-            Update();
+            InternalUpdate();
         }
 
-        private void Update()
+        private void InternalUpdate()
         {
             PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (player is null || player is not PlayerCharacter)
