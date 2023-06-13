@@ -283,8 +283,9 @@ namespace DelvUI
             UiBuilder.OverrideGameCursor = false;
 
             ConfigurationManager.Instance.Draw();
+            PartyManager.Instance?.Update();
 
-            var fontPushed = FontsManager.Instance.PushDefaultFont();
+            bool fontPushed = FontsManager.Instance.PushDefaultFont();
 
             if (!hudState)
             {
