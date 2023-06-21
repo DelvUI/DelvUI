@@ -160,9 +160,20 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            float current = battleChara.CurrentCastTime;
-            StructsBattleChara* chara = (StructsBattleChara*)battleChara.Address;
-            float total = chara->SpellCastInfo.AdjustedTotalCastTime;
+            float current = 0;
+            float total = 0;
+
+            try
+            {
+                current = battleChara.CurrentCastTime;
+                StructsBattleChara* chara = (StructsBattleChara*)battleChara.Address;
+                total = chara->SpellCastInfo.AdjustedTotalCastTime;
+            } catch
+            {
+                currentCastTime = 0;
+                totalCastTime = 0;
+                return;
+            }
 
             if (!Utils.IsActorCasting(battleChara) && current <= 0)
             {
