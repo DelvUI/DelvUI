@@ -13,6 +13,7 @@
 - Moved "Experience Bar", "GCD Indicator", "Pull Timer", "Limit Break" and "MP Ticker" from "Misc" to the new "Other Elements" section.
 - Moved "Fonts" from "Misc" to the new "Customization" section.
 - Fixed targeted unit Nameplate not drawing on top of other Nameplates.
+- Added minor improvements to the Party Frames preview.
 
 # 1.7.1.2
 - Attempt to fix DelvUI exception that causes ImGUI's fonts to be broken.

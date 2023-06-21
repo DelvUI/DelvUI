@@ -122,7 +122,7 @@ namespace DelvUI.Interface.Party
         public Character? Character => null;
 
         public int Order { get; set; }
-        public string Name => "Fake Name";
+        public string Name { get; private set; }
         public uint Level { get; private set; }
         public uint JobId { get; private set; }
         public uint HP { get; private set; }
@@ -140,6 +140,7 @@ namespace DelvUI.Interface.Party
 
         public FakePartyFramesMember(int order)
         {
+            Name = RNG.Next(0, 2) == 1 ? "Fake Name" : "FakeLonger MockedName";
             Order = order + 1;
             Level = (uint)RNG.Next(1, 80);
             JobId = (uint)RNG.Next(19, 41);
