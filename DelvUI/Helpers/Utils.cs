@@ -333,11 +333,35 @@ namespace DelvUI.Helpers
                 return null;
             }
 
-            for (int i = 0; i < 14; i++)
+            for (int i = 0; i < 17; i++)
             {
                 if (objectId == markingController->MarkerArray[i])
                 {
-                    return (uint)(60701 + i);
+                    // attack1-5
+                    if (i <= 4)
+                    {
+                        return (uint)(61201 + i);
+                    }
+                    // attack6-8
+                    else if (i >= 14)
+                    {
+                        return (uint)(61201 + i - 9);
+                    }
+                    // shapes
+                    else if (i >= 10)
+                    {
+                        return (uint)(61231 + i - 10);
+                    }
+                    // ignore1-2
+                    else if (i >= 8)
+                    {
+                        return (uint)(61221 + i - 8);
+                    }
+                    // bind1-3
+                    else if (i >= 5)
+                    {
+                        return (uint)(61211 + i - 5);
+                    }
                 }
             }
 
