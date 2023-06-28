@@ -190,7 +190,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDualCastBar(Vector2 origin, PlayerCharacter player)
         {
-            float duration = player.StatusList.FirstOrDefault(o => o.StatusId is 1249)?.RemainingTime ?? 0f;
+            float duration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1249)?.RemainingTime ?? 0f;
 
             if (Config.DualcastBar.HideWhenInactive && duration == 0)
             {

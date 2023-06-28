@@ -6,7 +6,6 @@ using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
@@ -291,7 +290,7 @@ namespace DelvUI.Interface.GeneralElements
             return labels.ToArray();
         }
 
-        
+
 
         private PluginConfigColor GetDistanceColor(Character? character, PluginConfigColor color)
         {
@@ -446,7 +445,7 @@ namespace DelvUI.Interface.GeneralElements
             uint jobId = chara.ClassJob.Id;
             if (JobsHelper.RoleForJob(jobId) != JobRoles.Tank) { return; }
 
-            var tankStanceBuff = chara.StatusList.Where(o =>
+            var tankStanceBuff = Utils.StatusListForBattleChara(chara).Where(o =>
                 o.StatusId == 79 || // IRON WILL
                 o.StatusId == 91 || // DEFIANCE
                 o.StatusId == 392 || // ROYAL GUARD

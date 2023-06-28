@@ -97,7 +97,7 @@ namespace DelvUI.Interface.GeneralElements
                 return null;
             }
 
-            bool leyLinesActive = player.StatusList.Any(e => e.StatusId == 738);
+            bool leyLinesActive = Utils.StatusListForBattleChara(player).Any(e => e.StatusId == 738);
             float castTime = config.Fire3CastTime * (leyLinesActive ? 0.85f : 1f);
 
             // tick rate is 3s

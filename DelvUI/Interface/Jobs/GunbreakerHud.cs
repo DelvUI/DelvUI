@@ -65,7 +65,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawNoMercyBar(Vector2 origin, PlayerCharacter player)
         {
-            float noMercyDuration = player.StatusList.FirstOrDefault(o => o.StatusId == 1831 && o.RemainingTime > 0f)?.RemainingTime ?? 0f;
+            float noMercyDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId == 1831 && o.RemainingTime > 0f)?.RemainingTime ?? 0f;
             if (!Config.NoMercy.HideWhenInactive || noMercyDuration > 0)
             {
                 Config.NoMercy.Label.SetValue(noMercyDuration);

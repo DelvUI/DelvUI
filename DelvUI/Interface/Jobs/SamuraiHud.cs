@@ -115,7 +115,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawShifuBar(Vector2 origin, PlayerCharacter player)
         {
-            float shifuDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1299)?.RemainingTime ?? 0f;
+            float shifuDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1299)?.RemainingTime ?? 0f;
 
             if (!Config.ShifuBar.HideWhenInactive || shifuDuration > 0)
             {
@@ -128,7 +128,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawJinpuBar(Vector2 origin, PlayerCharacter player)
         {
-            float jinpuDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1298)?.RemainingTime ?? 0f;
+            float jinpuDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1298)?.RemainingTime ?? 0f;
 
             if (!Config.JinpuBar.HideWhenInactive || jinpuDuration > 0)
             {

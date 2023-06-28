@@ -62,7 +62,8 @@ namespace DelvUI.Interface.Party
 
                 // check for disspellable debuff
 
-                foreach (var status in battleChara.StatusList)
+                var statusList = Utils.StatusListForBattleChara(battleChara); 
+                foreach (var status in statusList)
                 {
                     if (status == null || !status.GameData.CanDispel)
                     {

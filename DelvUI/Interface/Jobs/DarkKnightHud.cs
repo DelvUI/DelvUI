@@ -159,7 +159,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBloodWeaponBar(Vector2 origin, PlayerCharacter player)
         {
-            Status? bloodWeaponBuff = player.StatusList.FirstOrDefault(o => o.StatusId is 742);
+            Status? bloodWeaponBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 742);
             float duration = bloodWeaponBuff?.RemainingTime ?? 0f;
             int stacks = bloodWeaponBuff?.StackCount ?? 0;
 
@@ -188,7 +188,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDeliriumBar(Vector2 origin, PlayerCharacter player)
         {
-            Status? deliriumBuff = player.StatusList.FirstOrDefault(o => o.StatusId is 1972);
+            Status? deliriumBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1972);
             float deliriumDuration = Math.Max(0f, deliriumBuff?.RemainingTime ?? 0f);
             byte stacks = deliriumBuff?.StackCount ?? 0;
 

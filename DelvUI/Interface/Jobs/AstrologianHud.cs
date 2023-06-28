@@ -398,7 +398,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawLightspeed(Vector2 origin, PlayerCharacter player)
         {
-            float lightspeedDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 841 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
+            float lightspeedDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 841 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
 
             if (Config.LightspeedBar.HideWhenInactive && !(lightspeedDuration > 0))
             {
@@ -413,8 +413,8 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawStar(Vector2 origin, PlayerCharacter player)
         {
-            float starPreCookingBuff = player.StatusList.FirstOrDefault(o => o.StatusId is 1224 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
-            float starPostCookingBuff = player.StatusList.FirstOrDefault(o => o.StatusId is 1248 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
+            float starPreCookingBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1224 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
+            float starPostCookingBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1248 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
 
             if (Config.StarBar.HideWhenInactive && starPostCookingBuff == 0f && starPreCookingBuff == 0f)
             {

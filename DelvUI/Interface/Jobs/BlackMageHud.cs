@@ -233,12 +233,12 @@ namespace DelvUI.Interface.Jobs
 
         protected void DrawTripleCastBar(Vector2 origin, PlayerCharacter player)
         {
-            byte stackCount = player.StatusList.FirstOrDefault(o => o.StatusId is 1211)?.StackCount ?? 0;
+            byte stackCount = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1211)?.StackCount ?? 0;
             int maxCount = 3;
 
             if (Config.TriplecastBar.CountSwiftcast)
             {
-                bool hasSwiftcast = player.StatusList.FirstOrDefault(o => o.StatusId is 167) != null;
+                bool hasSwiftcast = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 167) != null;
                 if (hasSwiftcast)
                 {
                     stackCount++;

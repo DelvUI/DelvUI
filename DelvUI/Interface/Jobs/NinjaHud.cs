@@ -96,7 +96,8 @@ namespace DelvUI.Interface.Jobs
 
             if (player is not null)
             {
-                foreach (Status status in player.StatusList)
+                var statusList = Utils.StatusListForBattleChara(player);
+                foreach (Status status in statusList)
                 {
                     if (status.StatusId == 496) { ninjutsuBuff = status; }
                     if (status.StatusId == 497) { kassatsuBuff = status; }
@@ -207,7 +208,7 @@ namespace DelvUI.Interface.Jobs
 
             if (actor is BattleChara target)
             {
-                trickDuration = target.StatusList.FirstOrDefault(o => o.StatusId is 3254 && o.SourceId == player.ObjectId && o.RemainingTime > 0)?.RemainingTime ?? 0f;
+                trickDuration = Utils.StatusListForBattleChara(target).FirstOrDefault(o => o.StatusId is 3254 && o.SourceId == player.ObjectId && o.RemainingTime > 0)?.RemainingTime ?? 0f;
             }
 
             if (!Config.TrickAttackBar.HideWhenInactive || trickDuration > 0)
@@ -221,7 +222,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawSuitonBar(Vector2 origin, PlayerCharacter player)
         {
-            float suitonDuration = player.StatusList.FirstOrDefault(o => o.StatusId == 507 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
+            float suitonDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId == 507 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
 
             if (!Config.SuitonBar.HideWhenInactive || suitonDuration > 0)
             {

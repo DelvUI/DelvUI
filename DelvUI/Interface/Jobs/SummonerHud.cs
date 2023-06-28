@@ -169,7 +169,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawAetherBar(Vector2 origin, PlayerCharacter player)
         {
-            byte stackCount = player.StatusList.FirstOrDefault(o => o.StatusId == 304)?.StackCount ?? 0;
+            byte stackCount = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId == 304)?.StackCount ?? 0;
 
             if (Config.AetherflowBar.HideWhenInactive && stackCount == 0)
             {

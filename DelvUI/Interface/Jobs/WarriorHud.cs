@@ -69,7 +69,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawSurgingTempestBar(Vector2 origin, PlayerCharacter player)
         {
-            float surgingTempestDuration = Math.Abs(player.StatusList.FirstOrDefault(o => o.StatusId is 2677)?.RemainingTime ?? 0f);
+            float surgingTempestDuration = Math.Abs(Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 2677)?.RemainingTime ?? 0f);
 
             if (!Config.SurgingTempestBar.HideWhenInactive || surgingTempestDuration > 0)
             {
@@ -83,7 +83,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawBeastGauge(Vector2 origin, PlayerCharacter player)
         {
             WARGauge gauge = Plugin.JobGauges.Get<WARGauge>();
-            var nascentChaosDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1897)?.RemainingTime ?? 0f;
+            var nascentChaosDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1897)?.RemainingTime ?? 0f;
 
             if (!Config.BeastGauge.HideWhenInactive || gauge.BeastGauge > 0 || nascentChaosDuration > 0)
             {
@@ -100,7 +100,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawInnerReleaseBar(Vector2 origin, PlayerCharacter player)
         {
-            var innerReleaseStatus = player.StatusList.FirstOrDefault(o => o.StatusId is 1177 or 86);
+            var innerReleaseStatus = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1177 or 86);
 
             float innerReleaseDuration = Math.Max(innerReleaseStatus?.RemainingTime ?? 0f, 0f);
             byte innerReleaseStacks = innerReleaseStatus?.StackCount ?? 0;
@@ -108,7 +108,7 @@ namespace DelvUI.Interface.Jobs
             BarGlowConfig? primalRendGlow = null;
             if (Config.InnerReleaseBar.PrimalRendReadyGlowConfig.Enabled)
             {
-                bool isPrimalRendReady = player.StatusList.FirstOrDefault(o => o.StatusId is 2624)?.RemainingTime > 0;
+                bool isPrimalRendReady = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 2624)?.RemainingTime > 0;
                 if (isPrimalRendReady)
                 {
                     primalRendGlow = Config.InnerReleaseBar.PrimalRendReadyGlowConfig;

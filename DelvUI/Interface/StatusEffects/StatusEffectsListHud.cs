@@ -145,7 +145,11 @@ namespace DelvUI.Interface.StatusEffects
                 }
                 else
                 {
-                    status = character?.StatusList[i] == null ? null : (StatusStruct*)character.StatusList[i]!.Address;
+                    try
+                    {
+                        status = character?.StatusList[i] == null ? null : (StatusStruct*)character.StatusList[i]!.Address;
+                    }
+                    catch { }
                 }
 
                 if (status == null || status->StatusID == 0)
@@ -162,8 +166,12 @@ namespace DelvUI.Interface.StatusEffects
                 }
                 else
                 {
-                    data = character?.StatusList[i]?.GameData;
+                    try
+                    {
+                        data = character?.StatusList[i]?.GameData;
+                    } catch { }
                 }
+
                 if (data == null)
                 {
                     continue;

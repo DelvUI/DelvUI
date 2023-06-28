@@ -125,7 +125,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawAetherBar(Vector2 origin, PlayerCharacter player)
         {
-            byte stackCount = player.StatusList.FirstOrDefault(o => o.StatusId is 304)?.StackCount ?? 0;
+            byte stackCount = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 304)?.StackCount ?? 0;
 
             if (Config.AetherflowBar.HideWhenInactive && stackCount == 0)
             {
@@ -141,7 +141,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawSacredSoilBar(Vector2 origin, PlayerCharacter player)
         {
-            float sacredSoilDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 298 or 1944 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
+            float sacredSoilDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 298 or 1944 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.SacredSoilBar.HideWhenInactive || sacredSoilDuration > 0)
             {
