@@ -125,7 +125,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawPhysisBar(Vector2 origin, PlayerCharacter player)
         {
-            float physisDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 2617 or 2620 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
+            float physisDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 2617 or 2620 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.PhysisBar.HideWhenInactive || physisDuration > 0)
             {
@@ -137,8 +137,8 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawKeracholeBar(Vector2 origin, PlayerCharacter player)
         {
-            float keracholeDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 2618 or 2938 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
-            float holosDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 3003 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
+            float keracholeDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 2618 or 2938 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
+            float holosDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3003 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.KeracholeBar.HideWhenInactive || keracholeDuration > 0 || holosDuration > 0)
             {

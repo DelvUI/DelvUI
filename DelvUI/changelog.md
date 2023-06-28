@@ -15,6 +15,9 @@
 - Fixed targeted unit Nameplate not drawing on top of other Nameplates.
 - Added minor improvements to the Party Frames preview.
 
+# 1.7.1.5
+- Attempt to fix DelvUI exception that causes ImGUI's fonts to be broken.
+
 # 1.7.1.4
 - Attempt to fix DelvUI exception that causes ImGUI's fonts to be broken.
 

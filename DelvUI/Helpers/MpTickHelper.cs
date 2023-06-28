@@ -59,7 +59,7 @@ namespace DelvUI.Helpers
             var mp = player.CurrentMp;
 
             // account for lucid dreaming screwing up mp calculations
-            var lucidDreamingActive = player.StatusList.Any(e => e.StatusId == 1204);
+            var lucidDreamingActive = Utils.StatusListForBattleChara(player).Any(e => e.StatusId == 1204);
 
             if (!lucidDreamingActive && _lastMpValue < mp)
             {

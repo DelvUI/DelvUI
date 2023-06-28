@@ -97,7 +97,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawFightOrFlightBar(Vector2 origin, PlayerCharacter player)
         {
-            float fightOrFlightDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 76)?.RemainingTime ?? 0f;
+            float fightOrFlightDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 76)?.RemainingTime ?? 0f;
 
             if (!Config.FightOrFlightBar.HideWhenInactive || fightOrFlightDuration > 0)
             {
@@ -110,7 +110,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawRequiescatBar(Vector2 origin, PlayerCharacter player)
         {
-            Status? requiescatBuff = player.StatusList.FirstOrDefault(o => o.StatusId is 1368);
+            Status? requiescatBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1368);
             float requiescatDuration = Math.Max(0f, requiescatBuff?.RemainingTime ?? 0f);
             byte stacks = requiescatBuff?.StackCount ?? 0;
 
@@ -135,7 +135,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawAtonementBar(Vector2 origin, PlayerCharacter player)
         {
-            byte stackCount = player.StatusList.FirstOrDefault(o => o.StatusId is 1902)?.StackCount ?? 0;
+            byte stackCount = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1902)?.StackCount ?? 0;
 
             if (Config.AtonementBar.HideWhenInactive && stackCount == 0) { return; };
 

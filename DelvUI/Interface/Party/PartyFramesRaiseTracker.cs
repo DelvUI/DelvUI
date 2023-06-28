@@ -105,7 +105,8 @@ namespace DelvUI.Interface.Party
                 {
                     bool hasBuff = false;
 
-                    foreach (var status in battleChara.StatusList)
+                    var statusList = Utils.StatusListForBattleChara(battleChara);
+                    foreach (var status in statusList)
                     {
                         if (status == null || (status.StatusId != 148 && status.StatusId != 1140))
                         {

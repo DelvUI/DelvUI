@@ -146,7 +146,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawPowerSurgeBar(Vector2 origin, PlayerCharacter player)
         {
-            var duration = Math.Abs(player.StatusList.FirstOrDefault(o => o.StatusId is 2720)?.RemainingTime ?? 0f);
+            var duration = Math.Abs(Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 2720)?.RemainingTime ?? 0f);
             if (!Config.PowerSurgeBar.HideWhenInactive || duration > 0f)
             {
                 Config.PowerSurgeBar.Label.SetValue(duration);

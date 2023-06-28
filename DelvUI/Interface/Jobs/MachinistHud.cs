@@ -138,7 +138,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawOverheatBar(Vector2 origin, PlayerCharacter player)
         {
             MCHGauge gauge = Plugin.JobGauges.Get<MCHGauge>();
-            byte stackCount = player.StatusList.FirstOrDefault(o => o.StatusId is 2688)?.StackCount ?? 0;
+            byte stackCount = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 2688)?.StackCount ?? 0;
 
             if (!Config.OverheatChunkedGauge.HideWhenInactive || stackCount > 0)
             {
@@ -160,7 +160,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawWildfireBar(Vector2 origin, PlayerCharacter player)
         {
-            float wildfireDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1946)?.RemainingTime ?? 0f;
+            float wildfireDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1946)?.RemainingTime ?? 0f;
 
             if (!Config.WildfireBar.HideWhenInactive || wildfireDuration > 0)
             {

@@ -111,7 +111,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawFormsBar(Vector2 origin, PlayerCharacter player)
         {
             // formless fist
-            Status? formlessFist = player.StatusList.FirstOrDefault(o => o.StatusId == 2513);
+            Status? formlessFist = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId == 2513);
             if (formlessFist != null)
             {
                 float remaining = Math.Abs(formlessFist.RemainingTime);
@@ -134,7 +134,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             // forms
-            Status? form = player.StatusList.FirstOrDefault(o => o.StatusId is 107 or 108 or 109);
+            Status? form = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 107 or 108 or 109);
 
             if (!Config.StancesBar.HideWhenInactive || form is not null)
             {
@@ -175,7 +175,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawPerfectBalanceBar(Vector2 origin, PlayerCharacter player)
         {
-            Status? perfectBalance = player.StatusList.Where(o => o.StatusId is 110 && o.RemainingTime > 0f).FirstOrDefault();
+            Status? perfectBalance = Utils.StatusListForBattleChara(player).Where(o => o.StatusId is 110 && o.RemainingTime > 0f).FirstOrDefault();
             if (!Config.PerfectBalanceBar.HideWhenInactive || perfectBalance is not null)
             {
                 float duration = perfectBalance?.RemainingTime ?? 0f;

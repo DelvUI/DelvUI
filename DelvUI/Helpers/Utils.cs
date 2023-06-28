@@ -1,16 +1,15 @@
-using Colourful;
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Statuses;
 using Dalamud.Logging;
-using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
@@ -112,6 +111,23 @@ namespace DelvUI.Helpers
             return false;
         }
 
+        public static IEnumerable<Status> StatusListForBattleChara(BattleChara? chara)
+        {
+            List<Status> statusList = new List<Status>();
+            if (chara == null)
+            {
+                return statusList;
+            }
+
+            try
+            {
+                statusList = chara.StatusList.ToList();
+            }
+            catch { }
+
+            return statusList;
+        }
+
         public static string DurationToString(double duration)
         {
             if (duration == 0)
@@ -148,17 +164,7 @@ namespace DelvUI.Helpers
 
         public static Status? GetTankInvulnerabilityID(BattleChara actor)
         {
-            try
-            {
-                Status? tankInvulnBuff = actor.StatusList.FirstOrDefault(o => o.StatusId is 810 or 811 or 3255 or 1302 or 409 or 1836 or 82);
-
-
-                return tankInvulnBuff;
-            } 
-            catch
-            {
-                return null;
-            }
+            return StatusListForBattleChara(actor).FirstOrDefault(o => o.StatusId is 810 or 811 or 3255 or 1302 or 409 or 1836 or 82);
         }
 
         public static bool IsOnCleanseJob()

@@ -222,7 +222,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawFeathersBar(Vector2 origin, PlayerCharacter player)
         {
             DNCGauge gauge = Plugin.JobGauges.Get<DNCGauge>();
-            bool hasFlourishingBuff = player.StatusList.FirstOrDefault(o => o.StatusId is 1820 or 2021) != null;
+            bool hasFlourishingBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1820 or 2021) != null;
             bool[]? glows = null;
 
             if (Config.FeatherGauge.HideWhenInactive && gauge.Feathers is 0 && !hasFlourishingBuff)
@@ -245,9 +245,9 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawTechnicalBar(Vector2 origin, PlayerCharacter player)
         {
-            IEnumerable<Status> devilmentBuff = player.StatusList.Where(o => o.StatusId is 1825 && o.SourceId == player.ObjectId);
+            IEnumerable<Status> devilmentBuff = Utils.StatusListForBattleChara(player).Where(o => o.StatusId is 1825 && o.SourceId == player.ObjectId);
 
-            float technicalFinishDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1822 or 2050 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
+            float technicalFinishDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1822 or 2050 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.TechnicalFinishBar.HideWhenInactive || technicalFinishDuration > 0)
             {
@@ -260,7 +260,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDevilmentBar(Vector2 origin, PlayerCharacter player)
         {
-            float devilmentDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1825 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
+            float devilmentDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1825 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.DevilmentBar.HideWhenInactive || devilmentDuration > 0)
             {
@@ -273,7 +273,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawStandardBar(Vector2 origin, PlayerCharacter player)
         {
-            float standardFinishDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1821 or 2024 or 2105 or 2113 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
+            float standardFinishDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1821 or 2024 or 2105 or 2113 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.StandardFinishBar.HideWhenInactive || standardFinishDuration > 0)
             {

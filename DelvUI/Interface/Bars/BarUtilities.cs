@@ -74,7 +74,7 @@ namespace DelvUI.Interface.Bars
         {
             if (statusIDs.Count == 0 || maxDurations.Count == 0) { return null; }
 
-            Status? status = player.StatusList.FirstOrDefault(o => statusIDs.Contains(o.StatusId));
+            Status? status = Utils.StatusListForBattleChara(player).FirstOrDefault(o => statusIDs.Contains(o.StatusId));
             if (status == null && config.HideWhenInactive)
             {
                 return null;
@@ -116,7 +116,7 @@ namespace DelvUI.Interface.Bars
 
             if (target != null && target is BattleChara targetChara)
             {
-                status = targetChara.StatusList.FirstOrDefault(o => o.SourceId == player.ObjectId && statusIDs.Contains(o.StatusId));
+                status = Utils.StatusListForBattleChara(targetChara).FirstOrDefault(o => o.SourceId == player.ObjectId && statusIDs.Contains(o.StatusId));
             }
 
             if (status == null && config.HideWhenInactive)
