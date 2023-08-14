@@ -189,7 +189,7 @@ namespace DelvUI.Helpers
             int actualTargetId = GetActualTargetId(target);
             // The Object ID that gets returned from minions is in reality the index
             // Checking for the correct object ID wouldn't work anyways as you would yet again run into the ObjectID = 0xE0000000 issue
-            if (actualTargetId >= 0 && actors.Length < actualTargetId)
+            if (actualTargetId >= 0 && actualTargetId < actors.Length)
             {
                 return actors[actualTargetId];
             }
