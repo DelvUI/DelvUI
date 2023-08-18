@@ -1,6 +1,7 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
+using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.StatusEffects;
 using System;
