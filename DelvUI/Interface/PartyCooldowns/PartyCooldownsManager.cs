@@ -124,6 +124,7 @@ namespace DelvUI.Interface.PartyCooldowns
         public IReadOnlyDictionary<uint, Dictionary<uint, PartyCooldown>> CooldownsMap => _cooldownsMap;
 
         private Dictionary<uint, double> _technicalStepMap = new Dictionary<uint, double>();
+        private Dictionary<uint, double> _standardStepMap = new Dictionary<uint, double>();
 
         public delegate void PartyCooldownsChangedEventHandler(PartyCooldownsManager sender);
         public event PartyCooldownsChangedEventHandler? CooldownsChangedEvent;
@@ -188,25 +189,46 @@ namespace DelvUI.Interface.PartyCooldowns
                     {
                         actionID = 16004;
                     }
-
-                    if (actionID == 15998)
+                    
+                    // standard finish
+                    if (actionID == 16191 || actionID == 16192 || actionID == 25790)
                     {
-                        _technicalStepMap[actorId] = ImGui.GetTime();
+                        actionID = 16003;
                     }
-                    else
+
+                    switch (actionID)
                     {
-                        // check if its an action we track
-                        if (_cooldownsMap[actorId].TryGetValue(actionID, out PartyCooldown? cooldown) && cooldown != null)
+                        case 15998:
+                            _technicalStepMap[actorId] = ImGui.GetTime();
+                            break;
+                        case 15997:
+                            _standardStepMap[actorId] = ImGui.GetTime();
+                            break;
+
+                        default:
                         {
-                            // if its technical finish, we set the cooldown start time to
-                            // the time when step was pressed
-                            if (_technicalStepMap.TryGetValue(actorId, out double stepStartTime) && actionID == 16004)
+                            // check if its an action we track
+                            if (_cooldownsMap[actorId].TryGetValue(actionID, out PartyCooldown? cooldown) && cooldown != null)
                             {
-                                cooldown.OverridenCooldownStartTime = stepStartTime;
-                                _technicalStepMap.Remove(actorId);
+                                // if its technical finish, we set the cooldown start time to
+                                // the time when step was pressed
+                                if (_technicalStepMap.TryGetValue(actorId, out double techstepStartTime) && actionID == 16004)
+                                {
+                                    cooldown.OverridenCooldownStartTime = techstepStartTime;
+                                    _technicalStepMap.Remove(actorId);
+                                }
+                                
+                                // standard step
+                                if (_standardStepMap.TryGetValue(actorId, out double stdstepStartTime) && actionID == 16003)
+                                {
+                                    cooldown.OverridenCooldownStartTime = stdstepStartTime;
+                                    _standardStepMap.Remove(actorId);
+                                }
+
+                                cooldown.LastTimeUsed = ImGui.GetTime();
                             }
 
-                            cooldown.LastTimeUsed = ImGui.GetTime();
+                            break;
                         }
                     }
                 }

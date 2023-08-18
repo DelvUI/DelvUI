@@ -49,7 +49,7 @@ namespace DelvUI.Interface.PartyCooldowns
             int cooldown = GetCooldown();
             double timeSinceUse = OverridenCooldownStartTime != -1 ? ImGui.GetTime() - OverridenCooldownStartTime : ImGui.GetTime() - LastTimeUsed;
 
-            if (timeSinceUse > cooldown)
+            if (timeSinceUse > cooldown && Data.ActionId != 16003) // exclude standard step since duration > CD
             {
                 OverridenCooldownStartTime = -1;
                 LastTimeUsed = 0;
