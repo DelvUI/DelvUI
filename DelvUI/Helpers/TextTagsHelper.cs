@@ -1,13 +1,11 @@
-﻿using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Logging;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
 
 namespace DelvUI.Helpers
@@ -185,6 +183,8 @@ namespace DelvUI.Helpers
 
             ["[job]"] = (chara) => JobsHelper.JobNames.TryGetValue(chara.ClassJob.Id, out var jobName) ? jobName : "",
 
+            ["[job-full]"] = (chara) => JobsHelper.JobFullNames.TryGetValue(chara.ClassJob.Id, out var jobName) ? jobName : "",
+
             ["[time-till-max-gp]"] = JobsHelper.TimeTillMaxGP,
 
             ["[chocobo-time]"] = (chara) =>
@@ -228,11 +228,11 @@ namespace DelvUI.Helpers
         };
 
         private static string ReplaceTagWithString(
-            string tag, 
-            GameObject? actor, 
-            string? name = null, 
-            uint? current = null, 
-            uint? max = null, 
+            string tag,
+            GameObject? actor,
+            string? name = null,
+            uint? current = null,
+            uint? max = null,
             bool? isPlayerName = null,
             string? title = null)
         {
@@ -275,11 +275,11 @@ namespace DelvUI.Helpers
         }
 
         public static string FormattedText(
-            string text, 
-            GameObject? actor, 
-            string? name = null, 
-            uint? current = null, 
-            uint? max = null, 
+            string text,
+            GameObject? actor,
+            string? name = null,
+            uint? current = null,
+            uint? max = null,
             bool? isPlayerName = null,
             string? title = null)
         {
@@ -405,6 +405,15 @@ namespace DelvUI.Helpers
         private static string ValidateName(GameObject? actor, string? name)
         {
             string? n = actor?.Name.ToString() ?? name;
+
+            // Detour for PetRenamer
+            try
+            {
+                string? customPetName = PetRenamerHelper.GetPetName(actor);
+                n = customPetName ?? n;
+            }
+            catch { }
+
             return (n == null || n == "") ? "" : n;
         }
 

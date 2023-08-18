@@ -1,5 +1,4 @@
-﻿using Dalamud.Logging;
-using DelvUI.Config;
+﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Helpers;
@@ -8,10 +7,11 @@ using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Security.Cryptography;
+using LuminaAction = Lumina.Excel.GeneratedSheets.Action;
 
 namespace DelvUI.Interface.PartyCooldowns
 {
@@ -147,13 +147,16 @@ namespace DelvUI.Interface.PartyCooldowns
     public class PartyCooldownsDataConfig : PluginConfigObject
     {
         public List<PartyCooldownData> Cooldowns = new List<PartyCooldownData>();
-        
+
         private JobRoles _roleFilter = JobRoles.Unknown;
         private uint _tankFilter = 0;
         private uint _healerFilter = 0;
         private uint _meleeFilter = 0;
         private uint _rangedFilter = 0;
         private uint _casterFilter = 0;
+
+        private bool _needsPopupOpen = false;
+        private PartyCooldownData? _popupCooldown = null;
 
         public const int ColumnCount = 5;
 
@@ -201,12 +204,12 @@ namespace DelvUI.Interface.PartyCooldowns
                 }
             }
 
-            ExcelSheet<Action>? sheet = Plugin.DataManager.GetExcelSheet<Action>();
+            ExcelSheet<LuminaAction>? sheet = Plugin.DataManager.GetExcelSheet<LuminaAction>();
             ExcelSheet<ActionTransient>? descriptionsSheet = Plugin.DataManager.GetExcelSheet<ActionTransient>();
 
             foreach (PartyCooldownData cooldown in Cooldowns)
             {
-                Action? action = sheet?.GetRow(cooldown.ActionId);
+                LuminaAction? action = sheet?.GetRow(cooldown.ActionId);
                 if (action == null) { continue; }
 
                 // get real cooldown from data
@@ -263,18 +266,19 @@ namespace DelvUI.Interface.PartyCooldowns
                 ImGuiTableFlags.ScrollY |
                 ImGuiTableFlags.SizingFixedSame;
 
-            ExcelSheet<Action>? sheet = Plugin.DataManager.GetExcelSheet<Action>();
+            ExcelSheet<LuminaAction>? sheet = Plugin.DataManager.GetExcelSheet<LuminaAction>();
             var iconSize = new Vector2(30, 30);
 
-            if (ImGui.BeginTable("##DelvUI_PartyCooldownsTable", 7, flags, new Vector2(800, 500)))
+            if (ImGui.BeginTable("##DelvUI_PartyCooldownsTable", 8, flags, new Vector2(900, 500)))
             {
-                ImGui.TableSetupColumn("Enabled", ImGuiTableColumnFlags.WidthStretch, 27, 0);
+                ImGui.TableSetupColumn("Enabled", ImGuiTableColumnFlags.WidthStretch, 22, 0);
                 ImGui.TableSetupColumn("Icon", ImGuiTableColumnFlags.WidthStretch, 5, 1);
                 ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch, 24, 2);
-                ImGui.TableSetupColumn("Cooldown", ImGuiTableColumnFlags.WidthStretch, 12, 3);
-                ImGui.TableSetupColumn("Duration", ImGuiTableColumnFlags.WidthStretch, 12, 4);
-                ImGui.TableSetupColumn("Priority", ImGuiTableColumnFlags.WidthStretch, 13, 5);
-                ImGui.TableSetupColumn("Section", ImGuiTableColumnFlags.WidthStretch, 13, 6);
+                ImGui.TableSetupColumn("Cooldown", ImGuiTableColumnFlags.WidthStretch, 8, 3);
+                ImGui.TableSetupColumn("Duration", ImGuiTableColumnFlags.WidthStretch, 8, 4);
+                ImGui.TableSetupColumn("Priority", ImGuiTableColumnFlags.WidthStretch, 11, 5);
+                ImGui.TableSetupColumn("Section", ImGuiTableColumnFlags.WidthStretch, 11, 6);
+                ImGui.TableSetupColumn("Exclude Jobs", ImGuiTableColumnFlags.WidthStretch, 11, 7);
 
                 ImGui.TableSetupScrollFreeze(0, 1);
                 ImGui.TableHeadersRow();
@@ -293,7 +297,7 @@ namespace DelvUI.Interface.PartyCooldowns
                         if (_roleFilter == JobRoles.DPSCaster && _casterFilter != 0 && !cooldown.IsUsableBy(_casterFilter)) { continue; }
                     }
 
-                    Action? action = sheet?.GetRow(cooldown.ActionId);
+                    LuminaAction? action = sheet?.GetRow(cooldown.ActionId);
 
                     ImGui.PushID(cooldown.ActionId.ToString());
                     ImGui.TableNextRow(ImGuiTableRowFlags.None, iconSize.Y);
@@ -316,7 +320,7 @@ namespace DelvUI.Interface.PartyCooldowns
                     if (ImGui.TableSetColumnIndex(1) && action != null)
                     {
                         ImGui.SetCursorPosX(ImGui.GetCursorPosX() + 3);
-                        DrawHelper.DrawIcon<Action>(action, ImGui.GetCursorPos(), iconSize, false, false);
+                        DrawHelper.DrawIcon<LuminaAction>(action, ImGui.GetCursorPos(), iconSize, false, false);
                     }
 
                     // name
@@ -341,7 +345,7 @@ namespace DelvUI.Interface.PartyCooldowns
                     // priority
                     if (ImGui.TableSetColumnIndex(5))
                     {
-                        ImGui.PushItemWidth(90);
+                        ImGui.PushItemWidth(86);
                         ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 2);
 
                         if (ImGui.DragInt($"##{cooldown.ActionId}_priority", ref cooldown.Priority, 1, 0, 100, "%i", ImGuiSliderFlags.NoInput))
@@ -356,7 +360,7 @@ namespace DelvUI.Interface.PartyCooldowns
                     // column
                     if (ImGui.TableSetColumnIndex(6))
                     {
-                        ImGui.PushItemWidth(90);
+                        ImGui.PushItemWidth(86);
                         ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 2);
 
                         if (ImGui.DragInt($"##{cooldown.ActionId}_column", ref cooldown.Column, 0.1f, 1, ColumnCount, "%i", ImGuiSliderFlags.NoInput))
@@ -368,13 +372,86 @@ namespace DelvUI.Interface.PartyCooldowns
                         ImGuiHelper.SetTooltip("Allows to separate cooldowns in different columns.");
                     }
 
+                    // exlude
+                    if (ImGui.TableSetColumnIndex(7) && (cooldown.Roles != null || cooldown.Role != JobRoles.Unknown))
+                    {
+                        ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 2);
+
+                        if (ImGui.Button("Select##Exclude", new Vector2(86, 24)))
+                        {
+                            _needsPopupOpen = true;
+                            _popupCooldown = cooldown;
+                        }
+                    }
+
                     ImGui.PopID();
                 }
 
                 ImGui.EndTable();
             }
 
+            if (_needsPopupOpen)
+            {
+                ImGui.OpenPopup("Exclude Jobs##DelvUI");
+                _needsPopupOpen = false;
+            }
+
+            if (_popupCooldown != null)
+            {
+                DrawJobsListForCooldown(_popupCooldown);
+            }
+
             return false;
+        }
+
+        private List<uint> IgnoredJobIds = new List<uint>()
+        {
+            JobIDs.GLA, JobIDs.MRD,
+            JobIDs.CNJ, JobIDs.WHM,
+            JobIDs.PGL, JobIDs.LNC, JobIDs.ROG,
+            JobIDs.ARC,
+            JobIDs.THM, JobIDs.ACN, JobIDs.BLU,
+        };
+
+        private void DrawJobsListForCooldown(PartyCooldownData cooldown)
+        {
+            List<JobRoles> roles = cooldown.Roles ?? new List<JobRoles>() { cooldown.Role };
+
+            List<uint> jobIds = new List<uint>();
+            foreach (JobRoles role in roles)
+            {
+                jobIds.AddRange(JobsHelper.JobsByRole[role]);
+            }
+            jobIds = jobIds.Where(id => !IgnoredJobIds.Contains(id)).ToList();
+
+            string title = cooldown.Name + ":";
+            float width = Math.Max(100, ImGui.CalcTextSize(title).X + 10);
+            ImGui.SetNextWindowSize(new(width, jobIds.Count * 30 + 32));
+
+            if (ImGui.BeginPopup("Exclude Jobs##DelvUI", ImGuiWindowFlags.NoMove))
+            {
+                ImGui.Text(title);
+
+                foreach (uint jobId in jobIds)
+                {
+                    bool selected = !cooldown.ExcludedJobIds.Contains(jobId);
+                    if (ImGui.Checkbox(JobsHelper.JobNames[jobId] + "##popup", ref selected))
+                    {
+                        if (selected)
+                        {
+                            cooldown.ExcludedJobIds.Remove(jobId);
+                        }
+                        else
+                        {
+                            cooldown.ExcludedJobIds.Add(jobId);
+                        }
+
+                        CooldownsDataEnabledChangedEvent?.Invoke(this);
+                    }
+                }
+
+                ImGui.EndPopup();
+            }
         }
 
         private void DrawFilter(string name, JobRoles role)
@@ -397,7 +474,7 @@ namespace DelvUI.Interface.PartyCooldowns
 
         private void DrawJobFilters()
         {
-            if (_roleFilter ==  JobRoles.Unknown) { return; }
+            if (_roleFilter == JobRoles.Unknown) { return; }
 
             ImGui.Text("\t\t\t\t   ");
 
@@ -596,32 +673,32 @@ namespace DelvUI.Interface.PartyCooldowns
 
             // MULTI-ROLE  -------------------------------------------------------------------------------------------------
             [7541] = NewData(7541, new List<JobRoles>() { JobRoles.DPSMelee, JobRoles.DPSRanged }, 8, 120, 0, 80, 4, PartyCooldownEnabled.PartyFrames), // second wind
-            [7561] = NewData(7561, new List<JobRoles>() { JobRoles.Healer, JobRoles.DPSCaster }, 18, 60, 1, 80, 5, PartyCooldownEnabled.PartyFrames), // swiftcast
+            [7561] = NewData(7561, new List<JobRoles>() { JobRoles.Healer, JobRoles.DPSCaster }, 18, 60, 1, 80, 5, PartyCooldownEnabled.PartyFrames, null, new HashSet<uint>() { JobIDs.BLM, JobIDs.SMN, JobIDs.RDM }), // swiftcast
             [7562] = NewData(7562, new List<JobRoles>() { JobRoles.Healer, JobRoles.DPSCaster }, 14, 60, 21, 80, 5, PartyCooldownEnabled.Disabled), // lucid dreaming
         };
 
         #region helpers
-        private static PartyCooldownData NewData(uint actionId, uint jobId, uint level, int cooldown, int effectDuration, int priority, int column, PartyCooldownEnabled enabled, string? overriddenCooldownText = null)
+        private static PartyCooldownData NewData(uint actionId, uint jobId, uint level, int cooldown, int effectDuration, int priority, int column, PartyCooldownEnabled enabled, string? overriddenCooldownText = null, HashSet<uint>? excludedJobIds = null)
         {
-            PartyCooldownData data = NewData(actionId, level, cooldown, effectDuration, priority, column, enabled, overriddenCooldownText);
+            PartyCooldownData data = NewData(actionId, level, cooldown, effectDuration, priority, column, enabled, overriddenCooldownText, excludedJobIds);
             data.JobId = jobId;
             data.Role = JobRoles.Unknown;
 
             return data;
         }
 
-        private static PartyCooldownData NewData(uint actionId, JobRoles role, uint level, int cooldown, int effectDuration, int priority, int column, PartyCooldownEnabled enabled, string? overriddenCooldownText = null)
+        private static PartyCooldownData NewData(uint actionId, JobRoles role, uint level, int cooldown, int effectDuration, int priority, int column, PartyCooldownEnabled enabled, string? overriddenCooldownText = null, HashSet<uint>? excludedJobIds = null)
         {
-            PartyCooldownData data = NewData(actionId, level, cooldown, effectDuration, priority, column, enabled, overriddenCooldownText);
+            PartyCooldownData data = NewData(actionId, level, cooldown, effectDuration, priority, column, enabled, overriddenCooldownText, excludedJobIds);
             data.JobId = 0;
             data.Role = role;
 
             return data;
         }
 
-        private static PartyCooldownData NewData(uint actionId, List<JobRoles> roles, uint level, int cooldown, int effectDuration, int priority, int column, PartyCooldownEnabled enabled, string? overriddenCooldownText = null)
+        private static PartyCooldownData NewData(uint actionId, List<JobRoles> roles, uint level, int cooldown, int effectDuration, int priority, int column, PartyCooldownEnabled enabled, string? overriddenCooldownText = null, HashSet<uint>? excludedJobIds = null)
         {
-            PartyCooldownData data = NewData(actionId, level, cooldown, effectDuration, priority, column, enabled, overriddenCooldownText);
+            PartyCooldownData data = NewData(actionId, level, cooldown, effectDuration, priority, column, enabled, overriddenCooldownText, excludedJobIds);
             data.JobId = 0;
             data.Role = JobRoles.Unknown;
             data.Roles = roles;
@@ -629,7 +706,7 @@ namespace DelvUI.Interface.PartyCooldowns
             return data;
         }
 
-        private static PartyCooldownData NewData(uint actionId, uint level, int cooldown, int effectDuration, int priority, int column, PartyCooldownEnabled enabled, string? overriddenCooldownText = null)
+        private static PartyCooldownData NewData(uint actionId, uint level, int cooldown, int effectDuration, int priority, int column, PartyCooldownEnabled enabled, string? overriddenCooldownText = null, HashSet<uint>? excludedJobIds = null)
         {
             PartyCooldownData data = new PartyCooldownData();
             data.ActionId = actionId;
@@ -640,6 +717,11 @@ namespace DelvUI.Interface.PartyCooldowns
             data.Column = column;
             data.EnabledV2 = enabled;
             data.OverriddenCooldownText = overriddenCooldownText;
+
+            if (excludedJobIds != null)
+            {
+                data.ExcludedJobIds = excludedJobIds;
+            }
 
             return data;
         }

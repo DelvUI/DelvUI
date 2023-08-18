@@ -5,6 +5,7 @@ using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.PartyCooldowns;
 using ImGuiNET;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -19,7 +20,9 @@ namespace DelvUI.Interface.Party
         private LabelHud _timeLabel;
         private bool _needsUpdate = true;
         private LayoutInfo _layoutInfo;
+
         private List<PartyCooldown> _cooldowns = new List<PartyCooldown>();
+        private List<PartyCooldown>? _fakeCooldowns = new List<PartyCooldown>();
 
         public GameObject? Actor { get; set; }
 
@@ -32,13 +35,62 @@ namespace DelvUI.Interface.Party
 
             _dataConfig = ConfigurationManager.Instance.GetConfigObject<PartyCooldownsDataConfig>();
 
+            _config.ValueChangeEvent += OnConfigPropertyChanged;
             _dataConfig.CooldownsDataChangedEvent += OnCooldownsDataChanged;
             PartyCooldownsManager.Instance.CooldownsChangedEvent += OnCooldownsChanged;
+        }
+
+        ~PartyFramesCooldownListHud()
+        {
+            _config.ValueChangeEvent -= OnConfigPropertyChanged;
+            _dataConfig.CooldownsDataChangedEvent += OnCooldownsDataChanged;
+            PartyCooldownsManager.Instance.CooldownsChangedEvent += OnCooldownsChanged;
+        }
+
+        private void OnConfigPropertyChanged(object? sender, OnChangeBaseArgs args)
+        {
+            if (args.PropertyName == "Preview")
+            {
+                UpdatePreview();
+            }
+        }
+
+        private unsafe void UpdatePreview()
+        {
+            if (!Config.Preview)
+            {
+                _fakeCooldowns = null;
+                return;
+            }
+
+            var RNG = new Random((int)ImGui.GetTime());
+
+            _fakeCooldowns = new List<PartyCooldown>();
+
+            for (int i = 0; i < 10; i++)
+            {
+                int index = RNG.Next(0, _dataConfig.Cooldowns.Count);
+
+                PartyCooldown cooldown = new PartyCooldown(_dataConfig.Cooldowns[index], 0, 90, null);
+                
+                int rng = RNG.Next(100);
+                if (rng > 80)
+                {
+                    cooldown.LastTimeUsed = ImGui.GetTime() - 30;
+                }
+                else if (rng > 50)
+                {
+                    cooldown.LastTimeUsed = ImGui.GetTime() + 1;
+                }
+
+                _fakeCooldowns.Add(cooldown);
+            }
         }
 
         public void StopPreview()
         {
             Config.Preview = false;
+            UpdatePreview();
         }
 
         private void OnCooldownsDataChanged(PartyCooldownsDataConfig sender)
@@ -95,7 +147,9 @@ namespace DelvUI.Interface.Party
                 UpdateCooldowns();
             }
 
-            if (_cooldowns.Count == 0) { return; }
+            List<PartyCooldown> list = _fakeCooldowns != null ? _fakeCooldowns : _cooldowns;
+
+            if (list.Count == 0) { return; }
 
             // area
             GrowthDirections growthDirections = LayoutHelper.GrowthDirectionsFromIndex(Config.Directions);
@@ -106,7 +160,7 @@ namespace DelvUI.Interface.Party
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
             // calculate icon positions
-            uint count = (uint)_cooldowns.Count;
+            uint count = (uint)list.Count;
             CalculateLayout();
             var (iconPositions, minPos, maxPos) = LayoutHelper.CalculateIconPositions(
                 growthDirections,
@@ -138,7 +192,7 @@ namespace DelvUI.Interface.Party
                     for (int i = 0; i < count; i++)
                     {
                         Vector2 iconPos = iconPositions[i];
-                        PartyCooldown cooldown = _cooldowns[i];
+                        PartyCooldown cooldown = list[i];
 
                         float cooldownTime = cooldown.CooldownTimeRemaining();
                         float effectTime = cooldown.EffectTimeRemaining();
@@ -172,7 +226,7 @@ namespace DelvUI.Interface.Party
             for (var i = 0; i < count; i++)
             {
                 Vector2 iconPos = iconPositions[i];
-                PartyCooldown cooldown = _cooldowns[i];
+                PartyCooldown cooldown = list[i];
 
                 float cooldownTime = cooldown.CooldownTimeRemaining();
                 float effectTime = cooldown.EffectTimeRemaining();

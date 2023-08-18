@@ -9,11 +9,19 @@
 
 - Added settings for Enemy Nameplate Castbars to match the width or height of the Health Bar:
     + These are intended to be used when the Health Bar size changes for targeted units.
+
+- Party Cooldowns can now be tracked per player directly in the Party Frames:
+    + Tracked cooldowns are configured in Party Cooldowns > Tracked Cooldowns.
+    + Cooldowns can be set to be shown in the Party Cooldowns section or in the Party Frames (or both).
+    + Cooldowns can also be configured so they are only visible for certain jobs (For example making Swiftcast only visible for healers).
+    + Added a lot of cooldowns that were missing from the Tracked Cooldowns list.
     
 - Moved "Experience Bar", "GCD Indicator", "Pull Timer", "Limit Break" and "MP Ticker" from "Misc" to the new "Other Elements" section.
 - Moved "Fonts" from "Misc" to the new "Customization" section.
 - Fixed targeted unit Nameplate not drawing on top of other Nameplates.
 - Added minor improvements to the Party Frames preview.
+- Added support for the Pet Nicknames plugin (by Glyceri).
+- Added `[job-full]` text tag.
 
 # 1.7.1.5
 - Fixed Sign Icons not working.
