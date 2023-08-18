@@ -89,6 +89,8 @@ namespace DelvUI.Interface.PartyCooldowns
         public JobRoles Role = JobRoles.Unknown; // keep this for backwards compatibility
         public List<JobRoles>? Roles = null;
 
+        public HashSet<uint> ExcludedJobIds = new HashSet<uint>();
+
         public int CooldownDuration = 0;
         public int EffectDuration = 0;
 

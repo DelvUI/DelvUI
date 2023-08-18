@@ -694,7 +694,6 @@ namespace DelvUI.Interface.Party
             PartyFramesCooldownListConfig config = new PartyFramesCooldownListConfig();
             config.Position = new Vector2(-2, 0);
             config.Size = new Vector2(40 * 8 + 6, 40);
-            config.TimeLabel = new NumericLabelConfig(new Vector2(0, 0), "", DrawAnchor.Center, DrawAnchor.Center);
 
             return config;
         }
@@ -759,6 +758,6 @@ namespace DelvUI.Interface.Party
         public int IconActiveBorderThickness = 3;
 
         [NestedConfig("Time Label", 80)]
-        public NumericLabelConfig TimeLabel = new NumericLabelConfig(new Vector2(-5, 0), "", DrawAnchor.Center, DrawAnchor.Center);
+        public NumericLabelConfig TimeLabel = new NumericLabelConfig(new Vector2(0, 0), "", DrawAnchor.Center, DrawAnchor.Center) { NumberFormat = 1 };
     }
 }

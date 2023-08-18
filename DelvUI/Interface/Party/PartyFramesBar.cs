@@ -121,6 +121,7 @@ namespace DelvUI.Interface.Party
             _castbarHud.StopPreview();
             _buffsListHud.StopPreview();
             _debuffsListHud.StopPreview();
+            _cooldownListHud.StopPreview();
             _configs.HealthBar.MouseoverAreaConfig.Preview = false;
         }
 

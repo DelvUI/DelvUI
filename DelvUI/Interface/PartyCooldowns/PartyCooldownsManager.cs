@@ -206,7 +206,7 @@ namespace DelvUI.Interface.PartyCooldowns
                                 _technicalStepMap.Remove(actorId);
                             }
 
-                            cooldown.LastTimeUsed = ImGui.GetTime() + 1;
+                            cooldown.LastTimeUsed = ImGui.GetTime();
                         }
                     }
                 }
@@ -262,7 +262,10 @@ namespace DelvUI.Interface.PartyCooldowns
 
             foreach (PartyCooldownData data in _dataConfig.Cooldowns)
             {
-                if (data.EnabledV2 != PartyCooldownEnabled.Disabled && level >= data.RequiredLevel && data.IsUsableBy(jobId))
+                if (data.EnabledV2 != PartyCooldownEnabled.Disabled && 
+                    level >= data.RequiredLevel && 
+                    data.IsUsableBy(jobId) && 
+                    !data.ExcludedJobIds.Contains(jobId))
                 {
                     cooldowns.Add(data.ActionId, new PartyCooldown(data, objectId, level, member));
                 }
