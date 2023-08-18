@@ -124,6 +124,7 @@ namespace DelvUI
             TextTagsHelper.Initialize();
             TexturesCache.Initialize();
             TooltipsHelper.Initialize();
+            PetRenamerHelper.Initialize(pluginInterface);
 
             _hudManager = new HudManager();
 
