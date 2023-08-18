@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DelvUI.Interface.StatusEffects;
+using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace DelvUI.Helpers
@@ -110,5 +112,170 @@ namespace DelvUI.Helpers
 
             return new LayoutInfo(rowCount, colCount, realRowCount, realColCount, contentSize);
         }
+
+        private static List<GrowthDirections> DirectionOptionsValues = new List<GrowthDirections>()
+        {
+            GrowthDirections.Right | GrowthDirections.Down,
+            GrowthDirections.Right | GrowthDirections.Up,
+            GrowthDirections.Left | GrowthDirections.Down,
+            GrowthDirections.Left | GrowthDirections.Up,
+            GrowthDirections.Centered | GrowthDirections.Up,
+            GrowthDirections.Centered | GrowthDirections.Down
+        };
+        public static GrowthDirections GrowthDirectionsFromIndex(int index)
+        {
+            if (index > 0 && index < DirectionOptionsValues.Count)
+            {
+                return DirectionOptionsValues[index];
+            }
+
+            return DirectionOptionsValues[0];
+        }
+
+        public static int IndexFromGrowthDirections(GrowthDirections directions)
+        {
+            int index = DirectionOptionsValues.FindIndex(d => d == directions);
+
+            return index > 0 ? index : 0;
+        }
+
+        public static void CalculateAxisDirections(
+            GrowthDirections growthDirections, 
+            int row, 
+            uint elementCount, 
+            Vector2 size, 
+            Vector2 iconSize, 
+            Vector2 iconPadding,
+            out Vector2 direction, 
+            out Vector2 offset)
+        {
+            if ((growthDirections & GrowthDirections.Centered) != 0)
+            {
+                var elementsPerRow = (int)(size.X / (iconSize.X + iconPadding.X));
+                var elementsInRow = Math.Min(elementsPerRow, elementCount - (elementsPerRow * row));
+
+                direction.X = 1;
+                direction.Y = (growthDirections & GrowthDirections.Down) != 0 ? 1 : -1;
+                offset.X = -(iconSize.X + iconPadding.X) * elementsInRow / 2f;
+                offset.Y = direction.Y == 1 ? 0 : -iconSize.Y;
+            }
+            else
+            {
+                direction.X = (growthDirections & GrowthDirections.Right) != 0 ? 1 : -1;
+                direction.Y = (growthDirections & GrowthDirections.Down) != 0 ? 1 : -1;
+                offset.X = direction.X == 1 ? 0 : -iconSize.X;
+                offset.Y = direction.Y == 1 ? 0 : -iconSize.Y;
+            }
+        }
+
+        public static Vector2 CalculateStartPosition(Vector2 position, Vector2 size, GrowthDirections growthDirections)
+        {
+            var area = size;
+            if ((growthDirections & GrowthDirections.Left) != 0)
+            {
+                area.X = -area.X;
+            }
+
+            if ((growthDirections & GrowthDirections.Up) != 0)
+            {
+                area.Y = -area.Y;
+            }
+
+            var startPos = position;
+            if ((growthDirections & GrowthDirections.Centered) != 0)
+            {
+                startPos.X = position.X - size.X / 2f;
+            }
+
+            var endPos = position + area;
+
+            if (endPos.X < position.X)
+            {
+                startPos.X = endPos.X;
+            }
+
+            if (endPos.Y < position.Y)
+            {
+                startPos.Y = endPos.Y;
+            }
+
+            return startPos;
+        }
+
+        public static (List<Vector2>, Vector2, Vector2) CalculateIconPositions(
+            GrowthDirections directions, 
+            uint count, 
+            Vector2 position,
+            Vector2 size, 
+            Vector2 iconSize, 
+            Vector2 iconPadding,
+            bool fillRowsFirst,
+            LayoutInfo layoutInfo)
+        {
+            List<Vector2> list = new List<Vector2>();
+            Vector2 minPos = new Vector2(float.MaxValue, float.MaxValue);
+            Vector2 maxPos = Vector2.Zero;
+
+            int row = 0;
+            int col = 0;
+
+            for (int i = 0; i < count; i++)
+            {
+                CalculateAxisDirections(
+                    directions,
+                    row,
+                    count,
+                    size,
+                    iconSize,
+                    iconPadding,
+                    out Vector2 direction,
+                    out Vector2 offset
+                );
+
+                Vector2 pos = new Vector2(
+                    position.X + offset.X + iconSize.X * col * direction.X + iconPadding.X * col * direction.X,
+                    position.Y + offset.Y + iconSize.Y * row * direction.Y + iconPadding.Y * row * direction.Y
+                );
+
+                minPos.X = Math.Min(pos.X, minPos.X);
+                minPos.Y = Math.Min(pos.Y, minPos.Y);
+                maxPos.X = Math.Max(pos.X + iconSize.X, maxPos.X);
+                maxPos.Y = Math.Max(pos.Y + iconSize.Y, maxPos.Y);
+
+                list.Add(pos);
+
+                // rows / columns
+                if (fillRowsFirst || (directions & GrowthDirections.Centered) != 0)
+                {
+                    col += 1;
+                    if (col >= layoutInfo.TotalColCount)
+                    {
+                        col = 0;
+                        row += 1;
+                    }
+                }
+                else
+                {
+                    row += 1;
+                    if (row >= layoutInfo.TotalRowCount)
+                    {
+                        row = 0;
+                        col += 1;
+                    }
+                }
+            }
+
+            return (list, minPos, maxPos);
+        }
+    }
+
+    [Flags]
+    public enum GrowthDirections : short
+    {
+        Up = 1,
+        Down = 2,
+        Left = 4,
+        Right = 8,
+        Centered = 16,
     }
 }

@@ -35,6 +35,7 @@ namespace DelvUI.Interface.Party
         private CastbarHud _castbarHud;
         private StatusEffectsListHud _buffsListHud;
         private StatusEffectsListHud _debuffsListHud;
+        private PartyFramesCooldownListHud _cooldownListHud;
 
         private TextureWrap? _readyCheckTexture = null;
 
@@ -62,6 +63,8 @@ namespace DelvUI.Interface.Party
             _castbarHud = new CastbarHud(_configs.CastBar);
             _buffsListHud = new StatusEffectsListHud(_configs.Buffs);
             _debuffsListHud = new StatusEffectsListHud(_configs.Debuffs);
+
+            _cooldownListHud = new PartyFramesCooldownListHud(_configs.CooldownList);
 
             _readyCheckTexture = TexturesCache.Instance.GetTextureFromPath("ui/uld/ReadyCheck_hr1.tex") ?? TexturesCache.Instance.GetTextureFromPath("ui/uld/ReadyCheck.tex");
         }
@@ -523,6 +526,16 @@ namespace DelvUI.Interface.Party
                 _debuffsListHud.Actor = character;
                 _debuffsListHud.PrepareForDraw(debuffsPos);
                 _debuffsListHud.Draw(debuffsPos);
+            }
+            ));
+
+            // cooldown list
+            Vector2 cooldownListPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.CooldownList.HealthBarAnchor);
+            drawActions.Add((_configs.CooldownList.StrataLevel, () =>
+            {
+                _cooldownListHud.Actor = character;
+                _cooldownListHud.PrepareForDraw(cooldownListPos);
+                _cooldownListHud.Draw(cooldownListPos);
             }
             ));
 

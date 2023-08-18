@@ -559,6 +559,7 @@ namespace DelvUI.Config
             typeof(PartyFramesBuffsConfig),
             typeof(PartyFramesDebuffsConfig),
             typeof(PartyFramesTrackersConfig),
+            typeof(PartyFramesCooldownListConfig),
 
             // Party Cooldowns
             typeof(PartyCooldownsConfig),

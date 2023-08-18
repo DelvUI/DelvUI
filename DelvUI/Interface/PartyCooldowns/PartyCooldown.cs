@@ -7,6 +7,14 @@ using System.Collections.Generic;
 
 namespace DelvUI.Interface.PartyCooldowns
 {
+    public enum PartyCooldownEnabled
+    {
+        PartyCooldownsAndPartyFrames = 0,
+        PartyCooldowns = 1,
+        PartyFrames = 2,
+        Disabled = 3
+    }
+
     public class PartyCooldown
     {
         public readonly PartyCooldownData Data;
@@ -70,7 +78,7 @@ namespace DelvUI.Interface.PartyCooldowns
 
     public class PartyCooldownData : IEquatable<PartyCooldownData>
     {
-        public bool Enabled = true;
+        public PartyCooldownEnabled EnabledV2 = PartyCooldownEnabled.PartyCooldownsAndPartyFrames;
 
         public uint ActionId = 0;
         public uint RequiredLevel = 0;
@@ -154,6 +162,18 @@ namespace DelvUI.Interface.PartyCooldowns
             }
 
             return JobsHelper.RoleForJob(JobId) == role;
+        }
+
+        public bool IsEnabledForPartyCooldowns()
+        {
+            return EnabledV2 == PartyCooldownEnabled.PartyCooldownsAndPartyFrames ||
+                   EnabledV2 == PartyCooldownEnabled.PartyCooldowns;
+        }
+
+        public bool IsEnabledForPartyFrames()
+        {
+            return EnabledV2 == PartyCooldownEnabled.PartyCooldownsAndPartyFrames ||
+                   EnabledV2 == PartyCooldownEnabled.PartyFrames;
         }
 
         public bool Equals(PartyCooldownData? other)

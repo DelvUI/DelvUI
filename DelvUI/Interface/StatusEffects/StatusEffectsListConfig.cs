@@ -261,33 +261,8 @@ namespace DelvUI.Interface.StatusEffects
 
         private void SetGrowthDirections(GrowthDirections growthDirections)
         {
-            var index = DirectionOptionsValues.FindIndex(d => d == growthDirections);
-            if (index > 0)
-            {
-                Directions = index;
-            }
+            Directions = LayoutHelper.IndexFromGrowthDirections(growthDirections);
         }
-
-        public GrowthDirections GetGrowthDirections()
-        {
-            if (Directions > 0 && Directions < DirectionOptionsValues.Count)
-            {
-                return DirectionOptionsValues[Directions];
-            }
-
-            return DirectionOptionsValues[0];
-        }
-
-        [JsonIgnore]
-        internal List<GrowthDirections> DirectionOptionsValues = new List<GrowthDirections>()
-        {
-            GrowthDirections.Right | GrowthDirections.Down,
-            GrowthDirections.Right | GrowthDirections.Up,
-            GrowthDirections.Left | GrowthDirections.Down,
-            GrowthDirections.Left | GrowthDirections.Up,
-            GrowthDirections.Centered | GrowthDirections.Up,
-            GrowthDirections.Centered | GrowthDirections.Down
-        };
     }
 
     [Exportable(false)]

@@ -74,6 +74,8 @@ namespace DelvUI.Interface.PartyCooldowns
             {
                 foreach (PartyCooldown cooldown in memberCooldownList.Values)
                 {
+                    if (!cooldown.Data.IsEnabledForPartyCooldowns()) { continue; }
+
                     int columnIndex = Math.Min(columnCount - 1, cooldown.Data.Column - 1);
                     _cooldowns[columnIndex].Add(cooldown);
                 }

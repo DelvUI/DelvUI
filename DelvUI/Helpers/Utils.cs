@@ -157,8 +157,7 @@ namespace DelvUI.Helpers
             }
 
             TimeSpan t = TimeSpan.FromSeconds(duration);
-
-            return $"{t.Minutes:00}:{t.Seconds:00}";
+            return duration >= 60 ? $"{t.Minutes:0}:{t.Seconds:00}" : $"{t.Seconds:00}";
         }
 
 

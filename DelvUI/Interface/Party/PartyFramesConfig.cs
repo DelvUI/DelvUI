@@ -1,14 +1,12 @@
-﻿using Dalamud.Logging;
-using DelvUI.Config;
+﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
+using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Numerics;
 
 namespace DelvUI.Interface.Party
@@ -683,5 +681,84 @@ namespace DelvUI.Interface.Party
         [ColorEdit4("Border Color")]
         [Order(30, collapseWith = nameof(ChangeBorderCleanseColor))]
         public PluginConfigColor BorderColor = new(new Vector4(255f / 255f, 0f / 255f, 104f / 255f, 100f / 100f));
+    }
+
+    [Exportable(false)]
+    [DisableParentSettings("Anchor")]
+    [Section("Party Frames", true)]
+    [SubSection("Cooldowns", 0)]
+    public class PartyFramesCooldownListConfig : AnchorablePluginConfigObject
+    {
+        public new static PartyFramesCooldownListConfig DefaultConfig()
+        {
+            PartyFramesCooldownListConfig config = new PartyFramesCooldownListConfig();
+            config.Position = new Vector2(-2, 0);
+            config.Size = new Vector2(40 * 8 + 6, 40);
+            config.TimeLabel = new NumericLabelConfig(new Vector2(0, 0), "", DrawAnchor.Center, DrawAnchor.Center);
+
+            return config;
+        }
+
+        [Anchor("Health Bar Anchor")]
+        [Order(3)]
+        public DrawAnchor HealthBarAnchor = DrawAnchor.Left;
+
+        [Checkbox("Tooltips", spacing = true)]
+        [Order(20)]
+        public bool ShowTooltips = true;
+
+        [Checkbox("Preview", isMonitored = true)]
+        [Order(21)]
+        public bool Preview;
+
+        [DragInt2("Icon Size", min = 1, max = 4000, spacing = true)]
+        [Order(30)]
+        public Vector2 IconSize = new Vector2(40, 40);
+
+        [DragInt2("Icon Padding", min = 0, max = 500)]
+        [Order(31)]
+        public Vector2 IconPadding = new(4, 4);
+
+        [Checkbox("Fill Rows First")]
+        [Order(32)]
+        public bool FillRowsFirst = true;
+
+        [Combo("Icons Growth Direction",
+            "Right and Down",
+            "Right and Up",
+            "Left and Down",
+            "Left and Up",
+            "Centered and Up",
+            "Centered and Down"
+        )]
+        [Order(33)]
+        public int Directions = 3; // left & up
+
+        [Checkbox("Show Border", spacing = true)]
+        [Order(35)]
+        public bool DrawBorder = true;
+
+        [ColorEdit4("Border Color")]
+        [Order(36, collapseWith = nameof(DrawBorder))]
+        public PluginConfigColor BorderColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+
+        [DragInt("Border Thickness", min = 1, max = 10)]
+        [Order(37, collapseWith = nameof(DrawBorder))]
+        public int BorderThickness = 1;
+
+        [Checkbox("Change Icon Border When Active")]
+        [Order(45, collapseWith = nameof(DrawBorder))]
+        public bool ChangeIconBorderWhenActive = true;
+
+        [ColorEdit4("Icon Active Border Color")]
+        [Order(46, collapseWith = nameof(ChangeIconBorderWhenActive))]
+        public PluginConfigColor IconActiveBorderColor = new PluginConfigColor(new Vector4(255f / 255f, 200f / 255f, 35f / 255f, 100f / 100f));
+
+        [DragInt("Icon Active Border Thickness", min = 1, max = 10)]
+        [Order(47, collapseWith = nameof(ChangeIconBorderWhenActive))]
+        public int IconActiveBorderThickness = 3;
+
+        [NestedConfig("Time Label", 80)]
+        public NumericLabelConfig TimeLabel = new NumericLabelConfig(new Vector2(-5, 0), "", DrawAnchor.Center, DrawAnchor.Center);
     }
 }

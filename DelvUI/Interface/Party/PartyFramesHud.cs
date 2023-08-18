@@ -416,6 +416,7 @@ namespace DelvUI.Interface.Party
         public PartyFramesBuffsConfig Buffs;
         public PartyFramesDebuffsConfig Debuffs;
         public PartyFramesTrackersConfig Trackers;
+        public PartyFramesCooldownListConfig CooldownList;
 
         public PartyFramesConfigs(
             PartyFramesHealthBarsConfig healthBar,
@@ -424,7 +425,8 @@ namespace DelvUI.Interface.Party
             PartyFramesIconsConfig icons,
             PartyFramesBuffsConfig buffs,
             PartyFramesDebuffsConfig debuffs,
-            PartyFramesTrackersConfig trackers)
+            PartyFramesTrackersConfig trackers,
+            PartyFramesCooldownListConfig cooldownList)
         {
             HealthBar = healthBar;
             ManaBar = manaBar;
@@ -433,6 +435,7 @@ namespace DelvUI.Interface.Party
             Buffs = buffs;
             Debuffs = debuffs;
             Trackers = trackers;
+            CooldownList = cooldownList;
         }
 
         public static PartyFramesConfigs GetConfigs()
@@ -444,7 +447,8 @@ namespace DelvUI.Interface.Party
                 ConfigurationManager.Instance.GetConfigObject<PartyFramesIconsConfig>(),
                 ConfigurationManager.Instance.GetConfigObject<PartyFramesBuffsConfig>(),
                 ConfigurationManager.Instance.GetConfigObject<PartyFramesDebuffsConfig>(),
-                ConfigurationManager.Instance.GetConfigObject<PartyFramesTrackersConfig>()
+                ConfigurationManager.Instance.GetConfigObject<PartyFramesTrackersConfig>(),
+                ConfigurationManager.Instance.GetConfigObject<PartyFramesCooldownListConfig>()
             );
         }
 
