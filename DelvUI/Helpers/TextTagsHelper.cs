@@ -2,16 +2,11 @@ using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Logging;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
-using CSGameObjectManager = FFXIVClientStructs.FFXIV.Client.Game.Object.GameObjectManager;
-using CSCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
-using DelvUI.Helpers.PetRenamer;
 
 namespace DelvUI.Helpers
 {
@@ -187,7 +182,7 @@ namespace DelvUI.Helpers
             ["[level]"] = (chara) => chara.Level > 0 ? chara.Level.ToString() : "-",
 
             ["[job]"] = (chara) => JobsHelper.JobNames.TryGetValue(chara.ClassJob.Id, out var jobName) ? jobName : "",
-            
+
             ["[job-full]"] = (chara) => JobsHelper.JobFullNames.TryGetValue(chara.ClassJob.Id, out var jobName) ? jobName : "",
 
             ["[time-till-max-gp]"] = JobsHelper.TimeTillMaxGP,
@@ -233,11 +228,11 @@ namespace DelvUI.Helpers
         };
 
         private static string ReplaceTagWithString(
-            string tag, 
-            GameObject? actor, 
-            string? name = null, 
-            uint? current = null, 
-            uint? max = null, 
+            string tag,
+            GameObject? actor,
+            string? name = null,
+            uint? current = null,
+            uint? max = null,
             bool? isPlayerName = null,
             string? title = null)
         {
@@ -280,11 +275,11 @@ namespace DelvUI.Helpers
         }
 
         public static string FormattedText(
-            string text, 
-            GameObject? actor, 
-            string? name = null, 
-            uint? current = null, 
-            uint? max = null, 
+            string text,
+            GameObject? actor,
+            string? name = null,
+            uint? current = null,
+            uint? max = null,
             bool? isPlayerName = null,
             string? title = null)
         {
@@ -412,69 +407,14 @@ namespace DelvUI.Helpers
             string? n = actor?.Name.ToString() ?? name;
 
             // Detour for PetRenamer
-            try 
-            { 
-                GetPetName(actor, ref n); 
+            try
+            {
+                string? customPetName = PetRenamerHelper.GetPetName(actor);
+                n = customPetName ?? n;
             }
             catch { }
 
             return (n == null || n == "") ? "" : n;
-        }
-
-        /// <summary>
-        /// Gets Custom Pet Name where Applicable
-        /// </summary>
-        /// <param name="actor">GameObject to get custom name of</param>
-        /// <param name="n">String to validate</param>
-        private static unsafe void GetPetName(GameObject? actor, ref string? n)
-        {
-            // Null Check and valid ObjectKind Check.
-            // We only want to act on Minions and BattleNPCs
-            if (actor == null || (actor.ObjectKind != ObjectKind.Companion && actor.ObjectKind != ObjectKind.BattleNpc))
-            {
-                return;
-            }
-
-            // Get the owner of the BattlePet
-            int ownerID = (int)actor.OwnerId;
-            // For companions it doesn't work that way due to a missing Dalamud feature.
-            // Most Dalamud stuff does NOT work with unnetworked gameObjects so this workaround gets the owner ID of a companion.
-            if (actor?.ObjectKind == ObjectKind.Companion)
-            {
-                CSCompanion* gObj = (CSCompanion*)CSGameObjectManager.GetGameObjectByIndex(((Character)actor).ObjectIndex);
-                if (gObj == null)
-                {
-                    return;
-                }
-                ownerID = (int)gObj->Character.CompanionOwnerID;
-            }
-
-            // We get the Dalamud gameObject of the owner
-            GameObject? dalamudObj = Plugin.ObjectTable.SearchById((ulong)ownerID);
-            // Null Check
-            if (dalamudObj == null)
-            {
-                return;
-            }
-            // We get the petnames via IPC endpoints
-            // And convert that json data to usable data
-            string jsonData = PetRenamerHelper.GetPetNamesForCharacter((Character)dalamudObj);
-            NicknameData? nicknameData = PetRenamerHelper.FromString(jsonData);
-            if (nicknameData == null)
-            {
-                return;
-            }
-
-            // If the object is a BattleNPC and the nickname is valid, apply it!
-            if (actor?.ObjectKind == ObjectKind.BattleNpc && nicknameData.BatteValid())
-            {
-                n = nicknameData.BattleNickname;
-            }
-            // If the object is a Companion and the nickname is valid, apply it!
-            else if (actor?.ObjectKind == ObjectKind.Companion && nicknameData.CompanionValid())
-            {
-                n = nicknameData.Nickname;
-            }
         }
 
         private static string ValidatePlayerName(GameObject? actor, string? name, bool? isPlayerName = null)
