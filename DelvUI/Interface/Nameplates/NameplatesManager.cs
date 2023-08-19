@@ -161,7 +161,7 @@ namespace DelvUI.Interface.Nameplates
                 }
 
                 // order
-                int arrayIndex = 150 + (activeCount - nameplateObject.Priority - 1);
+                int arrayIndex = 200 + (activeCount - nameplateObject.Priority - 1);
                 string order = "";
                 try
                 {
