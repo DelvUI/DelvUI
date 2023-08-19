@@ -125,14 +125,14 @@ namespace DelvUI.Interface.Party
             _needsUpdate = false;
         }
 
-        private void CalculateLayout()
+        private void CalculateLayout(uint count)
         {
-            if (_cooldowns.Count <= 0) { return; }
+            if (count <= 0) { return; }
 
             _layoutInfo = LayoutHelper.CalculateLayout(
                 Config.Size,
                 Config.IconSize,
-                (uint)_cooldowns.Count,
+                count,
                 Config.IconPadding,
                 Config.FillRowsFirst
             );
@@ -161,7 +161,7 @@ namespace DelvUI.Interface.Party
 
             // calculate icon positions
             uint count = (uint)list.Count;
-            CalculateLayout();
+            CalculateLayout(count);
             var (iconPositions, minPos, maxPos) = LayoutHelper.CalculateIconPositions(
                 growthDirections,
                 count,
