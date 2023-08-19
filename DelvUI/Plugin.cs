@@ -125,6 +125,7 @@ namespace DelvUI
             TexturesCache.Initialize();
             TooltipsHelper.Initialize();
             PetRenamerHelper.Initialize();
+            WotsitHelper.Initialize();
 
             _hudManager = new HudManager();
 
@@ -144,6 +145,8 @@ namespace DelvUI
                     ShowInHelp = true
                 }
             );
+
+            WotsitHelper.Instance?.Update();
         }
 
         public void Dispose()
@@ -341,6 +344,7 @@ namespace DelvUI
             SpellHelper.Instance?.Dispose();
             TexturesCache.Instance?.Dispose();
             TooltipsHelper.Instance?.Dispose();
+            WotsitHelper.Instance?.Dispose();
 
             // This needs to remain last to avoid race conditions
             ConfigurationManager.Instance?.Dispose();

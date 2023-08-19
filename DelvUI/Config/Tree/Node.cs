@@ -6,6 +6,7 @@ namespace DelvUI.Config.Tree
     public abstract class Node
     {
         protected List<Node> _children = new List<Node>();
+        public IReadOnlyList<Node> Children => _children.AsReadOnly();
 
         public void Add(Node node)
         {

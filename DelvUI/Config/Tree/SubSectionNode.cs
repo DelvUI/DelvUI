@@ -10,6 +10,7 @@ namespace DelvUI.Config.Tree
     {
         public string Name = null!;
         public int Depth;
+        public string? ForceSelectedTabName = null;
 
         public abstract bool Draw(ref bool changed);
 
@@ -62,9 +63,22 @@ namespace DelvUI.Config.Tree
             {
                 if (subSectionNode is NestedSubSectionNode)
                 {
-                    if (!ImGui.BeginTabItem(subSectionNode.Name))
+                    if (ForceSelectedTabName != null)
                     {
-                        continue;
+                        bool a = subSectionNode.Name == ForceSelectedTabName; // no idea how this works
+                        ImGuiTabItemFlags flag = subSectionNode.Name == ForceSelectedTabName ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None;
+
+                        if (!ImGui.BeginTabItem(subSectionNode.Name, ref a, flag))
+                        {
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        if (!ImGui.BeginTabItem(subSectionNode.Name))
+                        {
+                            continue;
+                        }
                     }
 
                     DrawExportResetContextMenu(subSectionNode, subSectionNode.Name);
@@ -80,6 +94,8 @@ namespace DelvUI.Config.Tree
                     didReset |= subSectionNode.Draw(ref changed);
                 }
             }
+
+            ForceSelectedTabName = null;
 
             didReset |= DrawResetModal();
 

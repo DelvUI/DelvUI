@@ -148,6 +148,8 @@ namespace DelvUI.Config
 
             Plugin.ClientState.Logout += OnLogout;
             Plugin.JobChangedEvent += OnJobChanged;
+
+            _configBaseNode.CreateNodesIfNeeded();
         }
 
         ~ConfigurationManager()
@@ -267,7 +269,7 @@ namespace DelvUI.Config
 
         public void OpenConfigWindow()
         {
-            _mainConfigWindow.IsOpen = false;
+            _mainConfigWindow.IsOpen = true;
         }
 
         public void CloseConfigWindow()

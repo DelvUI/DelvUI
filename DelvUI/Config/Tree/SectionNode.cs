@@ -11,6 +11,7 @@ namespace DelvUI.Config.Tree
         public bool Selected;
         public string Name = null!;
         public bool ForceAllowExport = false;
+        public string? ForceSelectedTabName = null;
 
         public SectionNode() { }
 
@@ -50,9 +51,22 @@ namespace DelvUI.Config.Tree
                 {
                     foreach (SubSectionNode subSectionNode in _children)
                     {
-                        if (!ImGui.BeginTabItem(subSectionNode.Name))
+                        if (ForceSelectedTabName != null)
                         {
-                            continue;
+                            bool a = subSectionNode.Name == ForceSelectedTabName; // no idea how this works
+                            ImGuiTabItemFlags flag = subSectionNode.Name == ForceSelectedTabName ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None;
+
+                            if (!ImGui.BeginTabItem(subSectionNode.Name, ref a, flag))
+                            {
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            if (!ImGui.BeginTabItem(subSectionNode.Name))
+                            {
+                                continue;
+                            }
                         }
 
                         DrawExportResetContextMenu(subSectionNode, subSectionNode.Name);
@@ -65,6 +79,7 @@ namespace DelvUI.Config.Tree
                     }
 
                     ImGui.EndTabBar();
+                    ForceSelectedTabName = null;
                 }
 
                 if (ConfigurationManager.Instance.OverrideDalamudStyle)

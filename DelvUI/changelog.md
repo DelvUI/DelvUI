@@ -15,6 +15,10 @@
     + Cooldowns can be set to be shown in the Party Cooldowns section or in the Party Frames (or both).
     + Cooldowns can also be configured so they are only visible for certain jobs (For example making Swiftcast only visible for healers).
     + Added a lot of cooldowns that were missing from the Tracked Cooldowns list.
+
+- Added support for the Wotsit plugin:
+    + You can search for DelvUI settings by name to open the config window in the relevant section.
+    + For example searching for `black mage` will yield a result named `DelvUI Settings: Job Specific Bars > Caster > Black Mage`, and selecting it will open DelvUI Black Mage HUD configuration.
     
 - Moved "Experience Bar", "GCD Indicator", "Pull Timer", "Limit Break" and "MP Ticker" from "Misc" to the new "Other Elements" section.
 - Moved "Fonts" from "Misc" to the new "Customization" section.
