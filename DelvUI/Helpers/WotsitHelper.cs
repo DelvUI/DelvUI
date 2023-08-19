@@ -55,7 +55,10 @@ namespace DelvUI.Helpers
         public void Update()
         {
             _map.Clear();
-            UnregisterAll();
+            if (!UnregisterAll())
+            {
+                return;
+            }
 
             // sections
             foreach (Node node in ConfigurationManager.Instance.ConfigBaseNode.Sections)
@@ -126,9 +129,17 @@ namespace DelvUI.Helpers
             }
         }
 
-        public void UnregisterAll()
+        public bool UnregisterAll()
         {
-            _unregisterAll.InvokeFunc(Plugin.PluginInterface.InternalName);
+            try
+            {
+                _unregisterAll.InvokeFunc(Plugin.PluginInterface.InternalName);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
