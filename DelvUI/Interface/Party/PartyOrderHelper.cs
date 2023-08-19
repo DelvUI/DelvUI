@@ -83,7 +83,7 @@ namespace DelvUI.Interface.Party
                 default: option = ConfigOption.PartyListSortTypeOther; break;
             }
 
-            int value = ConfigModule.Instance()->GetIntValue(option);
+            int value = config->GetIntValue(option);
             if (value < 0 || value > (int)PartySortingSetting.Count) { return null; }
 
             return (PartySortingSetting)value;

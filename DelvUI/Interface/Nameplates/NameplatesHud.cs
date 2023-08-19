@@ -104,7 +104,7 @@ namespace DelvUI.Interface.Nameplates
 
                 if (InputsHelper.Instance.LeftButtonClicked)
                 {
-                    Plugin.TargetManager.SetTarget(mouseoveredActor);
+                    Plugin.TargetManager.Target = mouseoveredActor;
                 }
             }
             else if (_wasHovering)

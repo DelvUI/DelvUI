@@ -166,7 +166,7 @@ namespace DelvUI.Interface.Party
                     // target
                     else if (character != null)
                     {
-                        Plugin.TargetManager.SetTarget(character);
+                        Plugin.TargetManager.Target = character;
                     }
                 }
                 // right click (context menu)

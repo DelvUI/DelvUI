@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
+using static FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 using StructsBattleChara = FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara;
 
 namespace DelvUI.Interface.GeneralElements
@@ -167,7 +168,12 @@ namespace DelvUI.Interface.GeneralElements
             {
                 current = battleChara.CurrentCastTime;
                 StructsBattleChara* chara = (StructsBattleChara*)battleChara.Address;
-                total = chara->SpellCastInfo.AdjustedTotalCastTime;
+                CastInfo* castInfo = chara->GetCastInfo;
+
+                if (castInfo != null)
+                {
+                    total = castInfo->AdjustedTotalCastTime;
+                }
             } catch
             {
                 currentCastTime = 0;

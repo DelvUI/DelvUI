@@ -94,7 +94,7 @@ namespace DelvUI.Helpers
             }
 
             StructsCharacter* chara = (StructsCharacter*)actor.Address;
-            return Math.Min((float)chara->ShieldValue, 100f) / 100f;
+            return Math.Min(chara->CharacterData.ShieldValue, 100f) / 100f;
         }
 
         public static bool IsActorCasting(GameObject? actor)

@@ -324,7 +324,7 @@ namespace DelvUI.Interface.EnemyList
                 // left click
                 if (InputsHelper.Instance.LeftButtonClicked)
                 {
-                    Plugin.TargetManager.SetTarget(mouseoverTarget);
+                    Plugin.TargetManager.Target = mouseoverTarget;
                 }
             }
             else if (_wasHovering)

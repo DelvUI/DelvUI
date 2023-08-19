@@ -102,7 +102,7 @@ namespace DelvUI.Interface.GeneralElements
 
                 if (InputsHelper.Instance.LeftButtonClicked)
                 {
-                    Plugin.TargetManager.SetTarget(Actor);
+                    Plugin.TargetManager.Target = Actor;
                 }
                 else if (InputsHelper.Instance.RightButtonClicked)
                 {
