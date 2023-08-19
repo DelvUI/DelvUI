@@ -7,11 +7,13 @@ using DelvUI.Interface.Bars;
 using DelvUI.Interface.EnemyList;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using ImGuiNET;
+using ImGuiScene;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
 using static FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
+using LuminaAction = Lumina.Excel.GeneratedSheets.Action;
 using StructsBattleChara = FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara;
 
 namespace DelvUI.Interface.GeneralElements
@@ -67,8 +69,8 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             Vector2 size = GetSize();
-            bool validIcon = LastUsedCast?.IconTexture is not null;
-            Vector2 iconSize = Config.ShowIcon && validIcon ? new Vector2(size.Y, size.Y) : Vector2.Zero;
+            bool validIcon = Config.Preview ? true : LastUsedCast?.IconTexture is not null;
+            Vector2 iconSize = Config.ShowIcon && validIcon && !Config.SeparateIcon ? new Vector2(size.Y, size.Y) : Vector2.Zero;
 
             PluginConfigColor fillColor = GetColor();
             Rect background = new(Config.Position, size, Config.BackgroundColor);
@@ -97,21 +99,26 @@ namespace DelvUI.Interface.GeneralElements
 
             // icon
             Vector2 startPos = Config.Position + Utils.GetAnchoredPosition(pos, size, Config.Anchor);
-            if (Config.ShowIcon)
+            if (Config.ShowIcon && validIcon)
             {
+                Vector2 finalIconPos = Config.SeparateIcon ? startPos + Config.CustomIconPosition : startPos;
+                Vector2 finalIconSize = Config.SeparateIcon ? Config.CustomIconSize : iconSize;
+
                 AddDrawAction(Config.StrataLevel, () =>
                 {
-                    DrawHelper.DrawInWindow(ID + "_icon", startPos, size, false, false, (drawList) =>
+                    DrawHelper.DrawInWindow(ID + "_icon", finalIconPos, finalIconSize, false, false, (drawList) =>
                     {
-                        if (validIcon)
+                        ImGui.SetCursorPos(finalIconPos);
+
+                        TextureWrap? texture = Config.Preview ? TexturesCache.Instance.GetTexture<LuminaAction>(3577) : LastUsedCast?.IconTexture;
+                        if (texture != null)
                         {
-                            ImGui.SetCursorPos(startPos);
-                            ImGui.Image(LastUsedCast!.IconTexture!.ImGuiHandle, iconSize);
+                            ImGui.Image(texture.ImGuiHandle, finalIconSize);
                         }
 
                         if (Config.DrawBorder)
                         {
-                            drawList.AddRect(startPos, startPos + iconSize, Config.BorderColor.Base, 0, ImDrawFlags.None, Config.BorderThickness);
+                            drawList.AddRect(finalIconPos, finalIconPos + finalIconSize, Config.BorderColor.Base, 0, ImDrawFlags.None, Config.BorderThickness);
                         }
                     });
                 });
@@ -174,7 +181,8 @@ namespace DelvUI.Interface.GeneralElements
                 {
                     total = castInfo->AdjustedTotalCastTime;
                 }
-            } catch
+            }
+            catch
             {
                 currentCastTime = 0;
                 totalCastTime = 0;
@@ -390,7 +398,7 @@ namespace DelvUI.Interface.GeneralElements
     public class NameplateCastbarHud : TargetOfTargetCastbarHud
     {
         private NameplateCastbarConfig Config => (NameplateCastbarConfig)_config;
-        
+
         private Vector2 _customSize = new Vector2(0);
         public Vector2 ParentSize { get; set; } = new Vector2(0);
 

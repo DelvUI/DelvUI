@@ -20,6 +20,7 @@
 - Added settings for Enemy Nameplate Castbars to match the width or height of the Health Bar:
     + These are intended to be used when the Health Bar size changes for targeted units.
     
+- Added a setting to all Castbars to separate the icon from the bar.
 - Added minor improvements to the Party Frames preview.
 - Added support for the Pet Nicknames plugin (by Glyceri).
 - Added `[job-full]` text tag.
