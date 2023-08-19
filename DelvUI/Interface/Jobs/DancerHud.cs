@@ -3,7 +3,6 @@ using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
-using DelvUI.GameStructs;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
@@ -133,7 +132,7 @@ namespace DelvUI.Interface.Jobs
 
         private unsafe bool DrawStepBar(Vector2 origin, PlayerCharacter player)
         {
-            var gauge = Plugin.JobGauges.Get<DNCGauge>();
+            DNCGauge gauge = Plugin.JobGauges.Get<DNCGauge>();
             if (!gauge.IsDancing)
             {
                 return false;
@@ -283,6 +282,15 @@ namespace DelvUI.Interface.Jobs
                 AddDrawActions(bar.GetDrawActions(origin, Config.StandardFinishBar.StrataLevel));
             }
         }
+    }
+
+    public enum DNCStep : uint
+    {
+        None = 15998,
+        Emboite = 15999,
+        Entrechat = 16000,
+        Jete = 16001,
+        Pirouette = 16002
     }
 
     [Section("Job Specific Bars")]
