@@ -82,7 +82,7 @@ namespace DelvUI.Interface.GeneralElements
         {
             if (Preview)
             {
-                return 60701;
+                return 61231;
             }
 
             return Utils.SignIconIDForActor(actor);

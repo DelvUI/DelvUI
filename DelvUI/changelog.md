@@ -7,9 +7,6 @@
     + Textures can be previewed in Customization > Bar Textures.
     + Also in this section it is possible to apply a particular Bar Texture and Draw Mode to all bars with one click.
 
-- Added settings for Enemy Nameplate Castbars to match the width or height of the Health Bar:
-    + These are intended to be used when the Health Bar size changes for targeted units.
-
 - Party Cooldowns can now be tracked per player directly in the Party Frames:
     + Tracked cooldowns are configured in Party Cooldowns > Tracked Cooldowns.
     + Cooldowns can be set to be shown in the Party Cooldowns section or in the Party Frames (or both).
@@ -19,13 +16,18 @@
 - Added support for the Wotsit plugin:
     + You can search for DelvUI settings by name to open the config window in the relevant section.
     + For example searching for `black mage` will yield a result named `DelvUI Settings: Job Specific Bars > Caster > Black Mage`, and selecting it will open DelvUI Black Mage HUD configuration.
+
+- Added settings for Enemy Nameplate Castbars to match the width or height of the Health Bar:
+    + These are intended to be used when the Health Bar size changes for targeted units.
     
-- Moved "Experience Bar", "GCD Indicator", "Pull Timer", "Limit Break" and "MP Ticker" from "Misc" to the new "Other Elements" section.
-- Moved "Fonts" from "Misc" to the new "Customization" section.
-- Fixed targeted unit Nameplate not drawing on top of other Nameplates.
 - Added minor improvements to the Party Frames preview.
 - Added support for the Pet Nicknames plugin (by Glyceri).
 - Added `[job-full]` text tag.
+- Moved "Experience Bar", "GCD Indicator", "Pull Timer", "Limit Break" and "MP Ticker" from "Misc" to the new "Other Elements" section.
+- Moved "Fonts" from "Misc" to the new "Customization" section.
+- Fixed targeted unit Nameplate not drawing on top of other Nameplates.
+- Fixed Order Label not working for Enemy Nameplates.
+- Fixed preview not working for Sign Icons.
 
 # 1.7.1.5
 - Fixed Sign Icons not working.
