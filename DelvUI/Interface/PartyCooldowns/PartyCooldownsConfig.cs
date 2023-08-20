@@ -647,6 +647,7 @@ namespace DelvUI.Interface.PartyCooldowns
             // DNC
             [16012] = NewData(16012, JobIDs.DNC, 56, 90, 15, 70, 2, PartyCooldownEnabled.PartyFrames, "90-120"), // shield samba
             [16004] = NewData(16004, JobIDs.DNC, 70, 120, 20, 30, 3, PartyCooldownEnabled.PartyCooldowns), // technical step / finish
+            [16011] = NewData(16011, JobIDs.DNC, 62, 120, 20, 90, 3, PartyCooldownEnabled.PartyFrames), // devilment
 
             // MCH
             [16889] = NewData(16889, JobIDs.MCH, 56, 90, 15, 70, 2, PartyCooldownEnabled.PartyFrames, "90-120"), // tactician
