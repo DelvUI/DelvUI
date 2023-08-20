@@ -82,7 +82,7 @@ namespace DelvUI.Helpers
             byte* unk = (byte*)(new IntPtr(character.Address) + 0x1F0);
 
             return character != null
-                && ((character.SubKind == (byte)BattleNpcSubKind.Enemy || (int)character.SubKind == 1)
+                && ((character.SubKind == (byte)BattleNpcSubKind.Enemy || (int)character.SubKind == (byte)BattleNpcSubKind.BattleNpcPart)
                 && *unk != 0);
         }
 

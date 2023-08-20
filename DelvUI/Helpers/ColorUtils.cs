@@ -243,7 +243,7 @@ namespace DelvUI.Helpers
 
             if (character is BattleNpc npc)
             {
-                if (npc.BattleNpcKind == BattleNpcSubKind.Enemy && isHostile)
+                if ((npc.BattleNpcKind == BattleNpcSubKind.Enemy || npc.BattleNpcKind == BattleNpcSubKind.BattleNpcPart) && isHostile)
                 {
                     return GlobalColors.Instance.NPCHostileColor;
                 }
