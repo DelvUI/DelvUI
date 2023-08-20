@@ -107,6 +107,10 @@ namespace DelvUI.Interface.Nameplates
                     Plugin.TargetManager.Target = mouseoveredActor;
                     InputsHelper.Instance.ClearClicks();
                 }
+                else if (InputsHelper.Instance.RightButtonClicked)
+                {
+                    InputsHelper.Instance.ClearClicks();
+                }
             }
             else if (_wasHovering)
             {
