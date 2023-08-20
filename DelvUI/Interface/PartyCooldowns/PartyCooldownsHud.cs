@@ -185,12 +185,16 @@ namespace DelvUI.Interface.PartyCooldowns
 
                         if (_barConfig.UseJobColors)
                         {
-                            PluginConfigColor jobColor = GlobalColors.Instance.SafeColorForJobId(cooldown.Data.JobId);
-                            PluginConfigColor bgJobColor = new PluginConfigColor(new Vector4(jobColor.Vector[0], jobColor.Vector[1], jobColor.Vector[2], 40f / 100f));
-                            PluginConfigColor rechargeJobColor = new PluginConfigColor(new Vector4(jobColor.Vector[0], jobColor.Vector[1], jobColor.Vector[2], 25f / 100f));
-                            PluginConfigColor nonActive = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 50f / 100f));
-                            fillColor = effectTime > 0 ? jobColor : rechargeJobColor;
-                            bgColor = effectTime > 0 || cooldownTime == 0 ? bgJobColor : nonActive;
+                            uint? jobId = GetJobId(cooldown, player);
+                            if (jobId.HasValue)
+                            {
+                                PluginConfigColor jobColor = GlobalColors.Instance.SafeColorForJobId(jobId.Value);
+                                PluginConfigColor bgJobColor = jobColor.WithAlpha(40f / 100f);
+                                PluginConfigColor rechargeJobColor = jobColor.WithAlpha(25f / 100f);
+                                PluginConfigColor nonActive = PluginConfigColor.FromHex(0x88FFFFFF);
+                                fillColor = effectTime > 0 ? jobColor : rechargeJobColor;
+                                bgColor = effectTime > 0 || cooldownTime == 0 ? bgJobColor : nonActive;
+                            }
                         }
 
                         Rect background = new Rect(pos, size, bgColor);
@@ -293,6 +297,19 @@ namespace DelvUI.Interface.PartyCooldowns
 
                 addedOffset = false;
             }
+        }
+
+        private uint? GetJobId(PartyCooldown cooldown, PlayerCharacter player)
+        {
+            uint jobId = cooldown.Data.JobId;
+            if (jobId != 0) { return jobId; }
+
+            if (cooldown.Member != null) { return cooldown.Member.JobId; }
+
+            if (cooldown.SourceId == player.ObjectId) { return player.ClassJob.Id; }
+
+            Character? chara = Plugin.ObjectTable.SearchById(cooldown.SourceId) as Character;
+            return chara?.ClassJob.Id;
         }
     }
 }

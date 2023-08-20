@@ -22,6 +22,7 @@
     
 - Added an auto backup feature that runs every time DelvUI gets an update.
 - Added a setting to all Castbars to separate the icon from the bar.
+- Added Use Job Colors setting for Party Cooldown bars.
 - Added minor improvements to the Party Frames preview.
 - Added new possible Growth Directions for Status Effect Lists and Party Frames Cooldowns.
 - Added support for the Pet Nicknames plugin (by Glyceri).
