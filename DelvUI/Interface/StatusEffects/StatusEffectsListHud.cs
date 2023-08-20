@@ -103,8 +103,19 @@ namespace DelvUI.Interface.StatusEffects
         {
             var list = StatusEffectDataList(Actor);
 
+            // sort by duration
+            if (Config.SortByDuration)
+            {
+                list.Sort((a, b) =>
+                {
+                    float aTime = a.Data.IsPermanent || a.Data.IsFcBuff ? float.MaxValue : a.Status.RemainingTime;
+                    float bTime = b.Data.IsPermanent || b.Data.IsFcBuff ? float.MaxValue : b.Status.RemainingTime;
+
+                    return aTime.CompareTo(bTime);
+                });
+            } 
             // show mine or permanent first
-            if (Config.ShowMineFirst || Config.ShowPermanentFirst)
+            else if (Config.ShowMineFirst || Config.ShowPermanentFirst)
             {
                 return OrderByMineOrPermanentFirst(list);
             }

@@ -23,6 +23,7 @@
 - Added an auto backup feature that runs every time DelvUI gets an update.
 - Added a setting to all Castbars to separate the icon from the bar.
 - Added Use Job Colors setting for Party Cooldown bars.
+- Added Sort by Duration setting for all Status Effect Lists.
 - Added minor improvements to the Party Frames preview.
 - Added new possible Growth Directions for Status Effect Lists and Party Frames Cooldowns.
 - Added support for the Pet Nicknames plugin (by Glyceri).
@@ -30,6 +31,7 @@
 - Moved "Experience Bar", "GCD Indicator", "Pull Timer", "Limit Break" and "MP Ticker" from "Misc" to the new "Other Elements" section.
 - Moved "Fonts" from "Misc" to the new "Customization" section.
 - Updated and improved the default profile that comes with DelvUI.
+- Fixed DelvUI sometimes making Dalamud windows lose focus.
 - Fixed targeted unit Nameplate not drawing on top of other Nameplates.
 - Fixed Order Label not working for Enemy Nameplates.
 - Fixed preview not working for Sign Icons.

@@ -226,6 +226,10 @@ namespace DelvUI.Interface.StatusEffects
         [Order(50)]
         public bool ShowMineFirst = false;
 
+        [Checkbox("Sort by Duration", help = "If enabled, \"Permanent Effects First\" and \"My Effects First\" will be ignored!")]
+        [Order(51)]
+        public bool SortByDuration = false;
+
         [Checkbox("Pet As Own Effect")]
         [Order(55)]
         public bool IncludePetAsOwn = false;
