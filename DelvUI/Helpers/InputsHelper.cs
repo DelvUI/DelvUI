@@ -261,6 +261,13 @@ namespace DelvUI.Helpers
         private bool _leftButtonWasDown = false;
         private bool _rightButtonWasDown = false;
 
+
+        public void ClearClicks()
+        {
+            WndProcDetour(_wndHandle, WM_LBUTTONUP, 0, 0);
+            WndProcDetour(_wndHandle, WM_RBUTTONUP, 0, 0);
+        }
+
         // wnd proc detour
         // if we're "eating" inputs, we only process left and right clicks
         // any other message is passed along to the ImGui scene

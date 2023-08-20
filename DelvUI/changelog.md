@@ -32,6 +32,7 @@
 - Moved "Experience Bar", "GCD Indicator", "Pull Timer", "Limit Break" and "MP Ticker" from "Misc" to the new "Other Elements" section.
 - Moved "Fonts" from "Misc" to the new "Customization" section.
 - Updated and improved the default profile that comes with DelvUI.
+- Fixed Nameplates with interaction enabled sometimes making the mouse left-click to be stuck as if it was being held down.
 - Fixed DelvUI sometimes making Dalamud windows lose focus.
 - Fixed targeted unit Nameplate not drawing on top of other Nameplates.
 - Fixed Order Label not working for Enemy Nameplates.

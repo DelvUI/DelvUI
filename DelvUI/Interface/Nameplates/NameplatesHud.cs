@@ -105,6 +105,7 @@ namespace DelvUI.Interface.Nameplates
                 if (InputsHelper.Instance.LeftButtonClicked)
                 {
                     Plugin.TargetManager.Target = mouseoveredActor;
+                    InputsHelper.Instance.ClearClicks();
                 }
             }
             else if (_wasHovering)
@@ -205,7 +206,7 @@ namespace DelvUI.Interface.Nameplates
                 {
                     Ray ray = camera.ScreenPointToRay(point);
                     RaycastHit hit;
-                   
+
                     if (collisionModule->RaycastEx(&hit, ray.Origin, ray.Direction, data.Distance, 1, flags))
                     {
                         obstructionCount++;
