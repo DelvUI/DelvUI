@@ -109,6 +109,8 @@ namespace DelvUI.Interface.PartyCooldowns
             _dataConfig = sender.GetConfigObject<PartyCooldownsDataConfig>();
             _dataConfig.CooldownsDataEnabledChangedEvent += OnCooldownEnabledChanged;
             _dataConfig.UpdateDataIfNeeded();
+
+            ForcedUpdate();
         }
 
         #endregion Singleton
@@ -215,6 +217,11 @@ namespace DelvUI.Interface.PartyCooldowns
             OnActionUsedHook?.Original(characterId, characterAddress, position, effect, unk1, unk2);
         }
 
+        public void ForcedUpdate()
+        {
+            OnMembersChanged(PartyManager.Instance);
+        }
+
         private void OnMembersChanged(PartyManager sender)
         {
             if (sender.Previewing || _config.Preview) { return; }
@@ -293,12 +300,12 @@ namespace DelvUI.Interface.PartyCooldowns
 
         private void OnJobChanged(uint jobId)
         {
-            OnMembersChanged(PartyManager.Instance);
+            ForcedUpdate();
         }
 
         private void OnCooldownEnabledChanged(PartyCooldownsDataConfig config)
         {
-            OnMembersChanged(PartyManager.Instance);
+            ForcedUpdate();
         }
 
         private void OnTerritoryChanged(object? sender, ushort territoryId)
@@ -306,7 +313,7 @@ namespace DelvUI.Interface.PartyCooldowns
             bool isInDuty = Plugin.Condition[ConditionFlag.BoundByDuty];
             if (_config.ShowOnlyInDuties && _wasInDuty != isInDuty)
             {
-                OnMembersChanged(PartyManager.Instance);
+                ForcedUpdate();
             }
 
             _wasInDuty = isInDuty;

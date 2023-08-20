@@ -11,11 +11,11 @@
     + Tracked cooldowns are configured in Party Cooldowns > Tracked Cooldowns.
     + Cooldowns can be set to be shown in the Party Cooldowns section or in the Party Frames (or both).
     + Cooldowns can also be configured so they are only visible for certain jobs (For example making Swiftcast only visible for healers).
-    + Added a lot of cooldowns that were missing from the Tracked Cooldowns list.
+    + Added a lot of cooldowns that were missing in the Tracked Cooldowns list.
 
 - Added support for the Wotsit plugin:
     + You can search for DelvUI settings by name to open the config window in the relevant section.
-    + For example searching for `black mage` will yield a result named `DelvUI Settings: Job Specific Bars > Caster > Black Mage`, and selecting it will open DelvUI Black Mage HUD configuration.
+    + For example searching for `black mage` will yield a result named `DelvUI Settings: Job Specific Bars > Caster > Black Mage`, and selecting it will open DelvUI's Black Mage HUD configuration.
 
 - Added settings for Enemy Nameplate Castbars to match the width or height of the Health Bar:
     + These are intended to be used when the Health Bar size changes for targeted units.
@@ -23,10 +23,12 @@
 - Added an auto backup feature that runs every time DelvUI gets an update.
 - Added a setting to all Castbars to separate the icon from the bar.
 - Added minor improvements to the Party Frames preview.
+- Added new possible Growth Directions for Status Effect Lists and Party Frames Cooldowns.
 - Added support for the Pet Nicknames plugin (by Glyceri).
 - Added `[job-full]` text tag.
 - Moved "Experience Bar", "GCD Indicator", "Pull Timer", "Limit Break" and "MP Ticker" from "Misc" to the new "Other Elements" section.
 - Moved "Fonts" from "Misc" to the new "Customization" section.
+- Updated and improved the default profile that comes with DelvUI.
 - Fixed targeted unit Nameplate not drawing on top of other Nameplates.
 - Fixed Order Label not working for Enemy Nameplates.
 - Fixed preview not working for Sign Icons.

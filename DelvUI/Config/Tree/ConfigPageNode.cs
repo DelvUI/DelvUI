@@ -2,7 +2,7 @@ using Dalamud.Logging;
 using DelvUI.Config.Attributes;
 using DelvUI.Config.Profiles;
 using DelvUI.Helpers;
-using DelvUI.Interface.GeneralElements;
+using DelvUI.Interface;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
@@ -316,7 +316,23 @@ namespace DelvUI.Config.Tree
 
         public override void Reset()
         {
-            ConfigObject = ConfigurationManager.GetDefaultConfigObjectForType(ConfigObject.GetType());
+            Type type = ConfigObject.GetType();
+            ImportData? importData = ProfilesManager.Instance.DefaultImportData(type);
+
+            if (importData == null)
+            {
+                PluginLog.Error("Error finding default import data for type " + type.ToString());
+                return;
+            }
+
+            PluginConfigObject? config = importData.GetObject();
+            if (config == null)
+            {
+                PluginLog.Error("Error importing default import data for type " + type.ToString());
+                return;
+            }
+
+            ConfigObject = config;
         }
 
         public override ConfigPageNode? GetOrAddConfig<T>() => this;

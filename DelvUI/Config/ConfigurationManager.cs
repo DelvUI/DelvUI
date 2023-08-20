@@ -351,11 +351,7 @@ namespace DelvUI.Config
             try
             {
                 // detect if we need to create the config files (fresh install)
-                if (Directory.GetDirectories(ConfigDirectory).Length == 0)
-                {
-                    SaveConfigurations(true);
-                }
-                else
+                if (Directory.GetDirectories(ConfigDirectory).Length != 0)
                 {
                     LoadConfigurations();
 
@@ -459,27 +455,37 @@ namespace DelvUI.Config
             return ConfigBaseNode.GetBase64String();
         }
 
-        public bool ImportProfile(string oldProfileName, string profileName, string rawString)
+        public void OnProfileDeleted(string profileName)
+        {
+            try
+            {
+                _configBaseNodeByProfile.Remove(profileName);
+            }
+            catch { }
+        }
+
+        public bool ImportProfile(string oldProfileName, string profileName, string rawString, bool forceLoad = false)
         {
             // cache old profile
             _configBaseNodeByProfile[oldProfileName] = ConfigBaseNode;
 
             // load profile from cache or from rawString
-            if (!_configBaseNodeByProfile.TryGetValue(profileName, out BaseNode? maybeNode)
-                && !ImportProfileNonCached(rawString, out maybeNode))
+            BaseNode? loadedNode = null;
+            if (forceLoad || !_configBaseNodeByProfile.TryGetValue(profileName, out loadedNode))
             {
-                return false;
+                ImportProfileNonCached(rawString, out loadedNode);
             }
 
-            BaseNode node = maybeNode!;
-            if (IsConfigWindowOpened || string.IsNullOrEmpty(node.SelectedOptionName))
+            if (loadedNode == null) { return false; }
+
+            if (IsConfigWindowOpened || string.IsNullOrEmpty(loadedNode.SelectedOptionName))
             {
-                node.SelectedOptionName = ConfigBaseNode.SelectedOptionName;
-                node.RefreshSelectedNode();
+                loadedNode.SelectedOptionName = ConfigBaseNode.SelectedOptionName;
+                loadedNode.RefreshSelectedNode();
             }
 
             ConfigBaseNode.ConfigObjectResetEvent -= OnConfigObjectReset;
-            ConfigBaseNode = node;
+            ConfigBaseNode = loadedNode;
             ConfigBaseNode.ConfigObjectResetEvent += OnConfigObjectReset;
 
             PerformV2Migration();
@@ -519,12 +525,6 @@ namespace DelvUI.Config
             }
 
             return true;
-        }
-
-        public void ResetConfig()
-        {
-            ConfigBaseNode.Reset();
-            ResetEvent?.Invoke(this);
         }
         #endregion
 
