@@ -426,7 +426,7 @@ namespace DelvUI.Config
 
                 try
                 {
-                    if (File.Exists(v1Path))
+                    if (File.Exists(v1Path) && !File.Exists(v2Path))
                     {
                         File.Move(v1Path, v2Path);
                     }
