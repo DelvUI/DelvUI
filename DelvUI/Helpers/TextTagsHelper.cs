@@ -110,6 +110,10 @@ namespace DelvUI.Helpers
 
             ["[exp:required-short]"] = (actor, name) => ExperienceHelper.Instance.RequiredExp.KiloFormat(),
 
+            ["[exp:required-to-level]"] = (actor, name) => (ExperienceHelper.Instance.RequiredExp - ExperienceHelper.Instance.CurrentExp).ToString("N0", CultureInfo.InvariantCulture),
+
+            ["[exp:required-to-level-short]"] = (actor, name) => (ExperienceHelper.Instance.RequiredExp - ExperienceHelper.Instance.CurrentExp).KiloFormat(),
+
             ["[exp:rested]"] = (actor, name) => ExperienceHelper.Instance.RestedExp.ToString("N0", CultureInfo.InvariantCulture),
 
             ["[exp:rested-short]"] = (actor, name) => ExperienceHelper.Instance.RestedExp.KiloFormat(),
