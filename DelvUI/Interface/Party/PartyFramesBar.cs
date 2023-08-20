@@ -380,7 +380,7 @@ namespace DelvUI.Interface.Party
 
                     drawActions.Add((RoleIcon.StrataLevel, () =>
                     {
-                        DrawHelper.DrawInWindow(RoleIcon.ID, iconPos, RoleIcon.Size, false, false, (drawList) =>
+                        DrawHelper.DrawInWindow(RoleIcon.ID, iconPos, RoleIcon.Size, false, (drawList) =>
                         {
                             DrawHelper.DrawIcon(iconId, iconPos, RoleIcon.Size, false, drawList);
                         });
@@ -400,7 +400,7 @@ namespace DelvUI.Interface.Party
 
                     drawActions.Add((SignIcon.StrataLevel, () =>
                     {
-                        DrawHelper.DrawInWindow(SignIcon.ID, iconPos, SignIcon.Size, false, false, (drawList) =>
+                        DrawHelper.DrawInWindow(SignIcon.ID, iconPos, SignIcon.Size, false, (drawList) =>
                         {
                             DrawHelper.DrawIcon(iconId.Value, iconPos, SignIcon.Size, false, drawList);
                         });
@@ -417,7 +417,7 @@ namespace DelvUI.Interface.Party
 
                 drawActions.Add((LeaderIcon.StrataLevel, () =>
                 {
-                    DrawHelper.DrawInWindow(LeaderIcon.ID, iconPos, LeaderIcon.Size, false, false, (drawList) =>
+                    DrawHelper.DrawInWindow(LeaderIcon.ID, iconPos, LeaderIcon.Size, false, (drawList) =>
                     {
                         DrawHelper.DrawIcon(61521, iconPos, LeaderIcon.Size, false, drawList);
                     });
@@ -436,7 +436,7 @@ namespace DelvUI.Interface.Party
 
                     drawActions.Add((PlayerStatus.Icon.StrataLevel, () =>
                     {
-                        DrawHelper.DrawInWindow(PlayerStatus.Icon.ID, iconPos, PlayerStatus.Icon.Size, false, false, (drawList) =>
+                        DrawHelper.DrawInWindow(PlayerStatus.Icon.ID, iconPos, PlayerStatus.Icon.Size, false, (drawList) =>
                         {
                             DrawHelper.DrawIcon(iconId.Value, iconPos, PlayerStatus.Icon.Size, false, drawList);
                         });
@@ -453,7 +453,7 @@ namespace DelvUI.Interface.Party
 
                 drawActions.Add((ReadyCheck.Icon.StrataLevel, () =>
                 {
-                    DrawHelper.DrawInWindow(ReadyCheck.Icon.ID, iconPos, ReadyCheck.Icon.Size, false, false, (drawList) =>
+                    DrawHelper.DrawInWindow(ReadyCheck.Icon.ID, iconPos, ReadyCheck.Icon.Size, false, (drawList) =>
                     {
                         Vector2 uv0 = new Vector2(0.5f * (int)Member.ReadyCheckStatus, 0f);
                         Vector2 uv1 = new Vector2(0.5f + 0.5f * (int)Member.ReadyCheckStatus, 1f);
@@ -472,7 +472,7 @@ namespace DelvUI.Interface.Party
 
                 drawActions.Add((RaiseTracker.Icon.StrataLevel, () =>
                 {
-                    DrawHelper.DrawInWindow(RaiseTracker.Icon.ID, iconPos, RaiseTracker.Icon.Size, false, false, (drawList) =>
+                    DrawHelper.DrawInWindow(RaiseTracker.Icon.ID, iconPos, RaiseTracker.Icon.Size, false, (drawList) =>
                     {
                         DrawHelper.DrawIcon(411, iconPos, RaiseTracker.Icon.Size, true, drawList);
                     });
@@ -489,7 +489,7 @@ namespace DelvUI.Interface.Party
 
                 drawActions.Add((InvulnTracker.Icon.StrataLevel, () =>
                 {
-                    DrawHelper.DrawInWindow(InvulnTracker.Icon.ID, iconPos, InvulnTracker.Icon.Size, false, false, (drawList) =>
+                    DrawHelper.DrawInWindow(InvulnTracker.Icon.ID, iconPos, InvulnTracker.Icon.Size, false, (drawList) =>
                     {
                         DrawHelper.DrawIcon(Member.InvulnStatus!.InvulnIcon, iconPos, InvulnTracker.Icon.Size, true, drawList);
                     });

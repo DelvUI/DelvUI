@@ -256,7 +256,7 @@ namespace DelvUI.Helpers
             DrawGradientFilledRect(cursorPos, new Vector2(Math.Max(1, barSize.X * shield), h), color, drawList);
         }
 
-        public static void DrawInWindow(string name, Vector2 pos, Vector2 size, bool needsInput, bool needsFocus, Action<ImDrawListPtr> drawAction)
+        public static void DrawInWindow(string name, Vector2 pos, Vector2 size, bool needsInput, Action<ImDrawListPtr> drawAction)
         {
             const ImGuiWindowFlags windowFlags = ImGuiWindowFlags.NoTitleBar |
                                                  ImGuiWindowFlags.NoScrollbar |
@@ -264,7 +264,7 @@ namespace DelvUI.Helpers
                                                  ImGuiWindowFlags.NoMove |
                                                  ImGuiWindowFlags.NoResize;
 
-            DrawInWindow(name, pos, size, needsInput, needsFocus, false, windowFlags, drawAction);
+            DrawInWindow(name, pos, size, needsInput, false, windowFlags, drawAction);
         }
 
         public static void DrawInWindow(
@@ -272,7 +272,6 @@ namespace DelvUI.Helpers
             Vector2 pos,
             Vector2 size,
             bool needsInput,
-            bool needsFocus,
             bool needsWindow,
             ImGuiWindowFlags windowFlags,
             Action<ImDrawListPtr> drawAction)
@@ -284,16 +283,11 @@ namespace DelvUI.Helpers
                 return;
             }
 
-            windowFlags |= ImGuiWindowFlags.NoSavedSettings;
+            windowFlags |= ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoBringToFrontOnFocus;
 
             if (!needsInput)
             {
                 windowFlags |= ImGuiWindowFlags.NoInputs;
-            }
-
-            if (!needsFocus)
-            {
-                windowFlags |= ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoBringToFrontOnFocus;
             }
 
             ClipRect? clipRect = ClipRectsHelper.Instance.GetClipRectForArea(pos, size);

@@ -332,7 +332,7 @@ namespace DelvUI.Interface.StatusEffects
 
             AddDrawAction(Config.StrataLevel, () =>
             {
-                DrawHelper.DrawInWindow(ID, windowPos, windowSize + margin * 2, !Config.DisableInteraction, false, (drawList) =>
+                DrawHelper.DrawInWindow(ID, windowPos, windowSize + margin * 2, !Config.DisableInteraction, (drawList) =>
                 {
                     // area
                     if (Config.Preview)
@@ -373,11 +373,11 @@ namespace DelvUI.Interface.StatusEffects
                             var dispellIndicatorColor = new Vector4(141f / 255f, 206f / 255f, 229f / 255f, 100f / 100f);
                             // 24x32
                             drawList.AddRectFilled(
-                                    iconPos + new Vector2(Config.IconConfig.Size.X * .07f, Config.IconConfig.Size.Y * .07f),
-                                    iconPos + new Vector2(Config.IconConfig.Size.X * .93f, Config.IconConfig.Size.Y * .14f),
-                                    ImGui.ColorConvertFloat4ToU32(dispellIndicatorColor),
-                                    8f
-                                );
+                                           iconPos + new Vector2(Config.IconConfig.Size.X * .07f, Config.IconConfig.Size.Y * .07f),
+                                           iconPos + new Vector2(Config.IconConfig.Size.X * .93f, Config.IconConfig.Size.Y * .14f),
+                                           ImGui.ColorConvertFloat4ToU32(dispellIndicatorColor),
+                                           8f
+                                       );
                         }
                     }
                 });

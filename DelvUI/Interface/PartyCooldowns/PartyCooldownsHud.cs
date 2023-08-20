@@ -227,7 +227,7 @@ namespace DelvUI.Interface.PartyCooldowns
 
                         AddDrawAction(_barConfig.StrataLevel, () =>
                         {
-                            DrawHelper.DrawInWindow(barId + "_icon", iconPos, iconSize, false, false, (drawList) =>
+                            DrawHelper.DrawInWindow(barId + "_icon", iconPos, iconSize, false, (drawList) =>
                             {
                                 uint color = recharging ? 0xAAFFFFFF : 0xFFFFFFFF;
                                 DrawHelper.DrawIcon(cooldown.Data.IconId, iconPos, iconSize, false, color, drawList);

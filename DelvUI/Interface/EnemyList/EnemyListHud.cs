@@ -225,7 +225,7 @@ namespace DelvUI.Interface.EnemyList
 
                     AddDrawAction(Configs.EnmityIcon.StrataLevel, () =>
                     {
-                        DrawHelper.DrawInWindow(ID + "_enmityIcon", iconPos, Configs.EnmityIcon.Size, false, false, (drawList) =>
+                        DrawHelper.DrawInWindow(ID + "_enmityIcon", iconPos, Configs.EnmityIcon.Size, false, (drawList) =>
                         {
                             float w = 48f / _iconsTexture.Width;
                             float h = 48f / _iconsTexture.Height;
@@ -248,7 +248,7 @@ namespace DelvUI.Interface.EnemyList
 
                         AddDrawAction(Configs.SignIcon.StrataLevel, () =>
                         {
-                            DrawHelper.DrawInWindow(ID + "_signIcon", iconPos, Configs.SignIcon.Size, false, false, (drawList) =>
+                            DrawHelper.DrawInWindow(ID + "_signIcon", iconPos, Configs.SignIcon.Size, false, (drawList) =>
                             {
                                 DrawHelper.DrawIcon(signIconId.Value, iconPos, Configs.SignIcon.Size, false, drawList);
                             });

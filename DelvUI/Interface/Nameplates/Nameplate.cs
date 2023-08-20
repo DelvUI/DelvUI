@@ -382,7 +382,7 @@ namespace DelvUI.Interface.Nameplates
 
                     drawActions.Add((Config.RoleIconConfig.StrataLevel, () =>
                     {
-                        DrawHelper.DrawInWindow(_config.ID + "_jobIcon", iconPos, Config.RoleIconConfig.Size, false, false, (drawList) =>
+                        DrawHelper.DrawInWindow(_config.ID + "_jobIcon", iconPos, Config.RoleIconConfig.Size, false, (drawList) =>
                         {
                             DrawHelper.DrawIcon(iconId, iconPos, Config.RoleIconConfig.Size, false, alpha, drawList);
                         });
@@ -402,7 +402,7 @@ namespace DelvUI.Interface.Nameplates
 
                 drawActions.Add((Config.StateIconConfig.StrataLevel, () =>
                 {
-                    DrawHelper.DrawInWindow(_config.ID + "_stateIcon", iconPos, Config.StateIconConfig.Size, false, false, (drawList) =>
+                    DrawHelper.DrawInWindow(_config.ID + "_stateIcon", iconPos, Config.StateIconConfig.Size, false, (drawList) =>
                     {
                         DrawHelper.DrawIcon((uint)data.NamePlateIconId, iconPos, Config.StateIconConfig.Size, false, alpha, drawList);
                     });
@@ -517,7 +517,7 @@ namespace DelvUI.Interface.Nameplates
 
                 drawActions.Add((Config.IconConfig.StrataLevel, () =>
                 {
-                    DrawHelper.DrawInWindow(_config.ID + "_enemyIcon", iconPos, Config.IconConfig.Size, false, false, (drawList) =>
+                    DrawHelper.DrawInWindow(_config.ID + "_enemyIcon", iconPos, Config.IconConfig.Size, false, (drawList) =>
                     {
                         DrawHelper.DrawIcon((uint)data.NamePlateIconId, iconPos, Config.IconConfig.Size, false, alpha, drawList);
                     });

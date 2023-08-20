@@ -153,7 +153,7 @@ namespace DelvUI.Interface.GeneralElements
             current = Config.AlwaysShow && current == 0 ? total : current;
 
             var size = new Vector2(radius * 2);
-            DrawHelper.DrawInWindow(ID, position - size / 2, size, false, false, (drawList) =>
+            DrawHelper.DrawInWindow(ID, position - size / 2, size, false, (drawList) =>
             {
                 current = Math.Min(current, total);
 

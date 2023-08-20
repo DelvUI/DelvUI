@@ -181,7 +181,7 @@ namespace DelvUI.Interface.Party
 
             AddDrawAction(Config.StrataLevel, () =>
             {
-                DrawHelper.DrawInWindow(ID, windowPos, windowSize + margin * 2, false, false, (drawList) =>
+                DrawHelper.DrawInWindow(ID, windowPos, windowSize + margin * 2, false, (drawList) =>
                 {
                     // area
                     if (Config.Preview)

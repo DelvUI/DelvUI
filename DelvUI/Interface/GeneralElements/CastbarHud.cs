@@ -106,7 +106,7 @@ namespace DelvUI.Interface.GeneralElements
 
                 AddDrawAction(Config.StrataLevel, () =>
                 {
-                    DrawHelper.DrawInWindow(ID + "_icon", finalIconPos, finalIconSize, false, false, (drawList) =>
+                    DrawHelper.DrawInWindow(ID + "_icon", finalIconPos, finalIconSize, false, (drawList) =>
                     {
                         ImGui.SetCursorPos(finalIconPos);
 
