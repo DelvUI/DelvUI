@@ -22,7 +22,7 @@ namespace DelvUI.Interface.Party
         private LayoutInfo _layoutInfo;
 
         private List<PartyCooldown> _cooldowns = new List<PartyCooldown>();
-        private List<PartyCooldown>? _fakeCooldowns = new List<PartyCooldown>();
+        private List<PartyCooldown>? _fakeCooldowns = null;
 
         public GameObject? Actor { get; set; }
 
@@ -33,15 +33,22 @@ namespace DelvUI.Interface.Party
         {
             _timeLabel = new LabelHud(config.TimeLabel);
 
-            _dataConfig = ConfigurationManager.Instance.GetConfigObject<PartyCooldownsDataConfig>();
-
-            _config.ValueChangeEvent += OnConfigPropertyChanged;
-            _dataConfig.CooldownsDataChangedEvent += OnCooldownsDataChanged;
+            ConfigurationManager.Instance.ResetEvent += OnConfigReset;
             PartyCooldownsManager.Instance.CooldownsChangedEvent += OnCooldownsChanged;
+            _config.ValueChangeEvent += OnConfigPropertyChanged;
+
+            OnConfigReset(ConfigurationManager.Instance);
+        }
+
+        private void OnConfigReset(ConfigurationManager sender)
+        {
+            _dataConfig = ConfigurationManager.Instance.GetConfigObject<PartyCooldownsDataConfig>();
+            _dataConfig.CooldownsDataChangedEvent += OnCooldownsDataChanged;
         }
 
         ~PartyFramesCooldownListHud()
         {
+            ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
             _config.ValueChangeEvent -= OnConfigPropertyChanged;
             _dataConfig.CooldownsDataChangedEvent += OnCooldownsDataChanged;
             PartyCooldownsManager.Instance.CooldownsChangedEvent += OnCooldownsChanged;
