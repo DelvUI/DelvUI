@@ -157,7 +157,8 @@ namespace DelvUI.Interface.Nameplates
                         {
                             return _petHud;
                         }
-                        else if ((BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.Enemy)
+                        else if ((BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.Enemy || 
+                                 (BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.BattleNpcPart)
                         {
                             return Utils.IsHostile(battleNpc) ? _enemyHud : _npcHud;
                         }
