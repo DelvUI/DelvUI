@@ -87,7 +87,7 @@ namespace DelvUI.Interface.StatusEffects
                 Config.IconConfig.Size,
                 count,
                 Config.IconPadding,
-                Config.FillRowsFirst
+                LayoutHelper.GetFillsRowsFirst(Config.FillRowsFirst, LayoutHelper.GrowthDirectionsFromIndex(Config.Directions))
             );
 
             return count;
@@ -320,7 +320,7 @@ namespace DelvUI.Interface.StatusEffects
                 Config.Size,
                 Config.IconConfig.Size,
                 Config.IconPadding,
-                Config.FillRowsFirst,
+                LayoutHelper.GetFillsRowsFirst(Config.FillRowsFirst, growthDirections),
                 _layoutInfo
             );
      

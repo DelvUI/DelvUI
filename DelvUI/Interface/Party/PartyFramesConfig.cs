@@ -83,7 +83,7 @@ namespace DelvUI.Interface.Party
         [Order(31)]
         public Vector2 Padding = new Vector2(0, 0);
 
-        [NestedConfig("Name Label", 40)]
+        [NestedConfig("Name Label", 44)]
         public EditableLabelConfig NameLabelConfig = new EditableLabelConfig(Vector2.Zero, "[name:initials].", DrawAnchor.Center, DrawAnchor.Center);
 
         [NestedConfig("Health Label", 45)]
@@ -728,7 +728,9 @@ namespace DelvUI.Interface.Party
             "Left and Down",
             "Left and Up",
             "Centered and Up",
-            "Centered and Down"
+            "Centered and Down",
+            "Centered and Left",
+            "Centered and Right"
         )]
         [Order(33)]
         public int Directions = 3; // left & up

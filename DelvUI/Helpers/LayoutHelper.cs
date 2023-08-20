@@ -1,5 +1,4 @@
-﻿using DelvUI.Interface.StatusEffects;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -105,7 +104,7 @@ namespace DelvUI.Helpers
                 }
             }
 
-            var contentSize = new Vector2(
+            Vector2 contentSize = new Vector2(
                 realColCount * itemSize.X + (realColCount - 1) * padding.X,
                 realRowCount * itemSize.Y + (realRowCount - 1) * padding.Y
             );
@@ -120,7 +119,9 @@ namespace DelvUI.Helpers
             GrowthDirections.Left | GrowthDirections.Down,
             GrowthDirections.Left | GrowthDirections.Up,
             GrowthDirections.Centered | GrowthDirections.Up,
-            GrowthDirections.Centered | GrowthDirections.Down
+            GrowthDirections.Centered | GrowthDirections.Down,
+            GrowthDirections.Centered | GrowthDirections.Left,
+            GrowthDirections.Centered | GrowthDirections.Right
         };
         public static GrowthDirections GrowthDirectionsFromIndex(int index)
         {
@@ -139,25 +140,57 @@ namespace DelvUI.Helpers
             return index > 0 ? index : 0;
         }
 
+        public static bool GetFillsRowsFirst(bool fallback, GrowthDirections directions)
+        {
+            if ((directions & GrowthDirections.Centered) != 0)
+            {
+                if ((directions & GrowthDirections.Up) != 0 || (directions & GrowthDirections.Down) != 0)
+                {
+                    return true;
+                }
+                else if ((directions & GrowthDirections.Left) != 0 || (directions & GrowthDirections.Right) != 0)
+                {
+                    return false;
+                }
+            }
+
+            return fallback;
+        }
+
         public static void CalculateAxisDirections(
-            GrowthDirections growthDirections, 
-            int row, 
-            uint elementCount, 
-            Vector2 size, 
-            Vector2 iconSize, 
+            GrowthDirections growthDirections,
+            int row,
+            int col, 
+            uint elementCount,
+            Vector2 size,
+            Vector2 iconSize,
             Vector2 iconPadding,
-            out Vector2 direction, 
+            out Vector2 direction,
             out Vector2 offset)
         {
             if ((growthDirections & GrowthDirections.Centered) != 0)
             {
-                var elementsPerRow = (int)(size.X / (iconSize.X + iconPadding.X));
-                var elementsInRow = Math.Min(elementsPerRow, elementCount - (elementsPerRow * row));
+                if ((growthDirections & GrowthDirections.Up) != 0 || (growthDirections & GrowthDirections.Down) != 0)
+                {
+                    int elementsPerRow = (int)(size.X / (iconSize.X + iconPadding.X));
+                    long elementsInRow = Math.Min(elementsPerRow, elementCount - (elementsPerRow * row));
 
-                direction.X = 1;
-                direction.Y = (growthDirections & GrowthDirections.Down) != 0 ? 1 : -1;
-                offset.X = -(iconSize.X + iconPadding.X) * elementsInRow / 2f;
-                offset.Y = direction.Y == 1 ? 0 : -iconSize.Y;
+                    direction.X = 1;
+                    direction.Y = (growthDirections & GrowthDirections.Down) != 0 ? 1 : -1;
+                    offset.X = -(iconSize.X + iconPadding.X) * elementsInRow / 2f;
+                    offset.Y = direction.Y == 1 ? 0 : -iconSize.Y;
+                }
+
+                else// if ((growthDirections & GrowthDirections.Left) != 0 || (growthDirections & GrowthDirections.Right) != 0)
+                {
+                    int elementsPerCol = (int)(size.Y / (iconSize.Y + iconPadding.Y));
+                    long elementsInCol = Math.Min(elementsPerCol, elementCount - (elementsPerCol * col));
+
+                    direction.X = (growthDirections & GrowthDirections.Left) != 0 ? -1 : 1;
+                    direction.Y = 1;
+                    offset.X = direction.X == 1 ? 0 : -iconSize.X;
+                    offset.Y = -(iconSize.Y + iconPadding.Y) * elementsInCol / 2f;
+                }
             }
             else
             {
@@ -170,7 +203,7 @@ namespace DelvUI.Helpers
 
         public static Vector2 CalculateStartPosition(Vector2 position, Vector2 size, GrowthDirections growthDirections)
         {
-            var area = size;
+            Vector2 area = size;
             if ((growthDirections & GrowthDirections.Left) != 0)
             {
                 area.X = -area.X;
@@ -181,13 +214,20 @@ namespace DelvUI.Helpers
                 area.Y = -area.Y;
             }
 
-            var startPos = position;
+            Vector2 startPos = position;
             if ((growthDirections & GrowthDirections.Centered) != 0)
             {
-                startPos.X = position.X - size.X / 2f;
+                if ((growthDirections & GrowthDirections.Up) != 0 || (growthDirections & GrowthDirections.Down) != 0)
+                {
+                    startPos.X = position.X - size.X / 2f;
+                }
+                else if ((growthDirections & GrowthDirections.Left) != 0 || (growthDirections & GrowthDirections.Right) != 0)
+                {
+                    startPos.Y = position.Y - size.Y / 2f;
+                }
             }
 
-            var endPos = position + area;
+            Vector2 endPos = position + area;
 
             if (endPos.X < position.X)
             {
@@ -203,11 +243,11 @@ namespace DelvUI.Helpers
         }
 
         public static (List<Vector2>, Vector2, Vector2) CalculateIconPositions(
-            GrowthDirections directions, 
-            uint count, 
+            GrowthDirections directions,
+            uint count,
             Vector2 position,
-            Vector2 size, 
-            Vector2 iconSize, 
+            Vector2 size,
+            Vector2 iconSize,
             Vector2 iconPadding,
             bool fillRowsFirst,
             LayoutInfo layoutInfo)
@@ -224,6 +264,7 @@ namespace DelvUI.Helpers
                 CalculateAxisDirections(
                     directions,
                     row,
+                    col, 
                     count,
                     size,
                     iconSize,
@@ -245,7 +286,7 @@ namespace DelvUI.Helpers
                 list.Add(pos);
 
                 // rows / columns
-                if (fillRowsFirst || (directions & GrowthDirections.Centered) != 0)
+                if (fillRowsFirst)
                 {
                     col += 1;
                     if (col >= layoutInfo.TotalColCount)

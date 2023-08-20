@@ -199,7 +199,9 @@ namespace DelvUI.Interface.StatusEffects
             "Left and Down",
             "Left and Up",
             "Centered and Up",
-            "Centered and Down"
+            "Centered and Down",
+            "Centered and Left",
+            "Centered and Right"
         )]
         [Order(30)]
         public int Directions;

@@ -134,7 +134,7 @@ namespace DelvUI.Interface.Party
                 Config.IconSize,
                 count,
                 Config.IconPadding,
-                Config.FillRowsFirst
+                LayoutHelper.GetFillsRowsFirst(Config.FillRowsFirst, LayoutHelper.GrowthDirectionsFromIndex(Config.Directions))
             );
         }
 
@@ -169,7 +169,7 @@ namespace DelvUI.Interface.Party
                 Config.Size,
                 Config.IconSize,
                 Config.IconPadding,
-                Config.FillRowsFirst,
+                LayoutHelper.GetFillsRowsFirst(Config.FillRowsFirst, growthDirections),
                 _layoutInfo
             );
 
