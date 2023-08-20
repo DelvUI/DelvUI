@@ -183,6 +183,16 @@ namespace DelvUI.Interface.PartyCooldowns
                         PluginConfigColor fillColor = effectTime > 0 ? _barConfig.AvailableColor : _barConfig.RechargingColor;
                         PluginConfigColor bgColor = effectTime > 0 || cooldownTime == 0 ? _barConfig.AvailableBackgroundColor : _barConfig.RechargingBackgroundColor;
 
+                        if (_barConfig.UseJobColors)
+                        {
+                            PluginConfigColor jobColor = GlobalColors.Instance.SafeColorForJobId(cooldown.Data.JobId);
+                            PluginConfigColor bgJobColor = new PluginConfigColor(new Vector4(jobColor.Vector[0], jobColor.Vector[1], jobColor.Vector[2], 40f / 100f));
+                            PluginConfigColor rechargeJobColor = new PluginConfigColor(new Vector4(jobColor.Vector[0], jobColor.Vector[1], jobColor.Vector[2], 25f / 100f));
+                            PluginConfigColor nonActive = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 50f / 100f));
+                            fillColor = effectTime > 0 ? jobColor : rechargeJobColor;
+                            bgColor = effectTime > 0 || cooldownTime == 0 ? bgJobColor : nonActive;
+                        }
+
                         Rect background = new Rect(pos, size, bgColor);
                         Rect fill = BarUtilities.GetFillRect(pos, size, _barConfig.FillDirection, fillColor, current, max);
 
