@@ -220,6 +220,7 @@ namespace DelvUI.Config
             try
             {
                 bool needsWrite = false;
+                bool needsBackup = false;
 
                 if (!File.Exists(path))
                 {
@@ -231,6 +232,7 @@ namespace DelvUI.Config
                     if (PreviousVersion != Plugin.Version)
                     {
                         needsWrite = true;
+                        needsBackup = true;
                     }
                 }
 
@@ -240,10 +242,38 @@ namespace DelvUI.Config
                 {
                     File.WriteAllText(path, Plugin.Version);
                 }
+
+                if (needsBackup && PreviousVersion != null)
+                {
+                    BackupFiles(PreviousVersion);
+                }
             }
             catch (Exception e)
             {
                 PluginLog.Error("Error checking version: " + e.Message);
+            }
+        }
+
+        private void BackupFiles(string version)
+        {
+            string backupsRoot = Path.Combine(ConfigDirectory, "Backups");
+            if (!Directory.Exists(backupsRoot))
+            {
+                Directory.CreateDirectory(backupsRoot);
+            }
+
+            string backupPath = Path.Combine(backupsRoot, version);
+
+            foreach (string folderPath in Directory.GetDirectories(ConfigDirectory, "*", SearchOption.AllDirectories))
+            {
+                if (folderPath.Contains("Backups")) { continue; }
+
+                Directory.CreateDirectory(folderPath.Replace(ConfigDirectory, backupPath));
+            }
+
+            foreach (string filePath in Directory.GetFiles(ConfigDirectory, "*.*", SearchOption.AllDirectories))
+            {
+                File.Copy(filePath, filePath.Replace(ConfigDirectory, backupPath), true);
             }
         }
 
