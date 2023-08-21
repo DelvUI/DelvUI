@@ -126,6 +126,7 @@ namespace DelvUI
             TooltipsHelper.Initialize();
             PetRenamerHelper.Initialize();
             WotsitHelper.Initialize();
+            WhosTalkingHelper.Initialize();
 
             _hudManager = new HudManager();
 
@@ -288,6 +289,7 @@ namespace DelvUI
 
             ConfigurationManager.Instance.Draw();
             PartyManager.Instance?.Update();
+            WhosTalkingHelper.Instance?.Update();
 
             bool fontPushed = FontsManager.Instance.PushDefaultFont();
 
@@ -345,6 +347,7 @@ namespace DelvUI
             TexturesCache.Instance?.Dispose();
             TooltipsHelper.Instance?.Dispose();
             WotsitHelper.Instance?.Dispose();
+            WhosTalkingHelper.Instance?.Dispose();
 
             // This needs to remain last to avoid race conditions
             ConfigurationManager.Instance?.Dispose();

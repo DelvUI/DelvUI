@@ -47,6 +47,7 @@ namespace DelvUI.Interface.Party
         public float? RaiseTime { get; set; }
         public InvulnStatus? InvulnStatus { get; set; }
         public bool HasDispellableDebuff { get; set; } = false;
+        public WhosTalkingState WhosTalkingState => WhosTalkingHelper.Instance?.GetUserState(Name) ?? WhosTalkingState.None;
 
         public PartyFramesMember(PartyMember partyMember, int order, EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader)
         {
@@ -137,6 +138,7 @@ namespace DelvUI.Interface.Party
         public float? RaiseTime { get; set; }
         public InvulnStatus? InvulnStatus { get; set; }
         public bool HasDispellableDebuff { get; set; }
+        public WhosTalkingState WhosTalkingState { get; set; }
 
         public FakePartyFramesMember(int order)
         {
@@ -156,6 +158,7 @@ namespace DelvUI.Interface.Party
             HasDispellableDebuff = RNG.Next(0, 2) == 1;
             RaiseTime = order == 2 ? RNG.Next(0, 60) : null;
             InvulnStatus = order == 0 ? new InvulnStatus(3077, RNG.Next(0, 10), 810) : null;
+            WhosTalkingState = (WhosTalkingState)RNG.Next(0, 4);
         }
 
         public void Update(EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader, uint jobId)
@@ -185,6 +188,8 @@ namespace DelvUI.Interface.Party
         public float? RaiseTime { get; set; }
         public InvulnStatus? InvulnStatus { get; set; }
         public bool HasDispellableDebuff { get; set; }
+
+        public WhosTalkingState WhosTalkingState { get; }
 
         public void Update(EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader, uint jobId);
     }

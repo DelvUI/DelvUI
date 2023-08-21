@@ -392,6 +392,9 @@ namespace DelvUI.Interface.Party
 
         [NestedConfig("Ready Check Status", 14)]
         public PartyFramesReadyCheckStatusConfig ReadyCheckStatus = new PartyFramesReadyCheckStatusConfig();
+
+        [NestedConfig("Who's Talking", 15)]
+        public PartyFramesWhosTalkingConfig WhosTalking = new PartyFramesWhosTalkingConfig();
     }
 
     [Exportable(false)]
@@ -463,6 +466,52 @@ namespace DelvUI.Interface.Party
             DrawAnchor.TopRight,
             DrawAnchor.TopRight
         );
+    }
+
+    [Exportable(false)]
+    public class PartyFramesWhosTalkingConfig : PluginConfigObject
+    {
+        public new static PartyFramesWhosTalkingConfig DefaultConfig() => new PartyFramesWhosTalkingConfig();
+
+        [Checkbox("Replace Role/Job Icon when active")]
+        [Order(5)]
+        public bool ReplaceRoleJobIcon = false;
+        
+        [NestedConfig("Icon", 10)]
+        public IconConfig Icon = new IconConfig(
+            new Vector2(0, 0),
+            new Vector2(24, 24),
+            DrawAnchor.TopRight,
+            DrawAnchor.TopRight
+        );
+
+        [Checkbox("Change Health Bar Border when active", spacing = true, help = "Enabling this will override other border settings!")]
+        [Order(15)]
+        public bool ChangeBorders = false;
+
+        [DragInt("Border Thickness", min = 1, max = 10)]
+        [Order(16, collapseWith = nameof(ChangeBorders))]
+        public int BorderThickness = 1;
+
+        [ColorEdit4("Speaking Border Color")]
+        [Order(17, collapseWith = nameof(ChangeBorders))]
+        public PluginConfigColor SpeakingBorderColor = PluginConfigColor.FromHex(0xFF40BB40);
+
+        [ColorEdit4("Muted Border Color")]
+        [Order(18, collapseWith = nameof(ChangeBorders))]
+        public PluginConfigColor MutedBorderColor = PluginConfigColor.FromHex(0xFF008080);
+
+        [ColorEdit4("Deafened Border Color")]
+        [Order(19, collapseWith = nameof(ChangeBorders))]
+        public PluginConfigColor DeafenedBorderColor = PluginConfigColor.FromHex(0xFFFF4444);
+
+        public PluginConfigColor ColorForState(WhosTalkingState state)
+        {
+            if (state == WhosTalkingState.Speaking) { return SpeakingBorderColor; }
+            if (state == WhosTalkingState.Muted) { return MutedBorderColor; }
+
+            return DeafenedBorderColor;
+        }
     }
 
     [Exportable(false)]
