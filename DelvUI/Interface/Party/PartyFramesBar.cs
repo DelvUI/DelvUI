@@ -363,7 +363,7 @@ namespace DelvUI.Interface.Party
 
             // who's talking
             bool drawingWhosTalking = false;
-            if (WhosTalkingIcon.Enabled && WhosTalkingIcon.Icon.Enabled)
+            if (WhosTalkingIcon.Enabled && WhosTalkingIcon.Icon.Enabled && WhosTalkingIcon.EnabledForState(Member.WhosTalkingState))
             {
                 TextureWrap? texture = WhosTalkingHelper.Instance.GetTextureForState(Member.WhosTalkingState);
                 
