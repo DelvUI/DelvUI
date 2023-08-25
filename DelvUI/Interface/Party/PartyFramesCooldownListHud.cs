@@ -247,7 +247,7 @@ namespace DelvUI.Interface.Party
                     }
                     else if (cooldownTime > 0)
                     {
-                        Config.TimeLabel.SetText(Utils.DurationToFullString(cooldownTime));
+                        Config.TimeLabel.SetText(Utils.DurationToString(cooldownTime, Config.TimeLabel.NumberFormat));
                     }
                     else
                     {

@@ -1,4 +1,9 @@
 # 2.0.1.0
+- Added a "User Regional Number Format" setting in the Misc section:
+    + This can be set to use the system's settings, or default to English.
+
+- Added new `-formatted` Text Tags for numeric values.
+- Corrected a lot of numeric Text Tags that were using the wrong formatting.
 - Added Gunbreaker's No Mercy to the tracked Party Cooldowns.
 - Added Bard's Raging Strikes to the tracked Party Cooldowns.
 - Party Cooldowns priorty can now be edited with double click.

@@ -144,9 +144,12 @@ namespace DelvUI.Interface.GeneralElements
 
             if (Config.ShowMaxCastTime)
             {
-                string format = "0".Repeat(Config.CastTimeLabel.NumberFormat);
-                Config.CastTimeLabel.SetText(value.ToString($"####0.{format}", CultureInfo.InvariantCulture)
-                    + " / " + totalCastTime.ToString($"####0.{format}", CultureInfo.InvariantCulture));
+                string format = Config.CastTimeLabel.NumberFormat.ToString();
+                Config.CastTimeLabel.SetText(
+                    value.ToString("N" + format, ConfigurationManager.Instance.ActiveCultreInfo) +
+                    " / " + 
+                    totalCastTime.ToString("N" + format, ConfigurationManager.Instance.ActiveCultreInfo)
+                );
             }
             else
             {

@@ -14,6 +14,7 @@ using DelvUI.Interface.StatusEffects;
 using ImGuiScene;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -63,8 +64,16 @@ namespace DelvUI.Config
         {
             get
             {
-                var config = Instance.GetConfigObject<HUDOptionsConfig>();
+                HUDOptionsConfig config = Instance.GetConfigObject<HUDOptionsConfig>();
                 return config != null ? config.OverrideDalamudStyle : true;
+            }
+        }
+
+        public CultureInfo ActiveCultreInfo
+        {
+            get {
+                HUDOptionsConfig config = Instance.GetConfigObject<HUDOptionsConfig>();
+                return config == null || config.UseRegionalNumberFormats ? CultureInfo.CurrentCulture : CultureInfo.InvariantCulture;
             }
         }
 
