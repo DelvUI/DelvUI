@@ -81,7 +81,7 @@ namespace DelvUI.Helpers
             {
                 _currentTooltipTitle = title;
 
-                if (_config.ShowSourceName)
+                if (_config.ShowSourceName && name.Length > 0)
                 {
                     _currentTooltipTitle += $" ({name})";
                 }

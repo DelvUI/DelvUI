@@ -1,5 +1,6 @@
 # 2.0.1.0
 - Added Gunbreaker's No Mercy to the tracked Party Cooldowns.
+- Fixed tooltips showing "()" when the source name is empty.
 
 # 2.0.0.0
 - Added a Bar Texture setting for all bars:
