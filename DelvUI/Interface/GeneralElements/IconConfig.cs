@@ -107,6 +107,28 @@ namespace DelvUI.Interface.GeneralElements
         public bool PrioritizeHealthBarAnchor = false;
     }
 
+    public class NameplatePlayerIconConfig : NameplateIconConfig
+    {
+        public NameplatePlayerIconConfig() : base() { }
+
+        public NameplatePlayerIconConfig(Vector2 position, Vector2 size, DrawAnchor anchor, DrawAnchor frameAnchor)
+            : base(position, size, anchor, frameAnchor)
+        {
+        }
+
+        [Checkbox("Only show disconnected icon", spacing = true)]
+        [Order(19)]
+        public bool OnlyShowDisconnected = false;
+
+        public bool ShouldDrawIcon(int iconId)
+        {
+            if (!OnlyShowDisconnected) { return true; }
+
+            return (iconId >= 61503 && iconId <= 61505) ||
+                   (iconId >= 61553 && iconId <= 61555);
+        }
+    }
+
     public class NameplateRoleJobIconConfig : RoleJobIconConfig
     {
         public NameplateRoleJobIconConfig() : base() { }

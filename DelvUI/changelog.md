@@ -18,23 +18,27 @@
     + For example searching for `black mage` will yield a result named `DelvUI Settings: Job Specific Bars > Caster > Black Mage`, and selecting it will open DelvUI's Black Mage HUD configuration.
 
 - Added support for the Who's Talking plugin:
-    + Can be configured in Party Frames > Icons > Who's Talking
+    + Can be configured in Party Frames > Icons > Who's Talking.
 
 - Added settings for Enemy Nameplate Castbars to match the width or height of the Health Bar:
     + These are intended to be used when the Health Bar size changes for targeted units.
     
 - Added an auto backup feature that runs every time DelvUI gets an update.
+    + Automatic backups can be found in `%APPDATA%\XIVLauncher\pluginConfigs\DelvUI\Backups`.
+
+- Added support for the Pet Nicknames plugin (by Glyceri). 
 - Added a setting to all Castbars to separate the icon from the bar.
+- Added setting to the Player State Icon in Nameplates to only show for the disconnected state (aka pokeball).
 - Added Use Job Colors setting for Party Cooldown bars.
 - Added Sort by Duration setting for all Status Effect Lists.
 - Added minor improvements to the Party Frames preview.
 - Added new possible Growth Directions for Status Effect Lists and Party Frames Cooldowns.
-- Added support for the Pet Nicknames plugin (by Glyceri).
 - Added `[job-full]` text tag.
 - Added `[exp:required-to-level]` and `[exp:required-to-level-short]` text tags.
 - Moved "Experience Bar", "GCD Indicator", "Pull Timer", "Limit Break" and "MP Ticker" from "Misc" to the new "Other Elements" section.
 - Moved "Fonts" from "Misc" to the new "Customization" section.
 - Updated and improved the default profile that comes with DelvUI.
+
 - Fixed Nameplates with interaction enabled sometimes making the mouse left-click to be stuck as if it was being held down.
 - Fixed DelvUI sometimes making Dalamud windows lose focus.
 - Fixed targeted unit Nameplate not drawing on top of other Nameplates.

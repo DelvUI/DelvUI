@@ -443,7 +443,7 @@ namespace DelvUI.Interface.GeneralElements
         { Strata = StrataLevel.LOWEST };
 
         [NestedConfig("Player State Icon", 55)]
-        public NameplateIconConfig StateIconConfig = new NameplateIconConfig(
+        public NameplatePlayerIconConfig StateIconConfig = new NameplatePlayerIconConfig(
             new Vector2(5, 0),
             new Vector2(30, 30),
             DrawAnchor.Left,

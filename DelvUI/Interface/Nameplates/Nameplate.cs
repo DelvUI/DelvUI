@@ -360,12 +360,12 @@ namespace DelvUI.Interface.Nameplates
         protected override List<(StrataLevel, Action)> GetExtrasDrawActions(NameplateData data, NameplateExtrasAnchors anchors)
         {
             List<(StrataLevel, Action)> drawActions = new List<(StrataLevel, Action)>();
-            if (data.GameObject is not Character character) { return drawActions; }
+            if (data.GameObject is not PlayerCharacter character) { return drawActions; }
 
             float alpha = _config.RangeConfig.AlphaForDistance(data.Distance);
 
             // role/job icon
-            if (Config.RoleIconConfig.Enabled && character is PlayerCharacter)
+            if (Config.RoleIconConfig.Enabled)
             {
                 NameplateAnchor? anchor = anchors.GetAnchor(Config.RoleIconConfig.NameplateLabelAnchor, Config.RoleIconConfig.PrioritizeHealthBarAnchor);
                 anchor = anchor ?? new NameplateAnchor(data.ScreenPosition, Vector2.Zero);
@@ -392,7 +392,9 @@ namespace DelvUI.Interface.Nameplates
             }
 
             // state icon
-            if (Config.StateIconConfig.Enabled && data.NamePlateIconId > 0 && character is PlayerCharacter)
+            if (Config.StateIconConfig.Enabled && 
+                data.NamePlateIconId > 0 && 
+                Config.StateIconConfig.ShouldDrawIcon(data.NamePlateIconId))
             {
                 NameplateAnchor? anchor = anchors.GetAnchor(Config.StateIconConfig.NameplateLabelAnchor, Config.StateIconConfig.PrioritizeHealthBarAnchor);
                 anchor = anchor ?? new NameplateAnchor(data.ScreenPosition, Vector2.Zero);
