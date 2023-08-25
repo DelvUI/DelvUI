@@ -392,6 +392,9 @@ namespace DelvUI.Interface.Party
 
         [NestedConfig("Ready Check Status", 14)]
         public PartyFramesReadyCheckStatusConfig ReadyCheckStatus = new PartyFramesReadyCheckStatusConfig();
+
+        [NestedConfig("Who's Talking", 15)]
+        public PartyFramesWhosTalkingConfig WhosTalking = new PartyFramesWhosTalkingConfig();
     }
 
     [Exportable(false)]
@@ -463,6 +466,77 @@ namespace DelvUI.Interface.Party
             DrawAnchor.TopRight,
             DrawAnchor.TopRight
         );
+    }
+
+    [Exportable(false)]
+    public class PartyFramesWhosTalkingConfig : PluginConfigObject
+    {
+        public new static PartyFramesWhosTalkingConfig DefaultConfig() => new PartyFramesWhosTalkingConfig();
+
+        [Checkbox("Replace Role/Job Icon when active")]
+        [Order(5)]
+        public bool ReplaceRoleJobIcon = false;
+
+        [Checkbox("Show Speaking State", spacing = true)]
+        [Order(10)]
+        public bool ShowSpeaking = true;
+
+        [Checkbox("Show Muted State")]
+        [Order(10)]
+        public bool ShowMuted = true;
+
+        [Checkbox("Show Deafened State")]
+        [Order(10)]
+        public bool ShowDeafened = true;
+
+        [NestedConfig("Icon", 20)]
+        public IconConfig Icon = new IconConfig(
+            new Vector2(0, 0),
+            new Vector2(24, 24),
+            DrawAnchor.TopRight,
+            DrawAnchor.TopRight
+        );
+
+        [Checkbox("Change Health Bar Border when active", spacing = true, help = "Enabling this will override other border settings!")]
+        [Order(30)]
+        public bool ChangeBorders = false;
+
+        [DragInt("Border Thickness", min = 1, max = 10)]
+        [Order(31, collapseWith = nameof(ChangeBorders))]
+        public int BorderThickness = 1;
+
+        [ColorEdit4("Speaking Border Color")]
+        [Order(32, collapseWith = nameof(ChangeBorders))]
+        public PluginConfigColor SpeakingBorderColor = PluginConfigColor.FromHex(0xFF40BB40);
+
+        [ColorEdit4("Muted Border Color")]
+        [Order(33, collapseWith = nameof(ChangeBorders))]
+        public PluginConfigColor MutedBorderColor = PluginConfigColor.FromHex(0xFF008080);
+
+        [ColorEdit4("Deafened Border Color")]
+        [Order(34, collapseWith = nameof(ChangeBorders))]
+        public PluginConfigColor DeafenedBorderColor = PluginConfigColor.FromHex(0xFFFF4444);
+
+        public bool EnabledForState(WhosTalkingState state)
+        {
+            switch (state)
+            {
+                case WhosTalkingState.Speaking: return ShowSpeaking;
+                case WhosTalkingState.Muted: return ShowMuted;
+                case WhosTalkingState.Deafened: return ShowDeafened;
+            }
+
+            return false;
+        }
+
+        public PluginConfigColor? ColorForState(WhosTalkingState state)
+        {
+            if (state == WhosTalkingState.Speaking && ShowSpeaking) { return SpeakingBorderColor; }
+            if (state == WhosTalkingState.Muted && ShowMuted) { return MutedBorderColor; }
+            if (ShowDeafened) { return DeafenedBorderColor; }
+
+            return null;
+        }
     }
 
     [Exportable(false)]

@@ -17,6 +17,9 @@
     + You can search for DelvUI settings by name to open the config window in the relevant section.
     + For example searching for `black mage` will yield a result named `DelvUI Settings: Job Specific Bars > Caster > Black Mage`, and selecting it will open DelvUI's Black Mage HUD configuration.
 
+- Added support for the Who's Talking plugin:
+    + Can be configured in Party Frames > Icons > Who's Talking
+
 - Added settings for Enemy Nameplate Castbars to match the width or height of the Health Bar:
     + These are intended to be used when the Health Bar size changes for targeted units.
     
