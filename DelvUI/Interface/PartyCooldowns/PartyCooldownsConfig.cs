@@ -648,6 +648,7 @@ namespace DelvUI.Interface.PartyCooldowns
             [7405] = NewData(7405, JobIDs.BRD, 62, 90, 15, 70, 2, PartyCooldownEnabled.PartyFrames, "90-120"), // troubadour
             [7408] = NewData(7408, JobIDs.BRD, 66, 120, 15, 40, 2, PartyCooldownEnabled.PartyFrames), // nature's minne
             [25785] = NewData(25785, JobIDs.BRD, 90, 110, 15, 30, 3, PartyCooldownEnabled.PartyCooldowns), // radiant finale
+            [101] = NewData(101, JobIDs.BRD, 4, 120, 20, 90, 3, PartyCooldownEnabled.PartyFrames), // raging strikes
 
             // DNC
             [16012] = NewData(16012, JobIDs.DNC, 56, 90, 15, 70, 2, PartyCooldownEnabled.PartyFrames, "90-120"), // shield samba
