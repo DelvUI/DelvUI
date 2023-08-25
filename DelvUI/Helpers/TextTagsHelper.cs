@@ -180,11 +180,11 @@ namespace DelvUI.Helpers
 
             ["[mana:percent-decimal-uniform]"] = (currentMp, maxMp) => ConsistentDigitPercentage(currentMp, maxMp),
 
-            ["[mana:deficit]"] = (currentMp, maxMp) => currentMp == maxMp ? "0" : $"-{currentMp - maxMp}",
+            ["[mana:deficit]"] = (currentMp, maxMp) => currentMp == maxMp ? "0" : $"-{maxMp - currentMp}",
 
-            ["[mana:deficit-formatted]"] = (currentMp, maxMp) => currentMp == maxMp ? "0" : $"-{currentMp - maxMp:N0}",
+            ["[mana:deficit-formatted]"] = (currentMp, maxMp) => currentMp == maxMp ? "0" : $"-{maxMp - currentMp:N0}",
 
-            ["[mana:deficit-short]"] = (currentMp, maxMp) => currentMp == maxMp ? "0" : $"-{(currentMp - maxMp).KiloFormat()}",
+            ["[mana:deficit-short]"] = (currentMp, maxMp) => currentMp == maxMp ? "0" : $"-{(maxMp - currentMp).KiloFormat()}",
             #endregion
         };
 
