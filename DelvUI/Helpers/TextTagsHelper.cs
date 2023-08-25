@@ -127,6 +127,8 @@ namespace DelvUI.Helpers
             #region health
             ["[health:current]"] = (currentHp, maxHp) => currentHp.ToString(),
 
+            ["[health:current-formatted]"] = (currentHp, maxHp) => currentHp.ToString("N0"),
+
             ["[health:current-short]"] = (currentHp, maxHp) => currentHp.KiloFormat(),
 
             ["[health:current-percent]"] = (currentHp, maxHp) => currentHp == maxHp ? currentHp.ToString() : (100f * currentHp / Math.Max(1, maxHp)).ToString("N0") + "%",
@@ -134,6 +136,8 @@ namespace DelvUI.Helpers
             ["[health:current-percent-short]"] = (currentHp, maxHp) => currentHp == maxHp ? currentHp.KiloFormat() : (100f * currentHp / Math.Max(1, maxHp)).ToString("N0") + "%",
 
             ["[health:max]"] = (currentHp, maxHp) => maxHp.ToString(),
+
+            ["[health:max-formatted]"] = (currentHp, maxHp) => maxHp.ToString("N0"),
 
             ["[health:max-short]"] = (currentHp, maxHp) => maxHp.KiloFormat(),
 
@@ -145,6 +149,8 @@ namespace DelvUI.Helpers
 
             ["[health:deficit]"] = (currentHp, maxHp) => currentHp == maxHp ? "0" : $"-{maxHp - currentHp}",
 
+            ["[health:deficit-formatted]"] = (currentHp, maxHp) => currentHp == maxHp ? "0" : $"-{maxHp - currentHp:N0}",
+
             ["[health:deficit-short]"] = (currentHp, maxHp) => currentHp == maxHp ? "0" : $"-{(maxHp - currentHp).KiloFormat()}",
             #endregion
         };
@@ -154,6 +160,8 @@ namespace DelvUI.Helpers
             #region mana
             ["[mana:current]"] = (currentMp, maxMp) => currentMp.ToString(),
 
+            ["[mana:current-formatted]"] = (currentMp, maxMp) => currentMp.ToString("N0"),
+
             ["[mana:current-short]"] = (currentMp, maxMp) => currentMp.KiloFormat(),
 
             ["[mana:current-percent]"] = (currentMp, maxMp) => currentMp == maxMp ? currentMp.ToString() : (100f * currentMp / Math.Max(1, maxMp)).ToString("N0") + "%",
@@ -161,6 +169,8 @@ namespace DelvUI.Helpers
             ["[mana:current-percent-short]"] = (currentMp, maxMp) => currentMp == maxMp ? currentMp.KiloFormat() : (100f * currentMp / Math.Max(1, maxMp)).ToString("N0") + "%",
 
             ["[mana:max]"] = (currentMp, maxMp) => maxMp.ToString(),
+
+            ["[mana:max-formatted]"] = (currentMp, maxMp) => maxMp.ToString("N0"),
 
             ["[mana:max-short]"] = (currentMp, maxMp) => maxMp.KiloFormat(),
 
@@ -171,6 +181,8 @@ namespace DelvUI.Helpers
             ["[mana:percent-decimal-uniform]"] = (currentMp, maxMp) => ConsistentDigitPercentage(currentMp, maxMp),
 
             ["[mana:deficit]"] = (currentMp, maxMp) => currentMp == maxMp ? "0" : $"-{currentMp - maxMp}",
+
+            ["[mana:deficit-formatted]"] = (currentMp, maxMp) => currentMp == maxMp ? "0" : $"-{currentMp - maxMp:N0}",
 
             ["[mana:deficit-short]"] = (currentMp, maxMp) => currentMp == maxMp ? "0" : $"-{(currentMp - maxMp).KiloFormat()}",
             #endregion
@@ -242,6 +254,11 @@ namespace DelvUI.Helpers
         {
             int length = 0;
             ParseLength(ref tag, ref length);
+
+            string formatDecimal = ".";
+            string formatThousand = ",";
+            bool formatNumber = false;
+            ParseFormatNumber(ref tag, ref formatDecimal, ref formatThousand, ref formatNumber);
 
             if (TextTags.TryGetValue(tag, out Func<GameObject?, string?, int, bool?, string>? func) && func != null)
             {
@@ -406,6 +423,25 @@ namespace DelvUI.Helpers
                 tag = tag.Substring(0, tag.Length - lengthString.Length - 2) + "]";
             }
         }
+
+        private static void ParseFormatNumber(ref string tag, ref string formatDecimal, ref string formatThousand, ref bool formatNumber)
+        {
+            int index = tag.IndexOf("#");
+            if (index != -1)
+            {
+                string lengthString = tag.Substring(index + 1);
+                lengthString = lengthString.Substring(0, lengthString.Length - 1);
+                try
+                {
+                    formatDecimal = lengthString.Substring(0, 1);
+                    formatThousand = lengthString.Substring(1, 1);
+                    formatNumber = true;
+                }
+                catch { }
+                tag = tag.Substring(0, tag.Length - lengthString.Length - 2) + "]";
+            }
+        }
+
         private static string ValidateName(GameObject? actor, string? name)
         {
             string? n = actor?.Name.ToString() ?? name;
