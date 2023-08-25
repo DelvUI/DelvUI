@@ -3,6 +3,7 @@
 - Added Bard's Raging Strikes to the tracked Party Cooldowns.
 - Party Cooldowns priorty can now be edited with double click.
 - Fixed tooltips showing "()" when the source name is empty.
+- Fixed tooltips making other Dalamud windows to lose focus.
 
 # 2.0.0.0
 - Added a Bar Texture setting for all bars:

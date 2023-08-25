@@ -135,7 +135,8 @@ namespace DelvUI.Helpers
                 | ImGuiWindowFlags.NoDecoration
                 | ImGuiWindowFlags.NoBackground
                 | ImGuiWindowFlags.NoInputs
-                | ImGuiWindowFlags.NoSavedSettings;
+                | ImGuiWindowFlags.NoSavedSettings
+                | ImGuiWindowFlags.NoFocusOnAppearing;
 
             // imgui clips the left and right borders inside windows for some reason
             // we make the window bigger so the actual drawable size is the expected one
@@ -144,7 +145,6 @@ namespace DelvUI.Helpers
 
             ImGui.SetNextWindowPos(windowPos, ImGuiCond.Always);
             ImGui.SetNextWindowSize(_size + windowMargin * 2);
-            ImGui.SetNextWindowFocus();
 
             ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
             ImGui.Begin("DelvUI_tooltip", windowFlags);
