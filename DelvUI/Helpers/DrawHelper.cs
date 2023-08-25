@@ -1,5 +1,6 @@
 using Dalamud.Interface;
 using DelvUI.Config;
+using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using ImGuiScene;
@@ -31,6 +32,31 @@ namespace DelvUI.Helpers
                 GradientDirection.Up => new[] { color.BottomGradient, color.BottomGradient, color.TopGradient, color.TopGradient },
                 _ => new[] { color.TopGradient, color.TopGradient, color.BottomGradient, color.BottomGradient }
             };
+        }
+        
+        private static Vector2 GetBarTextureUV1Vector(Vector2 size, int textureWidth, int textureHeight, BarTextureDrawMode drawMode)
+        {
+            if (drawMode == BarTextureDrawMode.Stretch) { return new Vector2(1); }
+
+            float x = drawMode == BarTextureDrawMode.RepeatVertical ? 1 : (float)size.X / textureWidth;
+            float y = drawMode == BarTextureDrawMode.RepeatHorizontal ? 1 : (float)size.Y / textureHeight;
+
+            return new Vector2(x, y);
+        }
+
+        public static void DrawBarTexture(Vector2 position, Vector2 size, PluginConfigColor color, string? name, BarTextureDrawMode drawMode, ImDrawListPtr drawList)
+        {
+            TextureWrap? texture = BarTexturesManager.Instance?.GetBarTexture(name);
+            if (texture == null)
+            {
+                DrawGradientFilledRect(position, size, color, drawList);
+                return;
+            }
+
+            Vector2 uv0 = new Vector2(0);
+            Vector2 uv1 = GetBarTextureUV1Vector(size, texture.Width, texture.Height, drawMode);
+
+            drawList.AddImage(texture.ImGuiHandle, position, position + size, uv0, uv1, color.Base);
         }
 
         public static void DrawGradientFilledRect(Vector2 position, Vector2 size, PluginConfigColor color, ImDrawListPtr drawList)
@@ -230,7 +256,7 @@ namespace DelvUI.Helpers
             DrawGradientFilledRect(cursorPos, new Vector2(Math.Max(1, barSize.X * shield), h), color, drawList);
         }
 
-        public static void DrawInWindow(string name, Vector2 pos, Vector2 size, bool needsInput, bool needsFocus, Action<ImDrawListPtr> drawAction)
+        public static void DrawInWindow(string name, Vector2 pos, Vector2 size, bool needsInput, Action<ImDrawListPtr> drawAction)
         {
             const ImGuiWindowFlags windowFlags = ImGuiWindowFlags.NoTitleBar |
                                                  ImGuiWindowFlags.NoScrollbar |
@@ -238,7 +264,7 @@ namespace DelvUI.Helpers
                                                  ImGuiWindowFlags.NoMove |
                                                  ImGuiWindowFlags.NoResize;
 
-            DrawInWindow(name, pos, size, needsInput, needsFocus, false, windowFlags, drawAction);
+            DrawInWindow(name, pos, size, needsInput, false, windowFlags, drawAction);
         }
 
         public static void DrawInWindow(
@@ -246,7 +272,6 @@ namespace DelvUI.Helpers
             Vector2 pos,
             Vector2 size,
             bool needsInput,
-            bool needsFocus,
             bool needsWindow,
             ImGuiWindowFlags windowFlags,
             Action<ImDrawListPtr> drawAction)
@@ -258,16 +283,11 @@ namespace DelvUI.Helpers
                 return;
             }
 
-            windowFlags |= ImGuiWindowFlags.NoSavedSettings;
+            windowFlags |= ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoBringToFrontOnFocus;
 
             if (!needsInput)
             {
                 windowFlags |= ImGuiWindowFlags.NoInputs;
-            }
-
-            if (!needsFocus)
-            {
-                windowFlags |= ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoBringToFrontOnFocus;
             }
 
             ClipRect? clipRect = ClipRectsHelper.Instance.GetClipRectForArea(pos, size);

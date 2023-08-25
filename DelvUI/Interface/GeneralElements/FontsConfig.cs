@@ -28,7 +28,7 @@ namespace DelvUI.Interface.GeneralElements
     }
 
     [Disableable(false)]
-    [Section("Misc")]
+    [Section("Customization")]
     [SubSection("Fonts", 0)]
     public class FontsConfig : PluginConfigObject
     {
@@ -51,7 +51,7 @@ namespace DelvUI.Interface.GeneralElements
             
         };
 
-        [JsonIgnore] public static readonly List<string> DefaultFontsKeys = new List<string>() { "big-noodle-too_24", "big-noodle-too_20", "big-noodle-too_16" };
+        [JsonIgnore] public static readonly List<string> DefaultFontsKeys = new List<string>() { "Expressway_24", "Expressway_20", "Expressway_16" };
 
         [JsonIgnore] public static string DefaultBigFontKey => DefaultFontsKeys[0];
         [JsonIgnore] public static string DefaultMediumFontKey => DefaultFontsKeys[1];
@@ -207,12 +207,12 @@ namespace DelvUI.Interface.GeneralElements
 
             var indexToRemove = -1;
 
-            if (ImGui.BeginChild("Fonts", new Vector2(400, 400), false, ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+            if (ImGui.BeginChild("Fonts", new Vector2(400, 500), false, ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
                 if (_fonts.Length == 0)
                 {
                     ImGuiHelper.Tab();
-                    ImGui.Text("Default font not found in \"%appdata%/Roaming/XIVLauncher/InstalledPlugins/DelvUI/Media/Fonts/big-noodle-too.ttf\"");
+                    ImGui.Text("Default font not found in \"%appdata%/Roaming/XIVLauncher/InstalledPlugins/DelvUI/Media/Fonts/Expressway.ttf\"");
                     return false;
                 }
 
@@ -254,7 +254,7 @@ namespace DelvUI.Interface.GeneralElements
                 ImGui.PopFont();
 
                 ImGuiHelper.NewLineAndTab();
-                if (ImGui.BeginTable("table", 3, flags, new Vector2(326, 150)))
+                if (ImGui.BeginTable("table", 3, flags, new Vector2(326, 300)))
                 {
                     ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch, 0, 0);
                     ImGui.TableSetupColumn("Size", ImGuiTableColumnFlags.WidthFixed, 0, 1);
@@ -306,7 +306,6 @@ namespace DelvUI.Interface.GeneralElements
                     ImGui.EndTable();
                 }
 
-                ImGui.NewLine();
                 ImGuiHelper.NewLineAndTab();
                 if (ImGui.Checkbox("Support Chinese", ref SupportChineseCharacters))
                 {

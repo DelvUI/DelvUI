@@ -2,6 +2,7 @@ using Dalamud.Logging;
 using DelvUI.Config.Attributes;
 using DelvUI.Config.Profiles;
 using DelvUI.Helpers;
+using DelvUI.Interface;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
@@ -28,6 +29,50 @@ namespace DelvUI.Config.Tree
                 GenerateNestedConfigPageNodes();
                 _drawList = null;
             }
+        }
+
+        public override List<T> GetObjects<T>()
+        {
+            List<T> list = new List<T>();
+            if (_configObject == null) { return list; }
+
+            Type type = typeof(T);
+            if (_configObject is T obj)
+            {
+                list.Add(obj);
+            }
+
+            PropertyInfo[] properties = _configObject.GetType().GetProperties();
+            foreach (PropertyInfo property in properties)
+            {
+                if (property.PropertyType != type && !property.PropertyType.IsSubclassOf(type))
+                {
+                    continue;
+                }
+
+                object? value = property.GetValue(_configObject);
+                if (value != null && value is T o)
+                {
+                    list.Add(o);
+                }
+            }
+
+            FieldInfo[] fields = _configObject.GetType().GetFields();
+            foreach (FieldInfo field in fields)
+            {
+                if (field.FieldType != type && !field.FieldType.IsSubclassOf(type))
+                {
+                    continue;
+                }
+
+                object? value = field.GetValue(_configObject);
+                if (value != null && value is T o)
+                {
+                    list.Add(o);
+                }
+            }
+
+            return list;
         }
 
         private void GenerateNestedConfigPageNodes()
@@ -250,7 +295,7 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        public override void Load(string path, string currentVersion, string? previousVersion = null)
+        public override void Load(string path)
         {
             if (ConfigObject is not PluginConfigObject) { return; }
 
@@ -263,7 +308,7 @@ namespace DelvUI.Config.Tree
             MethodInfo? methodInfo = ConfigObject.GetType().GetMethod("Load");
             MethodInfo? function = methodInfo?.MakeGenericMethod(ConfigObject.GetType());
 
-            object?[] args = new object?[] { finalPath, currentVersion, previousVersion };
+            object?[] args = new object?[] { finalPath };
             PluginConfigObject? config = (PluginConfigObject?)function?.Invoke(ConfigObject, args);
 
             ConfigObject = config ?? ConfigObject;
@@ -271,7 +316,23 @@ namespace DelvUI.Config.Tree
 
         public override void Reset()
         {
-            ConfigObject = ConfigurationManager.GetDefaultConfigObjectForType(ConfigObject.GetType());
+            Type type = ConfigObject.GetType();
+            ImportData? importData = ProfilesManager.Instance.DefaultImportData(type);
+
+            if (importData == null)
+            {
+                PluginLog.Error("Error finding default import data for type " + type.ToString());
+                return;
+            }
+
+            PluginConfigObject? config = importData.GetObject();
+            if (config == null)
+            {
+                PluginLog.Error("Error importing default import data for type " + type.ToString());
+                return;
+            }
+
+            ConfigObject = config;
         }
 
         public override ConfigPageNode? GetOrAddConfig<T>() => this;

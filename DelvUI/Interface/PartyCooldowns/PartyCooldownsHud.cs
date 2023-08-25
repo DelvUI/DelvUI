@@ -74,6 +74,8 @@ namespace DelvUI.Interface.PartyCooldowns
             {
                 foreach (PartyCooldown cooldown in memberCooldownList.Values)
                 {
+                    if (!cooldown.Data.IsEnabledForPartyCooldowns()) { continue; }
+
                     int columnIndex = Math.Min(columnCount - 1, cooldown.Data.Column - 1);
                     _cooldowns[columnIndex].Add(cooldown);
                 }
@@ -181,6 +183,20 @@ namespace DelvUI.Interface.PartyCooldowns
                         PluginConfigColor fillColor = effectTime > 0 ? _barConfig.AvailableColor : _barConfig.RechargingColor;
                         PluginConfigColor bgColor = effectTime > 0 || cooldownTime == 0 ? _barConfig.AvailableBackgroundColor : _barConfig.RechargingBackgroundColor;
 
+                        if (_barConfig.UseJobColors)
+                        {
+                            uint? jobId = GetJobId(cooldown, player);
+                            if (jobId.HasValue)
+                            {
+                                PluginConfigColor jobColor = GlobalColors.Instance.SafeColorForJobId(jobId.Value);
+                                PluginConfigColor bgJobColor = jobColor.WithAlpha(40f / 100f);
+                                PluginConfigColor rechargeJobColor = jobColor.WithAlpha(25f / 100f);
+                                PluginConfigColor nonActive = PluginConfigColor.FromHex(0x88FFFFFF);
+                                fillColor = effectTime > 0 ? jobColor : rechargeJobColor;
+                                bgColor = effectTime > 0 || cooldownTime == 0 ? bgJobColor : nonActive;
+                            }
+                        }
+
                         Rect background = new Rect(pos, size, bgColor);
                         Rect fill = BarUtilities.GetFillRect(pos, size, _barConfig.FillDirection, fillColor, current, max);
 
@@ -191,7 +207,9 @@ namespace DelvUI.Interface.PartyCooldowns
                             _barConfig.BorderThickness,
                             DrawAnchor.TopLeft,
                             current: current,
-                            max: max
+                            max: max,
+                            barTextureName: _barConfig.BarTextureName,
+                            barTextureDrawMode: _barConfig.BarTextureDrawMode
                         );
 
                         bar.SetBackground(background);
@@ -209,7 +227,7 @@ namespace DelvUI.Interface.PartyCooldowns
 
                         AddDrawAction(_barConfig.StrataLevel, () =>
                         {
-                            DrawHelper.DrawInWindow(barId + "_icon", iconPos, iconSize, false, false, (drawList) =>
+                            DrawHelper.DrawInWindow(barId + "_icon", iconPos, iconSize, false, (drawList) =>
                             {
                                 uint color = recharging ? 0xAAFFFFFF : 0xFFFFFFFF;
                                 DrawHelper.DrawIcon(cooldown.Data.IconId, iconPos, iconSize, false, color, drawList);
@@ -279,6 +297,19 @@ namespace DelvUI.Interface.PartyCooldowns
 
                 addedOffset = false;
             }
+        }
+
+        private uint? GetJobId(PartyCooldown cooldown, PlayerCharacter player)
+        {
+            uint jobId = cooldown.Data.JobId;
+            if (jobId != 0) { return jobId; }
+
+            if (cooldown.Member != null) { return cooldown.Member.JobId; }
+
+            if (cooldown.SourceId == player.ObjectId) { return player.ClassJob.Id; }
+
+            Character? chara = Plugin.ObjectTable.SearchById(cooldown.SourceId) as Character;
+            return chara?.ClassJob.Id;
         }
     }
 }

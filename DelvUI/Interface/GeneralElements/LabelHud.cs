@@ -106,7 +106,7 @@ namespace DelvUI.Interface.GeneralElements
                 }
             };
 
-            DrawHelper.DrawInWindow(ID, pos, size, false, true, (drawList) =>
+            DrawHelper.DrawInWindow(ID, pos, size, false, (drawList) =>
             {
                 if (Config.UseSystemFont())
                 {
@@ -228,7 +228,7 @@ namespace DelvUI.Interface.GeneralElements
             Vector2 pos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(parentPos + Config.Position, -parentSize, Config.FrameAnchor), size, Config.TextAnchor);
             ImGui.PopFont();
 
-            DrawHelper.DrawInWindow(ID, pos, size, false, true, (drawList) =>
+            DrawHelper.DrawInWindow(ID, pos, size, false, (drawList) =>
             {
                 ImGui.SetWindowFontScale(Config.GetFontScale());
                 ImGui.PushFont(UiBuilder.IconFont);

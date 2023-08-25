@@ -1,9 +1,11 @@
-﻿using Dalamud.Interface;
+﻿using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Interface;
 using Dalamud.Interface.ImGuiFileDialog;
 using Dalamud.Logging;
 using DelvUI.Config.Attributes;
 using DelvUI.Config.Tree;
 using DelvUI.Helpers;
+using DelvUI.Interface;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
@@ -39,15 +41,39 @@ namespace DelvUI.Config.Profiles
             // default profile
             if (!Profiles.ContainsKey(DefaultProfileName))
             {
-                var defaultProfile = new Profile(DefaultProfileName);
+                Profile defaultProfile = new Profile(DefaultProfileName);
                 Profiles.Add(DefaultProfileName, defaultProfile);
             }
+        }
 
-            // make sure default profile file is created the first time this runs
-            if (!File.Exists(CurrentProfilePath()))
+        private bool ResetProfileToDefault(string profileName, bool forced = false)
+        {
+            string endPath = Path.Combine(ProfilesPath, profileName + ".delvui");
+
+            if (forced)
             {
-                SaveCurrentProfile();
+                try
+                {
+                    File.Delete(endPath);
+                } catch { }
             }
+
+            if (forced || !File.Exists(endPath))
+            {
+                try
+                {
+                    Directory.CreateDirectory(ProfilesPath);
+                    File.Copy(MediaDefaultProfilePath, endPath);
+
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    PluginLog.Error("Error copying default profile!: " + e.Message);
+                }
+            }
+
+            return false;
         }
 
         public static void Initialize()
@@ -75,6 +101,42 @@ namespace DelvUI.Config.Profiles
             catch
             {
                 Instance = new ProfilesManager();
+            }
+
+            // always make sure the default profile file is present
+            if (!File.Exists(DefaultProfilePath))
+            {
+                if (Instance.ResetProfileToDefault(DefaultProfileName))
+                {
+                    if (Instance.CurrentProfileName == DefaultProfileName)
+                    {
+                        Instance.ReloadCurrentProfile();
+                    }
+                }
+            }
+
+            Instance.UpdateSelectedIndex();
+            Instance.InitializeDefaultImportData();
+        }
+
+        private void InitializeDefaultImportData()
+        {
+            string importString = File.ReadAllText(MediaDefaultProfilePath);
+
+            string[] importStrings = importString.Trim().Split(new string[] { "|" }, StringSplitOptions.RemoveEmptyEntries);
+            if (importStrings.Length == 0)
+            {
+                return;
+            }
+
+            foreach (var str in importStrings)
+            {
+                try
+                {
+                    ImportData importData = new ImportData(str);
+                    _defaultImportData.Add(importData);
+                }
+                catch { }
             }
         }
 
@@ -120,14 +182,19 @@ namespace DelvUI.Config.Profiles
                     _currentProfileName = DefaultProfileName;
                 }
 
-                _selectedProfileIndex = Math.Max(0, Profiles.Keys.IndexOf(_currentProfileName));
+                UpdateSelectedIndex();
             }
         }
 
         [JsonIgnore] private static string ProfilesPath => Path.Combine(ConfigurationManager.Instance.ConfigDirectory, "Profiles");
         [JsonIgnore] private static string JsonPath => Path.Combine(ProfilesPath, "Profiles.json");
+        [JsonIgnore] private static string MediaDefaultProfilePath => Path.Combine(Plugin.AssemblyLocation, "Media", "Profiles", DefaultProfileName + ".delvui");
 
-        [JsonIgnore] private readonly string DefaultProfileName = "Default";
+        [JsonIgnore] private static string DefaultProfileName = "Default";
+        [JsonIgnore] private static string DefaultProfilePath = Path.Combine(ProfilesPath, DefaultProfileName + ".delvui");
+
+        [JsonIgnore] private List<ImportData> _defaultImportData = new List<ImportData>();
+
         [JsonIgnore] private string _newProfileName = "";
         [JsonIgnore] private int _copyFromIndex = 0;
         [JsonIgnore] private int _selectedProfileIndex = 0;
@@ -139,6 +206,11 @@ namespace DelvUI.Config.Profiles
         [JsonIgnore] private FileDialogManager _fileDialogManager = new FileDialogManager();
 
         public SortedList<string, Profile> Profiles = new SortedList<string, Profile>();
+
+        public ImportData? DefaultImportData(Type type)
+        {
+            return _defaultImportData.FirstOrDefault(o => o.ConfigType == type);
+        }
 
         public Profile CurrentProfile()
         {
@@ -191,7 +263,7 @@ namespace DelvUI.Config.Profiles
         {
             try
             {
-                var importString = File.ReadAllText(CurrentProfilePath());
+                string importString = File.ReadAllText(CurrentProfilePath());
                 return ConfigurationManager.Instance.ImportProfile(oldProfile, _currentProfileName, importString);
             }
             catch (Exception e)
@@ -202,9 +274,28 @@ namespace DelvUI.Config.Profiles
             return false;
         }
 
+        private bool ReloadCurrentProfile()
+        {
+            try
+            {
+                string importString = File.ReadAllText(CurrentProfilePath());
+                if (ConfigurationManager.Instance.ImportProfile(_currentProfileName, _currentProfileName, importString, true))
+                {
+                    ConfigurationManager.Instance.SaveConfigurations(true);
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                PluginLog.Error("Error re-loading profile: " + e.Message);
+            }
+
+            return false;
+        }
+
         public void UpdateCurrentProfile()
         {
-            var player = Plugin.ClientState.LocalPlayer;
+            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (player == null)
             {
                 return;
@@ -275,7 +366,7 @@ namespace DelvUI.Config.Profiles
                 return "Couldn't load profile \"" + profile + "\"!";
             }
 
-            _selectedProfileIndex = Math.Max(0, Profiles.IndexOfKey(profile));
+            UpdateSelectedIndex();
 
             try
             {
@@ -291,6 +382,11 @@ namespace DelvUI.Config.Profiles
             return null;
         }
 
+        private void UpdateSelectedIndex()
+        {
+            _selectedProfileIndex = Math.Max(0, Profiles.IndexOfKey(_currentProfileName));
+        }
+
         private string CurrentProfilePath()
         {
             return Path.Combine(ProfilesPath, _currentProfileName + ".delvui");
@@ -298,8 +394,8 @@ namespace DelvUI.Config.Profiles
 
         private string? CloneProfile(string profileName, string newProfileName)
         {
-            var srcPath = Path.Combine(ProfilesPath, profileName + ".delvui");
-            var dstPath = Path.Combine(ProfilesPath, newProfileName + ".delvui");
+            string srcPath = Path.Combine(ProfilesPath, profileName + ".delvui");
+            string dstPath = Path.Combine(ProfilesPath, newProfileName + ".delvui");
 
             return CloneProfile(profileName, srcPath, newProfileName, dstPath);
         }
@@ -329,7 +425,7 @@ namespace DelvUI.Config.Profiles
                 }
 
                 File.Copy(srcPath, dstPath);
-                var newProfile = new Profile(newProfileName);
+                Profile newProfile = new Profile(newProfileName);
                 Profiles.Add(newProfileName, newProfile);
 
                 Save();
@@ -355,8 +451,8 @@ namespace DelvUI.Config.Profiles
                 return "A profile with the name \"" + newProfileName + "\" already exists!";
             }
 
-            var srcPath = Path.Combine(ProfilesPath, _currentProfileName + ".delvui");
-            var dstPath = Path.Combine(ProfilesPath, newProfileName + ".delvui");
+            string srcPath = Path.Combine(ProfilesPath, _currentProfileName + ".delvui");
+            string dstPath = Path.Combine(ProfilesPath, newProfileName + ".delvui");
 
             try
             {
@@ -399,7 +495,7 @@ namespace DelvUI.Config.Profiles
                 return "A profile with the name \"" + newProfileName + "\" already exists!";
             }
 
-            var dstPath = Path.Combine(ProfilesPath, newProfileName + ".delvui");
+            string dstPath = Path.Combine(ProfilesPath, newProfileName + ".delvui");
 
             try
             {
@@ -410,7 +506,7 @@ namespace DelvUI.Config.Profiles
 
                 File.WriteAllText(dstPath, importString);
 
-                var newProfile = new Profile(newProfileName);
+                Profile newProfile = new Profile(newProfileName);
                 Profiles.Add(newProfileName, newProfile);
 
                 string? errorMessage = SwitchToProfile(newProfileName, false);
@@ -457,7 +553,7 @@ namespace DelvUI.Config.Profiles
                 {
                     if (finished && path.Length > 0)
                     {
-                        var importString = File.ReadAllText(path);
+                        string importString = File.ReadAllText(path);
                         _errorMessage = Import(newProfileName, importString);
 
                         if (_errorMessage == null)
@@ -510,7 +606,7 @@ namespace DelvUI.Config.Profiles
                 return "Couldn't find profile \"" + profileName + "\"!";
             }
 
-            var path = Path.Combine(ProfilesPath, profileName + ".delvui");
+            string path = Path.Combine(ProfilesPath, profileName + ".delvui");
 
             try
             {
@@ -523,6 +619,8 @@ namespace DelvUI.Config.Profiles
                 Profiles.Remove(profileName);
 
                 Save();
+
+                ConfigurationManager.Instance.OnProfileDeleted(profileName);
 
                 if (_currentProfileName == profileName)
                 {
@@ -571,7 +669,7 @@ namespace DelvUI.Config.Profiles
                 ImGuiHelper.NewLineAndTab();
                 if (ImGui.Combo("Active Profile", ref _selectedProfileIndex, profiles, profiles.Length, 10))
                 {
-                    var newProfileName = profiles[_selectedProfileIndex];
+                    string newProfileName = profiles[_selectedProfileIndex];
 
                     if (_currentProfileName != newProfileName)
                     {
@@ -760,7 +858,9 @@ namespace DelvUI.Config.Profiles
 
                 if (didConfirm)
                 {
-                    ConfigurationManager.Instance.ResetConfig();
+                    ResetProfileToDefault(_resetingProfileName, true);
+                    ReloadCurrentProfile();
+
                     changed = true;
                 }
 

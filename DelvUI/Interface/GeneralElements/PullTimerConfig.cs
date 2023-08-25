@@ -6,7 +6,7 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [Section("Misc")]
+    [Section("Other Elements")]
     [SubSection("Pull Timer", 0)]
     public class PullTimerConfig : ProgressBarConfig
     {

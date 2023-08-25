@@ -98,9 +98,10 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.7.1.5";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.0.0.0";
 
             FontsManager.Initialize(AssemblyLocation);
+            BarTexturesManager.Initialize(AssemblyLocation);
             LoadBanner();
 
             // initialize a not-necessarily-defaults configuration
@@ -109,7 +110,7 @@ namespace DelvUI
             ConfigurationManager.Instance.LoadOrInitializeFiles();
 
             FontsManager.Instance.LoadConfig();
-
+            BarTexturesManager.Instance.LoadConfig();
 
             ChatHelper.Initialize();
             ClipRectsHelper.Initialize();
@@ -123,6 +124,9 @@ namespace DelvUI
             TextTagsHelper.Initialize();
             TexturesCache.Initialize();
             TooltipsHelper.Initialize();
+            PetRenamerHelper.Initialize();
+            WotsitHelper.Initialize();
+            WhosTalkingHelper.Initialize();
 
             _hudManager = new HudManager();
 
@@ -142,6 +146,8 @@ namespace DelvUI
                     ShowInHelp = true
                 }
             );
+
+            WotsitHelper.Instance?.Update();
         }
 
         public void Dispose()
@@ -283,6 +289,7 @@ namespace DelvUI
 
             ConfigurationManager.Instance.Draw();
             PartyManager.Instance?.Update();
+            WhosTalkingHelper.Instance?.Update();
 
             bool fontPushed = FontsManager.Instance.PushDefaultFont();
 
@@ -323,6 +330,7 @@ namespace DelvUI
             UiBuilder.OpenConfigUi -= OpenConfigUi;
             UiBuilder.RebuildFonts();
 
+            BarTexturesManager.Instance?.Dispose();
             ChatHelper.Instance?.Dispose();
             ClipRectsHelper.Instance?.Dispose();
             ExperienceHelper.Instance?.Dispose();
@@ -338,6 +346,8 @@ namespace DelvUI
             SpellHelper.Instance?.Dispose();
             TexturesCache.Instance?.Dispose();
             TooltipsHelper.Instance?.Dispose();
+            WotsitHelper.Instance?.Dispose();
+            WhosTalkingHelper.Instance?.Dispose();
 
             // This needs to remain last to avoid race conditions
             ConfigurationManager.Instance?.Dispose();

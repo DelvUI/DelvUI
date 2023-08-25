@@ -256,7 +256,7 @@ namespace DelvUI.Interface
         }
     }
 
-    public struct ImportData
+    public class ImportData
     {
         public readonly Type ConfigType;
         public readonly string Name;
@@ -269,7 +269,7 @@ namespace DelvUI.Interface
             ImportString = base64String;
             JsonString = ImportExportHelper.Base64DecodeAndDecompress(base64String);
 
-            var typeString = (string?)JObject.Parse(JsonString)["$type"];
+            string? typeString = (string?)JObject.Parse(JsonString)["$type"];
             if (typeString == null)
             {
                 throw new ArgumentException("Invalid type");

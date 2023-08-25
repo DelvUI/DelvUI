@@ -1,14 +1,12 @@
-﻿using Dalamud.Logging;
-using DelvUI.Config;
+﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
+using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Numerics;
 
 namespace DelvUI.Interface.Party
@@ -85,7 +83,7 @@ namespace DelvUI.Interface.Party
         [Order(31)]
         public Vector2 Padding = new Vector2(0, 0);
 
-        [NestedConfig("Name Label", 40)]
+        [NestedConfig("Name Label", 44)]
         public EditableLabelConfig NameLabelConfig = new EditableLabelConfig(Vector2.Zero, "[name:initials].", DrawAnchor.Center, DrawAnchor.Center);
 
         [NestedConfig("Health Label", 45)]
@@ -112,33 +110,6 @@ namespace DelvUI.Interface.Party
         public PartyFramesHealthBarsConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor, BarDirection fillDirection = BarDirection.Right)
             : base(position, size, fillColor, fillDirection)
         {
-        }
-
-        protected override PluginConfigObject? InternalLoad(FileInfo fileInfo, string currentVersion, string? previousVersion)
-        {
-            if (previousVersion == null) { return null; }
-
-            // change introduced in 0.6.2.0
-            Version previous = new Version(previousVersion);
-            if (previous.Major > 0 || previous.Minor > 6 || previous.Minor == 6 && previous.Build >= 2) { return null; }
-
-            PartyFramesHealthBarsConfig? config = LoadFromJson<PartyFramesHealthBarsConfig>(fileInfo.FullName);
-            if (config == null) { return null; }
-
-            config.FillDirection = BarDirection.Right;
-
-            return config;
-        }
-
-        public override void ImportFromOldVersion(Dictionary<Type, PluginConfigObject> oldConfigObjects, string currentVersion, string? previousVersion)
-        {
-            if (previousVersion == null) { return; }
-
-            // change introduced in 0.6.2.0
-            Version previous = new Version(previousVersion);
-            if (previous.Major > 0 || previous.Minor > 6 || previous.Minor == 6 && previous.Build >= 2) { return; }
-
-            FillDirection = BarDirection.Right;
         }
     }
 
@@ -422,58 +393,8 @@ namespace DelvUI.Interface.Party
         [NestedConfig("Ready Check Status", 14)]
         public PartyFramesReadyCheckStatusConfig ReadyCheckStatus = new PartyFramesReadyCheckStatusConfig();
 
-        protected override PluginConfigObject? InternalLoad(FileInfo fileInfo, string currentVersion, string? previousVersion)
-        {
-            if (previousVersion == null) { return null; }
-
-            // change introduced in 0.4.0.0
-            Version previous = new Version(previousVersion);
-            if (previous.Major > 0 || previous.Minor > 3) { return null; }
-
-            string? path = fileInfo.DirectoryName;
-            if (path == null) { return null; }
-
-            PartyFramesIconsConfig config = new PartyFramesIconsConfig();
-
-            // role / job icon
-            try
-            {
-                string nestedConfigPath = Path.Combine(path, "Role-Job Icon.json");
-                config.Role = LoadFromJson<PartyFramesRoleIconConfig>(nestedConfigPath) ?? config.Role;
-            }
-            catch (Exception e)
-            {
-                PluginLog.Error("Error while merging role-job icon configs: " + e.Message);
-            }
-
-            // party leader
-            try
-            {
-                string nestedConfigPath = Path.Combine(path, "Party Leader Icon.json");
-                config.Leader = LoadFromJson<PartyFramesLeaderIconConfig>(nestedConfigPath) ?? config.Leader;
-            }
-            catch (Exception e)
-            {
-                PluginLog.Error("Error while merging invuln tracker configs: " + e.Message);
-            }
-
-            return config;
-        }
-
-        public override void ImportFromOldVersion(Dictionary<Type, PluginConfigObject> oldConfigObjects, string currentVersion, string? previousVersion)
-        {
-            if (oldConfigObjects.TryGetValue(typeof(PartyFramesRoleIconConfig), out PluginConfigObject? roleObj)
-                && roleObj is PartyFramesRoleIconConfig role)
-            {
-                Role = role;
-            }
-
-            if (oldConfigObjects.TryGetValue(typeof(PartyFramesLeaderIconConfig), out PluginConfigObject? leaderObj)
-                && leaderObj is PartyFramesLeaderIconConfig leader)
-            {
-                Leader = leader;
-            }
-        }
+        [NestedConfig("Who's Talking", 15)]
+        public PartyFramesWhosTalkingConfig WhosTalking = new PartyFramesWhosTalkingConfig();
     }
 
     [Exportable(false)]
@@ -545,6 +466,77 @@ namespace DelvUI.Interface.Party
             DrawAnchor.TopRight,
             DrawAnchor.TopRight
         );
+    }
+
+    [Exportable(false)]
+    public class PartyFramesWhosTalkingConfig : PluginConfigObject
+    {
+        public new static PartyFramesWhosTalkingConfig DefaultConfig() => new PartyFramesWhosTalkingConfig();
+
+        [Checkbox("Replace Role/Job Icon when active")]
+        [Order(5)]
+        public bool ReplaceRoleJobIcon = false;
+
+        [Checkbox("Show Speaking State", spacing = true)]
+        [Order(10)]
+        public bool ShowSpeaking = true;
+
+        [Checkbox("Show Muted State")]
+        [Order(10)]
+        public bool ShowMuted = true;
+
+        [Checkbox("Show Deafened State")]
+        [Order(10)]
+        public bool ShowDeafened = true;
+
+        [NestedConfig("Icon", 20)]
+        public IconConfig Icon = new IconConfig(
+            new Vector2(0, 0),
+            new Vector2(24, 24),
+            DrawAnchor.TopRight,
+            DrawAnchor.TopRight
+        );
+
+        [Checkbox("Change Health Bar Border when active", spacing = true, help = "Enabling this will override other border settings!")]
+        [Order(30)]
+        public bool ChangeBorders = false;
+
+        [DragInt("Border Thickness", min = 1, max = 10)]
+        [Order(31, collapseWith = nameof(ChangeBorders))]
+        public int BorderThickness = 1;
+
+        [ColorEdit4("Speaking Border Color")]
+        [Order(32, collapseWith = nameof(ChangeBorders))]
+        public PluginConfigColor SpeakingBorderColor = PluginConfigColor.FromHex(0xFF40BB40);
+
+        [ColorEdit4("Muted Border Color")]
+        [Order(33, collapseWith = nameof(ChangeBorders))]
+        public PluginConfigColor MutedBorderColor = PluginConfigColor.FromHex(0xFF008080);
+
+        [ColorEdit4("Deafened Border Color")]
+        [Order(34, collapseWith = nameof(ChangeBorders))]
+        public PluginConfigColor DeafenedBorderColor = PluginConfigColor.FromHex(0xFFFF4444);
+
+        public bool EnabledForState(WhosTalkingState state)
+        {
+            switch (state)
+            {
+                case WhosTalkingState.Speaking: return ShowSpeaking;
+                case WhosTalkingState.Muted: return ShowMuted;
+                case WhosTalkingState.Deafened: return ShowDeafened;
+            }
+
+            return false;
+        }
+
+        public PluginConfigColor? ColorForState(WhosTalkingState state)
+        {
+            if (state == WhosTalkingState.Speaking && ShowSpeaking) { return SpeakingBorderColor; }
+            if (state == WhosTalkingState.Muted && ShowMuted) { return MutedBorderColor; }
+            if (ShowDeafened) { return DeafenedBorderColor; }
+
+            return null;
+        }
     }
 
     [Exportable(false)]
@@ -640,76 +632,6 @@ namespace DelvUI.Interface.Party
 
         [NestedConfig("Cleanse Tracker", 15)]
         public PartyFramesCleanseTrackerConfig Cleanse = new PartyFramesCleanseTrackerConfig();
-
-        protected override PluginConfigObject? InternalLoad(FileInfo fileInfo, string currentVersion, string? previousVersion)
-        {
-            if (previousVersion == null) { return null; }
-
-            // change introduced in 0.4.0.0
-            Version previous = new Version(previousVersion);
-            if (previous.Major > 0 || previous.Minor > 3) { return null; }
-
-            string? path = fileInfo.DirectoryName;
-            if (path == null) { return null; }
-
-            PartyFramesTrackersConfig config = new PartyFramesTrackersConfig();
-
-            // raise tracker
-            try
-            {
-                string nestedConfigPath = Path.Combine(path, "Raise Tracker.json");
-                config.Raise = LoadFromJson<PartyFramesRaiseTrackerConfig>(nestedConfigPath) ?? config.Raise;
-            }
-            catch (Exception e)
-            {
-                PluginLog.Error("Error while merging raise tracker configs: " + e.Message);
-            }
-
-            // invuln tracker
-            try
-            {
-                string nestedConfigPath = Path.Combine(path, "Invuln Tracker.json");
-                config.Invuln = LoadFromJson<PartyFramesInvulnTrackerConfig>(nestedConfigPath) ?? config.Invuln;
-            }
-            catch (Exception e)
-            {
-                PluginLog.Error("Error while merging invuln tracker configs: " + e.Message);
-            }
-
-            // cleanse tracker
-            try
-            {
-                string nestedConfigPath = Path.Combine(path, "Cleanse Tracker.json");
-                config.Cleanse = LoadFromJson<PartyFramesCleanseTrackerConfig>(nestedConfigPath) ?? config.Cleanse;
-            }
-            catch (Exception e)
-            {
-                PluginLog.Error("Error while merging cleanse tracker configs: " + e.Message);
-            }
-
-            return config;
-        }
-
-        public override void ImportFromOldVersion(Dictionary<Type, PluginConfigObject> oldConfigObjects, string currentVersion, string? previousVersion)
-        {
-            if (oldConfigObjects.TryGetValue(typeof(PartyFramesRaiseTrackerConfig), out PluginConfigObject? raiseObj)
-                && raiseObj is PartyFramesRaiseTrackerConfig raise)
-            {
-                Raise = raise;
-            }
-
-            if (oldConfigObjects.TryGetValue(typeof(PartyFramesInvulnTrackerConfig), out PluginConfigObject? invulvObj)
-                && invulvObj is PartyFramesInvulnTrackerConfig invuln)
-            {
-                Invuln = invuln;
-            }
-
-            if (oldConfigObjects.TryGetValue(typeof(PartyFramesCleanseTrackerConfig), out PluginConfigObject? cleanseObj)
-                && cleanseObj is PartyFramesCleanseTrackerConfig cleanse)
-            {
-                Cleanse = cleanse;
-            }
-        }
     }
 
     [Exportable(false)]
@@ -833,5 +755,85 @@ namespace DelvUI.Interface.Party
         [ColorEdit4("Border Color")]
         [Order(30, collapseWith = nameof(ChangeBorderCleanseColor))]
         public PluginConfigColor BorderColor = new(new Vector4(255f / 255f, 0f / 255f, 104f / 255f, 100f / 100f));
+    }
+
+    [Exportable(false)]
+    [DisableParentSettings("Anchor")]
+    [Section("Party Frames", true)]
+    [SubSection("Cooldowns", 0)]
+    public class PartyFramesCooldownListConfig : AnchorablePluginConfigObject
+    {
+        public new static PartyFramesCooldownListConfig DefaultConfig()
+        {
+            PartyFramesCooldownListConfig config = new PartyFramesCooldownListConfig();
+            config.Position = new Vector2(-2, 0);
+            config.Size = new Vector2(40 * 8 + 6, 40);
+
+            return config;
+        }
+
+        [Anchor("Health Bar Anchor")]
+        [Order(3)]
+        public DrawAnchor HealthBarAnchor = DrawAnchor.Left;
+
+        [Checkbox("Tooltips", spacing = true)]
+        [Order(20)]
+        public bool ShowTooltips = true;
+
+        [Checkbox("Preview", isMonitored = true)]
+        [Order(21)]
+        public bool Preview;
+
+        [DragInt2("Icon Size", min = 1, max = 4000, spacing = true)]
+        [Order(30)]
+        public Vector2 IconSize = new Vector2(40, 40);
+
+        [DragInt2("Icon Padding", min = 0, max = 500)]
+        [Order(31)]
+        public Vector2 IconPadding = new(4, 4);
+
+        [Checkbox("Fill Rows First")]
+        [Order(32)]
+        public bool FillRowsFirst = true;
+
+        [Combo("Icons Growth Direction",
+            "Right and Down",
+            "Right and Up",
+            "Left and Down",
+            "Left and Up",
+            "Centered and Up",
+            "Centered and Down",
+            "Centered and Left",
+            "Centered and Right"
+        )]
+        [Order(33)]
+        public int Directions = 3; // left & up
+
+        [Checkbox("Show Border", spacing = true)]
+        [Order(35)]
+        public bool DrawBorder = true;
+
+        [ColorEdit4("Border Color")]
+        [Order(36, collapseWith = nameof(DrawBorder))]
+        public PluginConfigColor BorderColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+
+        [DragInt("Border Thickness", min = 1, max = 10)]
+        [Order(37, collapseWith = nameof(DrawBorder))]
+        public int BorderThickness = 1;
+
+        [Checkbox("Change Icon Border When Active")]
+        [Order(45, collapseWith = nameof(DrawBorder))]
+        public bool ChangeIconBorderWhenActive = true;
+
+        [ColorEdit4("Icon Active Border Color")]
+        [Order(46, collapseWith = nameof(ChangeIconBorderWhenActive))]
+        public PluginConfigColor IconActiveBorderColor = new PluginConfigColor(new Vector4(255f / 255f, 200f / 255f, 35f / 255f, 100f / 100f));
+
+        [DragInt("Icon Active Border Thickness", min = 1, max = 10)]
+        [Order(47, collapseWith = nameof(ChangeIconBorderWhenActive))]
+        public int IconActiveBorderThickness = 3;
+
+        [NestedConfig("Time Label", 80)]
+        public NumericLabelConfig TimeLabel = new NumericLabelConfig(new Vector2(0, 0), "", DrawAnchor.Center, DrawAnchor.Center) { NumberFormat = 1 };
     }
 }

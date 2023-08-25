@@ -2,6 +2,7 @@
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
+using DelvUI.Interface.Party;
 using ImGuiNET;
 using ImGuiScene;
 using System;
@@ -23,7 +24,9 @@ namespace DelvUI.Config.Tree
         public string? SelectedOptionName = null;
 
         private List<Node> _extraNodes = new List<Node>();
-        private List<Node>? _nodes = null;
+        private List<Node> _nodes = new List<Node>();
+
+        public IReadOnlyCollection<Node> Sections => _nodes.AsReadOnly();
 
         private float _scale => ImGuiHelpers.GlobalScale;
 
@@ -35,7 +38,9 @@ namespace DelvUI.Config.Tree
         public void AddExtraSectionNode(SectionNode node)
         {
             _extraNodes.Add(node);
-            _nodes = null;
+
+            _nodes.Clear();
+            CreateNodesIfNeeded();
         }
 
         public T? GetConfigObject<T>() where T : PluginConfigObject
@@ -139,24 +144,17 @@ namespace DelvUI.Config.Tree
             ImGui.PopStyleVar(6);
         }
 
-        private void CreateNodesIfNeeded()
+        public void CreateNodesIfNeeded()
         {
-            if (_nodes != null)
-            {
-                return;
-            }
+            if (_nodes.Count > 0) { return; }
 
-            _nodes = new List<Node>();
             _nodes.AddRange(_children);
             _nodes.AddRange(_extraNodes);
         }
 
         public void RefreshSelectedNode()
         {
-            if (_nodes == null)
-            {
-                return;
-            }
+            if (_nodes.Count == 0) { return; }
 
             foreach (SectionNode node in _nodes.FindAll(x => x is SectionNode))
             {
@@ -167,10 +165,7 @@ namespace DelvUI.Config.Tree
         public void Draw(float alpha)
         {
             CreateNodesIfNeeded();
-            if (_nodes == null)
-            {
-                return;
-            }
+            if (_nodes.Count == 0) { return; }
 
             bool changed = false;
             bool didReset = false;

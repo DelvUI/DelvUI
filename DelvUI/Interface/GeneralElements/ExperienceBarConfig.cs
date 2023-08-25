@@ -8,7 +8,7 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [Section("Misc")]
+    [Section("Other Elements")]
     [SubSection("Experience Bar", 0)]
     public class ExperienceBarConfig : BarConfig
     {

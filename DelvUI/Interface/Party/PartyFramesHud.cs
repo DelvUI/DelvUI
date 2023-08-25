@@ -310,12 +310,17 @@ namespace DelvUI.Interface.Party
             UpdateLayout(origin);
 
             // draw bars
+            // check borders to determine the order in which the bars are drawn
+            // which is necessary for grid-like party frames
+
             GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             int targetIndex = -1;
             int enmityLeaderIndex = -1;
             int enmitySecondIndex = -1;
+
             List<int> raisedIndexes = new List<int>();
             List<int> cleanseIndexes = new List<int>();
+            List<int> whosTalkingIndexes = new List<int>();
 
             for (int i = 0; i < count; i++)
             {
@@ -323,12 +328,21 @@ namespace DelvUI.Interface.Party
 
                 if (member != null)
                 {
+                    // whos talking
+                    if (Configs.Icons.WhosTalking.ChangeBorders && member.WhosTalkingState != WhosTalkingState.None)
+                    {
+                        whosTalkingIndexes.Add(i);
+                        continue;
+                    }
+
+                    // target
                     if (target != null && member.ObjectId == target.ObjectId)
                     {
                         targetIndex = i;
                         continue;
                     }
 
+                    // cleanse
                     bool cleanseCheck = true;
                     if (Configs.Trackers.Cleanse.CleanseJobsOnly)
                     {
@@ -341,12 +355,14 @@ namespace DelvUI.Interface.Party
                         continue;
                     }
 
+                    // raise
                     if (Configs.Trackers.Raise.Enabled && Configs.Trackers.Raise.ChangeBorderColorWhenRaised && member.RaiseTime.HasValue)
                     {
                         raisedIndexes.Add(i);
                         continue;
                     }
 
+                    // enmity
                     if (Configs.HealthBar.ColorsConfig.ShowEnmityBorderColors)
                     {
                         if (member.EnmityLevel == EnmityLevel.Leader)
@@ -363,6 +379,7 @@ namespace DelvUI.Interface.Party
                     }
                 }
 
+                // no special border
                 AddDrawActions(bars[i].GetBarDrawActions(origin));
             }
 
@@ -398,6 +415,20 @@ namespace DelvUI.Interface.Party
                 AddDrawActions(bars[index].GetBarDrawActions(origin, Configs.Trackers.Cleanse.BorderColor));
             }
 
+            // whos talking
+            foreach (int index in whosTalkingIndexes)
+            {
+                IPartyFramesMember? member = bars[index].Member;
+                if (member != null) 
+                {
+                    AddDrawActions(bars[index].GetBarDrawActions(origin, Configs.Icons.WhosTalking.ColorForState(member.WhosTalkingState)));
+                } 
+                else
+                {
+                    AddDrawActions(bars[index].GetBarDrawActions(origin));
+                }
+            }
+
             // extra elements
             foreach (PartyFramesBar bar in bars)
             {
@@ -416,6 +447,7 @@ namespace DelvUI.Interface.Party
         public PartyFramesBuffsConfig Buffs;
         public PartyFramesDebuffsConfig Debuffs;
         public PartyFramesTrackersConfig Trackers;
+        public PartyFramesCooldownListConfig CooldownList;
 
         public PartyFramesConfigs(
             PartyFramesHealthBarsConfig healthBar,
@@ -424,7 +456,8 @@ namespace DelvUI.Interface.Party
             PartyFramesIconsConfig icons,
             PartyFramesBuffsConfig buffs,
             PartyFramesDebuffsConfig debuffs,
-            PartyFramesTrackersConfig trackers)
+            PartyFramesTrackersConfig trackers,
+            PartyFramesCooldownListConfig cooldownList)
         {
             HealthBar = healthBar;
             ManaBar = manaBar;
@@ -433,6 +466,7 @@ namespace DelvUI.Interface.Party
             Buffs = buffs;
             Debuffs = debuffs;
             Trackers = trackers;
+            CooldownList = cooldownList;
         }
 
         public static PartyFramesConfigs GetConfigs()
@@ -444,7 +478,8 @@ namespace DelvUI.Interface.Party
                 ConfigurationManager.Instance.GetConfigObject<PartyFramesIconsConfig>(),
                 ConfigurationManager.Instance.GetConfigObject<PartyFramesBuffsConfig>(),
                 ConfigurationManager.Instance.GetConfigObject<PartyFramesDebuffsConfig>(),
-                ConfigurationManager.Instance.GetConfigObject<PartyFramesTrackersConfig>()
+                ConfigurationManager.Instance.GetConfigObject<PartyFramesTrackersConfig>(),
+                ConfigurationManager.Instance.GetConfigObject<PartyFramesCooldownListConfig>()
             );
         }
 

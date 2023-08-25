@@ -6,6 +6,7 @@ namespace DelvUI.Config.Tree
     public abstract class Node
     {
         protected List<Node> _children = new List<Node>();
+        public IReadOnlyList<Node> Children => _children.AsReadOnly();
 
         public void Add(Node node)
         {
@@ -15,6 +16,18 @@ namespace DelvUI.Config.Tree
         #region reset
         protected Node? _nodeToReset = null;
         protected string? _nodeToResetName = null;
+
+        public virtual List<T> GetObjects<T>()
+        {
+            List<T> list = new List<T>();
+
+            foreach (Node node in _children)
+            {
+                list.AddRange(node.GetObjects<T>());
+            }
+
+            return list;
+        }
 
         protected void DrawExportResetContextMenu(Node node, string name)
         {
@@ -115,11 +128,11 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        public virtual void Load(string path, string currentVersion, string? previousVersion = null)
+        public virtual void Load(string path)
         {
             foreach (Node child in _children)
             {
-                child.Load(path, currentVersion, previousVersion);
+                child.Load(path);
             }
         }
         #endregion

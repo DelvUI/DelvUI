@@ -1,13 +1,11 @@
-﻿using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Logging;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
-using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
 
 namespace DelvUI.Helpers
@@ -112,6 +110,10 @@ namespace DelvUI.Helpers
 
             ["[exp:required-short]"] = (actor, name) => ExperienceHelper.Instance.RequiredExp.KiloFormat(),
 
+            ["[exp:required-to-level]"] = (actor, name) => (ExperienceHelper.Instance.RequiredExp - ExperienceHelper.Instance.CurrentExp).ToString("N0", CultureInfo.InvariantCulture),
+
+            ["[exp:required-to-level-short]"] = (actor, name) => (ExperienceHelper.Instance.RequiredExp - ExperienceHelper.Instance.CurrentExp).KiloFormat(),
+
             ["[exp:rested]"] = (actor, name) => ExperienceHelper.Instance.RestedExp.ToString("N0", CultureInfo.InvariantCulture),
 
             ["[exp:rested-short]"] = (actor, name) => ExperienceHelper.Instance.RestedExp.KiloFormat(),
@@ -185,6 +187,8 @@ namespace DelvUI.Helpers
 
             ["[job]"] = (chara) => JobsHelper.JobNames.TryGetValue(chara.ClassJob.Id, out var jobName) ? jobName : "",
 
+            ["[job-full]"] = (chara) => JobsHelper.JobFullNames.TryGetValue(chara.ClassJob.Id, out var jobName) ? jobName : "",
+
             ["[time-till-max-gp]"] = JobsHelper.TimeTillMaxGP,
 
             ["[chocobo-time]"] = (chara) =>
@@ -228,11 +232,11 @@ namespace DelvUI.Helpers
         };
 
         private static string ReplaceTagWithString(
-            string tag, 
-            GameObject? actor, 
-            string? name = null, 
-            uint? current = null, 
-            uint? max = null, 
+            string tag,
+            GameObject? actor,
+            string? name = null,
+            uint? current = null,
+            uint? max = null,
             bool? isPlayerName = null,
             string? title = null)
         {
@@ -275,11 +279,11 @@ namespace DelvUI.Helpers
         }
 
         public static string FormattedText(
-            string text, 
-            GameObject? actor, 
-            string? name = null, 
-            uint? current = null, 
-            uint? max = null, 
+            string text,
+            GameObject? actor,
+            string? name = null,
+            uint? current = null,
+            uint? max = null,
             bool? isPlayerName = null,
             string? title = null)
         {
@@ -405,6 +409,15 @@ namespace DelvUI.Helpers
         private static string ValidateName(GameObject? actor, string? name)
         {
             string? n = actor?.Name.ToString() ?? name;
+
+            // Detour for PetRenamer
+            try
+            {
+                string? customPetName = PetRenamerHelper.GetPetName(actor);
+                n = customPetName ?? n;
+            }
+            catch { }
+
             return (n == null || n == "") ? "" : n;
         }
 

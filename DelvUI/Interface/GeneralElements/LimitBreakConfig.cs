@@ -7,7 +7,7 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [Section("Misc")]
+    [Section("Other Elements")]
     [SubSection("Limit Break", 0)]
     public class LimitBreakConfig : ChunkedProgressBarConfig
     {

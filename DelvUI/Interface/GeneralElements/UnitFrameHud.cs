@@ -102,7 +102,7 @@ namespace DelvUI.Interface.GeneralElements
 
                 if (InputsHelper.Instance.LeftButtonClicked)
                 {
-                    Plugin.TargetManager.SetTarget(Actor);
+                    Plugin.TargetManager.Target = Actor;
                 }
                 else if (InputsHelper.Instance.RightButtonClicked)
                 {
@@ -230,7 +230,7 @@ namespace DelvUI.Interface.GeneralElements
 
                     AddDrawAction(Config.RoleIconConfig.StrataLevel, () =>
                     {
-                        DrawHelper.DrawInWindow(ID + "_jobIcon", iconPos, Config.RoleIconConfig.Size, false, false, (drawList) =>
+                        DrawHelper.DrawInWindow(ID + "_jobIcon", iconPos, Config.RoleIconConfig.Size, false, (drawList) =>
                         {
                             DrawHelper.DrawIcon(iconId, iconPos, Config.RoleIconConfig.Size, false, drawList);
                         });
@@ -250,7 +250,7 @@ namespace DelvUI.Interface.GeneralElements
 
                     AddDrawAction(Config.SignIconConfig.StrataLevel, () =>
                     {
-                        DrawHelper.DrawInWindow(ID + "_signIcon", iconPos, Config.SignIconConfig.Size, false, false, (drawList) =>
+                        DrawHelper.DrawInWindow(ID + "_signIcon", iconPos, Config.SignIconConfig.Size, false, (drawList) =>
                         {
                             DrawHelper.DrawIcon(iconId.Value, iconPos, Config.SignIconConfig.Size, false, drawList);
                         });
@@ -298,7 +298,7 @@ namespace DelvUI.Interface.GeneralElements
             float currentAlpha = color.Vector.W * 100f;
             float alpha = Config.RangeConfig.AlphaForDistance(distance, currentAlpha) / 100f;
 
-            if (character is BattleNpc { BattleNpcKind: BattleNpcSubKind.Enemy } && Config.EnemyRangeConfig.Enabled)
+            if (character is BattleNpc { BattleNpcKind: BattleNpcSubKind.Enemy or BattleNpcSubKind.BattleNpcPart } && Config.EnemyRangeConfig.Enabled)
             {
                 alpha = Config.EnemyRangeConfig.AlphaForDistance(distance, currentAlpha) / 100f;
             }
@@ -472,13 +472,14 @@ namespace DelvUI.Interface.GeneralElements
 
             AddDrawAction(StrataLevel.LOWEST, () =>
             {
-                DrawHelper.DrawInWindow(ID + "_TankStance", startPos, endPos - startPos, false, false, (drawList) =>
+                DrawHelper.DrawInWindow(ID + "_TankStance", startPos, endPos - startPos, false, (drawList) =>
                 {
                     // TODO: clean up hacky math 
                     // there's some 1px errors prob due to negative sizes
                     // couldn't figure it out so I did the hacky fixes
 
                     // vertical
+
                     drawList.AddRectFilled(pos, vEndPos, color.Base);
 
                     if (config.Corner == TankStanceCorner.TopRight)

@@ -155,7 +155,6 @@ namespace DelvUI.Interface.Nameplates
             Rect background = new Rect(BarConfig.Position, barSize, bgColor);
             Rect healthFill = BarUtilities.GetFillRect(BarConfig.Position, barSize, BarConfig.FillDirection, fillColor, currentHp, maxHp);
 
-            //BarHud bar = new BarHud(BarConfig, character);
             BarHud bar = new BarHud(
                 BarConfig.ID,
                 BarConfig.DrawBorder,
@@ -165,7 +164,9 @@ namespace DelvUI.Interface.Nameplates
                 character,
                 current: currentHp,
                 max: maxHp,
-                shadowConfig: BarConfig.ShadowConfig
+                shadowConfig: BarConfig.ShadowConfig,
+                barTextureName: BarConfig.BarTextureName,
+                barTextureDrawMode: BarConfig.BarTextureDrawMode
             );
 
             bar.SetBackground(background);
@@ -359,12 +360,12 @@ namespace DelvUI.Interface.Nameplates
         protected override List<(StrataLevel, Action)> GetExtrasDrawActions(NameplateData data, NameplateExtrasAnchors anchors)
         {
             List<(StrataLevel, Action)> drawActions = new List<(StrataLevel, Action)>();
-            if (data.GameObject is not Character character) { return drawActions; }
+            if (data.GameObject is not PlayerCharacter character) { return drawActions; }
 
             float alpha = _config.RangeConfig.AlphaForDistance(data.Distance);
 
             // role/job icon
-            if (Config.RoleIconConfig.Enabled && character is PlayerCharacter)
+            if (Config.RoleIconConfig.Enabled)
             {
                 NameplateAnchor? anchor = anchors.GetAnchor(Config.RoleIconConfig.NameplateLabelAnchor, Config.RoleIconConfig.PrioritizeHealthBarAnchor);
                 anchor = anchor ?? new NameplateAnchor(data.ScreenPosition, Vector2.Zero);
@@ -381,7 +382,7 @@ namespace DelvUI.Interface.Nameplates
 
                     drawActions.Add((Config.RoleIconConfig.StrataLevel, () =>
                     {
-                        DrawHelper.DrawInWindow(_config.ID + "_jobIcon", iconPos, Config.RoleIconConfig.Size, false, false, (drawList) =>
+                        DrawHelper.DrawInWindow(_config.ID + "_jobIcon", iconPos, Config.RoleIconConfig.Size, false, (drawList) =>
                         {
                             DrawHelper.DrawIcon(iconId, iconPos, Config.RoleIconConfig.Size, false, alpha, drawList);
                         });
@@ -391,7 +392,9 @@ namespace DelvUI.Interface.Nameplates
             }
 
             // state icon
-            if (Config.StateIconConfig.Enabled && data.NamePlateIconId > 0 && character is PlayerCharacter)
+            if (Config.StateIconConfig.Enabled && 
+                data.NamePlateIconId > 0 && 
+                Config.StateIconConfig.ShouldDrawIcon(data.NamePlateIconId))
             {
                 NameplateAnchor? anchor = anchors.GetAnchor(Config.StateIconConfig.NameplateLabelAnchor, Config.StateIconConfig.PrioritizeHealthBarAnchor);
                 anchor = anchor ?? new NameplateAnchor(data.ScreenPosition, Vector2.Zero);
@@ -401,7 +404,7 @@ namespace DelvUI.Interface.Nameplates
 
                 drawActions.Add((Config.StateIconConfig.StrataLevel, () =>
                 {
-                    DrawHelper.DrawInWindow(_config.ID + "_stateIcon", iconPos, Config.StateIconConfig.Size, false, false, (drawList) =>
+                    DrawHelper.DrawInWindow(_config.ID + "_stateIcon", iconPos, Config.StateIconConfig.Size, false, (drawList) =>
                     {
                         DrawHelper.DrawIcon((uint)data.NamePlateIconId, iconPos, Config.StateIconConfig.Size, false, alpha, drawList);
                     });
@@ -498,6 +501,7 @@ namespace DelvUI.Interface.Nameplates
             Vector2 castbarPos = Utils.GetAnchoredPosition(anchor.Value.Position, -anchor.Value.Size, Config.CastbarConfig.HealthBarAnchor);
             drawActions.Add((Config.CastbarConfig.StrataLevel, () =>
             {
+                _castbarHud.ParentSize = anchor.Value.Size;
                 _castbarHud.Actor = character;
                 _castbarHud.PrepareForDraw(castbarPos);
                 _castbarHud.Draw(castbarPos);
@@ -515,7 +519,7 @@ namespace DelvUI.Interface.Nameplates
 
                 drawActions.Add((Config.IconConfig.StrataLevel, () =>
                 {
-                    DrawHelper.DrawInWindow(_config.ID + "_enemyIcon", iconPos, Config.IconConfig.Size, false, false, (drawList) =>
+                    DrawHelper.DrawInWindow(_config.ID + "_enemyIcon", iconPos, Config.IconConfig.Size, false, (drawList) =>
                     {
                         DrawHelper.DrawIcon((uint)data.NamePlateIconId, iconPos, Config.IconConfig.Size, false, alpha, drawList);
                     });

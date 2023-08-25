@@ -104,7 +104,12 @@ namespace DelvUI.Interface.Nameplates
 
                 if (InputsHelper.Instance.LeftButtonClicked)
                 {
-                    Plugin.TargetManager.SetTarget(mouseoveredActor);
+                    Plugin.TargetManager.Target = mouseoveredActor;
+                    InputsHelper.Instance.ClearClicks();
+                }
+                else if (InputsHelper.Instance.RightButtonClicked)
+                {
+                    InputsHelper.Instance.ClearClicks();
                 }
             }
             else if (_wasHovering)
@@ -152,7 +157,8 @@ namespace DelvUI.Interface.Nameplates
                         {
                             return _petHud;
                         }
-                        else if ((BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.Enemy)
+                        else if ((BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.Enemy || 
+                                 (BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.BattleNpcPart)
                         {
                             return Utils.IsHostile(battleNpc) ? _enemyHud : _npcHud;
                         }
@@ -205,7 +211,7 @@ namespace DelvUI.Interface.Nameplates
                 {
                     Ray ray = camera.ScreenPointToRay(point);
                     RaycastHit hit;
-                   
+
                     if (collisionModule->RaycastEx(&hit, ray.Origin, ray.Direction, data.Distance, 1, flags))
                     {
                         obstructionCount++;

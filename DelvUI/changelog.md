@@ -1,3 +1,52 @@
+# 2.0.0.0
+- Added a Bar Texture setting for all bars:
+    + Each bar can use a different Bar Texture and Draw Mode.
+    + Supported Draw Modes are: Strech, Repeat Horizontal, Repeat Vertical and Repeat.
+    + DelvUI comes with several textures to choose from.
+    + There's a new section under Customization > Bar Textures where custom textures can be added.
+    + Textures can be previewed in Customization > Bar Textures.
+    + Also in this section it is possible to apply a particular Bar Texture and Draw Mode to all bars with one click.
+
+- Party Cooldowns can now be tracked per player directly in the Party Frames:
+    + Tracked cooldowns are configured in Party Cooldowns > Tracked Cooldowns.
+    + Cooldowns can be set to be shown in the Party Cooldowns section or in the Party Frames (or both).
+    + Cooldowns can also be configured so they are only visible for certain jobs (For example making Swiftcast only visible for healers).
+    + Added a lot of cooldowns that were missing in the Tracked Cooldowns list.
+
+- Added support for the Wotsit plugin:
+    + You can search for DelvUI settings by name to open the config window in the relevant section.
+    + For example searching for `black mage` will yield a result named `DelvUI Settings: Job Specific Bars > Caster > Black Mage`, and selecting it will open DelvUI's Black Mage HUD configuration.
+
+- Added support for the Who's Talking plugin:
+    + Can be configured in Party Frames > Icons > Who's Talking.
+    + Requires v0.6.0.0+ of the Who's Talking plugin.
+
+- Added settings for Enemy Nameplate Castbars to match the width or height of the Health Bar:
+    + These are intended to be used when the Health Bar size changes for targeted units.
+    
+- Added an auto backup feature that runs every time DelvUI gets an update.
+    + Automatic backups can be found in `%APPDATA%\XIVLauncher\pluginConfigs\DelvUI\Backups`.
+
+- Added support for the Pet Nicknames plugin (by Glyceri). 
+- Added a setting to all Castbars to separate the icon from the bar.
+- Added setting to the Player State Icon in Nameplates to only show for the disconnected state (aka pokeball).
+- Added Use Job Colors setting for Party Cooldown bars.
+- Added Sort by Duration setting for all Status Effect Lists.
+- Added minor improvements to the Party Frames preview.
+- Added new possible Growth Directions for Status Effect Lists and Party Frames Cooldowns.
+- Added `[job-full]` text tag.
+- Added `[exp:required-to-level]` and `[exp:required-to-level-short]` text tags.
+- Moved "Experience Bar", "GCD Indicator", "Pull Timer", "Limit Break" and "MP Ticker" from "Misc" to the new "Other Elements" section.
+- Moved "Fonts" from "Misc" to the new "Customization" section.
+- Updated and improved the default profile that comes with DelvUI.
+
+- Fixed Nameplates with interaction enabled sometimes making the mouse left-click to be stuck as if it was being held down.
+- Fixed DelvUI sometimes making Dalamud windows lose focus.
+- Fixed targeted unit Nameplate not drawing on top of other Nameplates.
+- Fixed Order Label not working for Enemy Nameplates.
+- Fixed preview not working for Sign Icons.
+- Fixed DelvUI trying to show/hide hotbars during Chocobo races which resulted in chat error messages.
+
 # 1.7.1.5
 - Fixed Sign Icons not working.
 - Attempt to fix DelvUI exception that causes ImGUI's fonts to be broken.

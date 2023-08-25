@@ -148,6 +148,8 @@ namespace DelvUI.Config
 
             Plugin.ClientState.Logout += OnLogout;
             Plugin.JobChangedEvent += OnJobChanged;
+
+            _configBaseNode.CreateNodesIfNeeded();
         }
 
         ~ConfigurationManager()
@@ -218,6 +220,7 @@ namespace DelvUI.Config
             try
             {
                 bool needsWrite = false;
+                bool needsBackup = false;
 
                 if (!File.Exists(path))
                 {
@@ -229,6 +232,7 @@ namespace DelvUI.Config
                     if (PreviousVersion != Plugin.Version)
                     {
                         needsWrite = true;
+                        needsBackup = true;
                     }
                 }
 
@@ -238,10 +242,38 @@ namespace DelvUI.Config
                 {
                     File.WriteAllText(path, Plugin.Version);
                 }
+
+                if (needsBackup && PreviousVersion != null)
+                {
+                    BackupFiles(PreviousVersion);
+                }
             }
             catch (Exception e)
             {
                 PluginLog.Error("Error checking version: " + e.Message);
+            }
+        }
+
+        private void BackupFiles(string version)
+        {
+            string backupsRoot = Path.Combine(ConfigDirectory, "Backups");
+            if (!Directory.Exists(backupsRoot))
+            {
+                Directory.CreateDirectory(backupsRoot);
+            }
+
+            string backupPath = Path.Combine(backupsRoot, version);
+
+            foreach (string folderPath in Directory.GetDirectories(ConfigDirectory, "*", SearchOption.AllDirectories))
+            {
+                if (folderPath.Contains("Backups")) { continue; }
+
+                Directory.CreateDirectory(folderPath.Replace(ConfigDirectory, backupPath));
+            }
+
+            foreach (string filePath in Directory.GetFiles(ConfigDirectory, "*.*", SearchOption.AllDirectories))
+            {
+                File.Copy(filePath, filePath.Replace(ConfigDirectory, backupPath), true);
             }
         }
 
@@ -267,7 +299,7 @@ namespace DelvUI.Config
 
         public void OpenConfigWindow()
         {
-            _mainConfigWindow.IsOpen = false;
+            _mainConfigWindow.IsOpen = true;
         }
 
         public void CloseConfigWindow()
@@ -309,6 +341,8 @@ namespace DelvUI.Config
         public ConfigPageNode GetConfigPageNode<T>() where T : PluginConfigObject => ConfigBaseNode.GetConfigPageNode<T>()!;
 
         public void SetConfigObject(PluginConfigObject configObject) => ConfigBaseNode.SetConfigObject(configObject);
+
+        public List<T> GetObjects<T>() => ConfigBaseNode.GetObjects<T>();
         #endregion
 
         #region load / save / profiles
@@ -317,11 +351,7 @@ namespace DelvUI.Config
             try
             {
                 // detect if we need to create the config files (fresh install)
-                if (Directory.GetDirectories(ConfigDirectory).Length == 0)
-                {
-                    SaveConfigurations(true);
-                }
-                else
+                if (Directory.GetDirectories(ConfigDirectory).Length != 0)
                 {
                     LoadConfigurations();
 
@@ -347,7 +377,8 @@ namespace DelvUI.Config
 
         public void LoadConfigurations()
         {
-            ConfigBaseNode.Load(ConfigDirectory, CurrentVersion, PreviousVersion);
+            PerformV2Migration();
+            ConfigBaseNode.Load(ConfigDirectory);
         }
 
         public void SaveConfigurations(bool forced = false)
@@ -362,6 +393,49 @@ namespace DelvUI.Config
             ProfilesManager.Instance?.SaveCurrentProfile();
 
             ConfigBaseNode.NeedsSave = false;
+        }
+
+        public void PerformV2Migration()
+        {
+            // create necessary folders
+            string[] newFolders = new string[] { "Other Elements", "Customization" };
+            foreach (string folder in newFolders)
+            {
+                string path = Path.Combine(ConfigDirectory, folder);
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+            }
+
+            // move files
+            Dictionary<string, string> files = new Dictionary<string, string>()
+            {
+                ["Misc\\Experience Bar.json"] = "Other Elements\\Experience Bar.json",
+                ["Misc\\GCD Indicator.json"]  = "Other Elements\\GCD Indicator.json",
+                ["Misc\\Limit Break.json"]    = "Other Elements\\Limit Break.json",
+                ["Misc\\MP Ticker.json"]      = "Other Elements\\MP Ticker.json",
+                ["Misc\\Pull Timer.json"]     = "Other Elements\\Pull Timer.json",
+                ["Misc\\Fonts.json"]          = "Customization\\Fonts.json"
+            };
+
+            foreach (string key in files.Keys)
+            {
+                string v1Path = Path.Combine(ConfigDirectory, key);
+                string v2Path = Path.Combine(ConfigDirectory, files[key]);
+
+                try
+                {
+                    if (File.Exists(v1Path) && !File.Exists(v2Path))
+                    {
+                        File.Move(v1Path, v2Path);
+                    }
+                }
+                catch (Exception e)
+                {
+                    PluginLog.Error("Error migrating file \"" + v1Path + "\" to v2 config structure: " + e.Message);
+                }
+            }
         }
 
         public void UpdateCurrentProfile()
@@ -381,28 +455,40 @@ namespace DelvUI.Config
             return ConfigBaseNode.GetBase64String();
         }
 
-        public bool ImportProfile(string oldProfileName, string profileName, string rawString)
+        public void OnProfileDeleted(string profileName)
+        {
+            try
+            {
+                _configBaseNodeByProfile.Remove(profileName);
+            }
+            catch { }
+        }
+
+        public bool ImportProfile(string oldProfileName, string profileName, string rawString, bool forceLoad = false)
         {
             // cache old profile
             _configBaseNodeByProfile[oldProfileName] = ConfigBaseNode;
 
             // load profile from cache or from rawString
-            if (!_configBaseNodeByProfile.TryGetValue(profileName, out BaseNode? maybeNode)
-                && !ImportProfileNonCached(rawString, out maybeNode))
+            BaseNode? loadedNode = null;
+            if (forceLoad || !_configBaseNodeByProfile.TryGetValue(profileName, out loadedNode))
             {
-                return false;
+                ImportProfileNonCached(rawString, out loadedNode);
             }
 
-            BaseNode node = maybeNode!;
-            if (IsConfigWindowOpened || string.IsNullOrEmpty(node.SelectedOptionName))
+            if (loadedNode == null) { return false; }
+
+            if (IsConfigWindowOpened || string.IsNullOrEmpty(loadedNode.SelectedOptionName))
             {
-                node.SelectedOptionName = ConfigBaseNode.SelectedOptionName;
-                node.RefreshSelectedNode();
+                loadedNode.SelectedOptionName = ConfigBaseNode.SelectedOptionName;
+                loadedNode.RefreshSelectedNode();
             }
 
             ConfigBaseNode.ConfigObjectResetEvent -= OnConfigObjectReset;
-            ConfigBaseNode = node;
+            ConfigBaseNode = loadedNode;
             ConfigBaseNode.ConfigObjectResetEvent += OnConfigObjectReset;
+
+            PerformV2Migration();
 
             ResetEvent?.Invoke(this);
 
@@ -433,44 +519,12 @@ namespace DelvUI.Config
                 }
             }
 
-            try
-            {
-                // handle imports for breaking changes in the config
-                if (UnmergeableConfigTypesPerVersion.TryGetValue(CurrentVersion, out List<Type>? types) && types != null)
-                {
-                    foreach (Type type in types)
-                    {
-                        var genericMethod = node.GetType().GetMethod("GetConfigObject");
-                        var method = genericMethod?.MakeGenericMethod(type);
-                        PluginConfigObject? config = (PluginConfigObject?)method?.Invoke(node, null);
-
-                        if (config != null)
-                        {
-                            config.ImportFromOldVersion(oldConfigObjects, CurrentVersion, PreviousVersion);
-                            node.SetConfigObject(config); // needed to refresh nodes
-                        }
-                    }
-                }
-
-                node.Save(ConfigDirectory);
-            }
-            catch
-            {
-                return false;
-            }
-
             if (ProfilesManager.Instance != null)
             {
                 node.AddExtraSectionNode(ProfilesManager.Instance.ProfilesNode);
             }
 
             return true;
-        }
-
-        public void ResetConfig()
-        {
-            ConfigBaseNode.Reset();
-            ResetEvent?.Invoke(this);
         }
         #endregion
 
@@ -488,21 +542,25 @@ namespace DelvUI.Config
 
         private static Type[] ConfigObjectTypes = new Type[]
         {
+            // Unit Frames
             typeof(PlayerUnitFrameConfig),
             typeof(TargetUnitFrameConfig),
             typeof(TargetOfTargetUnitFrameConfig),
             typeof(FocusTargetUnitFrameConfig),
 
+            // Mana Bars
             typeof(PlayerPrimaryResourceConfig),
             typeof(TargetPrimaryResourceConfig),
             typeof(TargetOfTargetPrimaryResourceConfig),
             typeof(FocusTargetPrimaryResourceConfig),
-
+            
+            // Castbars
             typeof(PlayerCastbarConfig),
             typeof(TargetCastbarConfig),
             typeof(TargetOfTargetCastbarConfig),
             typeof(FocusTargetCastbarConfig),
 
+            // Buffs and Debuffs
             typeof(PlayerBuffsListConfig),
             typeof(PlayerDebuffsListConfig),
             typeof(TargetBuffsListConfig),
@@ -511,6 +569,7 @@ namespace DelvUI.Config
             typeof(FocusTargetDebuffsListConfig),
             typeof(CustomEffectsListConfig),
 
+            // Nameplates
             typeof(NameplatesGeneralConfig),
             typeof(PlayerNameplateConfig),
             typeof(EnemyNameplateConfig),
@@ -523,6 +582,7 @@ namespace DelvUI.Config
             typeof(MinionNPCNameplateConfig),
             typeof(ObjectsNameplateConfig),
 
+            // Party Frames
             typeof(PartyFramesConfig),
             typeof(PartyFramesHealthBarsConfig),
             typeof(PartyFramesManaBarConfig),
@@ -531,11 +591,14 @@ namespace DelvUI.Config
             typeof(PartyFramesBuffsConfig),
             typeof(PartyFramesDebuffsConfig),
             typeof(PartyFramesTrackersConfig),
+            typeof(PartyFramesCooldownListConfig),
 
+            // Party Cooldowns
             typeof(PartyCooldownsConfig),
             typeof(PartyCooldownsBarConfig),
             typeof(PartyCooldownsDataConfig),
 
+            // Enemy List
             typeof(EnemyListConfig),
             typeof(EnemyListHealthBarConfig),
             typeof(EnemyListEnmityIconConfig),
@@ -544,6 +607,7 @@ namespace DelvUI.Config
             typeof(EnemyListBuffsConfig),
             typeof(EnemyListDebuffsConfig),
 
+            // Job Specific Bars
             typeof(PaladinConfig),
             typeof(WarriorConfig),
             typeof(DarkKnightConfig),
@@ -569,6 +633,14 @@ namespace DelvUI.Config
             typeof(RedMageConfig),
             typeof(BlueMageConfig),
 
+            // Other Elements
+            typeof(ExperienceBarConfig),
+            typeof(GCDIndicatorConfig),
+            typeof(PullTimerConfig),
+            typeof(LimitBreakConfig),
+            typeof(MPTickerConfig),
+
+            // Colors
             typeof(TanksColorConfig),
             typeof(HealersColorConfig),
             typeof(MeleeColorConfig),
@@ -577,33 +649,22 @@ namespace DelvUI.Config
             typeof(RolesColorConfig),
             typeof(MiscColorConfig),
 
+            // Customization
+            typeof(FontsConfig),
+            typeof(BarTexturesConfig),
+
+            // Visibility
             typeof(GlobalVisibilityConfig),
             typeof(HotbarsVisibilityConfig),
 
-            typeof(FontsConfig),
+            // Misc
             typeof(HUDOptionsConfig),
             typeof(WindowClippingConfig),
             typeof(TooltipsConfig),
-            typeof(ExperienceBarConfig),
-            typeof(GCDIndicatorConfig),
-            typeof(PullTimerConfig),
-            typeof(LimitBreakConfig),
-            typeof(MPTickerConfig),
             typeof(GridConfig),
 
+            // Import
             typeof(ImportConfig)
-        };
-
-        private static Dictionary<string, List<Type>> UnmergeableConfigTypesPerVersion = new Dictionary<string, List<Type>>()
-        {
-            ["0.4.0.0"] = new List<Type>() {
-                typeof(PartyFramesIconsConfig),
-                typeof(PartyFramesTrackersConfig)
-            },
-            ["0.6.2.0"] = new List<Type>() {
-                typeof(PartyFramesHealthBarsConfig)
-            },
-
         };
         #endregion
     }

@@ -82,7 +82,7 @@ namespace DelvUI.Interface.GeneralElements
         {
             if (Preview)
             {
-                return 60701;
+                return 61231;
             }
 
             return Utils.SignIconIDForActor(actor);
@@ -105,6 +105,28 @@ namespace DelvUI.Interface.GeneralElements
         [Checkbox("Prioritize Health Bar as Anchor when visible", help = "When enabled, the icon will anchor to the Health Bar if it's visible.\nIf the Health Bar disappears, it will anchor back to the desired label.")]
         [Order(18)]
         public bool PrioritizeHealthBarAnchor = false;
+    }
+
+    public class NameplatePlayerIconConfig : NameplateIconConfig
+    {
+        public NameplatePlayerIconConfig() : base() { }
+
+        public NameplatePlayerIconConfig(Vector2 position, Vector2 size, DrawAnchor anchor, DrawAnchor frameAnchor)
+            : base(position, size, anchor, frameAnchor)
+        {
+        }
+
+        [Checkbox("Only show disconnected icon", spacing = true)]
+        [Order(19)]
+        public bool OnlyShowDisconnected = false;
+
+        public bool ShouldDrawIcon(int iconId)
+        {
+            if (!OnlyShowDisconnected) { return true; }
+
+            return (iconId >= 61503 && iconId <= 61505) ||
+                   (iconId >= 61553 && iconId <= 61555);
+        }
     }
 
     public class NameplateRoleJobIconConfig : RoleJobIconConfig

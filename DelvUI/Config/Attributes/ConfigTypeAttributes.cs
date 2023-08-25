@@ -4,6 +4,7 @@ using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
@@ -538,10 +539,56 @@ namespace DelvUI.Config.Attributes
     }
 
     [AttributeUsage(AttributeTargets.Field)]
+    public class BarTextureAttribute : ConfigAttribute
+    {
+        public BarTextureAttribute(string friendlyName = "Bar Texture") : base(friendlyName) { }
+
+        public override bool DrawField(FieldInfo field, PluginConfigObject config, string? ID, bool collapsingHeader)
+        {
+            if (BarTexturesManager.Instance == null)
+            {
+                return false;
+            }
+
+            List<string> textures = BarTexturesManager.Instance.BarTextureNames.ToList();
+            string? stringVal = (string?)field.GetValue(config);
+
+            int index = 0; 
+            if (stringVal != null && stringVal.Length > 0 && textures.Contains(stringVal))
+            {
+                index = textures.IndexOf(stringVal);
+            }
+
+            string[] options = textures.ToArray();
+
+            if (ImGui.Combo(friendlyName + IDText(ID), ref index, options, options.Length, 10))
+            {
+                stringVal = options[index];
+                field.SetValue(config, stringVal);
+
+                TriggerChangeEvent<string>(config, field.Name, stringVal);
+
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Field)]
     public class AnchorAttribute : ComboAttribute
     {
         public AnchorAttribute(string friendlyName)
             : base(friendlyName, new string[] { "Center", "Left", "Right", "Top", "TopLeft", "TopRight", "Bottom", "BottomLeft", "BottomRight" })
+        {
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Field)]
+    public class BarTextureDrawModeAttribute : ComboAttribute
+    {
+        public BarTextureDrawModeAttribute(string friendlyName)
+            : base(friendlyName, new string[] { "Stretch", "Repeat Horizontal", "Repeat Vertical", "Repeat" })
         {
         }
     }

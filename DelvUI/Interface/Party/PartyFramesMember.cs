@@ -47,6 +47,7 @@ namespace DelvUI.Interface.Party
         public float? RaiseTime { get; set; }
         public InvulnStatus? InvulnStatus { get; set; }
         public bool HasDispellableDebuff { get; set; } = false;
+        public WhosTalkingState WhosTalkingState => WhosTalkingHelper.Instance?.GetUserState(Name) ?? WhosTalkingState.None;
 
         public PartyFramesMember(PartyMember partyMember, int order, EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader)
         {
@@ -122,7 +123,7 @@ namespace DelvUI.Interface.Party
         public Character? Character => null;
 
         public int Order { get; set; }
-        public string Name => "Fake Name";
+        public string Name { get; private set; }
         public uint Level { get; private set; }
         public uint JobId { get; private set; }
         public uint HP { get; private set; }
@@ -137,9 +138,11 @@ namespace DelvUI.Interface.Party
         public float? RaiseTime { get; set; }
         public InvulnStatus? InvulnStatus { get; set; }
         public bool HasDispellableDebuff { get; set; }
+        public WhosTalkingState WhosTalkingState { get; set; }
 
         public FakePartyFramesMember(int order)
         {
+            Name = RNG.Next(0, 2) == 1 ? "Fake Name" : "FakeLonger MockedName";
             Order = order + 1;
             Level = (uint)RNG.Next(1, 80);
             JobId = (uint)RNG.Next(19, 41);
@@ -155,6 +158,7 @@ namespace DelvUI.Interface.Party
             HasDispellableDebuff = RNG.Next(0, 2) == 1;
             RaiseTime = order == 2 ? RNG.Next(0, 60) : null;
             InvulnStatus = order == 0 ? new InvulnStatus(3077, RNG.Next(0, 10), 810) : null;
+            WhosTalkingState = (WhosTalkingState)RNG.Next(0, 4);
         }
 
         public void Update(EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader, uint jobId)
@@ -184,6 +188,8 @@ namespace DelvUI.Interface.Party
         public float? RaiseTime { get; set; }
         public InvulnStatus? InvulnStatus { get; set; }
         public bool HasDispellableDebuff { get; set; }
+
+        public WhosTalkingState WhosTalkingState { get; }
 
         public void Update(EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader, uint jobId);
     }

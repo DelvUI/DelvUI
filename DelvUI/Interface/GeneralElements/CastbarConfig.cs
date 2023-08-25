@@ -184,6 +184,18 @@ namespace DelvUI.Interface.GeneralElements
         [Order(6)]
         public bool ShowMaxCastTime = false;
 
+        [Checkbox("Separate Icon", spacing = true)]
+        [Order(100)]
+        public bool SeparateIcon = false;
+
+        [DragInt2("Custom Icon Position", min = -500, max = 500)]
+        [Order(101, collapseWith = nameof(SeparateIcon))]
+        public Vector2 CustomIconPosition = Vector2.Zero;
+
+        [DragInt2("Custom Icon Size", min = 1, max = 500)]
+        [Order(101, collapseWith = nameof(SeparateIcon))]
+        public Vector2 CustomIconSize = new Vector2(40);
+
         [NestedConfig("Cast Name", 500)]
         public LabelConfig CastNameLabel;
 

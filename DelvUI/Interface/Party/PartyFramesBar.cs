@@ -35,6 +35,7 @@ namespace DelvUI.Interface.Party
         private CastbarHud _castbarHud;
         private StatusEffectsListHud _buffsListHud;
         private StatusEffectsListHud _debuffsListHud;
+        private PartyFramesCooldownListHud _cooldownListHud;
 
         private TextureWrap? _readyCheckTexture = null;
 
@@ -62,6 +63,8 @@ namespace DelvUI.Interface.Party
             _castbarHud = new CastbarHud(_configs.CastBar);
             _buffsListHud = new StatusEffectsListHud(_configs.Buffs);
             _debuffsListHud = new StatusEffectsListHud(_configs.Debuffs);
+
+            _cooldownListHud = new PartyFramesCooldownListHud(_configs.CooldownList);
 
             _readyCheckTexture = TexturesCache.Instance.GetTextureFromPath("ui/uld/ReadyCheck_hr1.tex") ?? TexturesCache.Instance.GetTextureFromPath("ui/uld/ReadyCheck.tex");
         }
@@ -118,6 +121,7 @@ namespace DelvUI.Interface.Party
             _castbarHud.StopPreview();
             _buffsListHud.StopPreview();
             _debuffsListHud.StopPreview();
+            _cooldownListHud.StopPreview();
             _configs.HealthBar.MouseoverAreaConfig.Preview = false;
         }
 
@@ -162,7 +166,7 @@ namespace DelvUI.Interface.Party
                     // target
                     else if (character != null)
                     {
-                        Plugin.TargetManager.SetTarget(character);
+                        Plugin.TargetManager.Target = character;
                     }
                 }
                 // right click (context menu)
@@ -224,6 +228,12 @@ namespace DelvUI.Interface.Party
 
             // bar
             int thickness = borderColor != null ? _configs.HealthBar.ColorsConfig.ActiveBorderThickness : _configs.HealthBar.ColorsConfig.InactiveBorderThickness;
+
+            if (WhosTalkingIcon.ChangeBorders && Member.WhosTalkingState != WhosTalkingState.None)
+            {
+                thickness = WhosTalkingIcon.BorderThickness;
+            }
+
             borderColor = borderColor ?? GetBorderColor(character);
 
             BarHud bar = new BarHud(
@@ -234,7 +244,9 @@ namespace DelvUI.Interface.Party
                 actor: character,
                 current: currentHp,
                 max: maxHp,
-                shadowConfig: _configs.HealthBar.ShadowConfig
+                shadowConfig: _configs.HealthBar.ShadowConfig,
+                barTextureName: _configs.HealthBar.BarTextureName,
+                barTextureDrawMode: _configs.HealthBar.BarTextureDrawMode
             );
 
             bar.SetBackground(background);
@@ -349,8 +361,33 @@ namespace DelvUI.Interface.Party
 
             Character? character = Member.Character;
 
+            // who's talking
+            bool drawingWhosTalking = false;
+            if (WhosTalkingIcon.Enabled && WhosTalkingIcon.Icon.Enabled && WhosTalkingIcon.EnabledForState(Member.WhosTalkingState))
+            {
+                TextureWrap? texture = WhosTalkingHelper.Instance.GetTextureForState(Member.WhosTalkingState);
+                
+                if (texture != null)
+                {
+                    Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, WhosTalkingIcon.Icon.FrameAnchor);
+                    Vector2 iconPos = Utils.GetAnchoredPosition(parentPos + WhosTalkingIcon.Icon.Position, WhosTalkingIcon.Icon.Size, WhosTalkingIcon.Icon.Anchor);
+
+                    drawActions.Add((WhosTalkingIcon.Icon.StrataLevel, () =>
+                    {
+                        DrawHelper.DrawInWindow(WhosTalkingIcon.Icon.ID, iconPos, WhosTalkingIcon.Icon.Size, false, (drawList) =>
+                        {
+                            ImGui.SetCursorPos(iconPos);
+                            ImGui.Image(texture.ImGuiHandle, WhosTalkingIcon.Icon.Size);
+                        });
+                    }
+                    ));
+
+                    drawingWhosTalking = true;
+                }
+            }
+
             // role/job icon
-            if (RoleIcon.Enabled)
+            if (RoleIcon.Enabled && (!drawingWhosTalking || !WhosTalkingIcon.ReplaceRoleJobIcon))
             {
                 uint iconId = 0;
 
@@ -374,7 +411,7 @@ namespace DelvUI.Interface.Party
 
                     drawActions.Add((RoleIcon.StrataLevel, () =>
                     {
-                        DrawHelper.DrawInWindow(RoleIcon.ID, iconPos, RoleIcon.Size, false, false, (drawList) =>
+                        DrawHelper.DrawInWindow(RoleIcon.ID, iconPos, RoleIcon.Size, false, (drawList) =>
                         {
                             DrawHelper.DrawIcon(iconId, iconPos, RoleIcon.Size, false, drawList);
                         });
@@ -394,7 +431,7 @@ namespace DelvUI.Interface.Party
 
                     drawActions.Add((SignIcon.StrataLevel, () =>
                     {
-                        DrawHelper.DrawInWindow(SignIcon.ID, iconPos, SignIcon.Size, false, false, (drawList) =>
+                        DrawHelper.DrawInWindow(SignIcon.ID, iconPos, SignIcon.Size, false, (drawList) =>
                         {
                             DrawHelper.DrawIcon(iconId.Value, iconPos, SignIcon.Size, false, drawList);
                         });
@@ -411,7 +448,7 @@ namespace DelvUI.Interface.Party
 
                 drawActions.Add((LeaderIcon.StrataLevel, () =>
                 {
-                    DrawHelper.DrawInWindow(LeaderIcon.ID, iconPos, LeaderIcon.Size, false, false, (drawList) =>
+                    DrawHelper.DrawInWindow(LeaderIcon.ID, iconPos, LeaderIcon.Size, false, (drawList) =>
                     {
                         DrawHelper.DrawIcon(61521, iconPos, LeaderIcon.Size, false, drawList);
                     });
@@ -430,7 +467,7 @@ namespace DelvUI.Interface.Party
 
                     drawActions.Add((PlayerStatus.Icon.StrataLevel, () =>
                     {
-                        DrawHelper.DrawInWindow(PlayerStatus.Icon.ID, iconPos, PlayerStatus.Icon.Size, false, false, (drawList) =>
+                        DrawHelper.DrawInWindow(PlayerStatus.Icon.ID, iconPos, PlayerStatus.Icon.Size, false, (drawList) =>
                         {
                             DrawHelper.DrawIcon(iconId.Value, iconPos, PlayerStatus.Icon.Size, false, drawList);
                         });
@@ -440,18 +477,18 @@ namespace DelvUI.Interface.Party
             }
 
             // ready check status icon
-            if (Member.ReadyCheckStatus != ReadyCheckStatus.None && ReadyCheck.Enabled && ReadyCheck.Icon.Enabled && _readyCheckTexture != null)
+            if (Member.ReadyCheckStatus != ReadyCheckStatus.None && ReadyCheckIcon.Enabled && ReadyCheckIcon.Icon.Enabled && _readyCheckTexture != null)
             {
-                Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, ReadyCheck.Icon.FrameAnchor);
-                Vector2 iconPos = Utils.GetAnchoredPosition(parentPos + ReadyCheck.Icon.Position, ReadyCheck.Icon.Size, ReadyCheck.Icon.Anchor);
+                Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, ReadyCheckIcon.Icon.FrameAnchor);
+                Vector2 iconPos = Utils.GetAnchoredPosition(parentPos + ReadyCheckIcon.Icon.Position, ReadyCheckIcon.Icon.Size, ReadyCheckIcon.Icon.Anchor);
 
-                drawActions.Add((ReadyCheck.Icon.StrataLevel, () =>
+                drawActions.Add((ReadyCheckIcon.Icon.StrataLevel, () =>
                 {
-                    DrawHelper.DrawInWindow(ReadyCheck.Icon.ID, iconPos, ReadyCheck.Icon.Size, false, false, (drawList) =>
+                    DrawHelper.DrawInWindow(ReadyCheckIcon.Icon.ID, iconPos, ReadyCheckIcon.Icon.Size, false, (drawList) =>
                     {
                         Vector2 uv0 = new Vector2(0.5f * (int)Member.ReadyCheckStatus, 0f);
                         Vector2 uv1 = new Vector2(0.5f + 0.5f * (int)Member.ReadyCheckStatus, 1f);
-                        drawList.AddImage(_readyCheckTexture.ImGuiHandle, iconPos, iconPos + ReadyCheck.Icon.Size, uv0, uv1);
+                        drawList.AddImage(_readyCheckTexture.ImGuiHandle, iconPos, iconPos + ReadyCheckIcon.Icon.Size, uv0, uv1);
                     });
                 }
                 ));
@@ -466,7 +503,7 @@ namespace DelvUI.Interface.Party
 
                 drawActions.Add((RaiseTracker.Icon.StrataLevel, () =>
                 {
-                    DrawHelper.DrawInWindow(RaiseTracker.Icon.ID, iconPos, RaiseTracker.Icon.Size, false, false, (drawList) =>
+                    DrawHelper.DrawInWindow(RaiseTracker.Icon.ID, iconPos, RaiseTracker.Icon.Size, false, (drawList) =>
                     {
                         DrawHelper.DrawIcon(411, iconPos, RaiseTracker.Icon.Size, true, drawList);
                     });
@@ -483,7 +520,7 @@ namespace DelvUI.Interface.Party
 
                 drawActions.Add((InvulnTracker.Icon.StrataLevel, () =>
                 {
-                    DrawHelper.DrawInWindow(InvulnTracker.Icon.ID, iconPos, InvulnTracker.Icon.Size, false, false, (drawList) =>
+                    DrawHelper.DrawInWindow(InvulnTracker.Icon.ID, iconPos, InvulnTracker.Icon.Size, false, (drawList) =>
                     {
                         DrawHelper.DrawIcon(Member.InvulnStatus!.InvulnIcon, iconPos, InvulnTracker.Icon.Size, true, drawList);
                     });
@@ -521,6 +558,16 @@ namespace DelvUI.Interface.Party
                 _debuffsListHud.Actor = character;
                 _debuffsListHud.PrepareForDraw(debuffsPos);
                 _debuffsListHud.Draw(debuffsPos);
+            }
+            ));
+
+            // cooldown list
+            Vector2 cooldownListPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.CooldownList.HealthBarAnchor);
+            drawActions.Add((_configs.CooldownList.StrataLevel, () =>
+            {
+                _cooldownListHud.Actor = character;
+                _cooldownListHud.PrepareForDraw(cooldownListPos);
+                _cooldownListHud.Draw(cooldownListPos);
             }
             ));
 
@@ -635,7 +682,7 @@ namespace DelvUI.Interface.Party
                 return false;
             }
 
-            if (Member != null && ReadyCheck.Enabled && ReadyCheck.HideName && Member.ReadyCheckStatus != ReadyCheckStatus.None)
+            if (Member != null && ReadyCheckIcon.Enabled && ReadyCheckIcon.HideName && Member.ReadyCheckStatus != ReadyCheckStatus.None)
             {
                 return false;
             }
@@ -699,7 +746,8 @@ namespace DelvUI.Interface.Party
         private SignIconConfig SignIcon => _configs.Icons.Sign;
         private PartyFramesLeaderIconConfig LeaderIcon => _configs.Icons.Leader;
         private PartyFramesPlayerStatusConfig PlayerStatus => _configs.Icons.PlayerStatus;
-        private PartyFramesReadyCheckStatusConfig ReadyCheck => _configs.Icons.ReadyCheckStatus;
+        private PartyFramesReadyCheckStatusConfig ReadyCheckIcon => _configs.Icons.ReadyCheckStatus;
+        private PartyFramesWhosTalkingConfig WhosTalkingIcon => _configs.Icons.WhosTalking;
         private PartyFramesRaiseTrackerConfig RaiseTracker => _configs.Trackers.Raise;
         private PartyFramesInvulnTrackerConfig InvulnTracker => _configs.Trackers.Invuln;
         private PartyFramesCleanseTrackerConfig CleanseTracker => _configs.Trackers.Cleanse;

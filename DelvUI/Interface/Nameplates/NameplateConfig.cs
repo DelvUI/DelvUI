@@ -1,6 +1,7 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
+using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.StatusEffects;
 using System;
@@ -442,7 +443,7 @@ namespace DelvUI.Interface.GeneralElements
         { Strata = StrataLevel.LOWEST };
 
         [NestedConfig("Player State Icon", 55)]
-        public NameplateIconConfig StateIconConfig = new NameplateIconConfig(
+        public NameplatePlayerIconConfig StateIconConfig = new NameplatePlayerIconConfig(
             new Vector2(5, 0),
             new Vector2(30, 30),
             DrawAnchor.Left,
@@ -683,6 +684,14 @@ namespace DelvUI.Interface.GeneralElements
     [DisableParentSettings("AnchorToUnitFrame", "UnitFrameAnchor", "HideWhenInactive", "FillDirection")]
     public class NameplateCastbarConfig : TargetCastbarConfig
     {
+        [Checkbox("Match Width with Health Bar")]
+        [Order(11)]
+        public bool MatchWidth = false;
+
+        [Checkbox("Match Height with Health Bar")]
+        [Order(12)]
+        public bool MatchHeight = false;
+
         [Anchor("Health Bar Anchor")]
         [Order(16)]
         public DrawAnchor HealthBarAnchor = DrawAnchor.BottomLeft;

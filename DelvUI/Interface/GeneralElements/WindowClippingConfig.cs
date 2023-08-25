@@ -18,15 +18,9 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("Window Clipping", 0)]
     public class WindowClippingConfig : PluginConfigObject
     {
-        public new static WindowClippingConfig DefaultConfig()
-        {
-            var config = new WindowClippingConfig();
-            config.Enabled = false;
+        public new static WindowClippingConfig DefaultConfig() => new WindowClippingConfig();
 
-            return config;
-        }
-
-        public WindowClippingMode Mode = WindowClippingMode.Performance;
+        public WindowClippingMode Mode = WindowClippingMode.Full;
 
         public bool NameplatesClipRectsEnabled = true;
         public bool TargetCastbarClipRectEnabled = false;

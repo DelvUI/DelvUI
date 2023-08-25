@@ -59,7 +59,7 @@ namespace DelvUI.Interface.StatusEffects
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
-            var pos = CalculateStartPosition(Config.Position, Config.Size, Config.GetGrowthDirections());
+            Vector2 pos = LayoutHelper.CalculateStartPosition(Config.Position, Config.Size, LayoutHelper.GrowthDirectionsFromIndex(Config.Directions));
             return (new List<Vector2>() { pos + Config.Size / 2f }, new List<Vector2>() { Config.Size });
         }
 
@@ -87,7 +87,7 @@ namespace DelvUI.Interface.StatusEffects
                 Config.IconConfig.Size,
                 count,
                 Config.IconPadding,
-                Config.FillRowsFirst
+                LayoutHelper.GetFillsRowsFirst(Config.FillRowsFirst, LayoutHelper.GrowthDirectionsFromIndex(Config.Directions))
             );
 
             return count;
@@ -103,8 +103,19 @@ namespace DelvUI.Interface.StatusEffects
         {
             var list = StatusEffectDataList(Actor);
 
+            // sort by duration
+            if (Config.SortByDuration)
+            {
+                list.Sort((a, b) =>
+                {
+                    float aTime = a.Data.IsPermanent || a.Data.IsFcBuff ? float.MaxValue : a.Status.RemainingTime;
+                    float bTime = b.Data.IsPermanent || b.Data.IsFcBuff ? float.MaxValue : b.Status.RemainingTime;
+
+                    return aTime.CompareTo(bTime);
+                });
+            } 
             // show mine or permanent first
-            if (Config.ShowMineFirst || Config.ShowPermanentFirst)
+            else if (Config.ShowMineFirst || Config.ShowPermanentFirst)
             {
                 return OrderByMineOrPermanentFirst(list);
             }
@@ -289,15 +300,15 @@ namespace DelvUI.Interface.StatusEffects
             }
 
             // calculate layout
-            var list = StatusEffectsData();
+            List<StatusEffectData> list = StatusEffectsData();
 
             // area
-            GrowthDirections growthDirections = Config.GetGrowthDirections();
+            GrowthDirections growthDirections = LayoutHelper.GrowthDirectionsFromIndex(Config.Directions);
             Vector2 position = origin + GetAnchoredPosition(Config.Position, Config.Size, DrawAnchor.TopLeft);
-            Vector2 areaPos = CalculateStartPosition(position, Config.Size, growthDirections);
-            var margin = new Vector2(14, 10);
+            Vector2 areaPos = LayoutHelper.CalculateStartPosition(position, Config.Size, growthDirections);
+            Vector2 margin = new Vector2(14, 10);
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
             // no need to do anything else if there are no effects
             if (list.Count == 0)
@@ -312,60 +323,27 @@ namespace DelvUI.Interface.StatusEffects
             }
 
             // calculate icon positions
-            var count = CalculateLayout(list);
-            var iconPositions = new List<Vector2>();
-            var minPos = new Vector2(float.MaxValue, float.MaxValue);
-            var maxPos = Vector2.Zero;
-
-            var row = 0;
-            var col = 0;
-
-            for (var i = 0; i < count; i++)
-            {
-                CalculateAxisDirections(growthDirections, row, count, out var direction, out var offset);
-
-                var pos = new Vector2(
-                    position.X + offset.X + Config.IconConfig.Size.X * col * direction.X + Config.IconPadding.X * col * direction.X,
-                    position.Y + offset.Y + Config.IconConfig.Size.Y * row * direction.Y + Config.IconPadding.Y * row * direction.Y
-                );
-
-                minPos.X = Math.Min(pos.X, minPos.X);
-                minPos.Y = Math.Min(pos.Y, minPos.Y);
-                maxPos.X = Math.Max(pos.X + Config.IconConfig.Size.X, maxPos.X);
-                maxPos.Y = Math.Max(pos.Y + Config.IconConfig.Size.Y, maxPos.Y);
-
-                iconPositions.Add(pos);
-
-                // rows / columns
-                if (Config.FillRowsFirst || (growthDirections & GrowthDirections.Centered) != 0)
-                {
-                    col += 1;
-                    if (col >= _layoutInfo.TotalColCount)
-                    {
-                        col = 0;
-                        row += 1;
-                    }
-                }
-                else
-                {
-                    row += 1;
-                    if (row >= _layoutInfo.TotalRowCount)
-                    {
-                        row = 0;
-                        col += 1;
-                    }
-                }
-            }
-
+            uint count = CalculateLayout(list);
+            var (iconPositions, minPos, maxPos) = LayoutHelper.CalculateIconPositions(
+                growthDirections,
+                count,
+                position,
+                Config.Size,
+                Config.IconConfig.Size,
+                Config.IconPadding,
+                LayoutHelper.GetFillsRowsFirst(Config.FillRowsFirst, growthDirections),
+                _layoutInfo
+            );
+     
             // window
             // imgui clips the left and right borders inside windows for some reason
             // we make the window bigger so the actual drawable size is the expected one
-            var windowPos = minPos - margin;
-            var windowSize = maxPos - minPos;
+            Vector2 windowPos = minPos - margin;
+            Vector2 windowSize = maxPos - minPos;
 
             AddDrawAction(Config.StrataLevel, () =>
             {
-                DrawHelper.DrawInWindow(ID, windowPos, windowSize + margin * 2, !Config.DisableInteraction, false, (drawList) =>
+                DrawHelper.DrawInWindow(ID, windowPos, windowSize + margin * 2, !Config.DisableInteraction, (drawList) =>
                 {
                     // area
                     if (Config.Preview)
@@ -375,7 +353,7 @@ namespace DelvUI.Interface.StatusEffects
 
                     for (var i = 0; i < count; i++)
                     {
-                        var iconPos = iconPositions[i];
+                        Vector2 iconPos = iconPositions[i];
                         var statusEffectData = list[i];
 
                         // shadow
@@ -406,11 +384,11 @@ namespace DelvUI.Interface.StatusEffects
                             var dispellIndicatorColor = new Vector4(141f / 255f, 206f / 255f, 229f / 255f, 100f / 100f);
                             // 24x32
                             drawList.AddRectFilled(
-                                    iconPos + new Vector2(Config.IconConfig.Size.X * .07f, Config.IconConfig.Size.Y * .07f),
-                                    iconPos + new Vector2(Config.IconConfig.Size.X * .93f, Config.IconConfig.Size.Y * .14f),
-                                    ImGui.ColorConvertFloat4ToU32(dispellIndicatorColor),
-                                    8f
-                                );
+                                           iconPos + new Vector2(Config.IconConfig.Size.X * .07f, Config.IconConfig.Size.Y * .07f),
+                                           iconPos + new Vector2(Config.IconConfig.Size.X * .93f, Config.IconConfig.Size.Y * .14f),
+                                           ImGui.ColorConvertFloat4ToU32(dispellIndicatorColor),
+                                           8f
+                                       );
                         }
                     }
                 });
@@ -518,61 +496,6 @@ namespace DelvUI.Interface.StatusEffects
             }
         }
 
-        private void CalculateAxisDirections(GrowthDirections growthDirections, int row, uint elementCount, out Vector2 direction, out Vector2 offset)
-        {
-            if ((growthDirections & GrowthDirections.Centered) != 0)
-            {
-                var elementsPerRow = (int)(Config.Size.X / (Config.IconConfig.Size.X + Config.IconPadding.X));
-                var elementsInRow = Math.Min(elementsPerRow, elementCount - (elementsPerRow * row));
-
-                direction.X = 1;
-                direction.Y = (growthDirections & GrowthDirections.Down) != 0 ? 1 : -1;
-                offset.X = -(Config.IconConfig.Size.X + Config.IconPadding.X) * elementsInRow / 2f;
-                offset.Y = direction.Y == 1 ? 0 : -Config.IconConfig.Size.Y;
-            }
-            else
-            {
-                direction.X = (growthDirections & GrowthDirections.Right) != 0 ? 1 : -1;
-                direction.Y = (growthDirections & GrowthDirections.Down) != 0 ? 1 : -1;
-                offset.X = direction.X == 1 ? 0 : -Config.IconConfig.Size.X;
-                offset.Y = direction.Y == 1 ? 0 : -Config.IconConfig.Size.Y;
-            }
-        }
-
-        private Vector2 CalculateStartPosition(Vector2 position, Vector2 size, GrowthDirections growthDirections)
-        {
-            var area = size;
-            if ((growthDirections & GrowthDirections.Left) != 0)
-            {
-                area.X = -area.X;
-            }
-
-            if ((growthDirections & GrowthDirections.Up) != 0)
-            {
-                area.Y = -area.Y;
-            }
-
-            var startPos = position;
-            if ((growthDirections & GrowthDirections.Centered) != 0)
-            {
-                startPos.X = position.X - size.X / 2f;
-            }
-
-            var endPos = position + area;
-
-            if (endPos.X < position.X)
-            {
-                startPos.X = endPos.X;
-            }
-
-            if (endPos.Y < position.Y)
-            {
-                startPos.Y = endPos.Y;
-            }
-
-            return startPos;
-        }
-
         public StatusEffectIconBorderConfig? GetBorderConfig(StatusEffectData statusEffectData)
         {
             StatusEffectIconBorderConfig? borderConfig = null;
@@ -643,15 +566,5 @@ namespace DelvUI.Interface.StatusEffects
             Status = status;
             Data = data;
         }
-    }
-
-    [Flags]
-    public enum GrowthDirections : short
-    {
-        Up = 1,
-        Down = 2,
-        Left = 4,
-        Right = 8,
-        Centered = 16,
     }
 }

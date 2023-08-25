@@ -199,7 +199,9 @@ namespace DelvUI.Interface.StatusEffects
             "Left and Down",
             "Left and Up",
             "Centered and Up",
-            "Centered and Down"
+            "Centered and Down",
+            "Centered and Left",
+            "Centered and Right"
         )]
         [Order(30)]
         public int Directions;
@@ -223,6 +225,10 @@ namespace DelvUI.Interface.StatusEffects
         [Checkbox("My Effects First")]
         [Order(50)]
         public bool ShowMineFirst = false;
+
+        [Checkbox("Sort by Duration", help = "If enabled, \"Permanent Effects First\" and \"My Effects First\" will be ignored!")]
+        [Order(51)]
+        public bool SortByDuration = false;
 
         [Checkbox("Pet As Own Effect")]
         [Order(55)]
@@ -261,33 +267,8 @@ namespace DelvUI.Interface.StatusEffects
 
         private void SetGrowthDirections(GrowthDirections growthDirections)
         {
-            var index = DirectionOptionsValues.FindIndex(d => d == growthDirections);
-            if (index > 0)
-            {
-                Directions = index;
-            }
+            Directions = LayoutHelper.IndexFromGrowthDirections(growthDirections);
         }
-
-        public GrowthDirections GetGrowthDirections()
-        {
-            if (Directions > 0 && Directions < DirectionOptionsValues.Count)
-            {
-                return DirectionOptionsValues[Directions];
-            }
-
-            return DirectionOptionsValues[0];
-        }
-
-        [JsonIgnore]
-        internal List<GrowthDirections> DirectionOptionsValues = new List<GrowthDirections>()
-        {
-            GrowthDirections.Right | GrowthDirections.Down,
-            GrowthDirections.Right | GrowthDirections.Up,
-            GrowthDirections.Left | GrowthDirections.Down,
-            GrowthDirections.Left | GrowthDirections.Up,
-            GrowthDirections.Centered | GrowthDirections.Up,
-            GrowthDirections.Centered | GrowthDirections.Down
-        };
     }
 
     [Exportable(false)]

@@ -16,6 +16,8 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using StructsCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
+using StructsGameObject = FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject;
+using StructsCharacterManager = FFXIVClientStructs.FFXIV.Client.Game.Character.CharacterManager;
 
 namespace DelvUI.Helpers
 {
@@ -80,7 +82,7 @@ namespace DelvUI.Helpers
             byte* unk = (byte*)(new IntPtr(character.Address) + 0x1F0);
 
             return character != null
-                && ((character.SubKind == (byte)BattleNpcSubKind.Enemy || (int)character.SubKind == 1)
+                && ((character.SubKind == (byte)BattleNpcSubKind.Enemy || (int)character.SubKind == (byte)BattleNpcSubKind.BattleNpcPart)
                 && *unk != 0);
         }
 
@@ -92,7 +94,7 @@ namespace DelvUI.Helpers
             }
 
             StructsCharacter* chara = (StructsCharacter*)actor.Address;
-            return Math.Min((float)chara->ShieldValue, 100f) / 100f;
+            return Math.Min(chara->CharacterData.ShieldValue, 100f) / 100f;
         }
 
         public static bool IsActorCasting(GameObject? actor)
@@ -157,8 +159,7 @@ namespace DelvUI.Helpers
             }
 
             TimeSpan t = TimeSpan.FromSeconds(duration);
-
-            return $"{t.Minutes:00}:{t.Seconds:00}";
+            return duration >= 60 ? $"{t.Minutes:0}:{t.Seconds:00}" : $"{t.Seconds:00}";
         }
 
 
@@ -181,6 +182,17 @@ namespace DelvUI.Helpers
                 return null;
             }
 
+            // Dalamud for now has an issue where it is only able to get the target ID of
+            // NON-Networked objects through anything but GetTargetId on ClientStruct Gameobjects.
+            // The bypass converts all Dalamud GameObject Data to ClientStructs GameObject Data and handles it accordingly.
+            int actualTargetId = GetActualTargetId(target);
+            // The Object ID that gets returned from minions is in reality the index
+            // Checking for the correct object ID wouldn't work anyways as you would yet again run into the ObjectID = 0xE0000000 issue
+            if (actualTargetId >= 0 && actualTargetId < actors.Length)
+            {
+                return actors[actualTargetId];
+            }
+
             if (target.TargetObjectId == 0 && player != null && player.TargetObjectId == 0)
             {
                 return player;
@@ -198,6 +210,48 @@ namespace DelvUI.Helpers
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Gets the actual target ID of your targets target.
+        /// </summary>
+        /// <param name="target">Your target</param>
+        /// <returns>Target ID of your targets targer. Returns -1 if old code should be ran.</returns>
+        private static unsafe int GetActualTargetId(GameObject target)
+        {
+            // We only need to check for companions. 
+            // Why not check target.TargetObject?.ObjectKind == ObjectKind.Companion?
+            // Due to the Non-Networked game object bug the game is unaware of what type the object should actually be
+            if (target.TargetObject?.ObjectKind != ObjectKind.Player)
+            {
+                return -1;
+            }
+            // Here we get the ClientStruct Character of our target (aka the player we are targeting)
+            StructsCharacter targetChara = StructsCharacterManager.Instance()->LookupBattleCharaByObjectId((int)target.ObjectId)->Character;
+            // This method is key. GetTargetId() returns the targets player target ID. If it is converted to a hex string and starts with the number 4, it is a minion.
+            // Even though it is a minion, it still returns the players target ID.
+            ulong realTargetID = targetChara.GetTargetId();
+            if (!realTargetID.ToString("X").StartsWith("4")) 
+            {
+                return -1;
+            }
+            // We look up the parents ClientStruct GameObject
+            StructsCharacter* realBattleChara = (StructsCharacter*)StructsCharacterManager.Instance()->LookupBattleCharaByObjectId((int)realTargetID);
+            if (realBattleChara == null)
+            {
+                return -1;
+            }
+            // And get the companion off of that
+            StructsGameObject * companionGameObject = (StructsGameObject*)realBattleChara->Companion.CompanionObject;
+            if (companionGameObject == null)
+            {
+                return -1;
+            }
+
+            // We return the index of the object here. Why?
+            // Again due to the bug where ObjectID = 0xE0000000
+            // The index does work and returns the exact minion index.
+            return companionGameObject->ObjectIndex;
         }
 
         public static Vector2 GetAnchoredPosition(Vector2 position, Vector2 size, DrawAnchor anchor)
