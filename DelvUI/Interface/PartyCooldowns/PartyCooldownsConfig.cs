@@ -568,6 +568,7 @@ namespace DelvUI.Interface.PartyCooldowns
             // GNB
             [16160] = NewData(16160, JobIDs.GNB, 64, 90, 15, 90, 2, PartyCooldownEnabled.PartyFrames), // heart of light
             [16164] = NewData(16164, JobIDs.GNB, 76, 120, 1, 10, 3, PartyCooldownEnabled.PartyFrames), // bloodfest
+            [16138] = NewData(16138, JobIDs.GNB, 2, 60, 20, 10, 3, PartyCooldownEnabled.PartyFrames), // no mercy
             [16140] = NewData(16140, JobIDs.GNB, 6, 90, 20, 90, 4, PartyCooldownEnabled.PartyFrames), // camouflage
             [16148] = NewData(16148, JobIDs.GNB, 38, 120, 15, 90, 4, PartyCooldownEnabled.PartyFrames), // nebula
             [16161] = NewData(16161, JobIDs.GNB, 68, 25, 7, 90, 4, PartyCooldownEnabled.PartyFrames), // heart of stone

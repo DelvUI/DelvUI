@@ -1,7 +1,10 @@
+# 2.0.1.0
+- Added Gunbreaker's No Mercy to the tracked Party Cooldowns.
+
 # 2.0.0.0
 - Added a Bar Texture setting for all bars:
     + Each bar can use a different Bar Texture and Draw Mode.
-    + Supported Draw Modes are: Strech, Repeat Horizontal, Repeat Vertical and Repeat.
+    + Supported Draw Modes are: Stretch, Repeat Horizontal, Repeat Vertical and Repeat.
     + DelvUI comes with several textures to choose from.
     + There's a new section under Customization > Bar Textures where custom textures can be added.
     + Textures can be previewed in Customization > Bar Textures.
@@ -40,7 +43,7 @@
 - Moved "Fonts" from "Misc" to the new "Customization" section.
 - Updated and improved the default profile that comes with DelvUI.
 
-- Fixed Nameplates with interaction enabled sometimes making the mouse left-click to be stuck as if it was being held down.
+- Fixed Nameplates with interaction enabled sometimes making the mouse clikcs to be stuck as if they were being held down.
 - Fixed DelvUI sometimes making Dalamud windows lose focus.
 - Fixed targeted unit Nameplate not drawing on top of other Nameplates.
 - Fixed Order Label not working for Enemy Nameplates.
