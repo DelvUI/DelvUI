@@ -255,11 +255,6 @@ namespace DelvUI.Helpers
             int length = 0;
             ParseLength(ref tag, ref length);
 
-            string formatDecimal = ".";
-            string formatThousand = ",";
-            bool formatNumber = false;
-            ParseFormatNumber(ref tag, ref formatDecimal, ref formatThousand, ref formatNumber);
-
             if (TextTags.TryGetValue(tag, out Func<GameObject?, string?, int, bool?, string>? func) && func != null)
             {
                 return func(actor, name, length, isPlayerName);
@@ -420,24 +415,6 @@ namespace DelvUI.Helpers
                 }
                 catch { }
 
-                tag = tag.Substring(0, tag.Length - lengthString.Length - 2) + "]";
-            }
-        }
-
-        private static void ParseFormatNumber(ref string tag, ref string formatDecimal, ref string formatThousand, ref bool formatNumber)
-        {
-            int index = tag.IndexOf("#");
-            if (index != -1)
-            {
-                string lengthString = tag.Substring(index + 1);
-                lengthString = lengthString.Substring(0, lengthString.Length - 1);
-                try
-                {
-                    formatDecimal = lengthString.Substring(0, 1);
-                    formatThousand = lengthString.Substring(1, 1);
-                    formatNumber = true;
-                }
-                catch { }
                 tag = tag.Substring(0, tag.Length - lengthString.Length - 2) + "]";
             }
         }
