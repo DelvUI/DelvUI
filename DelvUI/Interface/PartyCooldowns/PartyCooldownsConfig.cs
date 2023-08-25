@@ -348,8 +348,9 @@ namespace DelvUI.Interface.PartyCooldowns
                         ImGui.PushItemWidth(86);
                         ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 2);
 
-                        if (ImGui.DragInt($"##{cooldown.ActionId}_priority", ref cooldown.Priority, 1, 0, 100, "%i", ImGuiSliderFlags.NoInput))
+                        if (ImGui.DragInt($"##{cooldown.ActionId}_priority", ref cooldown.Priority, 1, 0, 100))
                         {
+                            cooldown.Priority = Math.Clamp(cooldown.Priority, 0, 100);
                             changed = true;
                             CooldownsDataChangedEvent?.Invoke(this);
                         }

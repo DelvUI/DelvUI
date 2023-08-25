@@ -1,6 +1,7 @@
 # 2.0.1.0
 - Added Gunbreaker's No Mercy to the tracked Party Cooldowns.
 - Added Bard's Raging Strikes to the tracked Party Cooldowns.
+- Party Cooldowns priorty can now be edited with double click.
 - Fixed tooltips showing "()" when the source name is empty.
 
 # 2.0.0.0
