@@ -19,6 +19,7 @@
 
 - Added support for the Who's Talking plugin:
     + Can be configured in Party Frames > Icons > Who's Talking.
+    + Requires v0.6.0.0+ of the Who's Talking plugin.
 
 - Added settings for Enemy Nameplate Castbars to match the width or height of the Health Bar:
     + These are intended to be used when the Health Bar size changes for targeted units.
