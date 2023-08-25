@@ -103,6 +103,12 @@ namespace DelvUI.Config.Profiles
                 Instance = new ProfilesManager();
             }
 
+            if (Instance == null)
+            {
+                PluginLog.Error("Error initializing DelvUI's profiles!!!");
+                return;
+            }
+
             // always make sure the default profile file is present
             if (!File.Exists(DefaultProfilePath))
             {
@@ -1003,7 +1009,7 @@ namespace DelvUI.Config.Profiles
 
         public override bool Draw(ref bool changed)
         {
-            return ProfilesManager.Instance.Draw(ref changed);
+            return ProfilesManager.Instance?.Draw(ref changed) ?? false;
         }
     }
 }

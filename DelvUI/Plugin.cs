@@ -241,7 +241,7 @@ namespace DelvUI
 
                         if (profile.Length > 0)
                         {
-                            ProfilesManager.Instance.CheckUpdateSwitchCurrentProfile(profile[1]);
+                            ProfilesManager.Instance?.CheckUpdateSwitchCurrentProfile(profile[1]);
                         }
 
                         break;
