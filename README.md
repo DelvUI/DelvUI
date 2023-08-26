@@ -10,6 +10,11 @@
 https://discord.gg/xzde5qQayh
 ***
 
+**Changelog**  
+
+https://github.com/DelvUI/DelvUI/blob/main/DelvUI/changelog.md
+***
+
 **Previews and Profiles**  
 
 https://wago.io/delvui
