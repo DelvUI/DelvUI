@@ -1,43 +1,43 @@
 # 2.0.1.0
 - Added a "User Regional Number Format" setting in the Misc section:
-    + This can be set to use the system's settings, or default to English.
+  * This can be set to use the system's settings, or default to English.
 
 - Added new `-formatted` Text Tags for numeric values.
 - Corrected a lot of numeric Text Tags that were using the wrong formatting.
 - Added Gunbreaker's No Mercy to the tracked Party Cooldowns.
 - Added Bard's Raging Strikes to the tracked Party Cooldowns.
-- Party Cooldowns priorty can now be edited with double click.
+- Party Cooldowns priority can now be edited with double click.
 - Fixed tooltips showing "()" when the source name is empty.
 - Fixed tooltips making other Dalamud windows to lose focus.
 
 # 2.0.0.0
 - Added a Bar Texture setting for all bars:
-    + Each bar can use a different Bar Texture and Draw Mode.
-    + Supported Draw Modes are: Stretch, Repeat Horizontal, Repeat Vertical and Repeat.
-    + DelvUI comes with several textures to choose from.
-    + There's a new section under Customization > Bar Textures where custom textures can be added.
-    + Textures can be previewed in Customization > Bar Textures.
-    + Also in this section it is possible to apply a particular Bar Texture and Draw Mode to all bars with one click.
+  * Each bar can use a different Bar Texture and Draw Mode.
+  * Supported Draw Modes are: Stretch, Repeat Horizontal, Repeat Vertical and Repeat.
+  * DelvUI comes with several textures to choose from.
+  * There's a new section under Customization > Bar Textures where custom textures can be added.
+  * Textures can be previewed in Customization > Bar Textures.
+  * Also in this section it is possible to apply a particular Bar Texture and Draw Mode to all bars with one click.
 
 - Party Cooldowns can now be tracked per player directly in the Party Frames:
-    + Tracked cooldowns are configured in Party Cooldowns > Tracked Cooldowns.
-    + Cooldowns can be set to be shown in the Party Cooldowns section or in the Party Frames (or both).
-    + Cooldowns can also be configured so they are only visible for certain jobs (For example making Swiftcast only visible for healers).
-    + Added a lot of cooldowns that were missing in the Tracked Cooldowns list.
+  * Tracked cooldowns are configured in Party Cooldowns > Tracked Cooldowns.
+  * Cooldowns can be set to be shown in the Party Cooldowns section or in the Party Frames (or both).
+  * Cooldowns can also be configured so they are only visible for certain jobs (For example making Swiftcast only visible for healers).
+  * Added a lot of cooldowns that were missing in the Tracked Cooldowns list.
 
 - Added support for the Wotsit plugin:
-    + You can search for DelvUI settings by name to open the config window in the relevant section.
-    + For example searching for `black mage` will yield a result named `DelvUI Settings: Job Specific Bars > Caster > Black Mage`, and selecting it will open DelvUI's Black Mage HUD configuration.
+  * You can search for DelvUI settings by name to open the config window in the relevant section.
+  * For example searching for `black mage` will yield a result named `DelvUI Settings: Job Specific Bars > Caster > Black Mage`, and selecting it will open DelvUI's Black Mage HUD configuration.
 
 - Added support for the Who's Talking plugin:
-    + Can be configured in Party Frames > Icons > Who's Talking.
-    + Requires v0.6.0.0+ of the Who's Talking plugin.
+  * Can be configured in Party Frames > Icons > Who's Talking.
+  * Requires v0.6.0.0+ of the Who's Talking plugin.
 
 - Added settings for Enemy Nameplate Castbars to match the width or height of the Health Bar:
-    + These are intended to be used when the Health Bar size changes for targeted units.
+  * These are intended to be used when the Health Bar size changes for targeted units.
     
 - Added an auto backup feature that runs every time DelvUI gets an update.
-    + Automatic backups can be found in `%APPDATA%\XIVLauncher\pluginConfigs\DelvUI\Backups`.
+  * Automatic backups can be found in `%APPDATA%\XIVLauncher\pluginConfigs\DelvUI\Backups`.
 
 - Added support for the Pet Nicknames plugin (by Glyceri). 
 - Added a setting to all Castbars to separate the icon from the bar.
@@ -52,7 +52,7 @@
 - Moved "Fonts" from "Misc" to the new "Customization" section.
 - Updated and improved the default profile that comes with DelvUI.
 
-- Fixed Nameplates with interaction enabled sometimes making the mouse clikcs to be stuck as if they were being held down.
+- Fixed Nameplates with interaction enabled sometimes making the mouse clicks to be stuck as if they were being held down.
 - Fixed DelvUI sometimes making Dalamud windows lose focus.
 - Fixed targeted unit Nameplate not drawing on top of other Nameplates.
 - Fixed Order Label not working for Enemy Nameplates.
@@ -94,9 +94,9 @@
 
 # 1.6.1.0
 - Added a new "Occlusion Type" setting for Nameplates:
-    + This lets you control which kind of objects in the world will cover nameplates.
-    + This setting's default value is "Walls".
-    + In previous versions, the default was "Walls and Objects" which was causing a lot of unexpected behaviors.
+  * This lets you control which kind of objects in the world will cover nameplates.
+  * This setting's default value is "Walls".
+  * In previous versions, the default was "Walls and Objects" which was causing a lot of unexpected behaviors.
 
 - Fixed released minions in the Island Sanctuary not having a nameplate.
 - Fixed elements in the enemies nameplates not being visible if both the Health Bar and Name Label were hidden.
@@ -113,28 +113,28 @@
 
 # 1.6.0.0
 - Added custom Nameplates:
-    + Like other DelvUI components, enabling this feature won't automatically disable the game's counterpart.
-    + You are supposed to manually hide the types of nameplates you don't want from either the game or DelvUI.
+  * Like other DelvUI components, enabling this feature won't automatically disable the game's counterpart.
+  * You are supposed to manually hide the types of nameplates you don't want from either the game or DelvUI.
 
 - Unit frames for NPCs with 1 max health points wont show health values if the "Hide Health if Possible" setting is enabled for the label (previously it only did it for units with no health points).
 - Fixed issues with colors in unit frames for NPCs.
 
 # 1.5.4.0
 - Implemented format groups for labels:
-    + This allows you to have entirely different formats for players and NPCs.
-    + The format is `{unitType=<text>}`. Anything inside the brackets will only be shown for units of that `unitType`.
-    + Valid unitTypes are `player` and `npc`.
-    + The text inside a group can have text tags.
-    + Example `{player=Lv [level]  [name:initials]}{npc=[distance]y  [name]}`:
-        * This will display "Lv 90  J. D." for a level 90 player named "John Doe".
-        * This will display "30y  Striking Dummy" for a Striking Dummy NPC that is 30 yalms away from you.
+  * This allows you to have entirely different formats for players and NPCs.
+  * The format is `{unitType=<text>}`. Anything inside the brackets will only be shown for units of that `unitType`.
+  * Valid unitTypes are `player` and `npc`.
+  * The text inside a group can have text tags.
+  * Example `{player=Lv [level]  [name:initials]}{npc=[distance]y  [name]}`:
+    * This will display "Lv 90  J. D." for a level 90 player named "John Doe".
+    * This will display "30y  Striking Dummy" for a Striking Dummy NPC that is 30 yalms away from you.
 
 - Removed some text tags: `[health:current-max]`, `[health:current-max-short]`, `[mana:current-max]`, `[mana:current-max-short]`.
-    + These can easily be replaced by combining other existing tags.
-    + Example: `[health:current] | [health:max]`.
+  * These can easily be replaced by combining other existing tags.
+  * Example: `[health:current] | [health:max]`.
 
 - Updated text tag `[time-till-max-gp]`:
-    + New format is `mm:ss` (the parenthesis were removed).
+  * New format is `mm:ss` (the parenthesis were removed).
 
 - Fixed experience text tags not showing in the text tags list.
 
@@ -147,13 +147,13 @@
 
 # 1.5.3.0
 - Reworked name text tags:
-    + A lot of existing text tags have been removed.
-    + You can now specifiy the type of unit for a name text tag.
-        * This allows to display player names and npc names differently on the same label.
-        * Example: `[player_name:initials][npc_name]` would display the initials for a player, and the full name for an npc.
-        * You can still use tags that start with `[name:` that work for both types of units.
-    + Additionally you can now specify a cap for the length of the names by adding `.#` at the end.
-        * Example: `[name.5]` would display `Tisch` for the name `Tischel`.
+  * A lot of existing text tags have been removed.
+  * You can now specify the type of unit for a name text tag.
+    * This allows to display player names and npc names differently on the same label.
+    * Example: `[player_name:initials][npc_name]` would display the initials for a player, and the full name for an npc.
+    * You can still use tags that start with `[name:` that work for both types of units.
+  * Additionally you can now specify a cap for the length of the names by adding `.#` at the end.
+    * Example: `[name.5]` would display `Tisch` for the name `Tischel`.
 
 - Disabled Sign Icons from unit frames for non-combat NPCs (until I find a better fix).
 
@@ -163,8 +163,8 @@
 
 # 1.5.2.0
 - Added visibility settings for PvP.
-- Added the ability to disable mouseover functionallity in individual frames.
-    + To use this you have to enable the Custom Mouseover Area and enable the Ignore setting.
+- Added the ability to disable mouseover functionality in individual frames.
+  * To use this you have to enable the Custom Mouseover Area and enable the Ignore setting.
 
 # 1.5.1.1
 - Fixed Text Tags popup not scrolling properly.
@@ -173,9 +173,9 @@
 Features:
 - Added Sign Icons to all Unit Frames, Party Frames and Enemy List.
 - Reworked Machinist's Overheat Bar:
-    + It now uses chunks for the 5 stacks.
-    + The label displays the remaining duration of the buff.
-    + Due to these changes, the settings for this bar will be reset.
+  * It now uses chunks for the 5 stacks.
+  * The label displays the remaining duration of the buff.
+  * Due to these changes, the settings for this bar will be reset.
 
 Fixes:
 - Fixed tooltips sometimes cutting off.
@@ -185,7 +185,7 @@ Fixes:
 - Fixed Enemy List castbars not working properly.
 
 # 1.5.0.1
-- Added Machinist's Dismatle to Party Cooldowns.
+- Added Machinist's Dismantle to Party Cooldowns.
 - Fixed Invulnerabilities and Raise Trackers' icons not being disableable.
 
 # 1.5.0.0
@@ -204,7 +204,7 @@ Fixes:
 
 # 1.4.4.1
 - Fixed abilities and status effect names for German, French and Japanese in Abyssos (Savage).
-- Fixed tooltipes being shown when mouseovering on hidden elements.
+- Fixed tooltips being shown when mouseovering on hidden elements.
 - Fixed Party Frames preview looking too dark.
 - Fixed Enemy List Shadows.
 
@@ -215,8 +215,8 @@ Fixes:
 
 # 1.4.3.0
 - Added a "First of my role" setting to the player overridden position for the Party Frames:
-    + It will place the player as the first of their current role, respecting the game's party list sorting settings.
-    + In cross-world parties the party is not sorted so this setting will not work properly.
+  * It will place the player as the first of their current role, respecting the game's party list sorting settings.
+  * In cross-world parties the party is not sorted so this setting will not work properly.
 
 # 1.4.2.3
 - Fixed Focus Target Castbar not showing sometimes.
@@ -275,19 +275,19 @@ Features:
 - Added "Hide when in duty" option to Visibility settings.
 - Added an icon to the experience bar that shows when the player is in a sanctuary.
 - Order Labels for Party Frames and Enemy List now uses the same symbols from the game:
-    + This means it will no longer be a text like '[A]' or '[1]'.
-    + These labels will no longer use a custom font, instead theres a Scale setting to make them bigger.
-    + Due to these changes, these label's settings will be reset.
+  * This means it will no longer be a text like '[A]' or '[1]'.
+  * These labels will no longer use a custom font, instead there's a Scale setting to make them bigger.
+  * Due to these changes, these label's settings will be reset.
 - Reworked Monk's Forms bar:
-    + It now uses chunks for the 3 forms.
-    + A different color can be assigned for each form and also Formless Fist.
-    + When Formless Fist is active, it will show a progress bar with the duration of the buff instead of the chunks.
-    + Due to these changes, the settings for this bar will be reset.
+  * It now uses chunks for the 3 forms.
+  * A different color can be assigned for each form and also Formless Fist.
+  * When Formless Fist is active, it will show a progress bar with the duration of the buff instead of the chunks.
+  * Due to these changes, the settings for this bar will be reset.
 
 Fixes:
 - Fixed cooldown for Troubadour, Shield Samba and Tactician in Party Cooldowns:
-    + It now adapts to the level of each player to account for the level 88 trait that reduces the cooldown from 120s to 90s.
-    + The cooldown will now read as "90-120" in the list for these actions.
+  * It now adapts to the level of each player to account for the level 88 trait that reduces the cooldown from 120s to 90s.
+  * The cooldown will now read as "90-120" in the list for these actions.
 - Fixed hotbar commands being spammed while doing PvP.
 
 # 1.2.0.1
@@ -298,10 +298,10 @@ Fixes:
 # 1.2.0.0
 Features:
 - Completely reworked visibility options for DelvUI elements and the game's hotbars:
-    + Most DelvUI elements now have their own visibility settings and can be changed individually.
-    + A global setting can be applied to all elements in 'Visibility > Global'.
-    + Hotbar visibility settings were moved from 'Misc > HUD Options' to 'Visibility > Hotbars'.
-    + Due to the change in the structure, all visibility related settings will be reset.
+  * Most DelvUI elements now have their own visibility settings and can be changed individually.
+  * A global setting can be applied to all elements in 'Visibility > Global'.
+  * Hotbar visibility settings were moved from 'Misc > HUD Options' to 'Visibility > Hotbars'.
+  * Due to the change in the structure, all visibility related settings will be reset.
 - Updated the main config window so it adapts better to higher Dalamud Global Font Scales.
 - Added a setting to prevent DelvUI from overriding the global Dalamud style (Misc > HUD Options > Use DelvUI style).
 
@@ -330,8 +330,8 @@ Features:
 - Improved performance when switching profiles in some situations.
 - Added sub-setting to show when crafting when DelvUI is hidden out of combat.
 - Gathering nodes integrity will be shown as health in the target unit frame:
-    + This DOES NOT include text tags support.
-    + Only the health bar will reflect the integrity, no health values will be visible in the labels.
+  * This DOES NOT include text tags support.
+  * Only the health bar will reflect the integrity, no health values will be visible in the labels.
 
 Fixes:
 - Fixed Addersting Bar stacks appearing full when below level 66.
@@ -355,13 +355,13 @@ Fixes:
 Features:
 - Updated for patch 6.1 support.
 - DelvUI option was removed from the in-game system menu:
-    + This feature used to conflict with Dalamud's system menu options which was not ideal.
-    + We ran into some issues with this feature and were not really comfortable with the way it was implemented so we decided to remove it.
-    + You can use "/delvui" to access the config window. We might add a shorter alias for this command in the future for convenience.
+  * This feature used to conflict with Dalamud's system menu options which was not ideal.
+  * We ran into some issues with this feature and were not really comfortable with the way it was implemented so we decided to remove it.
+  * You can use "/delvui" to access the config window. We might add a shorter alias for this command in the future for convenience.
 
 Fixes:
-- Fixed party sorting for Trust and Command Missisons parties.
-- Fixed party leader icon for Trust and Command Missisons parties.
+- Fixed party sorting for Trust and Command Missions parties.
+- Fixed party leader icon for Trust and Command Missions parties.
 
 # 1.0.1.3
 Fixes:
@@ -374,7 +374,7 @@ Features:
 - Added options for Glow to White Mages' "Blood Lily" bar when filled.
 - Added White Mages' "Liturgy of the Bell" to the Party Cooldowns tracker.
 - Added a sub-option to the Experience Bars' "Hide When Inactive" to hide the experience bar in downsynced content when on a max level job.
-- Added new texttags for Health and Mana percentages to also show for whole numbers (ie 78.0% instead of 78%).
+- Added new text tags for Health and Mana percentages to also show for whole numbers (ie 78.0% instead of 78%).
 
 Fixes:
 - Reaper "Death Gauge" bar now has Fill Direction options.
@@ -382,7 +382,7 @@ Fixes:
 # 1.0.1.1
 Features:
 - Added a sub-option to keep hiding Player Unitframe outside of combat when not full health if "Hide DelvUI outside of combat" is enabled.
-- Added a separate option to always hide Player Unitframe when at full health.
+- Added a separate option to always hide the Player Unitframe when at full health.
 
 Fixes:
 - Fixed status effects names and descriptions on P4S (English only for now).
@@ -410,8 +410,8 @@ Fixes:
 # 1.0.0.2
 Features:
 - Added "Right" and "Left" growth directions for Party Cooldowns:
-    + "Columns" renamed to "Sections". When using a vertical growth direction the Section of a cooldown would be the column. On horizontal directions, it would be the row.
-    + Due to adjustments in the positioning logic, the list might be silightly moved when updating.
+  * "Columns" renamed to "Sections". When using a vertical growth direction the Section of a cooldown would be the column. On horizontal directions, it would be the row.
+  * Due to adjustments in the positioning logic, the list might be slightly moved when updating.
 - Added an option to show mana up to 10k on Dark Knight's mana bar. Note that this will break thresholds.
 - Separated the Automaton Queen/Rook Autoturret duration tracker from the Battery Gauge into its own bar.
 
@@ -434,11 +434,11 @@ Fixes:
 # 1.0.0.0
 Features:
 - Several changes made to Window Clipping:
-    + Moved from Misc > HUD Options to its own tab under Misc.
-    + Will be disabled by default since it is known to cause random crashes to a small portion of users.
-    + It can still be manually enabled through the config window.
-    + A new "Performance" mode was added which has the clipping functionallity reduced in favor of FPS.
-    + Details on all the modes can be found in Misc > Window Clipping.
+  * Moved from Misc > HUD Options to its own tab under Misc.
+  * Will be disabled by default since it is known to cause random crashes to a small portion of users.
+  * It can still be manually enabled through the config window.
+  * A new "Performance" mode was added which has the clipping functionality reduced in favor of FPS.
+  * Details on all the modes can be found in Misc > Window Clipping.
 - Added "Change Alpha Based on Range" options for Target, Target of Target and Focus Frames separated into Friendly and Enemy settings.
 
 Fixes:
@@ -464,7 +464,7 @@ Fixes:
 
 # 0.6.3.1
 Features:
-- Added option to show Total Casttime on top of Current Casttime for Castbars.
+- Added option to show Total Casttime on top of Current Cast Time for Castbars.
 - Added option to use Job and Role Color as Background Color in Party Frames.
 - Added option to use Job and Role Color as Missing Health Color in Party Frames.
 - Added option to use Role Color as Background Color in Unit Frames.
@@ -495,8 +495,8 @@ Fixes:
 # 0.6.2.0
 Features:
 - Party Frames layout is now configured with the new Rows and Column settings:
-    + Party Frames are not longer draggable / resizable when the config window is opened.
-    + This is a breaking change in the config. When updating, the Party Frames will likely be in a bad position and with an incorrect layout. Use the Position, Rows and Columns settings to correct it. The actual elements inside the frames should remain exactly the same as before the update.
+  * Party Frames are not longer draggable / resizable when the config window is opened.
+  * This is a breaking change in the config. When updating, the Party Frames will likely be in a bad position and with an incorrect layout. Use the Position, Rows and Columns settings to correct it. The actual elements inside the frames should remain exactly the same as before the update.
 - Added Strata Level settings to most UI elements (these allow the user to choose which elements are drawn on top of others).
 - Castbars have been given the option to set a Fill Direction.
 - Castbars now has a Reverse Fill option to use in place of normal Background Color settings.
@@ -535,9 +535,9 @@ Fixes:
 # 0.6.1.0
 Features:
 - Added Party Cooldowns tracker:
-    + You can choose which spells to track (only party-wide effects enabled for now).
-    + The hud displays a grid with all the tracked spells for every member.
-    + You can organize them by priorty and column.
+  * You can choose which spells to track (only party-wide effects enabled for now).
+  * The hud displays a grid with all the tracked spells for every member.
+  * You can organize them by priority and column.
 - Added a Minor Arcana Bar for Astrologian.
 - Added a third label for unit frames that is empty by default.
 
@@ -551,8 +551,8 @@ Fixes:
 # 0.6.0.3
 Features:
 - Updated Paladin's hud to accommodate with the latest changes:
-    + Paladin hud mana bar removed since it doesn't have a special purpose anymore (the generic mana bar can be used instead).
-    + Requiescat Bar now shows the amount of stacks along with the duration of the buff.
+  * Paladin hud mana bar removed since it doesn't have a special purpose anymore (the generic mana bar can be used instead).
+  * Requiescat Bar now shows the amount of stacks along with the duration of the buff.
 
 Fixes:
 - Fixed Astrologian card stacks number when at max stacks.
@@ -560,12 +560,12 @@ Fixes:
 # 0.6.0.2
 Features:
 - Added a Sacred Soil Bar for Scholar.
-- Separated Surging Tempest and Inner Release into 2 separate bars to better accomodate for the new Warrior changes.
+- Separated Surging Tempest and Inner Release into 2 separate bars to better accommodate for the new Warrior changes.
 - New Warrior Inner Release Bar Features:
-    + Shows Inner Release (or Berserk) Stacks
-    + Option to show Inner Release buff duration
-    + Option to track Inner Release ability cooldown
-    + Optional bar glow when Primal Rend buff is gained by Inner Release at level 90.
+  * Shows Inner Release (or Berserk) Stacks
+  * Option to show Inner Release buff duration
+  * Option to track Inner Release ability cooldown
+  * Optional bar glow when Primal Rend buff is gained by Inner Release at level 90.
 
 Fixes:
 - Fixed Bard's Bloodletter Bar showing 2 charges instead of 3 with the level 84 trait.
@@ -612,7 +612,7 @@ Features:
 - Added more border options for bars.
 - Added tank stance indicator for the player's unit frame.
 - Added "Offline Status" tracking for party frames.
-- Added window clipping settings. These settings are targetted for people that are experiencing performance issues or crashes. Until we find a definitive solution, disabling window clipping might help with these issues.
+- Added window clipping settings. These settings are targeted for people that are experiencing performance issues or crashes. Until we find a definitive solution, disabling window clipping might help with these issues.
 - Added "Start Angle" and "Counter Clock Wise Rotation" settings for the circular GCD Indicator.
 - Added GCD Threshold to GCD Indicator.
 - Added sub-options to "Hide only JobPack HUD outside of combat" to always show in duties and/or when weapons are drawn.
@@ -650,7 +650,7 @@ Features:
 - Added role color setting to unit frames.
 - Added role/job icon to unit frames.
 - Added role color settings for DPS types (melee / ranged / caster).
-- Added setting to hide health related labels when appropiate in unit frames.
+- Added setting to hide health related labels when appropriate in unit frames.
 - Added a number format setting for labels in job specific bars.
 - Added thickness settings for party frames healthbars borders.
 - Added support for Trust and Squadron Command parties.
@@ -688,7 +688,7 @@ Features:
 - Added sub-option to Enable Combat Hotbars to show when weapons are drawn.
 - When adding a status effect to a filter list, if there are multiple effects with the same name, all of them will be added to the list at once.
 - Change Alpha Based on Range now also applies to the Death Indicator Background Color.
-- DelvUI windows are now using Dalamus' window system.
+- DelvUI windows are now using Dalamud's window system.
 
 Fixes:
 - Fixed clicks not working on game windows when they are on top of unit frames or party frames.
@@ -702,9 +702,9 @@ Fixes:
 # 0.3.1.2
 Features:
 - Added a Text Tags list when editing a label:
-    + Shows a list with all available tag formats.
-    + The tags can be added to the label by clicking on them.
-    + Hovering with the cursor on top of a tag shows an example of what they do.
+  * Shows a list with all available tag formats.
+  * The tags can be added to the label by clicking on them.
+  * Hovering with the cursor on top of a tag shows an example of what they do.
 
 - Added option to set a Death Indicator Background Color for unit frames and party frames. Disabled by default.
 - Added Buff/Debuffs for the Focus Target.
@@ -725,13 +725,13 @@ Fixes:
 # 0.3.1.0
 Features:
 - Added a mouseover settings under Misc > HUD Options. Three modes supported:
-    1. Mouseover completely disabled for DelvUI frames.
-    2. Automatic mode: All your actions will automatically assume mouseover when your cursor is on top of a unit frame. Mouseover macros or other mouseover plugins are not necessary and WON'T WORK with DelvUI in this mode!
-    3. Regular mode: DelvUI unit frames will behave like the game's ones. You'll need to use mouseover macros or other mouseover related plugins in this mode.
+  * Mouseover completely disabled for DelvUI frames.
+  * Automatic mode: All your actions will automatically assume mouseover when your cursor is on top of a unit frame. Mouseover macros or other mouseover plugins are not necessary and WON'T WORK with DelvUI in this mode!
+  * Regular mode: DelvUI unit frames will behave like the game's ones. You'll need to use mouseover macros or other mouseover related plugins in this mode.
 
 - Added a command to forcibly switch the active Job Pack to the specified job:
-    + Turn on with `/delvui forcejob job`
-    + Turn off with `/delvui forcejob off`
+  * Turn on with `/delvui forcejob job`
+  * Turn off with `/delvui forcejob off`
 
 Fixes:
 - Fixed some threshold or timers not working properly in some job specific bars.
@@ -761,17 +761,17 @@ This version brings A LOT of changes. Chances are your settings will be invalid 
 
 Features:
 - Added party frames. Currently they support:
-    + Resizable area and fill order. The frames will adapt to the area and grow in the desired direction.
-    + Light Parties and Full Parties. Alliances are not supported (you will only see your party).
-    + "Regular" parties and Cross-World parties.
-    + Chocobo (GC and Trust systems not supported).
-    + Their own health bar, mana bar and cast bar settings.
-    + Their own buffs and debuffs settings with their individual filter settings.
-    + The game's party sorting settings. You can use the game's sorting options and change player's order in the game's social window, and it will be reflected in DelvUI's party frames.
-    + Overriding your own position in the frames through the settings or by Ctrl+Alt+Shift+Clicking on another player (this will move you to that position in the list).
-    + Raise Tracker. Tracks Raise casts and Raise buffs on the party.
-    + Tank Invulnerability Tracker.
-    + Mouseover. All abilities automatically assume "mouseover" if the cursor is on top of a unit frame when the ability is used.
+  * Resizable area and fill order. The frames will adapt to the area and grow in the desired direction.
+  * Light Parties and Full Parties. Alliances are not supported (you will only see your party).
+  * "Regular" parties and Cross-World parties.
+  * Chocobo (GC and Trust systems not supported).
+  * Their own health bar, mana bar and cast bar settings.
+  * Their own buffs and debuffs settings with their individual filter settings.
+  * The game's party sorting settings. You can use the game's sorting options and change player's order in the game's social window, and it will be reflected in DelvUI's party frames.
+  * Overriding your own position in the frames through the settings or by Ctrl+Alt+Shift+Clicking on another player (this will move you to that position in the list).
+  * Raise Tracker. Tracks Raise casts and Raise buffs on the party.
+  * Tank Invulnerability Tracker.
+  * Mouseover. All abilities automatically assume "mouseover" if the cursor is on top of a unit frame when the ability is used.
 
 - Added Experience Bar hud.
 - Added Pull timer hud.
@@ -790,7 +790,7 @@ Features:
 - Added more text tags.
 - Added support for Penumbra texture mods.
 - Added option to show the id of status effects on the tooltips.
-- Added font options fot tooltips.
+- Added font options for tooltips.
 - Added option to show status effects with their original shape and dispellable indicator.
 - Added BLM specific options for the MP Ticker.
 - Smooth HP transitions for unit- and party frames.
