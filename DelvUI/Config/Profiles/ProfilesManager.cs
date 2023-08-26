@@ -78,6 +78,8 @@ namespace DelvUI.Config.Profiles
 
         public static void Initialize()
         {
+            bool attemptRepair = false;
+
             try
             {
                 string jsonString = File.ReadAllText(JsonPath);
@@ -101,12 +103,24 @@ namespace DelvUI.Config.Profiles
             catch
             {
                 Instance = new ProfilesManager();
+                attemptRepair = true;
             }
 
             if (Instance == null)
             {
                 PluginLog.Error("Error initializing DelvUI's profiles!!!");
                 return;
+            }
+
+            // attempt to reconstruct profile from files if the Profiles directory is missing
+            if (attemptRepair && 
+                !ConfigurationManager.Instance.IsFreshInstall() && 
+                !Directory.Exists(ProfilesPath))
+            {
+                Instance.CurrentProfileName = "Restored Profile";
+
+                Profile defaultProfile = new Profile(Instance.CurrentProfileName);
+                Instance.Profiles.Add(Instance.CurrentProfileName, defaultProfile);
             }
 
             // always make sure the default profile file is present

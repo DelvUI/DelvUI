@@ -143,9 +143,9 @@ namespace DelvUI.Helpers
 
             ["[health:current-short]"] = (currentHp, maxHp) => currentHp.KiloFormat(),
 
-            ["[health:current-percent]"] = (currentHp, maxHp) => currentHp == maxHp ? currentHp.ToString() : (100f * currentHp / Math.Max(1, maxHp)).ToString(),
+            ["[health:current-percent]"] = (currentHp, maxHp) => currentHp == maxHp ? currentHp.ToString() : (100f * currentHp / Math.Max(1, maxHp)).ToString("N0"),
 
-            ["[health:current-percent-short]"] = (currentHp, maxHp) => currentHp == maxHp ? currentHp.KiloFormat() : (100f * currentHp / Math.Max(1, maxHp)).ToString(),
+            ["[health:current-percent-short]"] = (currentHp, maxHp) => currentHp == maxHp ? currentHp.KiloFormat() : (100f * currentHp / Math.Max(1, maxHp)).ToString("N0"),
 
             ["[health:max]"] = (currentHp, maxHp) => maxHp.ToString(),
 
@@ -153,7 +153,7 @@ namespace DelvUI.Helpers
 
             ["[health:max-short]"] = (currentHp, maxHp) => maxHp.KiloFormat(),
 
-            ["[health:percent]"] = (currentHp, maxHp) => (100f * currentHp / Math.Max(1, maxHp)).ToString(),
+            ["[health:percent]"] = (currentHp, maxHp) => (100f * currentHp / Math.Max(1, maxHp)).ToString("N0"),
 
             ["[health:percent-decimal]"] = (currentHp, maxHp) => (100f * currentHp / Math.Max(1f, maxHp)).ToString("N1", ConfigurationManager.Instance.ActiveCultreInfo),
 
@@ -176,9 +176,9 @@ namespace DelvUI.Helpers
 
             ["[mana:current-short]"] = (currentMp, maxMp) => currentMp.KiloFormat(),
 
-            ["[mana:current-percent]"] = (currentMp, maxMp) => currentMp == maxMp ? currentMp.ToString() : (100f * currentMp / Math.Max(1, maxMp)).ToString(),
+            ["[mana:current-percent]"] = (currentMp, maxMp) => currentMp == maxMp ? currentMp.ToString() : (100f * currentMp / Math.Max(1, maxMp)).ToString("N0"),
 
-            ["[mana:current-percent-short]"] = (currentMp, maxMp) => currentMp == maxMp ? currentMp.KiloFormat() : (100f * currentMp / Math.Max(1, maxMp)).ToString(),
+            ["[mana:current-percent-short]"] = (currentMp, maxMp) => currentMp == maxMp ? currentMp.KiloFormat() : (100f * currentMp / Math.Max(1, maxMp)).ToString("N0"),
 
             ["[mana:max]"] = (currentMp, maxMp) => maxMp.ToString(),
 

@@ -355,12 +355,16 @@ namespace DelvUI.Config
         #endregion
 
         #region load / save / profiles
+        public bool IsFreshInstall()
+        {
+            return Directory.GetDirectories(ConfigDirectory).Length == 0;
+        }
+
         public void LoadOrInitializeFiles()
         {
             try
             {
-                // detect if we need to create the config files (fresh install)
-                if (Directory.GetDirectories(ConfigDirectory).Length != 0)
+                if (!IsFreshInstall())
                 {
                     LoadConfigurations();
 
