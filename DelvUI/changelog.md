@@ -1,3 +1,7 @@
+# 2.0.2.0
+- Fonts can now be applied globally to all elements:
+  * They will replace the font of the same size in all labels.
+
 # 2.0.1.0
 - Added a "User Regional Number Format" setting in the Misc section:
   * This can be set to use the system's settings, or default to English.
