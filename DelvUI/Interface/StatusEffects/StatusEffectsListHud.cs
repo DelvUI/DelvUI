@@ -111,7 +111,14 @@ namespace DelvUI.Interface.StatusEffects
                     float aTime = a.Data.IsPermanent || a.Data.IsFcBuff ? float.MaxValue : a.Status.RemainingTime;
                     float bTime = b.Data.IsPermanent || b.Data.IsFcBuff ? float.MaxValue : b.Status.RemainingTime;
 
-                    return aTime.CompareTo(bTime);
+                    if (Config.DurationSortType == StatusEffectDurationSortType.Ascending)
+                    {
+                        return aTime.CompareTo(bTime);
+                    }
+                    else
+                    {
+                        return bTime.CompareTo(aTime);
+                    }
                 });
             } 
             // show mine or permanent first

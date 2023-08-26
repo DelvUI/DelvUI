@@ -12,6 +12,8 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Interface.GameFonts;
 using Dalamud.Logging;
+using DelvUI.Enums;
+using DelvUI.Interface.Bars;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -62,6 +64,9 @@ namespace DelvUI.Interface.GeneralElements
 
         [JsonIgnore] private string[] _fonts = null!;
         [JsonIgnore] private string[] _sizes = null!;
+
+        [JsonIgnore] private int _removingIndex = -1;
+        [JsonIgnore] private int _applyingIndex = -1!;
 
         [JsonIgnore] private FileDialogManager _fileDialogManager = new FileDialogManager();
 
@@ -141,7 +146,7 @@ namespace DelvUI.Interface.GeneralElements
 
         private void ReloadFonts()
         {
-            var defaultFontsPath = ValidatePath(FontsManager.Instance.DefaultFontsPath);
+            string defaultFontsPath = ValidatePath(FontsManager.Instance.DefaultFontsPath);
             string[] defaultFonts = FontsFromPath(defaultFontsPath);
             string[] gameFonts = FontsFromGame();
             string[] userFonts = FontsFromPath(ValidatedFontsPath);
@@ -164,15 +169,15 @@ namespace DelvUI.Interface.GeneralElements
                 return false;
             }
 
-            var fontName = _fonts[font];
-            var key = fontName + "_" + size.ToString();
+            string fontName = _fonts[font];
+            string key = fontName + "_" + size.ToString();
 
             if (Fonts.ContainsKey(key))
             {
                 return false;
             }
 
-            var fontData = new FontData(fontName, size);
+            FontData fontData = new FontData(fontName, size);
             Fonts.Add(key, fontData);
 
             Plugin.UiBuilder.RebuildFonts();
@@ -197,15 +202,13 @@ namespace DelvUI.Interface.GeneralElements
         [ManualDraw]
         public bool Draw(ref bool changed)
         {
-            var flags =
+            ImGuiTableFlags flags =
                 ImGuiTableFlags.RowBg |
                 ImGuiTableFlags.Borders |
                 ImGuiTableFlags.BordersOuter |
                 ImGuiTableFlags.BordersInner |
                 ImGuiTableFlags.ScrollY |
                 ImGuiTableFlags.SizingFixedSame;
-
-            var indexToRemove = -1;
 
             if (ImGui.BeginChild("Fonts", new Vector2(400, 500), false, ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
@@ -258,7 +261,7 @@ namespace DelvUI.Interface.GeneralElements
                 {
                     ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch, 0, 0);
                     ImGui.TableSetupColumn("Size", ImGuiTableColumnFlags.WidthFixed, 0, 1);
-                    ImGui.TableSetupColumn("", ImGuiTableColumnFlags.WidthFixed, 0, 2);
+                    ImGui.TableSetupColumn("Actions", ImGuiTableColumnFlags.WidthFixed, 0, 2);
 
                     ImGui.TableSetupScrollFreeze(0, 1);
                     ImGui.TableHeadersRow();
@@ -284,17 +287,25 @@ namespace DelvUI.Interface.GeneralElements
                         }
 
                         // remove
-                        if (!IsDefaultFont(key) && ImGui.TableSetColumnIndex(2))
+                        if (ImGui.TableSetColumnIndex(2))
                         {
                             ImGui.PushFont(UiBuilder.IconFont);
                             ImGui.PushStyleColor(ImGuiCol.Button, Vector4.Zero);
                             ImGui.PushStyleColor(ImGuiCol.ButtonActive, Vector4.Zero);
                             ImGui.PushStyleColor(ImGuiCol.ButtonHovered, Vector4.Zero);
 
-                            if (ImGui.Button(FontAwesomeIcon.Trash.ToIconString()))
+                            if (ImGui.Button(FontAwesomeIcon.ArrowAltCircleUp.ToIconString()))
                             {
-                                changed = true;
-                                indexToRemove = i;
+                                _applyingIndex = i;
+                            }
+
+                            if (!IsDefaultFont(key))
+                            {
+                                ImGui.SameLine();
+                                if (ImGui.Button(FontAwesomeIcon.Trash.ToIconString()))
+                                {
+                                    _removingIndex = i;
+                                }
                             }
 
                             ImGui.PopFont();
@@ -321,10 +332,54 @@ namespace DelvUI.Interface.GeneralElements
                 }
             }
 
-            if (indexToRemove >= 0)
+            // apply confirmation
+            if (_applyingIndex >= 0)
             {
-                Fonts.RemoveAt(indexToRemove);
-                Plugin.UiBuilder.RebuildFonts();
+                string[] lines = new string[] { "Are you sure you want to apply this font", "to all labels using a font with the same size?" };
+                var (didConfirm, didClose) = ImGuiHelper.DrawConfirmationModal("Apply to all labels?", lines);
+
+                if (didConfirm)
+                {
+                    var (key, font) = Fonts.ElementAt(_applyingIndex);
+
+                    List<LabelConfig> labelConfigs = ConfigurationManager.Instance.GetObjects<LabelConfig>();
+                    foreach (LabelConfig label in labelConfigs)
+                    {
+                        if (label.FontID != null && Fonts.TryGetValue(label.FontID, out FontData value))
+                        {
+                            if (font.Size == value.Size)
+                            {
+                                label.FontID = key;
+                            }
+                        }
+                    }
+
+                    changed = true;
+                }
+
+                if (didConfirm || didClose)
+                {
+                    _applyingIndex = -1;
+                }
+            }
+
+            // delete confirmation
+            if (_removingIndex >= 0)
+            {
+                string[] lines = new string[] { "Are you sure you want to remove this font?" };
+                var (didConfirm, didClose) = ImGuiHelper.DrawConfirmationModal("Remove custom font?", lines);
+
+                if (didConfirm)
+                {
+                    Fonts.RemoveAt(_removingIndex);
+                    Plugin.UiBuilder.RebuildFonts();
+                    changed = true;
+                }
+
+                if (didConfirm || didClose)
+                {
+                    _removingIndex = -1;
+                }
             }
 
             ImGui.EndChild();

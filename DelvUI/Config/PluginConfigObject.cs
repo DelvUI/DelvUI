@@ -89,6 +89,51 @@ namespace DelvUI.Config
             return null!;
         }
 
+        public List<T> GetObjects<T>()
+        {
+            List<T> list = new List<T>();
+
+            Type type = typeof(T);
+            if (this is T obj)
+            {
+                list.Add(obj);
+            }
+
+            // iterate properties
+            PropertyInfo[] properties = GetType().GetProperties();
+            foreach (PropertyInfo property in properties)
+            {
+                object? value = property.GetValue(this);
+
+                if (value is T o)
+                {
+                    list.Add(o);
+                }
+                else if (value is PluginConfigObject p)
+                {
+                    list.AddRange(p.GetObjects<T>());
+                }
+            }
+
+            // iterate fields
+            FieldInfo[] fields = GetType().GetFields();
+            foreach (FieldInfo field in fields)
+            {
+                object? value = field.GetValue(this);
+
+                if (value is T o)
+                {
+                    list.Add(o);
+                }
+                else if (value is PluginConfigObject p)
+                {
+                    list.AddRange(p.GetObjects<T>());
+                }
+            }
+
+            return list;
+        }
+
         public T? Load<T>(FileInfo fileInfo) where T : PluginConfigObject
         {
             return LoadFromJson<T>(fileInfo.FullName);

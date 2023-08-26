@@ -3,6 +3,7 @@ using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Helpers;
+using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Lumina.Excel;
@@ -218,28 +219,32 @@ namespace DelvUI.Interface.StatusEffects
         [Order(41)]
         public bool ShowPermanentFirst;
 
-        [Checkbox("Only My Effects")]
-        [Order(45)]
+        [Checkbox("Only My Effects", spacing = true)]
+        [Order(42)]
         public bool ShowOnlyMine = false;
 
         [Checkbox("My Effects First")]
-        [Order(50)]
+        [Order(43)]
         public bool ShowMineFirst = false;
 
-        [Checkbox("Sort by Duration", help = "If enabled, \"Permanent Effects First\" and \"My Effects First\" will be ignored!")]
-        [Order(51)]
-        public bool SortByDuration = false;
-
         [Checkbox("Pet As Own Effect")]
-        [Order(55)]
+        [Order(44)]
         public bool IncludePetAsOwn = false;
 
-        [Checkbox("Tooltips")]
-        [Order(60)]
+        [Checkbox("Sort by Duration", spacing = true, help = "If enabled, \"Permanent Effects First\" and \"My Effects First\" will be ignored!")]
+        [Order(45)]
+        public bool SortByDuration = false;
+
+        [RadioSelector("Ascending", "Descending")]
+        [Order(46, collapseWith = nameof(SortByDuration))]
+        public StatusEffectDurationSortType DurationSortType = StatusEffectDurationSortType.Ascending;
+
+        [Checkbox("Tooltips", spacing = true)]
+        [Order(47)]
         public bool ShowTooltips = true;
 
         [Checkbox("Disable Interaction", help = "Enabling this will disable right clicking buffs off, or the shortcut to blacklist/whitelist a status effect.")]
-        [Order(61)]
+        [Order(48)]
         public bool DisableInteraction = false;
 
         [NestedConfig("Icons", 65)]
@@ -841,5 +846,11 @@ namespace DelvUI.Interface.StatusEffects
             : base(position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)
         {
         }
+    }
+
+    public enum StatusEffectDurationSortType
+    {
+        Ascending,
+        Descending
     }
 }

@@ -33,46 +33,7 @@ namespace DelvUI.Config.Tree
 
         public override List<T> GetObjects<T>()
         {
-            List<T> list = new List<T>();
-            if (_configObject == null) { return list; }
-
-            Type type = typeof(T);
-            if (_configObject is T obj)
-            {
-                list.Add(obj);
-            }
-
-            PropertyInfo[] properties = _configObject.GetType().GetProperties();
-            foreach (PropertyInfo property in properties)
-            {
-                if (property.PropertyType != type && !property.PropertyType.IsSubclassOf(type))
-                {
-                    continue;
-                }
-
-                object? value = property.GetValue(_configObject);
-                if (value != null && value is T o)
-                {
-                    list.Add(o);
-                }
-            }
-
-            FieldInfo[] fields = _configObject.GetType().GetFields();
-            foreach (FieldInfo field in fields)
-            {
-                if (field.FieldType != type && !field.FieldType.IsSubclassOf(type))
-                {
-                    continue;
-                }
-
-                object? value = field.GetValue(_configObject);
-                if (value != null && value is T o)
-                {
-                    list.Add(o);
-                }
-            }
-
-            return list;
+            return _configObject.GetObjects<T>();
         }
 
         private void GenerateNestedConfigPageNodes()
