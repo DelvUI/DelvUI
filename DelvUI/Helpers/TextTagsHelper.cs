@@ -128,7 +128,7 @@ namespace DelvUI.Helpers
 
             ["[exp:rested-short]"] = (actor, name) => ExperienceHelper.Instance.RestedExp.KiloFormat(),
 
-            ["[exp:percent]"] = (actor, name) => ExperienceHelper.Instance.PercentExp.ToString(),
+            ["[exp:percent]"] = (actor, name) => ExperienceHelper.Instance.PercentExp.ToString("N0"),
 
             ["[exp:percent-decimal]"] = (actor, name) => ExperienceHelper.Instance.PercentExp.ToString("N1", ConfigurationManager.Instance.ActiveCultreInfo),
             #endregion
