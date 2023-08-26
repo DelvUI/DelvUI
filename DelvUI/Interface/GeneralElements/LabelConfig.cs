@@ -92,7 +92,7 @@ namespace DelvUI.Interface.GeneralElements
             };
 
             double v = textValue / aux;
-            _text = v.ToString($"F{NumberFormat}", CultureInfo.InvariantCulture);
+            _text = v.ToString($"F{NumberFormat}", ConfigurationManager.Instance.ActiveCultreInfo);
         }
 
         public override NumericLabelConfig Clone(int index) =>

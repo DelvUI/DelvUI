@@ -18,6 +18,7 @@ using System.Text.RegularExpressions;
 using StructsCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 using StructsGameObject = FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject;
 using StructsCharacterManager = FFXIVClientStructs.FFXIV.Client.Game.Character.CharacterManager;
+using DelvUI.Config;
 
 namespace DelvUI.Helpers
 {
@@ -130,7 +131,7 @@ namespace DelvUI.Helpers
             return statusList;
         }
 
-        public static string DurationToString(double duration)
+        public static string DurationToString(double duration, int decimalCount = 0)
         {
             if (duration == 0)
             {
@@ -139,29 +140,12 @@ namespace DelvUI.Helpers
 
             TimeSpan t = TimeSpan.FromSeconds(duration);
 
-            return t.Hours switch
-            {
-                >= 1 => t.Hours + "h",
-                _ => t.Minutes switch
-                {
-                    >= 5 => t.Minutes + "m",
-                    >= 1 => $"{t.Minutes}:{t.Seconds:00}",
-                    _ => t.Seconds.ToString()
-                }
-            };
+            if (t.Hours >= 1) { return t.Hours + "h"; }
+            if (t.Minutes >= 5) { return t.Minutes + "m"; }
+            if (t.Minutes >= 1) { return $"{t.Minutes}:{t.Seconds:00}"; }
+
+            return duration.ToString("N" + decimalCount, ConfigurationManager.Instance.ActiveCultreInfo);
         }
-
-        public static string DurationToFullString(double duration)
-        {
-            if (duration == 0)
-            {
-                return "";
-            }
-
-            TimeSpan t = TimeSpan.FromSeconds(duration);
-            return duration >= 60 ? $"{t.Minutes:0}:{t.Seconds:00}" : $"{t.Seconds:00}";
-        }
-
 
         public static Status? GetTankInvulnerabilityID(BattleChara actor)
         {

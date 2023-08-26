@@ -317,7 +317,7 @@ namespace DelvUI.Config.Tree
         public override void Reset()
         {
             Type type = ConfigObject.GetType();
-            ImportData? importData = ProfilesManager.Instance.DefaultImportData(type);
+            ImportData? importData = ProfilesManager.Instance?.DefaultImportData(type);
 
             if (importData == null)
             {

@@ -235,7 +235,7 @@ namespace DelvUI.Helpers
             float gpPerSecond = gpRate / 3f;
             float secondsTillMax = (character.MaxGp - character.CurrentGp) / gpPerSecond;
 
-            return $"{Utils.DurationToFullString(secondsTillMax)}";
+            return $"{Utils.DurationToString(secondsTillMax)}";
         }
 
         public static uint IconIDForJob(uint jobId)

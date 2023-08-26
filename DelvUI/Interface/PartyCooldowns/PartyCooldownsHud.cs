@@ -271,7 +271,7 @@ namespace DelvUI.Interface.PartyCooldowns
                         }
                         else if (cooldownTime > 0)
                         {
-                            _barConfig.TimeLabel.SetText(Utils.DurationToFullString(cooldownTime));
+                            _barConfig.TimeLabel.SetText(Utils.DurationToString(cooldownTime, _barConfig.TimeLabel.NumberFormat));
                         }
                         else
                         {

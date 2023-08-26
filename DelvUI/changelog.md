@@ -1,7 +1,19 @@
+# 2.0.1.0
+- Added a "User Regional Number Format" setting in the Misc section:
+    + This can be set to use the system's settings, or default to English.
+
+- Added new `-formatted` Text Tags for numeric values.
+- Corrected a lot of numeric Text Tags that were using the wrong formatting.
+- Added Gunbreaker's No Mercy to the tracked Party Cooldowns.
+- Added Bard's Raging Strikes to the tracked Party Cooldowns.
+- Party Cooldowns priorty can now be edited with double click.
+- Fixed tooltips showing "()" when the source name is empty.
+- Fixed tooltips making other Dalamud windows to lose focus.
+
 # 2.0.0.0
 - Added a Bar Texture setting for all bars:
     + Each bar can use a different Bar Texture and Draw Mode.
-    + Supported Draw Modes are: Strech, Repeat Horizontal, Repeat Vertical and Repeat.
+    + Supported Draw Modes are: Stretch, Repeat Horizontal, Repeat Vertical and Repeat.
     + DelvUI comes with several textures to choose from.
     + There's a new section under Customization > Bar Textures where custom textures can be added.
     + Textures can be previewed in Customization > Bar Textures.
@@ -40,7 +52,7 @@
 - Moved "Fonts" from "Misc" to the new "Customization" section.
 - Updated and improved the default profile that comes with DelvUI.
 
-- Fixed Nameplates with interaction enabled sometimes making the mouse left-click to be stuck as if it was being held down.
+- Fixed Nameplates with interaction enabled sometimes making the mouse clikcs to be stuck as if they were being held down.
 - Fixed DelvUI sometimes making Dalamud windows lose focus.
 - Fixed targeted unit Nameplate not drawing on top of other Nameplates.
 - Fixed Order Label not working for Enemy Nameplates.

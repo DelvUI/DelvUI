@@ -46,7 +46,7 @@ namespace DelvUI.Interface.PartyCooldowns
 
         public float CooldownTimeRemaining()
         {
-            int cooldown = GetCooldown();
+            float cooldown = GetCooldown();
             double timeSinceUse = OverridenCooldownStartTime != -1 ? ImGui.GetTime() - OverridenCooldownStartTime : ImGui.GetTime() - LastTimeUsed;
 
             if (timeSinceUse > cooldown)

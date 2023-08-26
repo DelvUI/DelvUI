@@ -55,6 +55,10 @@ namespace DelvUI.Interface.GeneralElements
         [Order(50)]
         public bool HideDefaultPulltimer = false;
 
+        [Checkbox("Use Regional Number Format", help = "When enabled, DelvUI will use your system's regional format settings when showing numbers.\nWhen disabled, DelvUI will use English number formatting instead.", separator = true)]
+        [Order(60)]
+        public bool UseRegionalNumberFormats = true;
+
         // saves original positions for all 4 layouts
         public Vector2[] CastBarOriginalPositions = new Vector2[] { Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero };
         public Vector2[] PulltimerOriginalPositions = new Vector2[] { Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero };

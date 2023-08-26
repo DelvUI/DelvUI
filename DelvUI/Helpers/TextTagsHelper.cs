@@ -1,7 +1,9 @@
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Logging;
+using DelvUI.Config;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -102,23 +104,33 @@ namespace DelvUI.Helpers
         public static Dictionary<string, Func<GameObject?, string?, string>> ExpTags = new Dictionary<string, Func<GameObject?, string?, string>>()
         {
             #region experience
-            ["[exp:current]"] = (actor, name) => ExperienceHelper.Instance.CurrentExp.ToString("N0", CultureInfo.InvariantCulture),
+            ["[exp:current]"] = (actor, name) => ExperienceHelper.Instance.CurrentExp.ToString(),
+
+            ["[exp:current-formatted]"] = (actor, name) => ExperienceHelper.Instance.CurrentExp.ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
 
             ["[exp:current-short]"] = (actor, name) => ExperienceHelper.Instance.CurrentExp.KiloFormat(),
 
-            ["[exp:required]"] = (actor, name) => ExperienceHelper.Instance.RequiredExp.ToString("N0", CultureInfo.InvariantCulture),
+            ["[exp:required]"] = (actor, name) => ExperienceHelper.Instance.RequiredExp.ToString(),
+
+            ["[exp:required-formatted]"] = (actor, name) => ExperienceHelper.Instance.RequiredExp.ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
 
             ["[exp:required-short]"] = (actor, name) => ExperienceHelper.Instance.RequiredExp.KiloFormat(),
 
-            ["[exp:required-to-level]"] = (actor, name) => (ExperienceHelper.Instance.RequiredExp - ExperienceHelper.Instance.CurrentExp).ToString("N0", CultureInfo.InvariantCulture),
+            ["[exp:required-to-level]"] = (actor, name) => (ExperienceHelper.Instance.RequiredExp - ExperienceHelper.Instance.CurrentExp).ToString(),
+            
+            ["[exp:required-to-level-formatted]"] = (actor, name) => (ExperienceHelper.Instance.RequiredExp - ExperienceHelper.Instance.CurrentExp).ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
 
             ["[exp:required-to-level-short]"] = (actor, name) => (ExperienceHelper.Instance.RequiredExp - ExperienceHelper.Instance.CurrentExp).KiloFormat(),
 
-            ["[exp:rested]"] = (actor, name) => ExperienceHelper.Instance.RestedExp.ToString("N0", CultureInfo.InvariantCulture),
+            ["[exp:rested]"] = (actor, name) => ExperienceHelper.Instance.RestedExp.ToString(),
+
+            ["[exp:rested-formatted]"] = (actor, name) => ExperienceHelper.Instance.RestedExp.ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
 
             ["[exp:rested-short]"] = (actor, name) => ExperienceHelper.Instance.RestedExp.KiloFormat(),
 
-            ["[exp:percent]"] = (actor, name) => ExperienceHelper.Instance.PercentExp.ToString("N1", CultureInfo.InvariantCulture),
+            ["[exp:percent]"] = (actor, name) => ExperienceHelper.Instance.PercentExp.ToString(),
+
+            ["[exp:percent-decimal]"] = (actor, name) => ExperienceHelper.Instance.PercentExp.ToString("N1", ConfigurationManager.Instance.ActiveCultreInfo),
             #endregion
         };
 
@@ -127,23 +139,29 @@ namespace DelvUI.Helpers
             #region health
             ["[health:current]"] = (currentHp, maxHp) => currentHp.ToString(),
 
+            ["[health:current-formatted]"] = (currentHp, maxHp) => currentHp.ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
+
             ["[health:current-short]"] = (currentHp, maxHp) => currentHp.KiloFormat(),
 
-            ["[health:current-percent]"] = (currentHp, maxHp) => currentHp == maxHp ? currentHp.ToString() : (100f * currentHp / Math.Max(1, maxHp)).ToString("N0") + "%",
+            ["[health:current-percent]"] = (currentHp, maxHp) => currentHp == maxHp ? currentHp.ToString() : (100f * currentHp / Math.Max(1, maxHp)).ToString("N0"),
 
-            ["[health:current-percent-short]"] = (currentHp, maxHp) => currentHp == maxHp ? currentHp.KiloFormat() : (100f * currentHp / Math.Max(1, maxHp)).ToString("N0") + "%",
+            ["[health:current-percent-short]"] = (currentHp, maxHp) => currentHp == maxHp ? currentHp.KiloFormat() : (100f * currentHp / Math.Max(1, maxHp)).ToString("N0"),
 
             ["[health:max]"] = (currentHp, maxHp) => maxHp.ToString(),
+
+            ["[health:max-formatted]"] = (currentHp, maxHp) => maxHp.ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
 
             ["[health:max-short]"] = (currentHp, maxHp) => maxHp.KiloFormat(),
 
             ["[health:percent]"] = (currentHp, maxHp) => (100f * currentHp / Math.Max(1, maxHp)).ToString("N0"),
 
-            ["[health:percent-decimal]"] = (currentHp, maxHp) => FormattableString.Invariant($"{100f * currentHp / Math.Max(1f, maxHp):##0.#}"),
+            ["[health:percent-decimal]"] = (currentHp, maxHp) => (100f * currentHp / Math.Max(1f, maxHp)).ToString("N1", ConfigurationManager.Instance.ActiveCultreInfo),
 
             ["[health:percent-decimal-uniform]"] = (currentHp, maxHp) => ConsistentDigitPercentage(currentHp, maxHp),
 
             ["[health:deficit]"] = (currentHp, maxHp) => currentHp == maxHp ? "0" : $"-{maxHp - currentHp}",
+
+            ["[health:deficit-formatted]"] = (currentHp, maxHp) => currentHp == maxHp ? "0" : "-" + (maxHp - currentHp).ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
 
             ["[health:deficit-short]"] = (currentHp, maxHp) => currentHp == maxHp ? "0" : $"-{(maxHp - currentHp).KiloFormat()}",
             #endregion
@@ -154,25 +172,31 @@ namespace DelvUI.Helpers
             #region mana
             ["[mana:current]"] = (currentMp, maxMp) => currentMp.ToString(),
 
+            ["[mana:current-formatted]"] = (currentMp, maxMp) => currentMp.ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
+
             ["[mana:current-short]"] = (currentMp, maxMp) => currentMp.KiloFormat(),
 
-            ["[mana:current-percent]"] = (currentMp, maxMp) => currentMp == maxMp ? currentMp.ToString() : (100f * currentMp / Math.Max(1, maxMp)).ToString("N0") + "%",
+            ["[mana:current-percent]"] = (currentMp, maxMp) => currentMp == maxMp ? currentMp.ToString() : (100f * currentMp / Math.Max(1, maxMp)).ToString("N0"),
 
-            ["[mana:current-percent-short]"] = (currentMp, maxMp) => currentMp == maxMp ? currentMp.KiloFormat() : (100f * currentMp / Math.Max(1, maxMp)).ToString("N0") + "%",
+            ["[mana:current-percent-short]"] = (currentMp, maxMp) => currentMp == maxMp ? currentMp.KiloFormat() : (100f * currentMp / Math.Max(1, maxMp)).ToString("N0"),
 
             ["[mana:max]"] = (currentMp, maxMp) => maxMp.ToString(),
 
+            ["[mana:max-formatted]"] = (currentMp, maxMp) => maxMp.ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
+
             ["[mana:max-short]"] = (currentMp, maxMp) => maxMp.KiloFormat(),
 
-            ["[mana:percent]"] = (currentMp, maxMp) => (100f * currentMp / Math.Max(1, maxMp)).ToString("N0"),
+            ["[mana:percent]"] = (currentMp, maxMp) => (100f * currentMp / Math.Max(1, maxMp)).ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
 
-            ["[mana:percent-decimal]"] = (currentMp, maxMp) => FormattableString.Invariant($"{100f * currentMp / Math.Max(1, maxMp):##0.#}"),
+            ["[mana:percent-decimal]"] = (currentMp, maxMp) => (100f * currentMp / Math.Max(1, maxMp)).ToString("N1", ConfigurationManager.Instance.ActiveCultreInfo),
 
             ["[mana:percent-decimal-uniform]"] = (currentMp, maxMp) => ConsistentDigitPercentage(currentMp, maxMp),
 
-            ["[mana:deficit]"] = (currentMp, maxMp) => currentMp == maxMp ? "0" : $"-{currentMp - maxMp}",
+            ["[mana:deficit]"] = (currentMp, maxMp) => currentMp == maxMp ? "0" : $"-{maxMp - currentMp}",
 
-            ["[mana:deficit-short]"] = (currentMp, maxMp) => currentMp == maxMp ? "0" : $"-{(currentMp - maxMp).KiloFormat()}",
+            ["[mana:deficit-formatted]"] = (currentMp, maxMp) => currentMp == maxMp ? "0" : "-" + (maxMp - currentMp).ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
+
+            ["[mana:deficit-short]"] = (currentMp, maxMp) => currentMp == maxMp ? "0" : $"-{(maxMp - currentMp).KiloFormat()}",
             #endregion
         };
 
@@ -406,6 +430,7 @@ namespace DelvUI.Helpers
                 tag = tag.Substring(0, tag.Length - lengthString.Length - 2) + "]";
             }
         }
+
         private static string ValidateName(GameObject? actor, string? name)
         {
             string? n = actor?.Name.ToString() ?? name;

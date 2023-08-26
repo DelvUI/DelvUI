@@ -638,7 +638,7 @@ namespace DelvUI.Interface.Party
             if (showingRaise)
             {
                 float duration = Math.Abs(Member.RaiseTime!.Value);
-                string? text = duration < 10 ? duration.ToString("N1", CultureInfo.InvariantCulture) : Utils.DurationToString(duration);
+                string text = Utils.DurationToString(duration);
 
                 drawActions.Add((RaiseTracker.Icon.Label.StrataLevel, () =>
                 {
@@ -652,7 +652,7 @@ namespace DelvUI.Interface.Party
             if (showingInvuln)
             {
                 float duration = Math.Abs(Member.InvulnStatus!.InvulnTime);
-                string? text = duration < 10 ? duration.ToString("N1", CultureInfo.InvariantCulture) : Utils.DurationToString(duration);
+                string text = Utils.DurationToString(duration);
 
                 drawActions.Add((InvulnTracker.Icon.Label.StrataLevel, () =>
                 {
