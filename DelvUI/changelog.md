@@ -1,3 +1,6 @@
+# 2.0.2.1
+- Fixed `-short` Text Tags not using the correct regional formatting.
+
 # 2.0.2.0
 - Fonts can now be applied globally to all elements:
   * They will replace the font of the same size in all labels.

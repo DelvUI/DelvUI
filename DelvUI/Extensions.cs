@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Text;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.Text.SeStringHandling;
+using DelvUI.Config;
 using DelvUI.Interface.Bars;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using static System.Globalization.CultureInfo;
@@ -91,11 +92,11 @@ namespace DelvUI
         {
             return num switch
             {
-                >= 100000000 => (num / 1000000.0).ToString("#,0M", CultureInfo.InvariantCulture),
-                >= 1000000 => (num / 1000000.0).ToString("0.0", CultureInfo.InvariantCulture) + "M",
-                >= 100000 => (num / 1000.0).ToString("#,0K", CultureInfo.InvariantCulture),
-                >= 10000 => (num / 1000.0).ToString("0.0", CultureInfo.InvariantCulture) + "K",
-                _ => num.ToString("#,0", CultureInfo.InvariantCulture)
+                >= 100000000 => (num / 1000000.0).ToString("#,0M", ConfigurationManager.Instance.ActiveCultreInfo),
+                >= 1000000 => (num / 1000000.0).ToString("0.0", ConfigurationManager.Instance.ActiveCultreInfo) + "M",
+                >= 100000 => (num / 1000.0).ToString("#,0K", ConfigurationManager.Instance.ActiveCultreInfo),
+                >= 10000 => (num / 1000.0).ToString("0.0", ConfigurationManager.Instance.ActiveCultreInfo) + "K",
+                _ => num.ToString("#,0", ConfigurationManager.Instance.ActiveCultreInfo)
             };
         }
 
