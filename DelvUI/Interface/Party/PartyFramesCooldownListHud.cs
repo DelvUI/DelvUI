@@ -241,17 +241,21 @@ namespace DelvUI.Interface.Party
                 // time
                 AddDrawAction(Config.TimeLabel.StrataLevel, () =>
                 {
+                    Config.TimeLabel.SetText("");
+
                     if (effectTime > 0)
                     {
-                        Config.TimeLabel.SetValue(effectTime);
+                        if (Config.TimeLabel.ShowEffectDuration)
+                        {
+                            Config.TimeLabel.SetValue(effectTime);
+                        }
                     }
                     else if (cooldownTime > 0)
                     {
-                        Config.TimeLabel.SetText(Utils.DurationToString(cooldownTime, Config.TimeLabel.NumberFormat));
-                    }
-                    else
-                    {
-                        Config.TimeLabel.SetText("");
+                        if (Config.TimeLabel.ShowRemainingCooldown)
+                        {
+                            Config.TimeLabel.SetText(Utils.DurationToString(cooldownTime, Config.TimeLabel.NumberFormat));
+                        }
                     }
 
                     _timeLabel.Draw(iconPos, Config.IconSize, character);

@@ -4,6 +4,7 @@ using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
+using DelvUI.Interface.PartyCooldowns;
 using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
 using System;
@@ -834,6 +835,6 @@ namespace DelvUI.Interface.Party
         public int IconActiveBorderThickness = 3;
 
         [NestedConfig("Time Label", 80)]
-        public NumericLabelConfig TimeLabel = new NumericLabelConfig(new Vector2(0, 0), "", DrawAnchor.Center, DrawAnchor.Center) { NumberFormat = 1 };
+        public PartyCooldownTimeLabelConfig TimeLabel = new PartyCooldownTimeLabelConfig(new Vector2(0, 0), "", DrawAnchor.Center, DrawAnchor.Center) { NumberFormat = 1 };
     }
 }

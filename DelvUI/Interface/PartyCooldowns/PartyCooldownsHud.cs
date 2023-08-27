@@ -265,17 +265,21 @@ namespace DelvUI.Interface.PartyCooldowns
                     // time
                     AddDrawAction(_barConfig.TimeLabel.StrataLevel, () =>
                     {
+                        _barConfig.TimeLabel.SetText("");
+
                         if (effectTime > 0)
                         {
-                            _barConfig.TimeLabel.SetValue(effectTime);
+                            if (_barConfig.TimeLabel.ShowEffectDuration)
+                            {
+                                _barConfig.TimeLabel.SetValue(effectTime);
+                            }
                         }
                         else if (cooldownTime > 0)
                         {
-                            _barConfig.TimeLabel.SetText(Utils.DurationToString(cooldownTime, _barConfig.TimeLabel.NumberFormat));
-                        }
-                        else
-                        {
-                            _barConfig.TimeLabel.SetText("");
+                            if (_barConfig.TimeLabel.ShowRemainingCooldown)
+                            {
+                                _barConfig.TimeLabel.SetText(Utils.DurationToString(cooldownTime, _barConfig.TimeLabel.NumberFormat));
+                            }
                         }
 
                         _timeLabelHud.Draw(labelPos, size, character);

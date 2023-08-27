@@ -119,7 +119,7 @@ namespace DelvUI.Interface.PartyCooldowns
         public EditableLabelConfig NameLabel = new EditableLabelConfig(new Vector2(5, 0), "[name:initials]", DrawAnchor.Left, DrawAnchor.Left);
 
         [NestedConfig("Time Label", 105)]
-        public NumericLabelConfig TimeLabel = new NumericLabelConfig(new Vector2(-5, 0), "", DrawAnchor.Right, DrawAnchor.Right);
+        public PartyCooldownTimeLabelConfig TimeLabel = new PartyCooldownTimeLabelConfig(new Vector2(-5, 0), "", DrawAnchor.Right, DrawAnchor.Right);
 
         public new static PartyCooldownsBarConfig DefaultConfig()
         {
@@ -138,6 +138,22 @@ namespace DelvUI.Interface.PartyCooldowns
             : base(position, size, fillColor, fillDirection)
         {
         }
+    }
+
+    public class PartyCooldownTimeLabelConfig: NumericLabelConfig
+    {
+        public PartyCooldownTimeLabelConfig(Vector2 position, string text, DrawAnchor frameAnchor, DrawAnchor textAnchor)
+            : base(position, text, frameAnchor, textAnchor)
+        {
+        }
+
+        [Checkbox("Show Effect Duration", spacing = true)]
+        [Order(70)]
+        public bool ShowEffectDuration = true;
+
+        [Checkbox("Show Remainin Cooldown")]
+        [Order(71)]
+        public bool ShowRemainingCooldown = true;
     }
 
     [Exportable(false)]
