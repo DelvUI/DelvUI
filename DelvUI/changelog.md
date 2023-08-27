@@ -1,3 +1,10 @@
+# 2.0.2.1
+- Invulnerability and Raise trackers now use a numeric label:
+  * This means the amount of decimals shown can be now configured.
+
+- Added "Show Effect Duration" and "Show Remaining Cooldown" to Party Cooldowns Time Labels.
+- Fixed `-short` Text Tags not using the correct regional formatting.
+
 # 2.0.2.0
 - Fonts can now be applied globally to all elements:
   * They will replace the font of the same size in all labels.
