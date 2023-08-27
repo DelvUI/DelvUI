@@ -56,8 +56,8 @@ namespace DelvUI.Interface.Party
             _healthLabelHud = new LabelHud(_configs.HealthBar.HealthLabelConfig);
             _orderLabelHud = new LabelHud(_configs.HealthBar.OrderNumberConfig);
             _statusLabelHud = new LabelHud(PlayerStatus.Label);
-            _raiseLabelHud = new LabelHud(RaiseTracker.Icon.Label);
-            _invulnLabelHud = new LabelHud(InvulnTracker.Icon.Label);
+            _raiseLabelHud = new LabelHud(RaiseTracker.Icon.NumericLabel);
+            _invulnLabelHud = new LabelHud(InvulnTracker.Icon.NumericLabel);
 
             _manaBarHud = new PrimaryResourceHud(_configs.ManaBar);
             _castbarHud = new CastbarHud(_configs.CastBar);
@@ -638,11 +638,10 @@ namespace DelvUI.Interface.Party
             if (showingRaise)
             {
                 float duration = Math.Abs(Member.RaiseTime!.Value);
-                string text = Utils.DurationToString(duration);
 
-                drawActions.Add((RaiseTracker.Icon.Label.StrataLevel, () =>
+                drawActions.Add((RaiseTracker.Icon.NumericLabel.StrataLevel, () =>
                 {
-                    RaiseTracker.Icon.Label.SetText(text);
+                    RaiseTracker.Icon.NumericLabel.SetValue(duration);
                     _raiseLabelHud.Draw(Position, _configs.HealthBar.Size);
                 }
                 ));
@@ -652,11 +651,10 @@ namespace DelvUI.Interface.Party
             if (showingInvuln)
             {
                 float duration = Math.Abs(Member.InvulnStatus!.InvulnTime);
-                string text = Utils.DurationToString(duration);
 
-                drawActions.Add((InvulnTracker.Icon.Label.StrataLevel, () =>
+                drawActions.Add((InvulnTracker.Icon.NumericLabel.StrataLevel, () =>
                 {
-                    InvulnTracker.Icon.Label.SetText(text);
+                    InvulnTracker.Icon.NumericLabel.SetValue(duration);
                     _invulnLabelHud.Draw(Position, _configs.HealthBar.Size);
                 }
                 ));

@@ -1,4 +1,7 @@
 # 2.0.2.1
+- Invulnerability and Raise trackers now use a numeric label:
+  * This means the amount of decimals shown can be now configured.
+    
 - Fixed `-short` Text Tags not using the correct regional formatting.
 
 # 2.0.2.0
