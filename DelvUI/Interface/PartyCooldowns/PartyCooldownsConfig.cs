@@ -115,6 +115,14 @@ namespace DelvUI.Interface.PartyCooldowns
         [Order(84, collapseWith = nameof(ChangeIconBorderWhenActive))]
         public int IconActiveBorderThickness = 3;
 
+        [Checkbox("Change Labels Color When Active", spacing = true)]
+        [Order(85)]
+        public bool ChangeLabelsColorWhenActive = false;
+
+        [ColorEdit4("Labels Active Color")]
+        [Order(86, collapseWith = nameof(ChangeLabelsColorWhenActive))]
+        public PluginConfigColor LabelsActiveColor = new PluginConfigColor(new Vector4(255f / 255f, 200f / 255f, 35f / 255f, 100f / 100f));
+
         [NestedConfig("Name Label", 100)]
         public EditableLabelConfig NameLabel = new EditableLabelConfig(new Vector2(5, 0), "[name:initials]", DrawAnchor.Left, DrawAnchor.Left);
 

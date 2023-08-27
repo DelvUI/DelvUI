@@ -2,6 +2,7 @@
 - Invulnerability and Raise trackers now use a numeric label:
   * This means the amount of decimals shown can be now configured.
 
+- Added "Change Labels Colors When Active" setting to Party Cooldowns Bars / Icons.
 - Added "Show Effect Duration" and "Show Remaining Cooldown" to Party Cooldowns Time Labels.
 - Fixed `-short` Text Tags not using the correct regional formatting.
 

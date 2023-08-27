@@ -238,9 +238,13 @@ namespace DelvUI.Interface.Party
                 float cooldownTime = cooldown.CooldownTimeRemaining();
                 float effectTime = cooldown.EffectTimeRemaining();
 
+                PluginConfigColor? labelColor = effectTime > 0 && Config.ChangeLabelsColorWhenActive ? Config.LabelsActiveColor : null;
+
                 // time
                 AddDrawAction(Config.TimeLabel.StrataLevel, () =>
                 {
+                    PluginConfigColor realColor = Config.TimeLabel.Color;
+                    Config.TimeLabel.Color = labelColor ?? realColor;
                     Config.TimeLabel.SetText("");
 
                     if (effectTime > 0)
@@ -259,6 +263,7 @@ namespace DelvUI.Interface.Party
                     }
 
                     _timeLabel.Draw(iconPos, Config.IconSize, character);
+                    Config.TimeLabel.Color = realColor;
                 });
 
                 // tooltips / interaction

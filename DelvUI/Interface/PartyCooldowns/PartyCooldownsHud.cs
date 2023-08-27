@@ -249,6 +249,8 @@ namespace DelvUI.Interface.PartyCooldowns
                     }
 
                     // name
+                    PluginConfigColor? labelColor = effectTime > 0 && _barConfig.ChangeLabelsColorWhenActive ? _barConfig.LabelsActiveColor : null;
+
                     Character? character = cooldown.Member?.Character;
                     if (character == null && cooldown.SourceId == player.ObjectId)
                     {
@@ -258,13 +260,20 @@ namespace DelvUI.Interface.PartyCooldowns
                     Vector2 labelPos = origin + pos;
                     AddDrawAction(_barConfig.NameLabel.StrataLevel, () =>
                     {
+                        PluginConfigColor realColor = _barConfig.NameLabel.Color;
+                        _barConfig.NameLabel.Color = labelColor ?? realColor;
+
                         string? name = character == null ? "Fake Name" : null;
                         _nameLabelHud.Draw(labelPos, size, character, name);
+
+                        _barConfig.NameLabel.Color = realColor;
                     });
 
                     // time
                     AddDrawAction(_barConfig.TimeLabel.StrataLevel, () =>
                     {
+                        PluginConfigColor realColor = _barConfig.TimeLabel.Color;
+                        _barConfig.TimeLabel.Color = labelColor ?? realColor;
                         _barConfig.TimeLabel.SetText("");
 
                         if (effectTime > 0)
@@ -283,6 +292,7 @@ namespace DelvUI.Interface.PartyCooldowns
                         }
 
                         _timeLabelHud.Draw(labelPos, size, character);
+                        _barConfig.TimeLabel.Color = realColor;
                     });
 
                     // tooltip

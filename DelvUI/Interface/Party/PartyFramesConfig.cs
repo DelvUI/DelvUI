@@ -834,6 +834,14 @@ namespace DelvUI.Interface.Party
         [Order(47, collapseWith = nameof(ChangeIconBorderWhenActive))]
         public int IconActiveBorderThickness = 3;
 
+        [Checkbox("Change Label Color When Active", spacing = true)]
+        [Order(50)]
+        public bool ChangeLabelsColorWhenActive = false;
+
+        [ColorEdit4("Label Active Color")]
+        [Order(51, collapseWith = nameof(ChangeLabelsColorWhenActive))]
+        public PluginConfigColor LabelsActiveColor = new PluginConfigColor(new Vector4(255f / 255f, 200f / 255f, 35f / 255f, 100f / 100f));
+
         [NestedConfig("Time Label", 80)]
         public PartyCooldownTimeLabelConfig TimeLabel = new PartyCooldownTimeLabelConfig(new Vector2(0, 0), "", DrawAnchor.Center, DrawAnchor.Center) { NumberFormat = 1 };
     }
