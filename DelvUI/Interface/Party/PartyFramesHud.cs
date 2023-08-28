@@ -2,12 +2,16 @@
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
+using DelvUI.Interface.GeneralElements;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using ImGuiNET;
+using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DelvUI.Interface.Party
 {
@@ -30,6 +34,7 @@ namespace DelvUI.Interface.Party
         private bool _layoutDirty = true;
 
         private readonly List<PartyFramesBar> bars;
+        private LabelHud _labelHud;
 
         private bool Locked => !ConfigurationManager.Instance.IsConfigWindowOpened;
 
@@ -51,6 +56,8 @@ namespace DelvUI.Interface.Party
 
                 bars.Add(bar);
             }
+
+            _labelHud = new LabelHud(config.ShowPartyTitleConfig);
 
             PartyManager.Instance.MembersChangedEvent += OnMembersChanged;
             UpdateBars(Vector2.Zero);
@@ -86,6 +93,7 @@ namespace DelvUI.Interface.Party
             Configs.HealthBar.ValueChangeEvent -= OnLayoutPropertyChanged;
             Configs.HealthBar.ColorsConfig.ValueChangeEvent -= OnLayoutPropertyChanged;
             PartyManager.Instance.MembersChangedEvent -= OnMembersChanged;
+            _labelHud.Dispose();
         }
 
         private void OnMovePlayer(PartyFramesBar bar)
@@ -419,10 +427,10 @@ namespace DelvUI.Interface.Party
             foreach (int index in whosTalkingIndexes)
             {
                 IPartyFramesMember? member = bars[index].Member;
-                if (member != null) 
+                if (member != null)
                 {
                     AddDrawActions(bars[index].GetBarDrawActions(origin, Configs.Icons.WhosTalking.ColorForState(member.WhosTalkingState)));
-                } 
+                }
                 else
                 {
                     AddDrawActions(bars[index].GetBarDrawActions(origin));
@@ -434,6 +442,11 @@ namespace DelvUI.Interface.Party
             {
                 AddDrawActions(bar.GetElementsDrawActions(origin));
             }
+
+            AddDrawAction(Config.ShowPartyTitleConfig.StrataLevel, () =>
+            {
+                _labelHud.DrawText(origin + Config.Position, TextTagsHelper.GetPartyListTitle());
+            });
         }
     }
 

@@ -1,8 +1,10 @@
+using Dalamud.Data;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Logging;
 using DelvUI.Config;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
@@ -117,7 +119,7 @@ namespace DelvUI.Helpers
             ["[exp:required-short]"] = (actor, name) => ExperienceHelper.Instance.RequiredExp.KiloFormat(),
 
             ["[exp:required-to-level]"] = (actor, name) => (ExperienceHelper.Instance.RequiredExp - ExperienceHelper.Instance.CurrentExp).ToString(),
-            
+
             ["[exp:required-to-level-formatted]"] = (actor, name) => (ExperienceHelper.Instance.RequiredExp - ExperienceHelper.Instance.CurrentExp).ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
 
             ["[exp:required-to-level-short]"] = (actor, name) => (ExperienceHelper.Instance.RequiredExp - ExperienceHelper.Instance.CurrentExp).KiloFormat(),
@@ -478,6 +480,12 @@ namespace DelvUI.Helpers
         {
             var rawPercentage = 100f * currentVal / Math.Max(1f, maxVal);
             return rawPercentage >= 100 || rawPercentage <= 0 ? rawPercentage.ToString("N0") : rawPercentage.ToString("N1");
+        }
+
+        public static unsafe string GetPartyListTitle()
+        {
+            var partyText = Plugin.DataManager.GetExcelSheet<Addon>()?.GetRow(AgentModule.Instance()->GetAgentHUD()->PartyTitleAddonId)?.Text;
+            return partyText != null ? partyText : "";
         }
     }
 }
