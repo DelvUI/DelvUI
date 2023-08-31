@@ -11,7 +11,6 @@ using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -151,7 +150,6 @@ namespace DelvUI.Interface.Nameplates
                 string name = info.Name.ToString();
 
                 // title
-
                 string title = info.Title.ToString();
                 bool isTitlePrefix = info.IsPrefixTitle;
 
