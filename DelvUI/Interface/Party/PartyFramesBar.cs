@@ -366,7 +366,7 @@ namespace DelvUI.Interface.Party
             if (WhosTalkingIcon.Enabled && WhosTalkingIcon.Icon.Enabled && WhosTalkingIcon.EnabledForState(Member.WhosTalkingState))
             {
                 TextureWrap? texture = WhosTalkingHelper.Instance.GetTextureForState(Member.WhosTalkingState);
-                
+
                 if (texture != null)
                 {
                     Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, WhosTalkingIcon.Icon.FrameAnchor);
@@ -450,7 +450,7 @@ namespace DelvUI.Interface.Party
                 {
                     DrawHelper.DrawInWindow(LeaderIcon.ID, iconPos, LeaderIcon.Size, false, (drawList) =>
                     {
-                        DrawHelper.DrawIcon(61521, iconPos, LeaderIcon.Size, false, drawList);
+                        DrawHelper.DrawIcon(61571, iconPos, LeaderIcon.Size, false, drawList);
                     });
                 }
                 ));

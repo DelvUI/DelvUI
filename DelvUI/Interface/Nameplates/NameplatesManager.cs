@@ -4,12 +4,14 @@ using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Logging;
 using Dalamud.Memory;
 using DelvUI.Config;
+using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
+using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -149,8 +151,21 @@ namespace DelvUI.Interface.Nameplates
                 string name = info.Name.ToString();
 
                 // title
+
                 string title = info.Title.ToString();
                 bool isTitlePrefix = info.IsPrefixTitle;
+
+                // Get the title from Honorific, if it exists
+                try
+                {
+                    TitleData? customTitleData = HonorificHelper.GetTitle(gameObject!);
+                    if (customTitleData != null)
+                    {
+                        title = customTitleData.title ?? title;
+                        isTitlePrefix = customTitleData.isPrefix;
+                    }
+                }
+                catch { }
 
                 // state icon
                 int iconId = 0;
@@ -191,7 +206,7 @@ namespace DelvUI.Interface.Nameplates
                     targetData = data;
                 }
                 else
-                { 
+                {
                     _data.Add(data);
                 }
 
