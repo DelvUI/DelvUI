@@ -125,6 +125,7 @@ namespace DelvUI
             TexturesCache.Initialize();
             TooltipsHelper.Initialize();
             PetRenamerHelper.Initialize();
+            HonorificHelper.Initialize();
             WotsitHelper.Initialize();
             WhosTalkingHelper.Initialize();
 
