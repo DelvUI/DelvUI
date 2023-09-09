@@ -49,6 +49,11 @@ namespace DelvUI.Interface.GeneralElements
             DrawLabel(text, origin, parentSize ?? Vector2.Zero, actor);
         }
 
+        public virtual void DrawText(Vector2 origin, string text)
+        {
+            DrawLabel(text, origin, Vector2.Zero, null);
+        }
+
         protected virtual void DrawLabel(string text, Vector2 parentPos, Vector2 parentSize, GameObject? actor = null)
         {
             Vector2 size;
