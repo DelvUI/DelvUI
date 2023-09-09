@@ -15,6 +15,8 @@ using System.Runtime.InteropServices;
 using StructsFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework;
 using DalamudPartyMember = Dalamud.Game.ClientState.Party.PartyMember;
 using StructsPartyMember = FFXIVClientStructs.FFXIV.Client.Game.Group.PartyMember;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using Lumina.Excel.GeneratedSheets;
 
 namespace DelvUI.Interface.Party
 {
@@ -114,6 +116,9 @@ namespace DelvUI.Interface.Party
         private List<IPartyFramesMember> _groupMembers = new List<IPartyFramesMember>();
         public IReadOnlyCollection<IPartyFramesMember> GroupMembers => _groupMembers.AsReadOnly();
         public uint MemberCount => (uint)_groupMembers.Count;
+
+        private string? _partyTitle = null;
+        public string PartyTitle => _partyTitle ?? "";
         
         private uint _groupMemberCount => GroupManager.Instance()->MemberCount;
         private int _realMemberCount => PartyListAddon != null ? PartyListAddon->MemberCount : Plugin.PartyList.Length;
@@ -194,6 +199,9 @@ namespace DelvUI.Interface.Party
 
             try
             {
+                // title
+                _partyTitle = GetPartyListTitle();
+
                 // trust
                 if (PartyListAddon->TrustCount > 0)
                 {
@@ -716,6 +724,17 @@ namespace DelvUI.Interface.Party
 
                 return 1;
             });
+        }
+
+        private static unsafe string? GetPartyListTitle()
+        {
+            AgentModule* agentModule = AgentModule.Instance();
+            if (agentModule == null) { return ""; }
+
+            AgentHUD* agentHUD = agentModule->GetAgentHUD();
+            if (agentHUD == null) { return ""; }
+
+            return Plugin.DataManager.GetExcelSheet<Addon>()?.GetRow(agentHUD->PartyTitleAddonId)?.Text.ToString();
         }
         #endregion
 

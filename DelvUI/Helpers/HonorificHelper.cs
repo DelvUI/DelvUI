@@ -3,45 +3,70 @@ using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Logging;
 using Dalamud.Plugin.Ipc;
 using Newtonsoft.Json;
+using Lumina.Data.Parsing.Uld;
+using System;
 
 namespace DelvUI.Helpers
 {
 
-    internal class TitleData
+    public class TitleData
     {
-        public string title = string.Empty;
-        public bool isPrefix = false;
+        public string Title = "";
+        public bool IsPrefix = false;
     }
 
     internal class HonorificHelper
     {
+        private ICallGateSubscriber<Character, string>? _getCharacterTitle;
 
-        private static ICallGateSubscriber<Character, string>? GetCharacterTitle;
-
-        public static void Initialize()
+        #region Singleton
+        private HonorificHelper()
         {
-            GetCharacterTitle = Plugin.PluginInterface.GetIpcSubscriber<Character, string>("Honorific.GetCharacterTitle");
+            _getCharacterTitle = Plugin.PluginInterface.GetIpcSubscriber<Character, string>("Honorific.GetCharacterTitle");
         }
 
-        internal static string GetTitleForCharater(Character character)
+        public static void Initialize() { Instance = new HonorificHelper(); }
+
+        public static HonorificHelper Instance { get; private set; } = null!;
+
+        ~HonorificHelper()
         {
-            return GetCharacterTitle?.InvokeFunc(character) ?? string.Empty;
+            Dispose(false);
         }
 
-        public static TitleData? GetTitle(GameObject actor)
+        public void Dispose()
         {
-            if (actor == null || (actor.ObjectKind != ObjectKind.Player))
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            Instance = null!;
+        }
+        #endregion
+
+        public TitleData? GetTitle(GameObject? actor)
+        {
+            if (_getCharacterTitle == null || actor == null || actor.ObjectKind != ObjectKind.Player || actor is not Character character)
             {
                 return null;
             }
-            string jsonData = GetTitleForCharater((Character)actor);
-            TitleData? titleData = JsonConvert.DeserializeObject<TitleData>(jsonData ?? string.Empty);
-            if (titleData != null)
+
+            try
             {
+                string jsonData = _getCharacterTitle.InvokeFunc(character);
+                TitleData? titleData = JsonConvert.DeserializeObject<TitleData>(jsonData ?? string.Empty);
                 return titleData;
             }
+            catch { }
+
             return null;
         }
     }
-
 }

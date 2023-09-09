@@ -98,7 +98,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.0.2.1";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.0.3.0";
 
             FontsManager.Initialize(AssemblyLocation);
             BarTexturesManager.Initialize(AssemblyLocation);
@@ -347,6 +347,7 @@ namespace DelvUI
             SpellHelper.Instance?.Dispose();
             TexturesCache.Instance?.Dispose();
             TooltipsHelper.Instance?.Dispose();
+            HonorificHelper.Instance?.Dispose();
             WotsitHelper.Instance?.Dispose();
             WhosTalkingHelper.Instance?.Dispose();
 

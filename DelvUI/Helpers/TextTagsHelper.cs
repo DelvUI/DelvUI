@@ -481,11 +481,5 @@ namespace DelvUI.Helpers
             var rawPercentage = 100f * currentVal / Math.Max(1f, maxVal);
             return rawPercentage >= 100 || rawPercentage <= 0 ? rawPercentage.ToString("N0") : rawPercentage.ToString("N1");
         }
-
-        public static unsafe string GetPartyListTitle()
-        {
-            var partyText = Plugin.DataManager.GetExcelSheet<Addon>()?.GetRow(AgentModule.Instance()->GetAgentHUD()->PartyTitleAddonId)?.Text;
-            return partyText != null ? partyText : "";
-        }
     }
 }

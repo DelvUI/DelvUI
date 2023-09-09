@@ -154,16 +154,12 @@ namespace DelvUI.Interface.Nameplates
                 bool isTitlePrefix = info.IsPrefixTitle;
 
                 // Get the title from Honorific, if it exists
-                try
+                TitleData? customTitleData = HonorificHelper.Instance?.GetTitle(gameObject);
+                if (customTitleData != null)
                 {
-                    TitleData? customTitleData = HonorificHelper.GetTitle(gameObject!);
-                    if (customTitleData != null)
-                    {
-                        title = customTitleData.title ?? title;
-                        isTitlePrefix = customTitleData.isPrefix;
-                    }
+                    title = customTitleData.Title;
+                    isTitlePrefix = customTitleData.IsPrefix;
                 }
-                catch { }
 
                 // state icon
                 int iconId = 0;

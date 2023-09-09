@@ -61,11 +61,20 @@ namespace DelvUI.Interface.Party
         [Order(55)]
         public bool ShowChocobo = true;
 
-        [NestedConfig("Show Party Title", 10)]
-        public LabelConfig ShowPartyTitleConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Left, DrawAnchor.Left);
+        [NestedConfig("Party Title Label", 60)]
+        public PartyFramesTitleLabel ShowPartyTitleConfig = new PartyFramesTitleLabel(Vector2.Zero, "", DrawAnchor.Left, DrawAnchor.Left);
 
         [NestedConfig("Visibility", 200)]
         public VisibilityConfig VisibilityConfig = new VisibilityConfig();
+    }
+
+    [Exportable(false)]
+    [DisableParentSettings("FrameAnchor", "UseJobColor", "UseRoleColor")]
+    public class PartyFramesTitleLabel : LabelConfig
+    {
+        public PartyFramesTitleLabel(Vector2 position, string text, DrawAnchor frameAnchor, DrawAnchor textAnchor) : base(position, text, frameAnchor, textAnchor)
+        {
+        }
     }
 
     [Exportable(false)]

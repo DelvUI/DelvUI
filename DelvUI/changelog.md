@@ -1,3 +1,9 @@
+# 2.0.3.0
+- Added support for the Honorific plugin:
+  * Note that only the custom Titles are used and not the colors.
+
+- Added Party Title Label to Party Frames.
+
 # 2.0.2.1
 - Invulnerability and Raise trackers now use a numeric label:
   * This means the amount of decimals shown can be now configured.
