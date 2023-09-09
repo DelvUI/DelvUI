@@ -191,7 +191,7 @@ namespace DelvUI.Interface.PartyCooldowns
                                 PluginConfigColor jobColor = GlobalColors.Instance.SafeColorForJobId(jobId.Value);
                                 PluginConfigColor bgJobColor = jobColor.WithAlpha(40f / 100f);
                                 PluginConfigColor rechargeJobColor = jobColor.WithAlpha(25f / 100f);
-                                PluginConfigColor nonActive = PluginConfigColor.FromHex(0x88FFFFFF);
+                                PluginConfigColor nonActive = PluginConfigColor.FromHex(0x88000000);
                                 fillColor = effectTime > 0 ? jobColor : rechargeJobColor;
                                 bgColor = effectTime > 0 || cooldownTime == 0 ? bgJobColor : nonActive;
                             }
