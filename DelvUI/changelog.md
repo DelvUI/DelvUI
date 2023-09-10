@@ -1,3 +1,6 @@
+# 2.0.3.1
+- Fixed Paladin's Requiescat Bar fill direction not working properly.
+
 # 2.0.3.0
 - Added support for the Honorific plugin:
   * Note that only the custom Titles are used and not the colors.

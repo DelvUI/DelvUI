@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Security.Principal;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -116,16 +117,12 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.RequiescatStacksBar.HideWhenInactive || requiescatDuration > 0)
             {
-                var chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[4];
-
-                for (int i = 0; i < 4; i++)
-                {
-                    chunks[i] = new(Config.RequiescatStacksBar.FillColor, i < stacks ? 1 : 0, i == 2 ? Config.RequiescatStacksBar.Label : null);
-                }
-
                 Config.RequiescatStacksBar.Label.SetValue(requiescatDuration);
 
-                BarHud[] bars = BarUtilities.GetChunkedBars(Config.RequiescatStacksBar, chunks, player);
+                LabelConfig[] labels = new LabelConfig[4];
+                labels[2] = Config.RequiescatStacksBar.Label;
+
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.RequiescatStacksBar, 4, stacks, 4, labels: labels);
                 foreach (BarHud bar in bars)
                 {
                     AddDrawActions(bar.GetDrawActions(origin, Config.RequiescatStacksBar.StrataLevel));
