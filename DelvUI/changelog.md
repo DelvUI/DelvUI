@@ -1,5 +1,6 @@
 # 2.0.3.1
 - Fixed Paladin's Requiescat Bar fill direction not working properly.
+- Added `/dui` command to open DelvUI's settings.
 
 # 2.0.3.0
 - Added support for the Honorific plugin:

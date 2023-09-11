@@ -148,6 +148,19 @@ namespace DelvUI
                 }
             );
 
+            CommandManager.AddHandler(
+                "/dui",
+                new CommandInfo(PluginCommand)
+                {
+                    HelpMessage = "Opens the DelvUI configuration window.\n"
+                                + "/delvui toggle → Toggles HUD visibility.\n"
+                                + "/delvui show → Shows HUD.\n"
+                                + "/delvui hide → Hides HUD.",
+
+                    ShowInHelp = true
+                }
+            );
+
             WotsitHelper.Instance?.Update();
         }
 
@@ -325,6 +338,7 @@ namespace DelvUI
             ConfigurationManager.Instance?.CloseConfigWindow();
 
             CommandManager.RemoveHandler("/delvui");
+            CommandManager.RemoveHandler("/dui");
 
             UiBuilder.Draw -= Draw;
             UiBuilder.BuildFonts -= BuildFont;
