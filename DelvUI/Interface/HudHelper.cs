@@ -31,6 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace DelvUI.Interface
@@ -358,19 +359,20 @@ namespace DelvUI.Interface
             AtkUnitList* loadedUnitsList = &stage->RaptureAtkUnitManager->AtkUnitManager.AllLoadedUnitsList;
             if (loadedUnitsList == null) { return (addons, names); }
 
-            AtkUnitBase** addonList = &loadedUnitsList->AtkUnitEntries;
-            if (addonList == null) { return (addons, names); }
-
             for (int i = 0; i < loadedUnitsList->Count; i++)
             {
-                AtkUnitBase* addon = addonList[i];
-                if (addon == null) { continue; }
+                try
+                {
+                    AtkUnitBase* addon = *(AtkUnitBase**)Unsafe.AsPointer(ref loadedUnitsList->EntriesSpan[i]);
+                    if (addon == null) { continue; }
 
-                string? name = Marshal.PtrToStringAnsi(new IntPtr(addon->Name));
-                if (name == null || !name.StartsWith(startingWith)) { continue; }
+                    string? name = Marshal.PtrToStringAnsi(new IntPtr(addon->Name));
+                    if (name == null || !name.StartsWith(startingWith)) { continue; }
 
-                addons.Add((IntPtr)addon);
-                names.Add(name);
+                    addons.Add((IntPtr)addon);
+                    names.Add(name);
+                }
+                catch { }
             }
 
             return (addons, names);

@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Objects.SubKinds;
 using DelvUI.Helpers;
+using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using System.Collections.Generic;
 
@@ -83,7 +84,12 @@ namespace DelvUI.Interface.Party
                 default: option = ConfigOption.PartyListSortTypeOther; break;
             }
 
-            int value = config->GetIntValue(option);
+            Framework* framework = Framework.Instance();
+            if (framework == null || framework->SystemConfig.CommonSystemConfig.UiConfig.ConfigCount <= (int)option) {
+                return PartySortingSetting.Tank_Healer_DPS; 
+            }
+
+            uint value = framework->SystemConfig.CommonSystemConfig.UiConfig.ConfigEntry[(int)option].Value.UInt;
             if (value < 0 || value > (int)PartySortingSetting.Count) { return null; }
 
             return (PartySortingSetting)value;

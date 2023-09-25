@@ -32,21 +32,27 @@ namespace DelvUI.Interface.Party
         {
             try
             {
-                IntPtr startPtr = Plugin.SigScanner.ScanText("40 ?? 48 83 ?? ?? 48 8B ?? E8 ?? ?? ?? ?? 48 ?? ?? ?? 33 C0 ?? 89");
-                _onReadyCheckStartHook = Hook<ReadyCheckDelegate>.FromAddress(startPtr, OnReadyCheckStart);
+                _onReadyCheckStartHook = Plugin.GameInteropProvider.HookFromSignature<ReadyCheckDelegate>(
+                    "40 ?? 48 83 ?? ?? 48 8B ?? E8 ?? ?? ?? ?? 48 ?? ?? ?? 33 C0 ?? 89",
+                    OnReadyCheckStart
+                );
                 _onReadyCheckStartHook?.Enable();
 
-                IntPtr endPtr = Plugin.SigScanner.ScanText("40 ?? 53 48 ?? ?? ?? ?? 48 81 ?? ?? ?? ?? ?? 48 8B ?? ?? ?? ?? ?? 48 33 ?? ?? 89 ?? ?? ?? 83 ?? ?? ?? 48 8B ?? 75 ?? 48");
-                _onReadyCheckEndHook = Hook<ReadyCheckDelegate>.FromAddress(endPtr, OnReadycheckEnd);
+                _onReadyCheckEndHook = Plugin.GameInteropProvider.HookFromSignature<ReadyCheckDelegate>(
+                    "40 ?? 53 48 ?? ?? ?? ?? 48 81 ?? ?? ?? ?? ?? 48 8B ?? ?? ?? ?? ?? 48 33 ?? ?? 89 ?? ?? ?? 83 ?? ?? ?? 48 8B ?? 75 ?? 48",
+                    OnReadycheckEnd
+                );
                 _onReadyCheckEndHook?.Enable();
 
-                IntPtr actorControlPtr = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 0F B7 0B 83 E9 64");
-                _actorControlHook = Hook<ActorControlDelegate>.FromAddress(actorControlPtr, OnActorControl);
+                _actorControlHook = Plugin.GameInteropProvider.HookFromSignature<ActorControlDelegate>(
+                    "E8 ?? ?? ?? ?? 0F B7 0B 83 E9 64", 
+                    OnActorControl
+                );
                 _actorControlHook?.Enable();
             }
             catch (Exception e)
             {
-                PluginLog.Error("Error initiating ready check sigs!!!\n" + e.Message);
+                Plugin.Logger.Error("Error initiating ready check sigs!!!\n" + e.Message);
             }
         }
 

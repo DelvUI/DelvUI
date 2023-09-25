@@ -168,10 +168,8 @@ namespace DelvUI.Helpers
                 }
                 catch (Exception ex)
                 {
-                    PluginLog.Log($"Font failed to load: {path}");
-                    PluginLog.Log(ex.ToString());
-                }
-                
+                    Plugin.Logger.Error($"Font failed to load: {path}\n{ex}");
+                }                
             }
         }
 

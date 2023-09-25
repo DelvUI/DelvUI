@@ -1,22 +1,20 @@
-﻿using Dalamud.Game;
-using Dalamud.Game.ClientState.Objects.Enums;
+﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Game.ClientState.Party;
 using Dalamud.Memory;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
 using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using StructsFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework;
 using DalamudPartyMember = Dalamud.Game.ClientState.Party.PartyMember;
+using StructsFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework;
 using StructsPartyMember = FFXIVClientStructs.FFXIV.Client.Game.Group.PartyMember;
-using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using Lumina.Excel.GeneratedSheets;
 
 namespace DelvUI.Interface.Party
 {
@@ -119,7 +117,7 @@ namespace DelvUI.Interface.Party
 
         private string? _partyTitle = null;
         public string PartyTitle => _partyTitle ?? "";
-        
+
         private uint _groupMemberCount => GroupManager.Instance()->MemberCount;
         private int _realMemberCount => PartyListAddon != null ? PartyListAddon->MemberCount : Plugin.PartyList.Length;
 

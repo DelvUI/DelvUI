@@ -1,4 +1,6 @@
 using Dalamud.Interface;
+using Dalamud.Interface.Internal;
+using Dalamud.Interface.Utility;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
@@ -46,7 +48,7 @@ namespace DelvUI.Helpers
 
         public static void DrawBarTexture(Vector2 position, Vector2 size, PluginConfigColor color, string? name, BarTextureDrawMode drawMode, ImDrawListPtr drawList)
         {
-            TextureWrap? texture = BarTexturesManager.Instance?.GetBarTexture(name);
+            IDalamudTextureWrap? texture = BarTexturesManager.Instance?.GetBarTexture(name);
             if (texture == null)
             {
                 DrawGradientFilledRect(position, size, color, drawList);
@@ -177,7 +179,7 @@ namespace DelvUI.Helpers
 
         public static void DrawIcon(uint iconId, Vector2 position, Vector2 size, bool drawBorder, uint color, ImDrawListPtr drawList)
         {
-            TextureWrap? texture = TexturesCache.Instance.GetTextureFromIconId(iconId);
+            IDalamudTextureWrap? texture = TexturesCache.Instance.GetTextureFromIconId(iconId);
             if (texture == null) { return; }
 
             drawList.AddImage(texture.ImGuiHandle, position, position + size, Vector2.Zero, Vector2.One, color);

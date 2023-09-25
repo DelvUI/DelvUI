@@ -3,6 +3,7 @@ using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Logging;
 using Dalamud.Memory;
+using Dalamud.Plugin.Services;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
@@ -81,12 +82,12 @@ namespace DelvUI.Interface.Nameplates
 
         private NameplatesCache _cache = new NameplatesCache(50);
 
-        private void ClientStateOnTerritoryChangedEvent(object? sender, ushort territoryId)
+        private void ClientStateOnTerritoryChangedEvent(ushort territoryId)
         {
             _cache.Clear();
         }
 
-        private unsafe void FrameworkOnOnUpdateEvent(Framework framework)
+        private unsafe void FrameworkOnOnUpdateEvent(IFramework framework)
         {
             if (!_config.Enabled) { return; }
 

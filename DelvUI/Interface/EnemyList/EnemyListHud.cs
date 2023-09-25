@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState.Objects;
+using Dalamud.Interface.Internal;
 
 namespace DelvUI.Interface.EnemyList
 {
@@ -36,7 +37,7 @@ namespace DelvUI.Interface.EnemyList
         private StatusEffectsListHud _buffsListHud;
         private StatusEffectsListHud _debuffsListHud;
 
-        private TextureWrap? _iconsTexture = null;
+        private IDalamudTextureWrap? _iconsTexture = null;
 
         public EnemyListHud(EnemyListConfig config, string displayName) : base(config, displayName)
         {

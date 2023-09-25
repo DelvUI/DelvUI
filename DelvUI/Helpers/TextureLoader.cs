@@ -1,4 +1,5 @@
-﻿using Dalamud.Logging;
+﻿using Dalamud.Interface.Internal;
+using Dalamud.Logging;
 using Dalamud.Utility;
 using ImGuiScene;
 using Lumina.Data.Files;
@@ -13,7 +14,7 @@ namespace DelvUI.Helpers
 {
     public static class TextureLoader
     {
-        public static TextureWrap? LoadTexture(string path, bool manualLoad)
+        public static IDalamudTextureWrap? LoadTexture(string path, bool manualLoad)
         {
             if (!manualLoad)
             {
@@ -27,7 +28,7 @@ namespace DelvUI.Helpers
             return ManuallyLoadTexture(path);
         }
 
-        private static unsafe TextureWrap? ManuallyLoadTexture(string path)
+        private static unsafe IDalamudTextureWrap? ManuallyLoadTexture(string path)
         {
             try
             {
@@ -52,7 +53,7 @@ namespace DelvUI.Helpers
             }
             catch
             {
-                PluginLog.Error("Error loading texture: " + path);
+                Plugin.Logger.Error("Error loading texture: " + path);
                 return null;
             }
         }

@@ -1,3 +1,4 @@
+using Dalamud.Interface.Internal;
 using Dalamud.Interface.Windowing;
 using Dalamud.Logging;
 using DelvUI.Config.Profiles;
@@ -29,7 +30,7 @@ namespace DelvUI.Config
     {
         public static ConfigurationManager Instance { get; private set; } = null!;
 
-        public readonly TextureWrap? BannerImage;
+        public readonly IDalamudTextureWrap? BannerImage;
 
         private BaseNode _configBaseNode;
         private Dictionary<string, BaseNode> _configBaseNodeByProfile;
@@ -193,7 +194,7 @@ namespace DelvUI.Config
             ResetEvent?.Invoke(this);
         }
 
-        private void OnLogout(object? sender, EventArgs? args)
+        private void OnLogout()
         {
             SaveConfigurations();
             ProfilesManager.Instance?.SaveCurrentProfile();
@@ -216,7 +217,7 @@ namespace DelvUI.Config
             }
             catch (Exception e)
             {
-                PluginLog.Error("Error loading changelog: " + e.Message);
+                Plugin.Logger.Error("Error loading changelog: " + e.Message);
             }
 
             return "";
@@ -259,7 +260,7 @@ namespace DelvUI.Config
             }
             catch (Exception e)
             {
-                PluginLog.Error("Error checking version: " + e.Message);
+                Plugin.Logger.Error("Error checking version: " + e.Message);
             }
         }
 
@@ -374,11 +375,11 @@ namespace DelvUI.Config
             }
             catch (Exception e)
             {
-                PluginLog.Error("Error initializing configurations: " + e.Message);
+                Plugin.Logger.Error("Error initializing configurations: " + e.Message);
 
                 if (e.StackTrace != null)
                 {
-                    PluginLog.Error(e.StackTrace);
+                    Plugin.Logger.Error(e.StackTrace);
                 }
             }
         }
@@ -446,7 +447,7 @@ namespace DelvUI.Config
                 }
                 catch (Exception e)
                 {
-                    PluginLog.Error("Error migrating file \"" + v1Path + "\" to v2 config structure: " + e.Message);
+                    Plugin.Logger.Error("Error migrating file \"" + v1Path + "\" to v2 config structure: " + e.Message);
                 }
             }
         }

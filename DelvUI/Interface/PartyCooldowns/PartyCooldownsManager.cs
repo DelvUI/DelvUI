@@ -1,7 +1,6 @@
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Hooking;
-using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.Party;
@@ -22,24 +21,28 @@ namespace DelvUI.Interface.PartyCooldowns
         {
             try
             {
-                IntPtr funcPtr = Plugin.SigScanner.ScanText("40 55 53 57 41 54 41 55 41 56 41 57 48 8D AC 24 ?? ?? ?? ?? 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 45 70");
-                OnActionUsedHook = Hook<OnActionUsedDelegate>.FromAddress(funcPtr, OnActionUsed);
-                OnActionUsedHook?.Enable();
+                _onActionUsedHook = Plugin.GameInteropProvider.HookFromSignature<OnActionUsedDelegate>(
+                    "40 55 53 57 41 54 41 55 41 56 41 57 48 8D AC 24 ?? ?? ?? ?? 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 45 70",
+                    OnActionUsed
+                );
+                _onActionUsedHook?.Enable();
             }
             catch
             {
-                PluginLog.Error("PartyCooldowns OnActionUsed Hook failed!!!");
+                Plugin.Logger.Error("PartyCooldowns OnActionUsed Hook failed!!!");
             }
 
             try
             {
-                IntPtr actorControlPtr = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 0F B7 0B 83 E9 64");
-                ActorControlHook = Hook<ActorControlDelegate>.FromAddress(actorControlPtr, OnActorControl);
-                ActorControlHook?.Enable();
+                _actorControlHook = Plugin.GameInteropProvider.HookFromSignature<ActorControlDelegate>(
+                    "E8 ?? ?? ?? ?? 0F B7 0B 83 E9 64",
+                    OnActorControl
+                );
+                _actorControlHook?.Enable();
             }
             catch
             {
-                PluginLog.Error("PartyCooldowns OnActorControl Hook failed!!!");
+                Plugin.Logger.Error("PartyCooldowns OnActorControl Hook failed!!!");
             }
 
             PartyManager.Instance.MembersChangedEvent += OnMembersChanged;
@@ -76,11 +79,11 @@ namespace DelvUI.Interface.PartyCooldowns
                 return;
             }
 
-            OnActionUsedHook?.Disable();
-            OnActionUsedHook?.Dispose();
+            _onActionUsedHook?.Disable();
+            _onActionUsedHook?.Dispose();
 
-            ActorControlHook?.Disable();
-            ActorControlHook?.Dispose();
+            _actorControlHook?.Disable();
+            _actorControlHook?.Dispose();
 
             PartyManager.Instance.MembersChangedEvent -= OnMembersChanged;
             Plugin.JobChangedEvent -= OnJobChanged;
@@ -116,10 +119,10 @@ namespace DelvUI.Interface.PartyCooldowns
         #endregion Singleton
 
         private delegate void OnActionUsedDelegate(int characterId, IntPtr characterAddress, IntPtr position, IntPtr effect, IntPtr unk1, IntPtr unk2);
-        private Hook<OnActionUsedDelegate>? OnActionUsedHook;
+        private Hook<OnActionUsedDelegate>? _onActionUsedHook;
 
         private delegate void ActorControlDelegate(uint entityId, uint id, uint unk1, uint type, uint unk2, uint unk3, uint unk4, uint unk5, UInt64 targetId, byte unk6);
-        private Hook<ActorControlDelegate>? ActorControlHook;
+        private Hook<ActorControlDelegate>? _actorControlHook;
 
         private Dictionary<uint, Dictionary<uint, PartyCooldown>>? _oldMap;
         private Dictionary<uint, Dictionary<uint, PartyCooldown>> _cooldownsMap = new Dictionary<uint, Dictionary<uint, PartyCooldown>>();
@@ -134,7 +137,7 @@ namespace DelvUI.Interface.PartyCooldowns
 
         private void OnActorControl(uint entityId, uint id, uint unk1, uint type, uint unk2, uint unk3, uint unk4, uint unk5, UInt64 targetId, byte unk6)
         {
-            ActorControlHook?.Original(entityId, id, unk1, type, unk2, unk3, unk4, unk5, targetId, unk6);
+            _actorControlHook?.Original(entityId, id, unk1, type, unk2, unk3, unk4, unk5, targetId, unk6);
 
             // detect wipe fadeouts (not 100% reliable but good enough)
             if (type == 0x4000000F)
@@ -214,7 +217,7 @@ namespace DelvUI.Interface.PartyCooldowns
                 }
             }
 
-            OnActionUsedHook?.Original(characterId, characterAddress, position, effect, unk1, unk2);
+            _onActionUsedHook?.Original(characterId, characterAddress, position, effect, unk1, unk2);
         }
 
         public void ForcedUpdate()
@@ -269,9 +272,9 @@ namespace DelvUI.Interface.PartyCooldowns
 
             foreach (PartyCooldownData data in _dataConfig.Cooldowns)
             {
-                if (data.EnabledV2 != PartyCooldownEnabled.Disabled && 
-                    level >= data.RequiredLevel && 
-                    data.IsUsableBy(jobId) && 
+                if (data.EnabledV2 != PartyCooldownEnabled.Disabled &&
+                    level >= data.RequiredLevel &&
+                    data.IsUsableBy(jobId) &&
                     !data.ExcludedJobIds.Contains(jobId))
                 {
                     cooldowns.Add(data.ActionId, new PartyCooldown(data, objectId, level, member));
@@ -308,7 +311,7 @@ namespace DelvUI.Interface.PartyCooldowns
             ForcedUpdate();
         }
 
-        private void OnTerritoryChanged(object? sender, ushort territoryId)
+        private void OnTerritoryChanged(ushort territoryId)
         {
             bool isInDuty = Plugin.Condition[ConditionFlag.BoundByDuty];
             if (_config.ShowOnlyInDuties && _wasInDuty != isInDuty)

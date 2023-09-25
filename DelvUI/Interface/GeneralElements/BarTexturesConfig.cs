@@ -109,7 +109,6 @@ namespace DelvUI.Interface.GeneralElements
                     Vector2 size = new Vector2(512, 64);
                     ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
-                    TextureWrap? texture = BarTexturesManager.Instance!.GetBarTexture(textureNames[_inputBarTexture]);
                     DrawHelper.DrawBarTexture(
                         pos,
                         size,
@@ -118,7 +117,6 @@ namespace DelvUI.Interface.GeneralElements
                         (BarTextureDrawMode)_drawModeIndex,
                         drawList
                     );
-
 
                     ImGuiHelper.DrawSpacing(3);
                     ImGuiHelper.NewLineAndTab();

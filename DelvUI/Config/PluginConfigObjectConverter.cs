@@ -49,7 +49,7 @@ namespace DelvUI.Config
             }
             catch (Exception e)
             {
-                PluginLog.Error($"Error creating a {type.Name}: " + e.Message);
+                Plugin.Logger.Error($"Error creating a {type.Name}: " + e.Message);
             }
 
             if (config == null) { return null; }
@@ -117,7 +117,7 @@ namespace DelvUI.Config
             }
             catch (Exception e)
             {
-                PluginLog.Error($"Error deserializing {type.Name}: " + e.Message);
+                Plugin.Logger.Error($"Error deserializing {type.Name}: " + e.Message);
             }
 
             return config;

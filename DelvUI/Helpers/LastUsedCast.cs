@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Interface.Internal;
 using DelvUI.Enums;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using ImGuiScene;
@@ -17,7 +18,7 @@ namespace DelvUI.Helpers
         public readonly uint CastId;
         public string ActionText { get; private set; } = "";
         public DamageType DamageType { get; private set; } = DamageType.Unknown;
-        public TextureWrap? IconTexture { get; private set; } = null;
+        public IDalamudTextureWrap? IconTexture { get; private set; } = null;
 
         public LastUsedCast(uint castId, ActionType actionType, bool interruptible)
         {

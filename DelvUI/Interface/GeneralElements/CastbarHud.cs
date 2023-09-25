@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Interface.Internal;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
@@ -110,7 +111,7 @@ namespace DelvUI.Interface.GeneralElements
                     {
                         ImGui.SetCursorPos(finalIconPos);
 
-                        TextureWrap? texture = Config.Preview ? TexturesCache.Instance.GetTexture<LuminaAction>(3577) : LastUsedCast?.IconTexture;
+                        IDalamudTextureWrap? texture = Config.Preview ? TexturesCache.Instance.GetTexture<LuminaAction>(3577) : LastUsedCast?.IconTexture;
                         if (texture != null)
                         {
                             ImGui.Image(texture.ImGuiHandle, finalIconSize);

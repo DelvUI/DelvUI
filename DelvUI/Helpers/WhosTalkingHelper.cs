@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Party;
 using Dalamud.Interface;
+using Dalamud.Interface.Internal;
 using Dalamud.Plugin.Ipc;
 using DelvUI.Config;
 using DelvUI.Config.Tree;
@@ -26,9 +27,9 @@ namespace DelvUI.Helpers
         private readonly ICallGateSubscriber<string, int> _getUserState;
         private Dictionary<string, WhosTalkingState> _cachedStates = new Dictionary<string, WhosTalkingState>();
 
-        private TextureWrap? _speakingTexture = null;
-        private TextureWrap? _mutedTexture = null;
-        private TextureWrap? _deafenedTexture = null;
+        private IDalamudTextureWrap? _speakingTexture = null;
+        private IDalamudTextureWrap? _mutedTexture = null;
+        private IDalamudTextureWrap? _deafenedTexture = null;
 
         #region Singleton
         private WhosTalkingHelper()
@@ -113,7 +114,7 @@ namespace DelvUI.Helpers
             return WhosTalkingState.None;
         }
 
-        public TextureWrap? GetTextureForState(WhosTalkingState state)
+        public IDalamudTextureWrap? GetTextureForState(WhosTalkingState state)
         {
             switch (state)
             {
