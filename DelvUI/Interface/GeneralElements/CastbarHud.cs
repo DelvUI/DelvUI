@@ -111,7 +111,7 @@ namespace DelvUI.Interface.GeneralElements
                     {
                         ImGui.SetCursorPos(finalIconPos);
 
-                        IDalamudTextureWrap? texture = Config.Preview ? TexturesCache.Instance.GetTexture<LuminaAction>(3577) : LastUsedCast?.IconTexture;
+                        IDalamudTextureWrap? texture = Config.Preview ? TexturesHelper.GetTexture<LuminaAction>(3577) : LastUsedCast?.IconTexture;
                         if (texture != null)
                         {
                             ImGui.Image(texture.ImGuiHandle, finalIconSize);

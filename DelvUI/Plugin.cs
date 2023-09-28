@@ -35,11 +35,11 @@ namespace DelvUI
         public static IObjectTable ObjectTable { get; private set; } = null!;
         public static ISigScanner SigScanner { get; private set; } = null!;
         public static IGameInteropProvider GameInteropProvider { get; private set; } = null!;
-
         public static ITargetManager TargetManager { get; private set; } = null!;
         public static UiBuilder UiBuilder { get; private set; } = null!;
         public static IPartyList PartyList { get; private set; } = null!;
         public static IPluginLog Logger { get; private set; } = null!;
+        public static ITextureProvider TextureProvider { get; private set; } = null!;
 
         public static IDalamudTextureWrap? BannerTexture;
 
@@ -69,7 +69,8 @@ namespace DelvUI
             ISigScanner sigScanner,
             IGameInteropProvider gameInteropProvider,
             ITargetManager targetManager,
-            IPluginLog logger
+            IPluginLog logger,
+            ITextureProvider textureProvider
         )
         {
             BuddyList = buddyList;
@@ -88,6 +89,7 @@ namespace DelvUI
             TargetManager = targetManager;
             UiBuilder = PluginInterface.UiBuilder;
             Logger = logger;
+            TextureProvider = textureProvider;
 
             if (pluginInterface.AssemblyLocation.DirectoryName != null)
             {
@@ -122,7 +124,6 @@ namespace DelvUI
             PartyCooldownsManager.Initialize();
             PullTimerHelper.Initialize();
             TextTagsHelper.Initialize();
-            TexturesCache.Initialize();
             TooltipsHelper.Initialize();
             PetRenamerHelper.Initialize();
             HonorificHelper.Initialize();
@@ -358,7 +359,6 @@ namespace DelvUI
             PullTimerHelper.Instance?.Dispose();
             ProfilesManager.Instance?.Dispose();
             SpellHelper.Instance?.Dispose();
-            TexturesCache.Instance?.Dispose();
             TooltipsHelper.Instance?.Dispose();
             HonorificHelper.Instance?.Dispose();
             WotsitHelper.Instance?.Dispose();

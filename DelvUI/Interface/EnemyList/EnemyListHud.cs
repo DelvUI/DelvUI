@@ -59,7 +59,7 @@ namespace DelvUI.Interface.EnemyList
                 _castbarHud.Add(new EnemyListCastbarHud(Configs.CastBar));
             }
 
-            _iconsTexture = TexturesCache.Instance.GetTextureFromPath("ui/uld/enemylist_hr1.tex");
+            _iconsTexture = TexturesHelper.GetTextureFromPath("ui/uld/enemylist_hr1.tex");
 
             UpdatePreview();
         }

@@ -67,7 +67,7 @@ namespace DelvUI.Interface.Party
 
             _cooldownListHud = new PartyFramesCooldownListHud(_configs.CooldownList);
 
-            _readyCheckTexture = TexturesCache.Instance.GetTextureFromPath("ui/uld/ReadyCheck_hr1.tex") ?? TexturesCache.Instance.GetTextureFromPath("ui/uld/ReadyCheck.tex");
+            _readyCheckTexture = TexturesHelper.GetTextureFromPath("ui/uld/ReadyCheck_hr1.tex") ?? TexturesHelper.GetTextureFromPath("ui/uld/ReadyCheck.tex");
         }
 
         public PluginConfigColor GetColor(float scale)
