@@ -64,11 +64,11 @@ namespace DelvUI.Config.Tree
 
             if (ConfigurationManager.Instance.OverrideDalamudStyle)
             {
-                ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
+                ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2514");
             }
             else
             {
-                ImGui.Text("\u2002\u2514");
+                ImGui.Text("\u2514");
             }
 
             ImGui.SameLine();
