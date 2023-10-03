@@ -116,96 +116,100 @@ namespace DelvUI.Interface.Nameplates
 
             for (int i = 0; i < activeCount; i++)
             {
-                ObjectInfo* objectInfo = ((ObjectInfo**)ui3DModule->NamePlateObjectInfoPointerArray)[i];
-                if (objectInfo == null || objectInfo->NamePlateIndex >= NameplateCount) { continue; }
-
-                // actor
-                StructsGameObject* obj = objectInfo->GameObject;
-                if (obj == null) { continue; }
-
-                bool isTarget = false;
-                GameObject? gameObject = Plugin.ObjectTable.CreateObjectReference(new IntPtr(obj));
-                if (target != null && new IntPtr(obj) == target.Address)
-                {
-                    isTarget = true;
-                    foundTarget = true;
-                }
-
-                // ui nameplate
-                NamePlateObject nameplateObject = addon->NamePlateObjectArray[objectInfo->NamePlateIndex];
-
-                // position
-                Vector2 screenPos = new Vector2(
-                    nameplateObject.RootNode->AtkResNode.X + nameplateObject.RootNode->AtkResNode.Width / 2f,
-                    nameplateObject.RootNode->AtkResNode.Y + nameplateObject.RootNode->AtkResNode.Height
-                );
-                screenPos = ClampScreenPosition(screenPos);
-
-                Vector3 worldPos = new Vector3(obj->Position.X, obj->Position.Y + obj->Height * 2.2f, obj->Position.Z);
-
-                // distance
-                float distance = Vector3.Distance(camera.Object.Position, worldPos);
-
-                // name
-                NamePlateInfo info = infoArray[objectInfo->NamePlateIndex];
-                string name = info.Name.ToString();
-
-                // title
-                string title = info.Title.ToString();
-                bool isTitlePrefix = info.IsPrefixTitle;
-
-                // Get the title from Honorific, if it exists
-                TitleData? customTitleData = HonorificHelper.Instance?.GetTitle(gameObject);
-                if (customTitleData != null)
-                {
-                    title = customTitleData.Title;
-                    isTitlePrefix = customTitleData.IsPrefix;
-                }
-
-                // state icon
-                int iconId = 0;
-                AtkUldAsset* textureInfo = nameplateObject.IconImageNode->PartsList->Parts[nameplateObject.IconImageNode->PartId].UldAsset;
-                if (textureInfo != null && textureInfo->AtkTexture.Resource != null)
-                {
-                    iconId = textureInfo->AtkTexture.Resource->IconID;
-                }
-
-                // order
-                int arrayIndex = 200 + (activeCount - nameplateObject.Priority - 1);
-                string order = "";
                 try
                 {
-                    if (stringArray->AtkArrayData.Size > arrayIndex && stringArray->StringArray[arrayIndex] != null)
+                    ObjectInfo* objectInfo = ((ObjectInfo**)ui3DModule->NamePlateObjectInfoPointerArray)[i];
+                    if (objectInfo == null || objectInfo->NamePlateIndex >= NameplateCount) { continue; }
+
+                    // actor
+                    StructsGameObject* obj = objectInfo->GameObject;
+                    if (obj == null) { continue; }
+
+                    bool isTarget = false;
+                    GameObject? gameObject = Plugin.ObjectTable.CreateObjectReference(new IntPtr(obj));
+                    if (target != null && new IntPtr(obj) == target.Address)
                     {
-                        order = MemoryHelper.ReadSeStringNullTerminated(new IntPtr(stringArray->StringArray[arrayIndex])).ToString();
+                        isTarget = true;
+                        foundTarget = true;
                     }
+
+                    // ui nameplate
+                    NamePlateObject nameplateObject = addon->NamePlateObjectArray[objectInfo->NamePlateIndex];
+
+                    // position
+                    Vector2 screenPos = new Vector2(
+                        nameplateObject.RootNode->AtkResNode.X + nameplateObject.RootNode->AtkResNode.Width / 2f,
+                        nameplateObject.RootNode->AtkResNode.Y + nameplateObject.RootNode->AtkResNode.Height
+                    );
+                    screenPos = ClampScreenPosition(screenPos);
+
+                    Vector3 worldPos = new Vector3(obj->Position.X, obj->Position.Y + obj->Height * 2.2f, obj->Position.Z);
+
+                    // distance
+                    float distance = Vector3.Distance(camera.Object.Position, worldPos);
+
+                    // name
+                    NamePlateInfo info = infoArray[objectInfo->NamePlateIndex];
+                    string name = info.Name.ToString();
+
+                    // title
+                    string title = info.Title.ToString();
+                    bool isTitlePrefix = info.IsPrefixTitle;
+
+                    // Get the title from Honorific, if it exists
+                    TitleData? customTitleData = HonorificHelper.Instance?.GetTitle(gameObject);
+                    if (customTitleData != null)
+                    {
+                        title = customTitleData.Title;
+                        isTitlePrefix = customTitleData.IsPrefix;
+                    }
+
+                    // state icon
+                    int iconId = 0;
+                    AtkUldAsset* textureInfo = nameplateObject.IconImageNode->PartsList->Parts[nameplateObject.IconImageNode->PartId].UldAsset;
+                    if (textureInfo != null && textureInfo->AtkTexture.Resource != null)
+                    {
+                        iconId = textureInfo->AtkTexture.Resource->IconID;
+                    }
+
+                    // order
+                    int arrayIndex = 200 + (activeCount - nameplateObject.Priority - 1);
+                    string order = "";
+                    try
+                    {
+                        if (stringArray->AtkArrayData.Size > arrayIndex && stringArray->StringArray[arrayIndex] != null)
+                        {
+                            order = MemoryHelper.ReadSeStringNullTerminated(new IntPtr(stringArray->StringArray[arrayIndex])).ToString();
+                        }
+                    }
+                    catch { }
+
+                    NameplateData data = new NameplateData(
+                        gameObject,
+                        name,
+                        title,
+                        isTitlePrefix,
+                        iconId,
+                        order,
+                        (ObjectKind)obj->ObjectKind,
+                        obj->SubKind,
+                        screenPos,
+                        worldPos,
+                        distance
+                    );
+
+                    if (isTarget)
+                    {
+                        targetData = data;
+                    }
+                    else
+                    {
+                        _data.Add(data);
+                    }
+
+                    _cache.Add(obj->ObjectID, data);
                 }
                 catch { }
-
-                NameplateData data = new NameplateData(
-                    gameObject,
-                    name,
-                    title,
-                    isTitlePrefix,
-                    iconId,
-                    order,
-                    (ObjectKind)obj->ObjectKind,
-                    obj->SubKind,
-                    screenPos,
-                    worldPos,
-                    distance
-                );
-
-                if (isTarget)
-                {
-                    targetData = data;
-                }
-                else
-                {
-                    _data.Add(data);
-                }
-
-                _cache.Add(obj->ObjectID, data);
             }
 
             _data.Reverse();
