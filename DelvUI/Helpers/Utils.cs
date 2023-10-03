@@ -19,6 +19,7 @@ using StructsCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Characte
 using StructsGameObject = FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject;
 using StructsCharacterManager = FFXIVClientStructs.FFXIV.Client.Game.Character.CharacterManager;
 using DelvUI.Config;
+using Dalamud.Plugin.Services;
 
 namespace DelvUI.Helpers
 {
@@ -159,7 +160,7 @@ namespace DelvUI.Helpers
             return player != null && JobsHelper.IsJobWithCleanse(player.ClassJob.Id, player.Level);
         }
 
-        public static GameObject? FindTargetOfTarget(GameObject? target, GameObject? player, ObjectTable actors)
+        public static GameObject? FindTargetOfTarget(GameObject? target, GameObject? player, IObjectTable actors)
         {
             if (target == null)
             {
@@ -210,8 +211,10 @@ namespace DelvUI.Helpers
             {
                 return -1;
             }
+
             // Here we get the ClientStruct Character of our target (aka the player we are targeting)
-            StructsCharacter targetChara = StructsCharacterManager.Instance()->LookupBattleCharaByObjectId((int)target.ObjectId)->Character;
+            StructsCharacter targetChara = StructsCharacterManager.Instance()->LookupBattleCharaByObjectId(target.ObjectId)->Character;
+            
             // This method is key. GetTargetId() returns the targets player target ID. If it is converted to a hex string and starts with the number 4, it is a minion.
             // Even though it is a minion, it still returns the players target ID.
             ulong realTargetID = targetChara.GetTargetId();
@@ -219,12 +222,14 @@ namespace DelvUI.Helpers
             {
                 return -1;
             }
+            
             // We look up the parents ClientStruct GameObject
-            StructsCharacter* realBattleChara = (StructsCharacter*)StructsCharacterManager.Instance()->LookupBattleCharaByObjectId((int)realTargetID);
+            StructsCharacter* realBattleChara = (StructsCharacter*)StructsCharacterManager.Instance()->LookupBattleCharaByObjectId((uint)realTargetID);
             if (realBattleChara == null)
             {
                 return -1;
             }
+            
             // And get the companion off of that
             StructsGameObject * companionGameObject = (StructsGameObject*)realBattleChara->Companion.CompanionObject;
             if (companionGameObject == null)
@@ -293,7 +298,7 @@ namespace DelvUI.Helpers
                 }
                 catch (Exception e)
                 {
-                    PluginLog.Error("Error trying to open url: " + e.Message);
+                    Plugin.Logger.Error("Error trying to open url: " + e.Message);
                 }
             }
         }

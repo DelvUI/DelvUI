@@ -57,22 +57,27 @@ namespace DelvUI.Helpers
                 .text:00007FF64830FD70 00
                 */
                 _setUIMouseOverActor = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 48 8B 5C 24 40 4C 8B 74 24 58 83 FD 02");
-                _uiMouseOverActorHook = Hook<OnSetUIMouseoverActor>.FromAddress(_setUIMouseOverActor, new OnSetUIMouseoverActor(HandleUIMouseOverActorId));
+                //_uiMouseOverActorHook = Plugin.GameInteropProvider.HookFromSignature<OnSetUIMouseoverActor>(
+                //    "E8 ?? ?? ?? ?? 48 8B 5C 24 40 4C 8B 74 24 58 83 FD 02",
+                //    HandleUIMouseOverActorId
+                //);
             }
             catch
             {
-                PluginLog.Error("InputsHelper OnSetUIMouseoverActor Hook failed!!!");
+                Plugin.Logger.Error("InputsHelper OnSetUIMouseoverActor Hook failed!!!");
             }
 
             try
             {
-                IntPtr ptr = Plugin.SigScanner.ScanText(ActionManager.Addresses.UseAction.String);
-                _requestActionHook = Hook<UseActionDelegate>.FromAddress(ptr, HandleRequestAction);
+                _requestActionHook = Plugin.GameInteropProvider.HookFromSignature<UseActionDelegate>(
+                    ActionManager.Addresses.UseAction.String,
+                    HandleRequestAction
+                );
                 _requestActionHook?.Enable();
             }
             catch
             {
-                PluginLog.Error("InputsHelper UseActionDelegate Hook failed!!!");
+                Plugin.Logger.Error("InputsHelper UseActionDelegate Hook failed!!!");
             }
 
             // mouseover setting
@@ -104,8 +109,8 @@ namespace DelvUI.Helpers
 
             ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
 
-            _uiMouseOverActorHook?.Disable();
-            _uiMouseOverActorHook?.Dispose();
+            //_uiMouseOverActorHook?.Disable();
+            //_uiMouseOverActorHook?.Dispose();
 
             _requestActionHook?.Disable();
             _requestActionHook?.Dispose();
@@ -123,7 +128,7 @@ namespace DelvUI.Helpers
         private HUDOptionsConfig _config = null!;
 
         private IntPtr _setUIMouseOverActor;
-        private Hook<OnSetUIMouseoverActor>? _uiMouseOverActorHook;
+        //private Hook<OnSetUIMouseoverActor>? _uiMouseOverActorHook;
 
         private Hook<UseActionDelegate>? _requestActionHook;
 
@@ -182,11 +187,11 @@ namespace DelvUI.Helpers
             _config = sender.GetConfigObject<HUDOptionsConfig>();
         }
 
-        private void HandleUIMouseOverActorId(long arg1, long arg2)
-        {
-            //PluginLog.Log("MO: {0} - {1}", arg1.ToString("X"), arg2.ToString("X"));
-            _uiMouseOverActorHook?.Original(arg1, arg2);
-        }
+        //private void HandleUIMouseOverActorId(long arg1, long arg2)
+        //{
+            //Plugin.Logger.Log("MO: {0} - {1}", arg1.ToString("X"), arg2.ToString("X"));
+            //_uiMouseOverActorHook?.Original(arg1, arg2);
+        //}
 
         private bool HandleRequestAction(IntPtr manager, ActionType actionType, uint actionId, GameObjectID targetId, uint a4, uint a5,
                                           uint a6, IntPtr a7)
@@ -358,8 +363,8 @@ namespace DelvUI.Helpers
             _wndProcPtr = Marshal.GetFunctionPointerForDelegate(_wndProcDelegate);
             _imguiWndProcPtr = SetWindowLongPtr(hWnd, GWL_WNDPROC, _wndProcPtr);
 
-            PluginLog.Log("Hooking WndProc for window: " + hWnd.ToString("X"));
-            PluginLog.Log("Old WndProc: " + _imguiWndProcPtr.ToString("X"));
+            Plugin.Logger.Debug("Hooking WndProc for window: " + hWnd.ToString("X"));
+            Plugin.Logger.Debug("Old WndProc: " + _imguiWndProcPtr.ToString("X"));
         }
 
         private IntPtr _wndHandle = IntPtr.Zero;

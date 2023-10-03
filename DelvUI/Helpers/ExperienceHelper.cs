@@ -107,7 +107,7 @@ namespace DelvUI.Helpers
             }
             catch (Exception e)
             {
-                PluginLog.Error("Error when receiving experience information: " + e.Message);
+                Plugin.Logger.Error("Error when receiving experience information: " + e.Message);
                 return false;
             }
         }

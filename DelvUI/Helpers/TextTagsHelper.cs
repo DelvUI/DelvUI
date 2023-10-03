@@ -341,7 +341,7 @@ namespace DelvUI.Helpers
             }
             catch (Exception e)
             {
-                PluginLog.Error(e.Message);
+                Plugin.Logger.Error(e.Message);
                 return text;
             }
         }

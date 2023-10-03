@@ -1,8 +1,8 @@
 ﻿using Dalamud.Interface;
+using Dalamud.Interface.Internal;
+using Dalamud.Interface.Utility;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
-using DelvUI.Interface.GeneralElements;
-using DelvUI.Interface.Party;
 using ImGuiNET;
 using ImGuiScene;
 using System;
@@ -177,7 +177,7 @@ namespace DelvUI.Config.Tree
                 ImGui.BeginGroup(); // Left
                 {
                     // banner
-                    TextureWrap? delvUiBanner = ConfigurationManager.Instance.BannerImage;
+                    IDalamudTextureWrap? delvUiBanner = ConfigurationManager.Instance.BannerImage;
                     if (delvUiBanner != null)
                     {
                         ImGui.SetCursorPos(new Vector2(15 + 150 * _scale / 2f - delvUiBanner.Width / 2f, 5));

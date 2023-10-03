@@ -2,6 +2,7 @@
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Statuses;
+using Dalamud.Interface.Internal;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
@@ -37,7 +38,7 @@ namespace DelvUI.Interface.Party
         private StatusEffectsListHud _debuffsListHud;
         private PartyFramesCooldownListHud _cooldownListHud;
 
-        private TextureWrap? _readyCheckTexture = null;
+        private IDalamudTextureWrap? _readyCheckTexture = null;
 
         public bool Visible = false;
         public Vector2 Position;
@@ -66,7 +67,7 @@ namespace DelvUI.Interface.Party
 
             _cooldownListHud = new PartyFramesCooldownListHud(_configs.CooldownList);
 
-            _readyCheckTexture = TexturesCache.Instance.GetTextureFromPath("ui/uld/ReadyCheck_hr1.tex") ?? TexturesCache.Instance.GetTextureFromPath("ui/uld/ReadyCheck.tex");
+            _readyCheckTexture = TexturesHelper.GetTextureFromPath("ui/uld/ReadyCheck_hr1.tex") ?? TexturesHelper.GetTextureFromPath("ui/uld/ReadyCheck.tex");
         }
 
         public PluginConfigColor GetColor(float scale)
@@ -365,7 +366,7 @@ namespace DelvUI.Interface.Party
             bool drawingWhosTalking = false;
             if (WhosTalkingIcon.Enabled && WhosTalkingIcon.Icon.Enabled && WhosTalkingIcon.EnabledForState(Member.WhosTalkingState))
             {
-                TextureWrap? texture = WhosTalkingHelper.Instance.GetTextureForState(Member.WhosTalkingState);
+                IDalamudTextureWrap? texture = WhosTalkingHelper.Instance.GetTextureForState(Member.WhosTalkingState);
 
                 if (texture != null)
                 {

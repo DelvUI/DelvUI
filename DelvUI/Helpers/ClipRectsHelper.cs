@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace DelvUI.Helpers
@@ -85,14 +86,11 @@ namespace DelvUI.Helpers
             AtkUnitList* loadedUnitsList = &manager->AtkUnitManager.AllLoadedUnitsList;
             if (loadedUnitsList == null) { return; }
 
-            AtkUnitBase** addonList = &loadedUnitsList->AtkUnitEntries;
-            if (addonList == null) { return; }
-
             for (int i = 0; i < loadedUnitsList->Count; i++)
             {
                 try
                 {
-                    AtkUnitBase* addon = addonList[i];
+                    AtkUnitBase* addon = *(AtkUnitBase**)Unsafe.AsPointer(ref loadedUnitsList->EntriesSpan[i]);
                     if (addon == null || !addon->IsVisible || addon->WindowNode == null || addon->Scale == 0)
                     {
                         continue;

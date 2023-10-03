@@ -1,19 +1,11 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-using Dalamud.Data;
-using Dalamud.Game;
-using Dalamud.Game.ClientState;
-using Dalamud.Game.ClientState.Buddy;
+﻿using Dalamud.Game;
 using Dalamud.Game.ClientState.Conditions;
-using Dalamud.Game.ClientState.JobGauge;
 using Dalamud.Game.ClientState.Objects;
-using Dalamud.Game.ClientState.Party;
 using Dalamud.Game.Command;
-using Dalamud.Game.Gui;
 using Dalamud.Interface;
-using Dalamud.Logging;
+using Dalamud.Interface.Internal;
 using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
 using DelvUI.Config;
 using DelvUI.Config.Profiles;
 using DelvUI.Helpers;
@@ -23,29 +15,33 @@ using DelvUI.Interface.Nameplates;
 using DelvUI.Interface.Party;
 using DelvUI.Interface.PartyCooldowns;
 using ImGuiNET;
-using ImGuiScene;
-using SigScanner = Dalamud.Game.SigScanner;
+using System;
+using System.IO;
+using System.Reflection;
 
 namespace DelvUI
 {
     public class Plugin : IDalamudPlugin
     {
-        public static BuddyList BuddyList { get; private set; } = null!;
-        public static ClientState ClientState { get; private set; } = null!;
-        public static CommandManager CommandManager { get; private set; } = null!;
-        public static Condition Condition { get; private set; } = null!;
+        public static IBuddyList BuddyList { get; private set; } = null!;
+        public static IClientState ClientState { get; private set; } = null!;
+        public static ICommandManager CommandManager { get; private set; } = null!;
+        public static ICondition Condition { get; private set; } = null!;
         public static DalamudPluginInterface PluginInterface { get; private set; } = null!;
-        public static DataManager DataManager { get; private set; } = null!;
-        public static Framework Framework { get; private set; } = null!;
-        public static GameGui GameGui { get; private set; } = null!;
-        public static JobGauges JobGauges { get; private set; } = null!;
-        public static ObjectTable ObjectTable { get; private set; } = null!;
-        public static SigScanner SigScanner { get; private set; } = null!;
-        public static TargetManager TargetManager { get; private set; } = null!;
+        public static IDataManager DataManager { get; private set; } = null!;
+        public static IFramework Framework { get; private set; } = null!;
+        public static IGameGui GameGui { get; private set; } = null!;
+        public static IJobGauges JobGauges { get; private set; } = null!;
+        public static IObjectTable ObjectTable { get; private set; } = null!;
+        public static ISigScanner SigScanner { get; private set; } = null!;
+        public static IGameInteropProvider GameInteropProvider { get; private set; } = null!;
+        public static ITargetManager TargetManager { get; private set; } = null!;
         public static UiBuilder UiBuilder { get; private set; } = null!;
-        public static PartyList PartyList { get; private set; } = null!;
+        public static IPartyList PartyList { get; private set; } = null!;
+        public static IPluginLog Logger { get; private set; } = null!;
+        public static ITextureProvider TextureProvider { get; private set; } = null!;
 
-        public static TextureWrap? BannerTexture;
+        public static IDalamudTextureWrap? BannerTexture;
 
         public static string AssemblyLocation { get; private set; } = "";
         public string Name => "DelvUI";
@@ -59,19 +55,22 @@ namespace DelvUI
         private uint _jobId = 0;
 
         public Plugin(
-            BuddyList buddyList,
-            ClientState clientState,
-            CommandManager commandManager,
-            Condition condition,
+            IBuddyList buddyList,
+            IClientState clientState,
+            ICommandManager commandManager,
+            ICondition condition,
             DalamudPluginInterface pluginInterface,
-            DataManager dataManager,
-            Framework framework,
-            GameGui gameGui,
-            JobGauges jobGauges,
-            ObjectTable objectTable,
-            PartyList partyList,
-            SigScanner sigScanner,
-            TargetManager targetManager
+            IDataManager dataManager,
+            IFramework framework,
+            IGameGui gameGui,
+            IJobGauges jobGauges,
+            IObjectTable objectTable,
+            IPartyList partyList,
+            ISigScanner sigScanner,
+            IGameInteropProvider gameInteropProvider,
+            ITargetManager targetManager,
+            IPluginLog logger,
+            ITextureProvider textureProvider
         )
         {
             BuddyList = buddyList;
@@ -86,8 +85,11 @@ namespace DelvUI
             ObjectTable = objectTable;
             PartyList = partyList;
             SigScanner = sigScanner;
+            GameInteropProvider = gameInteropProvider;
             TargetManager = targetManager;
             UiBuilder = PluginInterface.UiBuilder;
+            Logger = logger;
+            TextureProvider = textureProvider;
 
             if (pluginInterface.AssemblyLocation.DirectoryName != null)
             {
@@ -98,7 +100,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.0.3.1";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.1.0.0";
 
             FontsManager.Initialize(AssemblyLocation);
             BarTexturesManager.Initialize(AssemblyLocation);
@@ -122,7 +124,6 @@ namespace DelvUI
             PartyCooldownsManager.Initialize();
             PullTimerHelper.Initialize();
             TextTagsHelper.Initialize();
-            TexturesCache.Initialize();
             TooltipsHelper.Initialize();
             PetRenamerHelper.Initialize();
             HonorificHelper.Initialize();
@@ -187,13 +188,12 @@ namespace DelvUI
                 }
                 catch (Exception ex)
                 {
-                    PluginLog.Log($"Image failed to load. {bannerImage}");
-                    PluginLog.Log(ex.ToString());
+                    Logger.Error($"Image failed to load. {bannerImage}\n\n{ex}");
                 }
             }
             else
             {
-                PluginLog.Log($"Image doesn't exist. {bannerImage}");
+                Logger.Debug($"Image doesn't exist. {bannerImage}");
             }
         }
 
@@ -359,7 +359,6 @@ namespace DelvUI
             PullTimerHelper.Instance?.Dispose();
             ProfilesManager.Instance?.Dispose();
             SpellHelper.Instance?.Dispose();
-            TexturesCache.Instance?.Dispose();
             TooltipsHelper.Instance?.Dispose();
             HonorificHelper.Instance?.Dispose();
             WotsitHelper.Instance?.Dispose();

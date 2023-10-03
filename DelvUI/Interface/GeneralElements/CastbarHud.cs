@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Interface.Internal;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
@@ -110,7 +111,7 @@ namespace DelvUI.Interface.GeneralElements
                     {
                         ImGui.SetCursorPos(finalIconPos);
 
-                        TextureWrap? texture = Config.Preview ? TexturesCache.Instance.GetTexture<LuminaAction>(3577) : LastUsedCast?.IconTexture;
+                        IDalamudTextureWrap? texture = Config.Preview ? TexturesHelper.GetTexture<LuminaAction>(3577) : LastUsedCast?.IconTexture;
                         if (texture != null)
                         {
                             ImGui.Image(texture.ImGuiHandle, finalIconSize);
@@ -238,15 +239,31 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            float slideCastWidth = Math.Min(Config.Size.X, Config.SlideCastTime / 1000f * Config.Size.X / totalCastTime);
-            Vector2 size = new(slideCastWidth, Config.Size.Y);
-            Rect slideCast = new(Config.Position + Config.Size - size, size, Config.SlideCastColor);
+            Rect slideCast;
 
-            if (Config.FillDirection is BarDirection.Left)
+            if (Config.FillDirection.IsHorizontal())
             {
-                bool validIcon = LastUsedCast?.IconTexture is not null;
-                Vector2 iconSize = Config.ShowIcon && validIcon ? new Vector2(Config.Size.Y, Config.Size.Y) : Vector2.Zero;
-                slideCast = Config.ShowIcon ? new Rect(Config.Position, size + new Vector2(iconSize.X, 0), Config.SlideCastColor) : new Rect(Config.Position, size, Config.SlideCastColor);
+                float slideCastWidth = Math.Min(Config.Size.X, Config.SlideCastTime / 1000f * Config.Size.X / totalCastTime);
+                Vector2 size = new(slideCastWidth, Config.Size.Y);
+                slideCast = new(Config.Position + Config.Size - size, size, Config.SlideCastColor);
+
+                if (Config.FillDirection is BarDirection.Left)
+                {
+                    bool validIcon = LastUsedCast?.IconTexture is not null;
+                    Vector2 iconSize = Config.ShowIcon && validIcon ? new Vector2(Config.Size.Y, Config.Size.Y) : Vector2.Zero;
+                    slideCast = Config.ShowIcon ? new Rect(Config.Position, size + new Vector2(iconSize.X, 0), Config.SlideCastColor) : new Rect(Config.Position, size, Config.SlideCastColor);
+                }
+            }
+            else
+            {
+                float slideCastHeight = Math.Min(Config.Size.Y, Config.SlideCastTime / 1000f * Config.Size.Y / totalCastTime);
+                Vector2 size = new(Config.Size.X, slideCastHeight);
+                slideCast = new(Config.Position + Config.Size - size, size, Config.SlideCastColor);
+
+                if (Config.FillDirection is BarDirection.Up)
+                {
+                    slideCast = new(Config.Position, size, Config.SlideCastColor);
+                }
             }
 
             bar.AddForegrounds(slideCast);

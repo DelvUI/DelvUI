@@ -69,7 +69,7 @@ namespace DelvUI.Config.Profiles
                 }
                 catch (Exception e)
                 {
-                    PluginLog.Error("Error copying default profile!: " + e.Message);
+                    Plugin.Logger.Error("Error copying default profile!: " + e.Message);
                 }
             }
 
@@ -108,7 +108,7 @@ namespace DelvUI.Config.Profiles
 
             if (Instance == null)
             {
-                PluginLog.Error("Error initializing DelvUI's profiles!!!");
+                Plugin.Logger.Error("Error initializing DelvUI's profiles!!!");
                 return;
             }
 
@@ -256,7 +256,7 @@ namespace DelvUI.Config.Profiles
             }
             catch (Exception e)
             {
-                PluginLog.Error("Error saving profile: " + e.Message);
+                Plugin.Logger.Error("Error saving profile: " + e.Message);
             }
         }
 
@@ -275,7 +275,7 @@ namespace DelvUI.Config.Profiles
             }
             catch (Exception e)
             {
-                PluginLog.Error("Error saving profile: " + e.Message);
+                Plugin.Logger.Error("Error saving profile: " + e.Message);
             }
         }
 
@@ -288,7 +288,7 @@ namespace DelvUI.Config.Profiles
             }
             catch (Exception e)
             {
-                PluginLog.Error("Error loading profile: " + e.Message);
+                Plugin.Logger.Error("Error loading profile: " + e.Message);
             }
 
             return false;
@@ -307,7 +307,7 @@ namespace DelvUI.Config.Profiles
             }
             catch (Exception e)
             {
-                PluginLog.Error("Error re-loading profile: " + e.Message);
+                Plugin.Logger.Error("Error re-loading profile: " + e.Message);
             }
 
             return false;
@@ -395,7 +395,7 @@ namespace DelvUI.Config.Profiles
             }
             catch (Exception e)
             {
-                PluginLog.Error("Error saving profile: " + e.Message);
+                Plugin.Logger.Error("Error saving profile: " + e.Message);
                 return "Couldn't load profile \"" + profile + "\"!";
             }
 
@@ -452,7 +452,7 @@ namespace DelvUI.Config.Profiles
             }
             catch (Exception e)
             {
-                PluginLog.Error("Error cloning profile: " + e.Message);
+                Plugin.Logger.Error("Error cloning profile: " + e.Message);
                 return "Error trying to clone profile \"" + profileName + "\"!";
             }
 
@@ -496,7 +496,7 @@ namespace DelvUI.Config.Profiles
             }
             catch (Exception e)
             {
-                PluginLog.Error("Error renaming profile: " + e.Message);
+                Plugin.Logger.Error("Error renaming profile: " + e.Message);
                 return "Error trying to rename profile \"" + _currentProfileName + "\"!";
             }
 
@@ -542,7 +542,7 @@ namespace DelvUI.Config.Profiles
             }
             catch (Exception e)
             {
-                PluginLog.Error("Error importing profile: " + e.Message);
+                Plugin.Logger.Error("Error importing profile: " + e.Message);
                 return "Error trying to import profile \"" + newProfileName + "\"!";
             }
 
@@ -584,7 +584,7 @@ namespace DelvUI.Config.Profiles
                 }
                 catch (Exception e)
                 {
-                    PluginLog.Error("Error reading import file: " + e.Message);
+                    Plugin.Logger.Error("Error reading import file: " + e.Message);
                     _errorMessage = "Error reading the file!";
                 }
             };
@@ -611,7 +611,7 @@ namespace DelvUI.Config.Profiles
                 }
                 catch (Exception e)
                 {
-                    PluginLog.Error("Error copying file: " + e.Message);
+                    Plugin.Logger.Error("Error copying file: " + e.Message);
                     _errorMessage = "Error exporting the file!";
                 }
             };
@@ -649,7 +649,7 @@ namespace DelvUI.Config.Profiles
             }
             catch (Exception e)
             {
-                PluginLog.Error("Error deleting profile: " + e.Message);
+                Plugin.Logger.Error("Error deleting profile: " + e.Message);
                 return "Error trying to delete profile \"" + profileName + "\"!";
             }
 

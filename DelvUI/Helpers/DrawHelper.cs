@@ -1,4 +1,6 @@
 using Dalamud.Interface;
+using Dalamud.Interface.Internal;
+using Dalamud.Interface.Utility;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
@@ -46,7 +48,7 @@ namespace DelvUI.Helpers
 
         public static void DrawBarTexture(Vector2 position, Vector2 size, PluginConfigColor color, string? name, BarTextureDrawMode drawMode, ImDrawListPtr drawList)
         {
-            TextureWrap? texture = BarTexturesManager.Instance?.GetBarTexture(name);
+            IDalamudTextureWrap? texture = BarTexturesManager.Instance?.GetBarTexture(name);
             if (texture == null)
             {
                 DrawGradientFilledRect(position, size, color, drawList);
@@ -132,7 +134,7 @@ namespace DelvUI.Helpers
 
         public static void DrawIcon<T>(dynamic row, Vector2 position, Vector2 size, bool drawBorder, bool cropIcon, int stackCount = 1) where T : ExcelRow
         {
-            TextureWrap texture = TexturesCache.Instance.GetTexture<T>(row, (uint)Math.Max(0, stackCount - 1));
+            IDalamudTextureWrap texture = TexturesHelper.GetTexture<T>(row, (uint)Math.Max(0, stackCount - 1));
             if (texture == null) { return; }
 
             (Vector2 uv0, Vector2 uv1) = GetTexCoordinates(texture, size, cropIcon);
@@ -149,7 +151,7 @@ namespace DelvUI.Helpers
 
         public static void DrawIcon<T>(ImDrawListPtr drawList, dynamic row, Vector2 position, Vector2 size, bool drawBorder, bool cropIcon, int stackCount = 1) where T : ExcelRow
         {
-            TextureWrap texture = TexturesCache.Instance.GetTexture<T>(row, (uint)Math.Max(0, stackCount - 1));
+            IDalamudTextureWrap texture = TexturesHelper.GetTexture<T>(row, (uint)Math.Max(0, stackCount - 1));
             if (texture == null) { return; }
 
             (Vector2 uv0, Vector2 uv1) = GetTexCoordinates(texture, size, cropIcon);
@@ -177,7 +179,7 @@ namespace DelvUI.Helpers
 
         public static void DrawIcon(uint iconId, Vector2 position, Vector2 size, bool drawBorder, uint color, ImDrawListPtr drawList)
         {
-            TextureWrap? texture = TexturesCache.Instance.GetTextureFromIconId(iconId);
+            IDalamudTextureWrap? texture = TexturesHelper.GetTextureFromIconId(iconId);
             if (texture == null) { return; }
 
             drawList.AddImage(texture.ImGuiHandle, position, position + size, Vector2.Zero, Vector2.One, color);
@@ -188,7 +190,7 @@ namespace DelvUI.Helpers
             }
         }
 
-        public static (Vector2, Vector2) GetTexCoordinates(TextureWrap texture, Vector2 size, bool cropIcon = true)
+        public static (Vector2, Vector2) GetTexCoordinates(IDalamudTextureWrap texture, Vector2 size, bool cropIcon = true)
         {
             if (texture == null)
             {

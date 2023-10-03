@@ -10,9 +10,9 @@
 	<!-- Assembly Configuration -->
 	<PropertyGroup>
 		<AssemblyName>DelvUI</AssemblyName>
-		<AssemblyVersion>2.0.3.1</AssemblyVersion>
-		<FileVersion>2.0.3.1</FileVersion>
-		<InformationalVersion>2.0.3.1</InformationalVersion>
+		<AssemblyVersion>2.1.0.0</AssemblyVersion>
+		<FileVersion>2.1.0.0</FileVersion>
+		<InformationalVersion>2.1.0.0</InformationalVersion>
 	</PropertyGroup>
 
 	<!-- Build Configuration -->
@@ -95,7 +95,7 @@
 
 	<!-- NuGet Packages -->
 	<ItemGroup>
-		<PackageReference Include="DalamudPackager" Version="2.1.10" />
+		<PackageReference Include="DalamudPackager" Version="2.1.12" />
 		<PackageReference Include="Colourful" Version="3.1.0" />
 	</ItemGroup>
 </Project>

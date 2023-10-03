@@ -52,12 +52,15 @@ namespace DelvUI.Helpers
             IntPtr countdownPtr = Plugin.SigScanner.ScanText("48 89 5C 24 ?? 57 48 83 EC 40 8B 41");
             try
             {
-                _countdownTimerHook = Hook<CountdownTimer>.FromAddress(countdownPtr, CountdownTimerFunc);
+                _countdownTimerHook = Plugin.GameInteropProvider.HookFromSignature<CountdownTimer>(
+                    "48 89 5C 24 ?? 57 48 83 EC 40 8B 41",
+                    CountdownTimerFunc
+                );
                 _countdownTimerHook?.Enable();
             }
             catch
             {
-                PluginLog.Error("PullTimeHelper CountdownTimer Hook failed!!!");
+                Plugin.Logger.Error("PullTimeHelper CountdownTimer Hook failed!!!");
             }
         }
         public static void Initialize() { Instance = new PullTimerHelper(); }

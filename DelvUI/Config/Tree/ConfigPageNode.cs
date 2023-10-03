@@ -252,7 +252,7 @@ namespace DelvUI.Config.Tree
             }
             catch (Exception e)
             {
-                PluginLog.Error("Error when saving config object: " + e.Message);
+                Plugin.Logger.Error("Error when saving config object: " + e.Message);
             }
         }
 
@@ -282,14 +282,14 @@ namespace DelvUI.Config.Tree
 
             if (importData == null)
             {
-                PluginLog.Error("Error finding default import data for type " + type.ToString());
+                Plugin.Logger.Error("Error finding default import data for type " + type.ToString());
                 return;
             }
 
             PluginConfigObject? config = importData.GetObject();
             if (config == null)
             {
-                PluginLog.Error("Error importing default import data for type " + type.ToString());
+                Plugin.Logger.Error("Error importing default import data for type " + type.ToString());
                 return;
             }
 

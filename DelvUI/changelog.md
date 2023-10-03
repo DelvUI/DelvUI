@@ -1,3 +1,7 @@
+# 2.1.0.0
+- Added support for patch 6.5 and Dalamud API 9.
+- Fixed Castbar's slide cast not adjusting properly to all fill directions.
+
 # 2.0.3.1
 - Fixed Paladin's Requiescat Bar fill direction not working properly.
 - Added `/dui` command to open DelvUI's settings.
