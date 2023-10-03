@@ -66,8 +66,8 @@ namespace DelvUI.Helpers
             switch (ActionType)
             {
                 case ActionType.PetAction:
-                case ActionType.Spell:
-                case ActionType.SquadronAction:
+                case ActionType.Action:
+                case ActionType.BgcArmyAction:
                 case ActionType.PvPAction:
                 case ActionType.CraftAction:
                 case ActionType.Ability:
@@ -108,24 +108,6 @@ namespace DelvUI.Helpers
                     DamageType = DamageType.Unknown;
 
                     _lastUsedAction = companion;
-
-                    break;
-
-                case ActionType.None:
-                case ActionType.General:
-                case ActionType.Unk_7:
-                case ActionType.Unk_8:
-                case ActionType.MainCommand:
-                case ActionType.Waymark:
-                case ActionType.ChocoboRaceAbility:
-                case ActionType.ChocoboRaceItem:
-                case ActionType.Unk_12:
-                case ActionType.Unk_18:
-                case ActionType.Accessory:
-                    _lastUsedAction = null;
-                    ActionText = "Casting...";
-                    IconTexture = null;
-                    DamageType = DamageType.Unknown;
 
                     break;
 

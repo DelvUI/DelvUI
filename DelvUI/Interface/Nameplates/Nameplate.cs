@@ -545,14 +545,14 @@ namespace DelvUI.Interface.Nameplates
             {
                 StructsCharacter* chara = (StructsCharacter*)character.Address;
 
-                bool inCombat = (chara->StatusFlags & 0x20) != 0;
+                bool inCombat = (chara->CharacterData.Flags1 & 0x20) != 0;
                 if (inCombat && !config.ColorByHealth.Enabled)
                 {
                     return config.InCombatColor;
                 }
                 else if (!inCombat)
                 {
-                    bool isHostile = (chara->StatusFlags & 0x10) != 0;
+                    bool isHostile = (chara->CharacterData.Flags1 & 0x10) != 0;
                     return isHostile ? config.OutOfCombatHostileColor : config.OutOfCombatColor;
                 }
             }

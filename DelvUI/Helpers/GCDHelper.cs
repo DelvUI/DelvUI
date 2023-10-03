@@ -63,7 +63,7 @@ namespace DelvUI.Helpers
             [JobIDs.BLU] = 11385  // Water Cannon
         };
 
-        public static unsafe bool GetGCDInfo(PlayerCharacter player, out float timeElapsed, out float timeTotal, ActionType actionType = ActionType.Spell)
+        public static unsafe bool GetGCDInfo(PlayerCharacter player, out float timeElapsed, out float timeTotal, ActionType actionType = ActionType.Action)
         {
             if (player is null || !JobActionIDs.TryGetValue(player.ClassJob.Id, out var actionId))
             {
