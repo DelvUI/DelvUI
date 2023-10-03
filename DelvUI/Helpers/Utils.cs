@@ -1,9 +1,9 @@
-using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Statuses;
-using Dalamud.Logging;
+using Dalamud.Plugin.Services;
+using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
@@ -16,10 +16,8 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using StructsCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
-using StructsGameObject = FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject;
 using StructsCharacterManager = FFXIVClientStructs.FFXIV.Client.Game.Character.CharacterManager;
-using DelvUI.Config;
-using Dalamud.Plugin.Services;
+using StructsGameObject = FFXIVClientStructs.FFXIV.Client.Game.Object.GameObject;
 
 namespace DelvUI.Helpers
 {
@@ -81,11 +79,11 @@ namespace DelvUI.Helpers
 
         public static unsafe bool IsHostile(Character character)
         {
-            byte* unk = (byte*)(new IntPtr(character.Address) + 0x1F0);
+            StructsCharacter* chara = (StructsCharacter*)character.Address;
 
             return character != null
                 && ((character.SubKind == (byte)BattleNpcSubKind.Enemy || (int)character.SubKind == (byte)BattleNpcSubKind.BattleNpcPart)
-                && *unk != 0);
+                && chara->CharacterData.Battalion > 0);
         }
 
         public static unsafe float ActorShieldValue(GameObject? actor)
@@ -214,24 +212,24 @@ namespace DelvUI.Helpers
 
             // Here we get the ClientStruct Character of our target (aka the player we are targeting)
             StructsCharacter targetChara = StructsCharacterManager.Instance()->LookupBattleCharaByObjectId(target.ObjectId)->Character;
-            
+
             // This method is key. GetTargetId() returns the targets player target ID. If it is converted to a hex string and starts with the number 4, it is a minion.
             // Even though it is a minion, it still returns the players target ID.
             ulong realTargetID = targetChara.GetTargetId();
-            if (!realTargetID.ToString("X").StartsWith("4")) 
+            if (!realTargetID.ToString("X").StartsWith("4"))
             {
                 return -1;
             }
-            
+
             // We look up the parents ClientStruct GameObject
             StructsCharacter* realBattleChara = (StructsCharacter*)StructsCharacterManager.Instance()->LookupBattleCharaByObjectId((uint)realTargetID);
             if (realBattleChara == null)
             {
                 return -1;
             }
-            
+
             // And get the companion off of that
-            StructsGameObject * companionGameObject = (StructsGameObject*)realBattleChara->Companion.CompanionObject;
+            StructsGameObject* companionGameObject = (StructsGameObject*)realBattleChara->Companion.CompanionObject;
             if (companionGameObject == null)
             {
                 return -1;
