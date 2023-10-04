@@ -23,7 +23,7 @@ namespace DelvUI.Interface.StatusEffects
 
         private LayoutInfo _layoutInfo;
 
-        internal static int StatusEffectListsSize = 30;
+        internal static int StatusEffectListsSize = 60;
         private StatusStruct[]? _fakeEffects = null;
 
         private LabelHud _durationLabel;
@@ -145,6 +145,7 @@ namespace DelvUI.Interface.StatusEffects
                 }
 
                 character = (BattleChara)actor;
+                count = Math.Min(count, character.StatusList.Length);
             }
             else
             {

@@ -1,3 +1,6 @@
+# 2.1.0.1
+- Fixed status effects sometimes not showing.
+
 # 2.1.0.0
 - Added support for patch 6.5 and Dalamud API 9.
 - Fixed Castbar's slide cast not adjusting properly to all fill directions.
