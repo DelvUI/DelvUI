@@ -145,7 +145,12 @@ namespace DelvUI.Interface.StatusEffects
                 }
 
                 character = (BattleChara)actor;
-                count = Math.Min(count, character.StatusList.Length);
+
+                try
+                {
+                    count = Math.Min(count, character.StatusList.Length);
+                }
+                catch { }
             }
             else
             {
