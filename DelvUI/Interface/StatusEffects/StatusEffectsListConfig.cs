@@ -513,11 +513,11 @@ namespace DelvUI.Interface.StatusEffects
 
             if (ImGui.BeginChild("Filter Effects", new Vector2(0, 360), false, ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
-                ImGui.Text("\u2002 \u2002");
+                ImGui.Text("    ");
                 ImGui.SameLine();
                 ImGui.Text("Type an ID or Name");
 
-                ImGui.Text("\u2002 \u2002");
+                ImGui.Text("    ");
                 ImGui.SameLine();
                 ImGui.PushItemWidth(300);
                 if (ImGui.InputText("", ref _input, 64, ImGuiInputTextFlags.EnterReturnsTrue))
@@ -573,7 +573,7 @@ namespace DelvUI.Interface.StatusEffects
                 ImGui.PopFont();
                 ImGuiHelper.SetTooltip("Clear List");
 
-                ImGui.Text("\u2002 \u2002");
+                ImGui.Text("    ");
                 ImGui.SameLine();
 
                 if (ImGui.BeginTable("table", 4, flags, new Vector2(583, List.Count > 0 ? 200 : 40)))
@@ -642,7 +642,7 @@ namespace DelvUI.Interface.StatusEffects
 
                     ImGui.EndTable();
                 }
-                ImGui.Text("\u2002 \u2002");
+                ImGui.Text("    ");
                 ImGui.SameLine();
                 ImGui.Text("Tip: You can [Ctrl + Alt + Shift] + Left Click on a status effect to automatically add it to the list.");
 

@@ -522,7 +522,7 @@ namespace DelvUI.Config.Attributes
                 }
             }
 
-            var options = fontsConfig.Fonts.Values.Select(fontData => fontData.Name + "\u2002\u2002" + fontData.Size.ToString()).ToArray();
+            var options = fontsConfig.Fonts.Values.Select(fontData => fontData.Name + "  " + fontData.Size.ToString()).ToArray();
 
             if (ImGui.Combo(friendlyName + IDText(ID), ref index, options, options.Length, 4))
             {

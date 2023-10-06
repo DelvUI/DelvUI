@@ -1,3 +1,6 @@
+# 2.1.0.2
+- Fixed weird artifacts in some parts of the config window.
+
 # 2.1.0.1
 - Fixed status effects sometimes not showing.
 

@@ -43,7 +43,7 @@ namespace DelvUI.Helpers
 
         public static void Tab()
         {
-            ImGui.Text("\u2002");
+            ImGui.Text("  ");
             ImGui.SameLine();
         }
 
