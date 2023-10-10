@@ -361,6 +361,7 @@ namespace DelvUI
             SpellHelper.Instance?.Dispose();
             TooltipsHelper.Instance?.Dispose();
             HonorificHelper.Instance?.Dispose();
+            PetRenamerHelper.Instance?.Dispose();
             WotsitHelper.Instance?.Dispose();
             WhosTalkingHelper.Instance?.Dispose();
 

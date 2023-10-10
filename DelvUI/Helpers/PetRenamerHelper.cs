@@ -1,100 +1,113 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Ipc;
-using Newtonsoft.Json;
-using CSCompanion = FFXIVClientStructs.FFXIV.Client.Game.Character.Companion;
-using CSGameObjectManager = FFXIVClientStructs.FFXIV.Client.Game.Object.GameObjectManager;
+using System;
 
 namespace DelvUI.Helpers
 {
-    public static class PetRenamerHelper
+    internal class PetRenamerHelper
     {
-        private static ICallGateSubscriber<Character, string>? GetCharacterNickname;
+        private ICallGateSubscriber<nint, string>? GetPetNicknameNint;
+        private ICallGateSubscriber<object>? PetNicknameReady;
+        private ICallGateSubscriber<object>? PetNicknameDispose;
+        private ICallGateSubscriber<bool>? Enabled;
 
-        public static void Initialize()
+        private bool pluginEnabled = false;
+
+        #region Singleton
+        public static void Initialize() { Instance = new PetRenamerHelper(); }
+
+        public static PetRenamerHelper Instance { get; private set; } = null!;
+
+        public PetRenamerHelper()
         {
-            GetCharacterNickname = Plugin.PluginInterface.GetIpcSubscriber<Character, string>("PetRenamer.GetCharacterNickname");
+            AssignIPCs();
+            AssignFunctions();
+            CheckPluginEnabled();
         }
 
-        internal static string GetPetNamesForCharacter(Character character) => GetCharacterNickname?.InvokeFunc(character) ?? string.Empty;
-        internal static NicknameData? FromString(string? str) => JsonConvert.DeserializeObject<NicknameData>(str ?? string.Empty);
-
-        public static unsafe string? GetPetName(GameObject? actor)
+        ~PetRenamerHelper()
         {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            PetNicknameReady?.Unsubscribe(OnPetReady);
+            PetNicknameDispose?.Unsubscribe(OnPetDispose);
+
+            Instance = null!;
+        }
+        #endregion
+
+        private void AssignIPCs()
+        {
+            GetPetNicknameNint = Plugin.PluginInterface.GetIpcSubscriber<nint, string>("PetRenamer.GetPetNicknameNint");
+            PetNicknameReady = Plugin.PluginInterface.GetIpcSubscriber<object>("PetRenamer.Ready");
+            PetNicknameDispose = Plugin.PluginInterface.GetIpcSubscriber<object>("PetRenamer.Disposing");
+            Enabled = Plugin.PluginInterface.GetIpcSubscriber<bool>("PetRenamer.Enabled");
+        }
+
+        private void AssignFunctions()
+        {
+            PetNicknameReady?.Subscribe(OnPetReady);
+            PetNicknameDispose?.Subscribe(OnPetDispose);
+        }
+
+        private void CheckPluginEnabled()
+        {
+            try
+            {
+                pluginEnabled = Enabled?.InvokeFunc() ?? false;
+            }
+            catch { }
+        }
+
+        private void OnPetReady()
+        {
+            pluginEnabled = true;
+        }
+
+        private void OnPetDispose()
+        {
+            pluginEnabled = false;
+        }
+
+        private string GetPetNamesForCharacter(nint character)
+        {
+            try
+            {
+                return GetPetNicknameNint?.InvokeFunc(character) ?? null!;
+            }
+            catch { }
+
+            return null!;
+        }
+
+        public string? GetPetName(GameObject? actor)
+        {
+            if (!pluginEnabled)
+            {
+                return null;
+            }
+
             if (actor == null || (actor.ObjectKind != ObjectKind.Companion && actor.ObjectKind != ObjectKind.BattleNpc))
             {
                 return null;
             }
 
-            // For companions it doesn't work that way due to a missing Dalamud feature.
-            // Most Dalamud stuff does NOT work with unnetworked gameObjects so this workaround gets the owner ID of a companion.
-            int ownerID = (int)actor.OwnerId;
-            if (actor?.ObjectKind == ObjectKind.Companion)
-            {
-                CSCompanion* gObj = (CSCompanion*)CSGameObjectManager.GetGameObjectByIndex(((Character)actor).ObjectIndex);
-                if (gObj == null)
-                {
-                    return null;
-                }
-                ownerID = (int)gObj->Character.CompanionOwnerID;
-            }
-
-            // We get the Dalamud gameObject of the owner
-            GameObject? dalamudObj = Plugin.ObjectTable.SearchById((ulong)ownerID);
-            if (dalamudObj == null)
-            {
-                return null;
-            }
-
-            // We get the petnames via IPC endpoints
-            // And convert that json data to usable data
-            string jsonData = GetPetNamesForCharacter((Character)dalamudObj);
-            NicknameData? nicknameData = FromString(jsonData);
-            if (nicknameData == null)
-            {
-                return null;
-            }
-
-            // If the object is a BattleNPC and the nickname is valid, apply it!
-            if (actor?.ObjectKind == ObjectKind.BattleNpc && nicknameData.BatteValid())
-            {
-                return nicknameData.BattleNickname;
-            }
-            // If the object is a Companion and the nickname is valid, apply it!
-            else if (actor?.ObjectKind == ObjectKind.Companion && nicknameData.CompanionValid())
-            {
-                return nicknameData.Nickname;
-            }
-
-            return null;
+            return GetPetNamesForCharacter(actor.Address);
         }
-    }
-
-    internal class NicknameData
-    {
-        public int ID = -1;
-        public string? Nickname = string.Empty;
-        public int BattleID = -1;
-        public string? BattleNickname = string.Empty;
-
-        public NicknameData() { }
-
-        [JsonConstructor]
-        public NicknameData(int ID, string? nickname, int BattleID, string? BattleNickname)
-        {
-            this.ID = ID;
-            Nickname = nickname;
-            this.BattleID = BattleID;
-            this.BattleNickname = BattleNickname;
-        }
-
-        public new string ToString() => $"{ID}^{Nickname}^{BattleID}^{BattleNickname}";
-        public string ToNormalString() => ToString().Replace("^", ",");
-
-        public bool CompanionValid() => ID != -1 && Nickname != string.Empty;
-        public bool BatteValid() => BattleID != -1 && BattleNickname != string.Empty;
-
-        public bool Equals(NicknameData other) => ID == other.ID && Nickname == other.Nickname;
-        public bool IDEquals(NicknameData other) => ID == other.ID;
     }
 }
