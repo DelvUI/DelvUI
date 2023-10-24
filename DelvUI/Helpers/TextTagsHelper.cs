@@ -440,7 +440,7 @@ namespace DelvUI.Helpers
             // Detour for PetRenamer
             try
             {
-                string? customPetName = PetRenamerHelper.GetPetName(actor);
+                string? customPetName = PetRenamerHelper.Instance.GetPetName(actor);
                 n = customPetName ?? n;
             }
             catch { }
