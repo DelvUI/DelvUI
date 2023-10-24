@@ -42,6 +42,7 @@ namespace DelvUI.Interface.GeneralElements
         public SortedList<string, FontData> Fonts = new SortedList<string, FontData>();
         public bool SupportChineseCharacters = false;
         public bool SupportKoreanCharacters = false;
+        public bool SupportCyrillicCharacters = false;
         [JsonIgnore] public readonly Dictionary<string, string> GameFontMap = new Dictionary<string, string>()
         {
             {"Axis", "axis-ffxiv"},
@@ -210,7 +211,7 @@ namespace DelvUI.Interface.GeneralElements
                 ImGuiTableFlags.ScrollY |
                 ImGuiTableFlags.SizingFixedSame;
 
-            if (ImGui.BeginChild("Fonts", new Vector2(400, 500), false, ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+            if (ImGui.BeginChild("Fonts", new Vector2(800, 500), false, ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
                 if (_fonts.Length == 0)
                 {
@@ -326,6 +327,13 @@ namespace DelvUI.Interface.GeneralElements
 
                 ImGui.SameLine();
                 if (ImGui.Checkbox("Support Korean", ref SupportKoreanCharacters))
+                {
+                    changed = true;
+                    Plugin.UiBuilder.RebuildFonts();
+                }
+
+                ImGui.SameLine();
+                if (ImGui.Checkbox("Support Cyrillic", ref SupportCyrillicCharacters))
                 {
                     changed = true;
                     Plugin.UiBuilder.RebuildFonts();

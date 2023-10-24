@@ -194,6 +194,11 @@ namespace DelvUI.Helpers
                 builder.AddRanges(io.Fonts.GetGlyphRangesKorean());
             }
 
+            if (config.SupportCyrillicCharacters)
+            {
+                builder.AddRanges(io.Fonts.GetGlyphRangesCyrillic());
+            }
+
             builder.BuildRanges(out ImVector ranges);
 
             return ranges;

@@ -1,3 +1,7 @@
+# 2.1.1.0
+- Updated support for the Pet Nicknames plugin.
+- Added support for cyrillic characters in fonts.
+
 # 2.1.0.2
 - Fixed weird artifacts in some parts of the config window.
 
