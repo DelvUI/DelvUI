@@ -175,7 +175,7 @@ namespace DelvUI.Helpers
 
         private unsafe ImVector? GetCharacterRanges(FontsConfig config, ImGuiIOPtr io)
         {
-            if (!config.SupportChineseCharacters && !config.SupportKoreanCharacters)
+            if (!config.SupportChineseCharacters && !config.SupportKoreanCharacters && !config.SupportCyrillicCharacters)
             {
                 return null;
             }
