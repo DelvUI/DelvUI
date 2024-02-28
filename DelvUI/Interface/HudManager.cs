@@ -393,8 +393,17 @@ namespace DelvUI.Interface
                 Plugin.UiBuilder.RebuildFonts();
             }
 
-            LimitBreakHelper.Instance.Update();
-            PullTimerHelper.Instance.Update();
+            try
+            {
+                LimitBreakHelper.Instance.Update();
+            } catch { }
+
+            try
+            {
+                PullTimerHelper.Instance.Update();
+            }
+            catch { }
+
             TooltipsHelper.Instance.RemoveTooltip(); // remove tooltip from previous frame
 
             if (!ShouldBeVisible())

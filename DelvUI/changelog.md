@@ -1,3 +1,6 @@
+# 2.1.1.2
+- Attempting to fix crashes / exceptions.
+
 # 2.1.1.1
 - Fixed support for cyrillic characters.
 

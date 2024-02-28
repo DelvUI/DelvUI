@@ -100,7 +100,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.1.1.1";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.1.1.2";
 
             FontsManager.Initialize(AssemblyLocation);
             BarTexturesManager.Initialize(AssemblyLocation);
@@ -143,7 +143,10 @@ namespace DelvUI
                     HelpMessage = "Opens the DelvUI configuration window.\n"
                                 + "/delvui toggle → Toggles HUD visibility.\n"
                                 + "/delvui show → Shows HUD.\n"
-                                + "/delvui hide → Hides HUD.",
+                                + "/delvui hide → Hides HUD.\n"
+                                + "/delvui toggledefaulthud → Toggles the game's Job Gauges visibility.\n"
+                                + "/delvui forcejob <JOB> → Forces DelvUI to show the hud for the given Job short name.\n"
+                                + "/delvui profile <PROFILE> → Switch to the given profile",
 
                     ShowInHelp = true
                 }
@@ -154,9 +157,12 @@ namespace DelvUI
                 new CommandInfo(PluginCommand)
                 {
                     HelpMessage = "Opens the DelvUI configuration window.\n"
-                                + "/delvui toggle → Toggles HUD visibility.\n"
-                                + "/delvui show → Shows HUD.\n"
-                                + "/delvui hide → Hides HUD.",
+                                + "/dui toggle → Toggles HUD visibility.\n"
+                                + "/dui show → Shows HUD.\n"
+                                + "/dui hide → Hides HUD."
+                                + "/dui toggledefaulthud → Toggles the game's Job Gauges visibility.\n"
+                                + "/dui forcejob <JOB> → Forces DelvUI to show the hud for the given Job short name.\n"
+                                + "/dui profile <PROFILE> → Switch to the given profile",
 
                     ShowInHelp = true
                 }
@@ -307,14 +313,20 @@ namespace DelvUI
 
             bool fontPushed = FontsManager.Instance.PushDefaultFont();
 
-            if (!hudState)
+            try
             {
-                _hudManager?.Draw(_jobId);
+                if (!hudState)
+                {
+                    _hudManager?.Draw(_jobId);
+                }
             }
-
-            if (fontPushed)
+            finally
             {
-                ImGui.PopFont();
+                if (fontPushed)
+                {
+                    ImGui.PopFont();
+                }
+
             }
 
             InputsHelper.Instance.Update();
