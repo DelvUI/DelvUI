@@ -1,3 +1,6 @@
+# 2.1.1.3
+- Fixed Limit Break bar not working.
+
 # 2.1.1.2
 - Attempting to fix crashes / exceptions.
 

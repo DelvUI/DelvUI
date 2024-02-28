@@ -103,7 +103,7 @@ namespace DelvUI.Helpers
             if (!foundCaGauge)
             {
                 // Get LB Width
-                if (LBWidget == null && LBWidget->UldManager.NodeListCount != 6)
+                if (LBWidget == null || LBWidget->UldManager.NodeListCount != 6)
                 {
                     return;
                 }
