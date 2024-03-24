@@ -1,4 +1,5 @@
-﻿using Dalamud.Game;
+﻿using Colourful;
+using Dalamud.Game;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.Command;
@@ -100,7 +101,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.1.1.3";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.1.2.0";
 
             FontsManager.Initialize(AssemblyLocation);
             BarTexturesManager.Initialize(AssemblyLocation);
@@ -133,8 +134,9 @@ namespace DelvUI
             _hudManager = new HudManager();
 
             UiBuilder.Draw += Draw;
-            UiBuilder.BuildFonts += BuildFont;
             UiBuilder.OpenConfigUi += OpenConfigUi;
+
+            FontsManager.Instance.BuildFonts();
 
             CommandManager.AddHandler(
                 "/delvui",
@@ -175,11 +177,6 @@ namespace DelvUI
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-        }
-
-        private void BuildFont()
-        {
-            FontsManager.Instance.BuildFonts();
         }
 
         private void LoadBanner()
@@ -311,22 +308,19 @@ namespace DelvUI
             PartyManager.Instance?.Update();
             WhosTalkingHelper.Instance?.Update();
 
-            bool fontPushed = FontsManager.Instance.PushDefaultFont();
-
             try
             {
-                if (!hudState)
+                using (FontsManager.Instance.PushDefaultFont())
                 {
-                    _hudManager?.Draw(_jobId);
+                    if (!hudState)
+                    {
+                        _hudManager?.Draw(_jobId);
+                    }
                 }
             }
-            finally
+            catch (Exception e)
             {
-                if (fontPushed)
-                {
-                    ImGui.PopFont();
-                }
-
+                Logger.Error("Something went wrong!:\n" + e.Message);    
             }
 
             InputsHelper.Instance.Update();
@@ -353,7 +347,6 @@ namespace DelvUI
             CommandManager.RemoveHandler("/dui");
 
             UiBuilder.Draw -= Draw;
-            UiBuilder.BuildFonts -= BuildFont;
             UiBuilder.OpenConfigUi -= OpenConfigUi;
             UiBuilder.RebuildFonts();
 

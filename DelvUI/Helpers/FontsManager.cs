@@ -1,31 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using Dalamud.Interface.GameFonts;
-using Dalamud.Logging;
+﻿using Dalamud.Interface.GameFonts;
+using Dalamud.Interface.ManagedFontAtlas;
+using Dalamud.Interface.Utility;
 using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace DelvUI.Helpers
 {
     public class FontScope : IDisposable
     {
-        private bool _fontPushed;
+        private readonly IFontHandle? _handle;
 
-        public FontScope(bool fontPushed)
+        public FontScope(IFontHandle? handle)
         {
-            _fontPushed = fontPushed;
+            _handle = handle;
+            _handle?.Push();
         }
 
         public void Dispose()
         {
-            if (_fontPushed)
-            {
-                ImGui.PopFont();
-            }
+            _handle?.Pop();
+            GC.SuppressFinalize(this);
         }
     }
 
@@ -87,56 +86,65 @@ namespace DelvUI.Helpers
         public readonly string DefaultFontsPath;
 
         public bool DefaultFontBuilt { get; private set; }
-        public ImFontPtr DefaultFont { get; private set; } = null;
+        public IFontHandle? DefaultFont { get; private set; } = null!;
 
-        private List<ImFontPtr> _fonts = new List<ImFontPtr>();
-        public IReadOnlyCollection<ImFontPtr> Fonts => _fonts.AsReadOnly();
+        private List<IFontHandle> _fonts = new List<IFontHandle>();
+        public IReadOnlyCollection<IFontHandle> Fonts => _fonts.AsReadOnly();
 
-        public bool PushDefaultFont()
+        public FontScope PushDefaultFont()
         {
-            if (DefaultFontBuilt)
+            if (DefaultFontBuilt && DefaultFont != null)
             {
-                ImGui.PushFont(DefaultFont);
-                return true;
+                return new FontScope(DefaultFont);
             }
 
-            return false;
+            return new FontScope(null);
         }
 
         public FontScope PushFont(string? fontId)
         {
             if (fontId == null || _config == null || !_config.Fonts.ContainsKey(fontId))
             {
-                return new FontScope(false);
+                return new FontScope(null);
             }
 
             var index = _config.Fonts.IndexOfKey(fontId);
             if (index < 0 || index >= _fonts.Count)
             {
-                return new FontScope(false);
+                return new FontScope(null);
             }
 
-            ImGui.PushFont(_fonts[index]);
-            return new FontScope(true);
+            return new FontScope(_fonts[index]);
+        }
+
+        public void ClearFonts()
+        {
+            foreach (IFontHandle font in _fonts)
+            {
+                font.Dispose();
+            }
+
+            _fonts.Clear();
         }
 
         public unsafe void BuildFonts()
         {
-            _fonts.Clear();
+            ClearFonts();
             DefaultFontBuilt = false;
 
-            var config = ConfigurationManager.Instance.GetConfigObject<FontsConfig>();
+            FontsConfig config = ConfigurationManager.Instance.GetConfigObject<FontsConfig>();
             ImGuiIOPtr io = ImGui.GetIO();
-            var ranges = GetCharacterRanges(config, io);
+            ushort[]? ranges = GetCharacterRanges(config, io);
 
-            foreach (var fontData in config.Fonts)
+            foreach (KeyValuePair<string, FontData> fontData in config.Fonts)
             {
-                var isGameFont = config.GameFontMap.ContainsValue(fontData.Value.Name);
-                var path = DefaultFontsPath + fontData.Value.Name + ".ttf";
+                bool isGameFont = config.GameFontMap.ContainsValue(fontData.Value.Name);
+                string path = DefaultFontsPath + fontData.Value.Name + ".ttf";
+
                 if (!File.Exists(path))
                 {
                     path = config.ValidatedFontsPath + fontData.Value.Name + ".ttf";
-                    
+
                     if (!File.Exists(path) && !isGameFont)
                     {
                         continue;
@@ -145,21 +153,40 @@ namespace DelvUI.Helpers
 
                 try
                 {
-                    ImFontPtr font;
+                    IFontHandle font;
+
                     if (isGameFont)
                     {
-                        GameFontFamily fontFamily = (GameFontFamily)Enum.Parse(typeof(GameFontFamily), config.GameFontMap.FirstOrDefault(x => x.Value == fontData.Value.Name).Key);
-                        GameFontHandle fontHandle = Plugin.PluginInterface.UiBuilder.GetGameFontHandle(new GameFontStyle(fontFamily, fontData.Value.Size));
-                        font = fontHandle.ImFont;
+                        GameFontFamily fontFamily = (GameFontFamily)Enum.Parse(
+                            typeof(GameFontFamily),
+                            config.GameFontMap.FirstOrDefault(x => x.Value == fontData.Value.Name).Key
+                        );
+                        GameFontStyle style = new GameFontStyle(fontFamily, fontData.Value.Size);
+
+                        font = Plugin.UiBuilder.FontAtlas.NewGameFontHandle(style);
                     }
                     else
                     {
-                        font = ranges == null ? io.Fonts.AddFontFromFileTTF(path, fontData.Value.Size)
-                            : io.Fonts.AddFontFromFileTTF(path, fontData.Value.Size, null, ranges.Value.Data);
+                        font = Plugin.UiBuilder.FontAtlas.NewDelegateFontHandle
+                        (
+                            e => e.OnPreBuild
+                            (
+                                tk => tk.AddFontFromFile
+                                (
+                                    path,
+                                    new SafeFontConfig
+                                    {
+                                        SizePx = fontData.Value.Size,
+                                        GlyphRanges = ranges
+                                    }
+                                )
+                            )
+                        );
                     }
-                    
+
                     _fonts.Add(font);
 
+                    // save default font
                     if (fontData.Key == FontsConfig.DefaultBigFontKey)
                     {
                         DefaultFont = font;
@@ -168,12 +195,13 @@ namespace DelvUI.Helpers
                 }
                 catch (Exception ex)
                 {
-                    Plugin.Logger.Error($"Font failed to load: {path}\n{ex}");
-                }                
+                    Plugin.Logger.Error($"Error loading font from path {path}:\n{ex.Message}");
+                }
+
             }
         }
 
-        private unsafe ImVector? GetCharacterRanges(FontsConfig config, ImGuiIOPtr io)
+        private unsafe ushort[]? GetCharacterRanges(FontsConfig config, ImGuiIOPtr io)
         {
             if (!config.SupportChineseCharacters && !config.SupportKoreanCharacters && !config.SupportCyrillicCharacters)
             {
@@ -199,9 +227,7 @@ namespace DelvUI.Helpers
                 builder.AddRanges(io.Fonts.GetGlyphRangesCyrillic());
             }
 
-            builder.BuildRanges(out ImVector ranges);
-
-            return ranges;
+            return builder.BuildRangesToArray();
         }
     }
 }

@@ -44,7 +44,9 @@ namespace DelvUI.Config
                 // last resource, hackily create an instance without calling the constructor
                 if (config == null)
                 {
+#pragma warning disable SYSLIB0050 // Type or member is obsolete
                     config = (T)FormatterServices.GetUninitializedObject(type);
+#pragma warning restore SYSLIB0050 // Type or member is obsolete
                 }
             }
             catch (Exception e)

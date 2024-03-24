@@ -218,7 +218,7 @@ namespace DelvUI.Helpers
                 {
                     if (chara is BattleNpc npc && npc.BattleNpcKind == BattleNpcSubKind.Chocobo)
                     {
-                        float seconds = UIState.Instance()->Buddy.TimeLeft;
+                        float seconds = UIState.Instance()->Buddy.CompanionInfo.TimeLeft;
                         if (seconds <= 0)
                         {
                             return "";

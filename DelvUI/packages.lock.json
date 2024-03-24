@@ -1,7 +1,7 @@
 {
   "version": 1,
   "dependencies": {
-    "net7.0": {
+    "net8.0": {
       "Colourful": {
         "type": "Direct",
         "requested": "[3.1.0, )",

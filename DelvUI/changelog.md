@@ -1,3 +1,8 @@
+# 2.1.2.0
+- Added support for the "new" Dalamund Fonts API.
+- Added support for multi-line text in all labels.
+- Potential fixes for some crashes.
+
 # 2.1.1.3
 - Fixed Limit Break bar not working.
 

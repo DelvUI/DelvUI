@@ -1,4 +1,5 @@
 ﻿using Dalamud.Interface;
+using Dalamud.Interface.Utility;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
@@ -340,15 +341,27 @@ namespace DelvUI.Config.Attributes
             string? finalValue = null;
 
             string popupId = ID != null ? "DelvUI_TextTagsList " + ID : "DelvUI_TextTagsList ##" + friendlyName;
-
-            if (ImGui.InputText(friendlyName + IDText(ID), ref stringVal, maxLength))
+           
+            if (!formattable)
             {
-                finalValue = stringVal;
+                if (ImGui.InputText(friendlyName + IDText(ID), ref stringVal, maxLength))
+                {
+                    finalValue = stringVal;
+                }
             }
-
-            // text tags
-            if (formattable)
+            else
             {
+                float scale = ImGuiHelpers.GlobalScale;
+                float width = ImGui.CalcItemWidth();
+                float height = Math.Max(24 * scale, ImGui.CalcTextSize(stringVal, false, width).Y + 6 * scale);
+                Vector2 size = new Vector2(width, height);
+
+                if (ImGui.InputTextMultiline(friendlyName + IDText(ID), ref stringVal, maxLength, size, ImGuiInputTextFlags.AllowTabInput))
+                {
+                    finalValue = stringVal;
+                }
+
+                // text tags
                 ImGui.SameLine();
                 ImGui.PushFont(UiBuilder.IconFont);
                 if (ImGui.Button(FontAwesomeIcon.Pen.ToIconString() + "##" + ID))

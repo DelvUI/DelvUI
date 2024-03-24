@@ -139,7 +139,7 @@ namespace DelvUI.Interface.StatusEffects
 
             if (_fakeEffects == null)
             {
-                if (actor == null || actor is not BattleChara)
+                if (actor == null || actor is not BattleChara battleChara || battleChara.IsDead || battleChara.CurrentHp <= 0)
                 {
                     return list;
                 }
