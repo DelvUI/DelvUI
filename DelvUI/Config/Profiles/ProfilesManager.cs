@@ -391,7 +391,7 @@ namespace DelvUI.Config.Profiles
             try
             {
                 Save();
-                Plugin.UiBuilder.RebuildFonts();
+                FontsManager.Instance.BuildFonts();
             }
             catch (Exception e)
             {

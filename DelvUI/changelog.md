@@ -1,3 +1,6 @@
+# 2.1.2.1
+- Fixed fonts not reloading properly when switching profiles.
+
 # 2.1.2.0
 - Added support for the "new" Dalamund Fonts API.
 - Added support for multi-line text in all labels.
