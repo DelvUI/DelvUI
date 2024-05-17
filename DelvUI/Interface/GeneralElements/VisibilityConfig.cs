@@ -68,6 +68,10 @@ namespace DelvUI.Interface
         [Order(26)]
         public bool ShowInPvP = false;
 
+        [Checkbox("Always show while target exists")]
+        [Order(27)]
+        public bool ShowWhileTargetExists = false;
+
 
         private bool IsInCombat() => Plugin.Condition[ConditionFlag.InCombat];
 
@@ -94,7 +98,9 @@ namespace DelvUI.Interface
 
             bool isInIslandSanctuary = IsInIslandSanctuary();
             bool isInDuty = IsInDuty() && !isInIslandSanctuary;
+            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
 
+            // show
             if (ShowInDuty && isInDuty) { return true; }
 
             if (ShowOnWeaponDrawn && HasWeaponDrawn()) { return true; }
@@ -109,14 +115,16 @@ namespace DelvUI.Interface
 
             if (ShowInPvP && Plugin.ClientState.IsPvP) { return true; }
 
+            if (ShowWhileTargetExists && player != null && player.TargetObject != null) { return true; }
 
+
+            // hide
             if (HideOutsideOfCombat && !IsInCombat()) { return false; }
 
             if (HideInCombat && IsInCombat()) { return false; }
 
             if (HideInGoldSaucer && IsInGoldSaucer()) { return false; }
 
-            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (HideOnFullHP && player != null && player.CurrentHp == player.MaxHp) { return false; }
 
             if (HideInDuty && isInDuty) { return false; }
@@ -133,10 +141,12 @@ namespace DelvUI.Interface
             Enabled = config.Enabled;
 
             HideOutsideOfCombat = config.HideOutsideOfCombat;
+            HideInCombat = config.HideInCombat;
             HideInGoldSaucer = config.HideInGoldSaucer;
             HideOnFullHP = config.HideOnFullHP;
             HideInDuty = config.HideInDuty;
             HideInIslandSanctuary = config.HideInIslandSanctuary;
+            HideInPvP = config.HideInPvP;
 
             ShowInDuty = config.ShowInDuty;
             ShowOnWeaponDrawn = config.ShowOnWeaponDrawn;
@@ -144,6 +154,8 @@ namespace DelvUI.Interface
             ShowWhileGathering = config.ShowWhileGathering;
             ShowInParty = config.ShowInParty;
             ShowInIslandSanctuary = config.ShowInIslandSanctuary;
+            ShowInPvP = config.ShowInPvP;
+            ShowWhileTargetExists = config.ShowWhileTargetExists;
         }
 
         public VisibilityConfig()
