@@ -1,5 +1,4 @@
-﻿using Colourful;
-using Dalamud.Game;
+﻿using Dalamud.Game;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.Command;
@@ -15,7 +14,6 @@ using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Nameplates;
 using DelvUI.Interface.Party;
 using DelvUI.Interface.PartyCooldowns;
-using ImGuiNET;
 using System;
 using System.IO;
 using System.Reflection;
@@ -41,6 +39,7 @@ namespace DelvUI
         public static IPartyList PartyList { get; private set; } = null!;
         public static IPluginLog Logger { get; private set; } = null!;
         public static ITextureProvider TextureProvider { get; private set; } = null!;
+        public static IAddonLifecycle AddonLifecycle { get; private set; } = null!;
 
         public static IDalamudTextureWrap? BannerTexture;
 
@@ -71,7 +70,8 @@ namespace DelvUI
             IGameInteropProvider gameInteropProvider,
             ITargetManager targetManager,
             IPluginLog logger,
-            ITextureProvider textureProvider
+            ITextureProvider textureProvider,
+            IAddonLifecycle addonLifecycle
         )
         {
             BuddyList = buddyList;
@@ -91,6 +91,7 @@ namespace DelvUI
             UiBuilder = PluginInterface.UiBuilder;
             Logger = logger;
             TextureProvider = textureProvider;
+            AddonLifecycle = addonLifecycle;
 
             if (pluginInterface.AssemblyLocation.DirectoryName != null)
             {
@@ -101,7 +102,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.1.2.1";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.1.3.0";
 
             FontsManager.Initialize(AssemblyLocation);
             BarTexturesManager.Initialize(AssemblyLocation);
@@ -320,7 +321,7 @@ namespace DelvUI
             }
             catch (Exception e)
             {
-                Logger.Error("Something went wrong!:\n" + e.Message);    
+                Logger.Error("Something went wrong!:\n" + e.Message);
             }
 
             InputsHelper.Instance.Update();

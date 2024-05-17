@@ -59,11 +59,6 @@ namespace DelvUI.Interface.GeneralElements
         [Order(60)]
         public bool UseRegionalNumberFormats = true;
 
-        // saves original positions for all 4 layouts
-        public Vector2[] CastBarOriginalPositions = new Vector2[] { Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero };
-        public Vector2[] PulltimerOriginalPositions = new Vector2[] { Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero };
-        public Dictionary<string, Vector2>[] JobGaugeOriginalPositions = new Dictionary<string, Vector2>[] { new(), new(), new(), new() };
-
         public new static HUDOptionsConfig DefaultConfig() => new();
     }
 

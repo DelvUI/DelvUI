@@ -7,6 +7,7 @@ using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using System;
@@ -106,7 +107,7 @@ namespace DelvUI.Interface.GeneralElements
                 }
                 else if (InputsHelper.Instance.RightButtonClicked)
                 {
-                    var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
+                    var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalId(AgentId.Hud));
                     _openContextMenuFromTarget(agentHud, Actor.Address);
                 }
             }

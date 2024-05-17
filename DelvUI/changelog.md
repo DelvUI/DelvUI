@@ -1,3 +1,7 @@
+# 2.1.3.0
+- Fixed the default castbar, job gauges and pull timer sometimes being off screen when DelvUI is unloaded.
+- Fixed the chat getting spammed with hotbar commands during dialogues.
+
 # 2.1.2.1
 - Fixed fonts not reloading properly when switching profiles.
 
