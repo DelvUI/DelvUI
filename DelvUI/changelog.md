@@ -1,3 +1,6 @@
+# 2.1.3.1
+- Fixed "Hide Default Castbar" and "Hide Default Job Gauges" not working properly.
+
 # 2.1.3.0
 - Added "Always show while target exists" visibilty setting.
 - Fixed the default castbar, job gauges and pull timer sometimes being off screen when DelvUI is unloaded.

@@ -19,6 +19,8 @@ namespace DelvUI.Interface
         private readonly string[] _hotbarAddonNames = { "_ActionBar", "_ActionBar01", "_ActionBar02", "_ActionBar03", "_ActionBar04", "_ActionBar05", "_ActionBar06", "_ActionBar07", "_ActionBar08", "_ActionBar09" };
         private bool? _previousHotbarCrossVisible = null;
 
+        private bool _firstUpdate = true;
+
         private Vector2 _castBarPos = Vector2.Zero;
         private bool _hidingCastBar = false;
         private Dictionary<string, Vector2> _jobGaugePos = new();
@@ -65,30 +67,35 @@ namespace DelvUI.Interface
         {
             UpdateCombatActionBars();
 
-            // detect job change
-            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
-            if (player != null)
+            if (_firstUpdate)
             {
-                uint job = player.ClassJob.Id;
-                double now = ImGui.GetTime();
-
-                if (job != _previousJob)
+                _firstUpdate = false;
+                UpdateDefaultCastBar();
+                UpdateDefaultPulltimer();
+                UpdateJobGauges();
+            }
+            else
+            {
+                // detect job change
+                PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+                if (player != null)
                 {
-                    _hidingCastBar = false;
-                    UpdateDefaultCastBar();
+                    uint job = player.ClassJob.Id;
+                    double now = ImGui.GetTime();
 
-                    _hidingPullTimer = false;
-                    UpdateDefaultPulltimer();
-
-                    _previousJob = job;
-                    _jobChangeUpdated = false;
-                    _jobChangeTime = now;
-                }
-                else if (!_jobChangeUpdated && now - _jobChangeTime > 0.01f)
-                {
-                    _jobChangeUpdated = true;
-                    _hidingJobGauge = false;
-                    UpdateJobGauges();
+                    if (job != _previousJob)
+                    {
+                        _previousJob = job;
+                        _jobChangeUpdated = false;
+                        _jobChangeTime = now;
+                        ResetJobGauges();
+                    }
+                    else if (!_jobChangeUpdated && now - _jobChangeTime > 0.1f)
+                    { 
+                        _hidingJobGauge = false;
+                        ResetJobGauges();
+                        UpdateJobGauges();
+                    }
                 }
             }
         }
@@ -180,17 +187,24 @@ namespace DelvUI.Interface
         {
             if (Config.HideDefaultCastbar && !_hidingCastBar)
             {
-                AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_CastBar", 1);
-                if (addon != null)
+                Plugin.AddonLifecycle.RegisterListener(AddonEvent.PreDraw, "_CastBar", (addonEvent, args) =>
                 {
-                    _castBarPos = new Vector2(addon->RootNode->GetX(), addon->RootNode->GetY());
-                    addon->RootNode->SetPositionFloat(-9999, -9999);
-                }
+                    AtkUnitBase* addon = (AtkUnitBase*)args.Addon;
+
+                    if (!_hidingCastBar)
+                    {
+                        _castBarPos = new Vector2(addon->RootNode->GetX(), addon->RootNode->GetY());
+                    }
+
+                    addon->RootNode->SetPositionFloat(-9999.0f, -9999.0f);
+                });
 
                 _hidingCastBar = true;
             }
             else if ((forceVisible || !Config.HideDefaultCastbar) && _hidingCastBar)
             {
+                Plugin.AddonLifecycle.UnregisterListener(AddonEvent.PreDraw, "_CastBar");
+
                 AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_CastBar", 1);
                 if (addon != null)
                 {
@@ -269,6 +283,12 @@ namespace DelvUI.Interface
                     {
                         _jobGaugePos[addonName] = new Vector2(addon->RootNode->GetX(), addon->RootNode->GetY());
                         addon->RootNode->SetPositionFloat(-9999, -9999);
+
+                        Plugin.AddonLifecycle.RegisterListener(AddonEvent.PreDraw, addonName, (addonEvent, args) =>
+                        {
+                            AtkUnitBase* addon = (AtkUnitBase*)args.Addon;
+                            addon->RootNode->SetPositionFloat(-9999.0f, -9999.0f);
+                        });
                     }
 
                     i++;
@@ -278,27 +298,22 @@ namespace DelvUI.Interface
             }
             else if ((forceVisible || !Config.HideDefaultJobGauges) && _hidingJobGauge)
             {
-                int i = 0;
-                bool stop = false;
-
-                do
-                {
-                    string addonName = $"JobHud{jobName}{i}";
-
-                    AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName(addonName, 1);
-                    if (addon == null)
-                    {
-                        stop = true;
-                    }
-                    else if (_jobGaugePos.TryGetValue(addonName, out Vector2 pos))
-                    {
-                        addon->RootNode->SetPositionFloat(pos.X, pos.Y);
-                    }
-
-                    i++;
-                } while (!stop);
-
+                ResetJobGauges();
                 _hidingJobGauge = false;
+            }
+        }
+
+        private unsafe void ResetJobGauges()
+        {
+            foreach (KeyValuePair<string, Vector2> entry in _jobGaugePos)
+            {
+                Plugin.AddonLifecycle.UnregisterListener(AddonEvent.PreDraw, entry.Key);
+
+                AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName(entry.Key, 1);
+                if (addon != null)
+                {
+                    addon->RootNode->SetPositionFloat(entry.Value.X, entry.Value.Y);
+                }
             }
         }
     }
