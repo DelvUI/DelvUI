@@ -84,9 +84,15 @@ namespace DelvUI.Interface.Nameplates
                     if (!data.IsTitleOriginal)
                     {
                         Vector4 color = new Vector4(data.HonorificTitleColor.X, data.HonorificTitleColor.Y, data.HonorificTitleColor.Z, 1.0f);
+                        Vector4 glow = new Vector4(data.HonorificTitleGlow.X, data.HonorificTitleGlow.Y, data.HonorificTitleGlow.Z, 1.0f);
                         titleColor = new PluginConfigColor(color);
+
+                        _titleLabelHud.DrawTitle(titleText, titlePos, titleSize, titleColor, new PluginConfigColor(glow), titleAlpha);
                     }
-                    _titleLabelHud.DrawLabel(titleText, titlePos, titleSize, titleColor, titleAlpha);
+                    else
+                    {
+                        _titleLabelHud.DrawLabel(titleText, titlePos, titleSize, titleColor, titleAlpha);
+                    }
                 }
                 ));
             }
@@ -338,7 +344,6 @@ namespace DelvUI.Interface.Nameplates
                         titleColor = new PluginConfigColor(color);
 
                         _titleLabelHud.DrawTitle(titleText, titlePos, titleSize, titleColor, new PluginConfigColor(glow), titleAlpha);
-                        //_titleLabelHud.DrawLabel(titleText, titlePos, titleSize, titleColor, titleAlpha);
                     }
                     else
                     {
