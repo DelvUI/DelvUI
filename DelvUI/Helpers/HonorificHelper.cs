@@ -5,6 +5,7 @@ using Dalamud.Plugin.Ipc;
 using Newtonsoft.Json;
 using Lumina.Data.Parsing.Uld;
 using System;
+using System.Numerics;
 
 namespace DelvUI.Helpers
 {
@@ -13,6 +14,9 @@ namespace DelvUI.Helpers
     {
         public string Title = "";
         public bool IsPrefix = false;
+        public bool IsOriginal = false;
+        public Vector3? Color = new Vector3(0f, 0f, 0f);
+        public Vector3? Glow = new Vector3(0f, 0f, 0f);
     }
 
     internal class HonorificHelper
