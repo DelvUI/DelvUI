@@ -671,6 +671,11 @@ namespace DelvUI.Interface
                 [JobIDs.MIN] = typeof(MinerConfig),
                 [JobIDs.BOT] = typeof(BotanistConfig),
                 [JobIDs.FSH] = typeof(FisherConfig),
+                
+                // not implemented yet,
+                [JobIDs.VPR] = typeof(ViperConfig),
+                [JobIDs.PCT] = typeof(PictomancerConfig),
+                
             };
 
             _jobTypes = new List<Type>()

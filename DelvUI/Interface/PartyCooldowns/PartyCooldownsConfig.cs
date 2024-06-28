@@ -527,6 +527,7 @@ namespace DelvUI.Interface.PartyCooldowns
                 DrawJobFilter(JobsHelper.JobNames[JobIDs.NIN], JobIDs.NIN, ref _meleeFilter);
                 DrawJobFilter(JobsHelper.JobNames[JobIDs.SAM], JobIDs.SAM, ref _meleeFilter);
                 DrawJobFilter(JobsHelper.JobNames[JobIDs.RPR], JobIDs.RPR, ref _meleeFilter);
+                DrawJobFilter(JobsHelper.JobNames[JobIDs.VPR], JobIDs.VPR, ref _meleeFilter);
             }
             else if (_roleFilter == JobRoles.DPSRanged)
             {
@@ -541,6 +542,7 @@ namespace DelvUI.Interface.PartyCooldowns
                 DrawJobFilter(JobsHelper.JobNames[JobIDs.BLM], JobIDs.BLM, ref _casterFilter);
                 DrawJobFilter(JobsHelper.JobNames[JobIDs.SMN], JobIDs.SMN, ref _casterFilter);
                 DrawJobFilter(JobsHelper.JobNames[JobIDs.RDM], JobIDs.RDM, ref _casterFilter);
+                DrawJobFilter(JobsHelper.JobNames[JobIDs.PCT], JobIDs.PCT, ref _casterFilter);
             }
         }
 

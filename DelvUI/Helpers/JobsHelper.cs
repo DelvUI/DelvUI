@@ -311,6 +311,7 @@ namespace DelvUI.Helpers
             [JobIDs.NIN] = JobRoles.DPSMelee,
             [JobIDs.SAM] = JobRoles.DPSMelee,
             [JobIDs.RPR] = JobRoles.DPSMelee,
+            [JobIDs.VPR] = JobRoles.DPSMelee,
 
             // ranged phys dps
             [JobIDs.ARC] = JobRoles.DPSRanged,
@@ -324,6 +325,7 @@ namespace DelvUI.Helpers
             [JobIDs.BLM] = JobRoles.DPSCaster,
             [JobIDs.SMN] = JobRoles.DPSCaster,
             [JobIDs.RDM] = JobRoles.DPSCaster,
+            [JobIDs.PCT] = JobRoles.DPSCaster,
             [JobIDs.BLU] = JobRoles.DPSCaster,
 
             // crafters
@@ -373,7 +375,8 @@ namespace DelvUI.Helpers
                 JobIDs.DRG,
                 JobIDs.NIN,
                 JobIDs.SAM,
-                JobIDs.RPR
+                JobIDs.RPR,
+                JobIDs.VPR
             },
 
             // ranged phys dps
@@ -393,6 +396,7 @@ namespace DelvUI.Helpers
                 JobIDs.BLM,
                 JobIDs.SMN,
                 JobIDs.RDM,
+                JobIDs.PCT,
                 JobIDs.BLU,
             },
 
@@ -440,6 +444,7 @@ namespace DelvUI.Helpers
             [JobIDs.NIN] = "NIN",
             [JobIDs.SAM] = "SAM",
             [JobIDs.RPR] = "RPR",
+            [JobIDs.VPR] = "VPR",
 
             // ranged phys dps
             [JobIDs.ARC] = "ARC",
@@ -453,6 +458,7 @@ namespace DelvUI.Helpers
             [JobIDs.BLM] = "BLM",
             [JobIDs.SMN] = "SMN",
             [JobIDs.RDM] = "RDM",
+            [JobIDs.PCT] = "PCT",
             [JobIDs.BLU] = "BLU",
 
             // healers
@@ -497,6 +503,7 @@ namespace DelvUI.Helpers
             [JobIDs.NIN] = "Ninja",
             [JobIDs.SAM] = "Samurai",
             [JobIDs.RPR] = "Reaper",
+            [JobIDs.VPR] = "Viper",
 
             // ranged phys dps
             [JobIDs.ARC] = "Archer",
@@ -510,6 +517,7 @@ namespace DelvUI.Helpers
             [JobIDs.BLM] = "Black Mage",
             [JobIDs.SMN] = "Summoner",
             [JobIDs.RDM] = "Red Mage",
+            [JobIDs.PCT] = "Pictomancer",
             [JobIDs.BLU] = "Blue Mage",
 
             // healers
@@ -558,6 +566,7 @@ namespace DelvUI.Helpers
             [JobIDs.NIN] = 62584,
             [JobIDs.SAM] = 62584,
             [JobIDs.RPR] = 62584,
+            [JobIDs.VPR] = 62584,
 
             // ranged phys dps
             [JobIDs.ARC] = 62586,
@@ -571,6 +580,7 @@ namespace DelvUI.Helpers
             [JobIDs.BLM] = 62587,
             [JobIDs.SMN] = 62587,
             [JobIDs.RDM] = 62587,
+            [JobIDs.PCT] = 62587,
             [JobIDs.BLU] = 62587
         };
 
@@ -593,6 +603,7 @@ namespace DelvUI.Helpers
             [JobIDs.NIN] = 92622,
             [JobIDs.SAM] = 92627,
             [JobIDs.RPR] = 92632,
+            [JobIDs.VPR] = 92685,
 
             // ranged phys dps
             [JobIDs.ARC] = 92526,
@@ -606,6 +617,7 @@ namespace DelvUI.Helpers
             [JobIDs.BLM] = 92585,
             [JobIDs.SMN] = 92586,
             [JobIDs.RDM] = 92628,
+            [JobIDs.PCT] = 92686,
             [JobIDs.BLU] = 92629,
 
             // healers
@@ -667,6 +679,7 @@ namespace DelvUI.Helpers
         public const uint NIN = 30;
         public const uint SAM = 34;
         public const uint RPR = 39;
+        public const uint VPR = 41;
 
         public const uint ARC = 5;
         public const uint BRD = 23;
@@ -678,6 +691,7 @@ namespace DelvUI.Helpers
         public const uint BLM = 25;
         public const uint SMN = 27;
         public const uint RDM = 35;
+        public const uint PCT = 42;
         public const uint BLU = 36;
 
         public const uint CRP = 8;
