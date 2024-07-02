@@ -68,7 +68,8 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             Vector2 size = GetSize();
-            bool validIcon = Config.Preview ? true : LastUsedCast?.IconTexture is not null;
+            IDalamudTextureWrap? iconTexture = LastUsedCast?.GetIconTexture();
+            bool validIcon = Config.Preview ? true : iconTexture is not null;
             Vector2 iconSize = Config.ShowIcon && validIcon && !Config.SeparateIcon ? new Vector2(size.Y, size.Y) : Vector2.Zero;
 
             PluginConfigColor fillColor = GetColor();
@@ -89,7 +90,7 @@ namespace DelvUI.Interface.GeneralElements
                 bar.AddForegrounds(new Rect(reverseFillPos, reverseFillSize, reverseFillColor));
             }
 
-            AddExtras(bar, totalCastTime);
+            AddExtras(bar, totalCastTime, iconTexture);
 
             bar.AddForegrounds(progress);
 
@@ -109,7 +110,7 @@ namespace DelvUI.Interface.GeneralElements
                     {
                         ImGui.SetCursorPos(finalIconPos);
 
-                        IDalamudTextureWrap? texture = Config.Preview ? TexturesHelper.GetTexture<LuminaAction>(3577) : LastUsedCast?.IconTexture;
+                        IDalamudTextureWrap? texture = Config.Preview ? TexturesHelper.GetTexture<LuminaAction>(3577) : iconTexture;
                         if (texture != null)
                         {
                             ImGui.Image(texture.ImGuiHandle, finalIconSize);
@@ -210,7 +211,7 @@ namespace DelvUI.Interface.GeneralElements
             }
         }
 
-        public virtual void AddExtras(BarHud bar, float totalCastTime)
+        public virtual void AddExtras(BarHud bar, float totalCastTime, IDalamudTextureWrap? iconTexture)
         {
             // override
         }
@@ -230,7 +231,7 @@ namespace DelvUI.Interface.GeneralElements
 
         }
 
-        public override void AddExtras(BarHud bar, float totalCastTime)
+        public override void AddExtras(BarHud bar, float totalCastTime, IDalamudTextureWrap? iconTexture)
         {
             if (!Config.ShowSlideCast || Config.SlideCastTime <= 0 || Config.Preview)
             {
@@ -247,7 +248,7 @@ namespace DelvUI.Interface.GeneralElements
 
                 if (Config.FillDirection is BarDirection.Left)
                 {
-                    bool validIcon = LastUsedCast?.IconTexture is not null;
+                    bool validIcon = iconTexture is not null;
                     Vector2 iconSize = Config.ShowIcon && validIcon ? new Vector2(Config.Size.Y, Config.Size.Y) : Vector2.Zero;
                     slideCast = Config.ShowIcon ? new Rect(Config.Position, size + new Vector2(iconSize.X, 0), Config.SlideCastColor) : new Rect(Config.Position, size, Config.SlideCastColor);
                 }
