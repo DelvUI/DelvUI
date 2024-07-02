@@ -3,6 +3,7 @@ using Dalamud.Interface;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -31,7 +32,10 @@ namespace DelvUI.Interface.GeneralElements
 
         public override void DrawChildren(Vector2 origin)
         {
-            if (!Config.Enabled || Actor is null || Config.HideWhenInactive && (Plugin.ClientState.LocalPlayer?.Level ?? 0) >= 90 || (Config.HideWhenInactive && Config.HideWhenDownsynced && _helper.IsMaxLevel()))
+            if (!Config.Enabled || 
+                Actor is null || 
+                Config.HideWhenInactive && (Plugin.ClientState.LocalPlayer?.Level ?? 0) >= 100 || 
+                (Config.HideWhenInactive && Config.HideWhenDownsynced && _helper.IsMaxLevel()))
             {
                 return;
             }
