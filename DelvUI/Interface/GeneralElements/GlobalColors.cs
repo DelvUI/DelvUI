@@ -59,6 +59,7 @@ namespace DelvUI.Interface.GeneralElements
                 [JobIDs.NIN] = meleeColorConfig.NINColor,
                 [JobIDs.SAM] = meleeColorConfig.SAMColor,
                 [JobIDs.RPR] = meleeColorConfig.RPRColor,
+                [JobIDs.VPR] = meleeColorConfig.VPRColor,
 
                 // ranged 
                 [JobIDs.ARC] = rangedColorConfig.ARCColor,
@@ -72,6 +73,7 @@ namespace DelvUI.Interface.GeneralElements
                 [JobIDs.BLM] = castersColorConfig.BLMColor,
                 [JobIDs.SMN] = castersColorConfig.SMNColor,
                 [JobIDs.RDM] = castersColorConfig.RDMColor,
+                [JobIDs.PCT] = castersColorConfig.PCTColor,
                 [JobIDs.BLU] = castersColorConfig.BLUColor,
 
                 // crafters
@@ -238,6 +240,10 @@ namespace DelvUI.Interface.GeneralElements
         [ColorEdit4("Reaper")]
         [Order(25)]
         public PluginConfigColor RPRColor = new PluginConfigColor(new(150f / 255f, 90f / 255f, 144f / 255f, 100f / 100f));
+        
+        [ColorEdit4("Viper")]   // TODO: Update when colors are finalized, prob needs to be a green?
+        [Order(25)]
+        public PluginConfigColor VPRColor = new PluginConfigColor(new(150f / 255f, 90f / 255f, 144f / 255f, 100f / 100f));
 
         [ColorEdit4("Pugilist", spacing = true)]
         [Order(30)]
@@ -295,6 +301,10 @@ namespace DelvUI.Interface.GeneralElements
         [Order(15)]
         public PluginConfigColor RDMColor = new PluginConfigColor(new(232f / 255f, 123f / 255f, 123f / 255f, 100f / 100f));
 
+        [ColorEdit4("Pictomancer")]    // TODO: Update when colors are finalized, no idea what color
+        [Order(15)]
+        public PluginConfigColor PCTColor = new PluginConfigColor(new(232f / 255f, 123f / 255f, 123f / 255f, 100f / 100f));
+        
         [ColorEdit4("Blue Mage", spacing = true)]
         [Order(20)]
         public PluginConfigColor BLUColor = new PluginConfigColor(new(0f / 255f, 185f / 255f, 247f / 255f, 100f / 100f));

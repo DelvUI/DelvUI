@@ -325,6 +325,7 @@ namespace DelvUI.Helpers
             [JobIDs.BLM] = JobRoles.DPSCaster,
             [JobIDs.SMN] = JobRoles.DPSCaster,
             [JobIDs.RDM] = JobRoles.DPSCaster,
+            [JobIDs.PCT] = JobRoles.DPSCaster,
             [JobIDs.BLU] = JobRoles.DPSCaster,
             [JobIDs.PCT] = JobRoles.DPSCaster,
 
@@ -396,6 +397,7 @@ namespace DelvUI.Helpers
                 JobIDs.BLM,
                 JobIDs.SMN,
                 JobIDs.RDM,
+                JobIDs.PCT,
                 JobIDs.BLU,
                 JobIDs.PCT
             },
@@ -458,6 +460,7 @@ namespace DelvUI.Helpers
             [JobIDs.BLM] = "BLM",
             [JobIDs.SMN] = "SMN",
             [JobIDs.RDM] = "RDM",
+            [JobIDs.PCT] = "PCT",
             [JobIDs.BLU] = "BLU",
             [JobIDs.PCT] = "PCT",
 
@@ -517,6 +520,7 @@ namespace DelvUI.Helpers
             [JobIDs.BLM] = "Black Mage",
             [JobIDs.SMN] = "Summoner",
             [JobIDs.RDM] = "Red Mage",
+            [JobIDs.PCT] = "Pictomancer",
             [JobIDs.BLU] = "Blue Mage",
             [JobIDs.PCT] = "Pictomancer",
 
@@ -617,6 +621,7 @@ namespace DelvUI.Helpers
             [JobIDs.BLM] = 92585,
             [JobIDs.SMN] = 92586,
             [JobIDs.RDM] = 92628,
+            [JobIDs.PCT] = 92686,
             [JobIDs.BLU] = 92629,
             [JobIDs.PCT] = 92686,
 
@@ -691,6 +696,7 @@ namespace DelvUI.Helpers
         public const uint BLM = 25;
         public const uint SMN = 27;
         public const uint RDM = 35;
+        public const uint PCT = 42;
         public const uint BLU = 36;
         public const uint PCT = 42;
 
