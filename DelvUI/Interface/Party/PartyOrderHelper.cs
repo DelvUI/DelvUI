@@ -48,7 +48,7 @@ namespace DelvUI.Interface.Party
         // in the party frames
         public static int? GetRoleFirstOrder(List<IPartyFramesMember> members)
         {
-            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (player == null) { return null; }
 
             JobRoles role = JobsHelper.RoleForJob(player.ClassJob.Id);
@@ -85,11 +85,11 @@ namespace DelvUI.Interface.Party
             }
 
             Framework* framework = Framework.Instance();
-            if (framework == null || framework->SystemConfig.CommonSystemConfig.UiConfig.ConfigCount <= (int)option) {
+            if (framework == null || framework->SystemConfig.SystemConfigBase.UiConfig.ConfigCount <= (int)option) {
                 return PartySortingSetting.Tank_Healer_DPS; 
             }
 
-            uint value = framework->SystemConfig.CommonSystemConfig.UiConfig.ConfigEntry[(int)option].Value.UInt;
+            uint value = framework->SystemConfig.SystemConfigBase.UiConfig.ConfigEntry[(int)option].Value.UInt;
             if (value < 0 || value > (int)PartySortingSetting.Count) { return null; }
 
             return (PartySortingSetting)value;
@@ -99,12 +99,12 @@ namespace DelvUI.Interface.Party
         {
             PartyRoles rolesCount = new PartyRoles();
 
-            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (player == null) { return rolesCount; }
 
             foreach (IPartyFramesMember member in members)
             {
-                if (member.ObjectId == player.ObjectId) { continue; }
+                if (member.ObjectId == player.GameObjectId) { continue; }
 
                 JobRoles role = JobsHelper.RoleForJob(member.JobId);
                 switch (role)

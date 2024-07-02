@@ -69,7 +69,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             var position = origin + Config.Position;
             if (Config.StancesBar.Enabled)
@@ -108,7 +108,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawFormsBar(Vector2 origin, PlayerCharacter player)
+        private void DrawFormsBar(Vector2 origin, IPlayerCharacter player)
         {
             // formless fist
             Status? formlessFist = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId == 2513);
@@ -173,7 +173,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawPerfectBalanceBar(Vector2 origin, PlayerCharacter player)
+        private void DrawPerfectBalanceBar(Vector2 origin, IPlayerCharacter player)
         {
             Status? perfectBalance = Utils.StatusListForBattleChara(player).Where(o => o.StatusId is 110 && o.RemainingTime > 0f).FirstOrDefault();
             if (!Config.PerfectBalanceBar.HideWhenInactive || perfectBalance is not null)
@@ -200,7 +200,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawChakraGauge(Vector2 origin, PlayerCharacter player)
+        private void DrawChakraGauge(Vector2 origin, IPlayerCharacter player)
         {
             var gauge = Plugin.JobGauges.Get<MNKGauge>();
             if (!Config.ChakraBar.HideWhenInactive || gauge.Chakra > 0)
@@ -213,7 +213,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawBeastChakraGauge(Vector2 origin, PlayerCharacter player)
+        private void DrawBeastChakraGauge(Vector2 origin, IPlayerCharacter player)
         {
             var gauge = Plugin.JobGauges.Get<MNKGauge>();
             if (!Config.MastersGauge.HideWhenInactive ||
@@ -265,7 +265,7 @@ namespace DelvUI.Interface.Jobs
             _ => new PluginConfigColor(new(0, 0, 0, 0))
         };
 
-        private void DrawTwinSnakesBar(Vector2 origin, PlayerCharacter player)
+        private void DrawTwinSnakesBar(Vector2 origin, IPlayerCharacter player)
         {
             BarHud? bar = BarUtilities.GetProcBar(Config.TwinSnakesBar, player, 3001, 15f);
             if (bar != null)
@@ -274,7 +274,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawLeadenFistBar(Vector2 origin, PlayerCharacter player)
+        private void DrawLeadenFistBar(Vector2 origin, IPlayerCharacter player)
         {
             BarHud? bar = BarUtilities.GetProcBar(Config.LeadenFistBar, player, 1861, 30f);
             if (bar != null)
@@ -283,9 +283,9 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawDemolishBar(Vector2 origin, PlayerCharacter player)
+        private void DrawDemolishBar(Vector2 origin, IPlayerCharacter player)
         {
-            GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            IGameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
             BarHud? bar = BarUtilities.GetDoTBar(Config.DemolishBar, player, target, 246, 18f);
             if (bar != null)

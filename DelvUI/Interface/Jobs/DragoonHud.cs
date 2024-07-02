@@ -62,7 +62,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             var position = origin + Config.Position;
             if (Config.ChaosThrustBar.Enabled)
@@ -91,9 +91,9 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawChaosThrustBar(Vector2 origin, PlayerCharacter player)
+        private void DrawChaosThrustBar(Vector2 origin, IPlayerCharacter player)
         {
-            GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            IGameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
             BarHud? bar = BarUtilities.GetDoTBar(Config.ChaosThrustBar, player, target, ChaosThrustIDs, ChaosThrustDurations);
             if (bar != null)
@@ -102,7 +102,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawEyeOfTheDragonBars(Vector2 origin, PlayerCharacter player)
+        private void DrawEyeOfTheDragonBars(Vector2 origin, IPlayerCharacter player)
         {
             DRGGauge gauge = Plugin.JobGauges.Get<DRGGauge>();
 
@@ -116,7 +116,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawFirstmindsFocusBars(Vector2 origin, PlayerCharacter player)
+        private void DrawFirstmindsFocusBars(Vector2 origin, IPlayerCharacter player)
         {
             DRGGauge gauge = Plugin.JobGauges.Get<DRGGauge>();
 
@@ -130,7 +130,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawBloodOfTheDragonBar(Vector2 origin, PlayerCharacter player)
+        private void DrawBloodOfTheDragonBar(Vector2 origin, IPlayerCharacter player)
         {
             DRGGauge gauge = Plugin.JobGauges.Get<DRGGauge>();
             float duration = gauge.LOTDTimer / 1000f;
@@ -144,7 +144,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawPowerSurgeBar(Vector2 origin, PlayerCharacter player)
+        private void DrawPowerSurgeBar(Vector2 origin, IPlayerCharacter player)
         {
             var duration = Math.Abs(Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 2720)?.RemainingTime ?? 0f);
             if (!Config.PowerSurgeBar.HideWhenInactive || duration > 0f)

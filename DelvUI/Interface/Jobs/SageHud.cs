@@ -57,7 +57,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             Vector2 pos = origin + Config.Position;
 
@@ -82,9 +82,9 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawDotBar(Vector2 origin, PlayerCharacter player)
+        private void DrawDotBar(Vector2 origin, IPlayerCharacter player)
         {
-            GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            IGameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
             BarHud? bar = BarUtilities.GetDoTBar(Config.DotBar, player, target, DotIDs, DotDurations);
             if (bar != null)
@@ -93,7 +93,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawAddersgallBar(Vector2 origin, PlayerCharacter player)
+        private void DrawAddersgallBar(Vector2 origin, IPlayerCharacter player)
         {
             SGEGauge gauge = Plugin.JobGauges.Get<SGEGauge>();
 
@@ -123,9 +123,9 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawPhysisBar(Vector2 origin, PlayerCharacter player)
+        private void DrawPhysisBar(Vector2 origin, IPlayerCharacter player)
         {
-            float physisDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 2617 or 2620 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
+            float physisDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 2617 or 2620 && o.SourceId == player.GameObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.PhysisBar.HideWhenInactive || physisDuration > 0)
             {
@@ -135,10 +135,10 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawKeracholeBar(Vector2 origin, PlayerCharacter player)
+        private void DrawKeracholeBar(Vector2 origin, IPlayerCharacter player)
         {
-            float keracholeDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 2618 or 2938 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
-            float holosDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3003 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
+            float keracholeDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 2618 or 2938 && o.SourceId == player.GameObjectId)?.RemainingTime ?? 0f;
+            float holosDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3003 && o.SourceId == player.GameObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.KeracholeBar.HideWhenInactive || keracholeDuration > 0 || holosDuration > 0)
             {

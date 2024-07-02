@@ -59,7 +59,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             var pos = origin + Config.Position;
             if (Config.MudraBar.Enabled)
@@ -88,7 +88,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        public (bool, bool, bool) GetMudraBuffs(PlayerCharacter? player, out Status? ninjutsuBuff, out Status? kassatsuBuff, out Status? tcjBuff)
+        public (bool, bool, bool) GetMudraBuffs(IPlayerCharacter? player, out Status? ninjutsuBuff, out Status? kassatsuBuff, out Status? tcjBuff)
         {
             ninjutsuBuff = null;
             kassatsuBuff = null;
@@ -108,7 +108,7 @@ namespace DelvUI.Interface.Jobs
             return (ninjutsuBuff is not null, kassatsuBuff is not null, tcjBuff is not null);
         }
 
-        private void DrawMudraBars(Vector2 origin, PlayerCharacter player)
+        private void DrawMudraBars(Vector2 origin, IPlayerCharacter player)
         {
             var (hasNinjutsuBuff, hasKassatsuBuff, hasTCJBuff) = GetMudraBuffs(player, out Status? ninjutsuBuff, out Status? kassatsuBuff, out Status? tcjBuff);
 
@@ -171,7 +171,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawHutonGauge(Vector2 origin, PlayerCharacter player)
+        private void DrawHutonGauge(Vector2 origin, IPlayerCharacter player)
         {
             NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
             float hutonDuration = gauge.HutonTimer / 1000f;
@@ -185,7 +185,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private unsafe void DrawNinkiGauge(Vector2 origin, PlayerCharacter player)
+        private unsafe void DrawNinkiGauge(Vector2 origin, IPlayerCharacter player)
         {
             NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
 
@@ -201,14 +201,14 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawTrickAttackBar(Vector2 origin, PlayerCharacter player)
+        private void DrawTrickAttackBar(Vector2 origin, IPlayerCharacter player)
         {
-            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            IGameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             float trickDuration = 0f;
 
-            if (actor is BattleChara target)
+            if (actor is IBattleChara target)
             {
-                trickDuration = Utils.StatusListForBattleChara(target).FirstOrDefault(o => o.StatusId is 3254 && o.SourceId == player.ObjectId && o.RemainingTime > 0)?.RemainingTime ?? 0f;
+                trickDuration = Utils.StatusListForBattleChara(target).FirstOrDefault(o => o.StatusId is 3254 && o.SourceId == player.GameObjectId && o.RemainingTime > 0)?.RemainingTime ?? 0f;
             }
 
             if (!Config.TrickAttackBar.HideWhenInactive || trickDuration > 0)
@@ -220,7 +220,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawSuitonBar(Vector2 origin, PlayerCharacter player)
+        private void DrawSuitonBar(Vector2 origin, IPlayerCharacter player)
         {
             float suitonDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId == 507 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
 

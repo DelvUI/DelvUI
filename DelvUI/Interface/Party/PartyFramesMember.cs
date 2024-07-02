@@ -23,13 +23,13 @@ namespace DelvUI.Interface.Party
 
     public unsafe class PartyFramesMember : IPartyFramesMember
     {
-        protected PartyMember? _partyMember = null;
+        protected IPartyMember? _partyMember = null;
         private string _name = "";
         private uint _jobId = 0;
         private uint _objectID = 0;
 
         public uint ObjectId => _partyMember != null ? _partyMember.ObjectId : _objectID;
-        public Character? Character { get; private set; }
+        public ICharacter? Character { get; private set; }
 
         public int Order { get; set; }
         public string Name => _partyMember != null ? _partyMember.Name.ToString() : (Character != null ? Character.Name.ToString() : _name);
@@ -49,7 +49,7 @@ namespace DelvUI.Interface.Party
         public bool HasDispellableDebuff { get; set; } = false;
         public WhosTalkingState WhosTalkingState => WhosTalkingHelper.Instance?.GetUserState(Name) ?? WhosTalkingState.None;
 
-        public PartyFramesMember(PartyMember partyMember, int order, EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader)
+        public PartyFramesMember(IPartyMember partyMember, int order, EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader)
         {
             _partyMember = partyMember;
             Order = order;
@@ -59,13 +59,13 @@ namespace DelvUI.Interface.Party
             IsPartyLeader = isPartyLeader;
 
             var gameObject = partyMember.GameObject;
-            if (gameObject is Character character)
+            if (gameObject is ICharacter character)
             {
                 Character = character;
             }
         }
 
-        public PartyFramesMember(Character character, int order, EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader)
+        public PartyFramesMember(ICharacter character, int order, EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader)
         {
             Order = order;
             EnmityLevel = enmityLevel;
@@ -73,7 +73,7 @@ namespace DelvUI.Interface.Party
             ReadyCheckStatus = readyCheckStatus;
             IsPartyLeader = isPartyLeader;
 
-            _objectID = character.ObjectId;
+            _objectID = (uint)character.GameObjectId;
             Character = character;
         }
 
@@ -106,7 +106,7 @@ namespace DelvUI.Interface.Party
             }
 
             var gameObject = Plugin.ObjectTable.SearchById(ObjectId);
-            Character = gameObject is Character ? (Character)gameObject : null;
+            Character = gameObject is ICharacter ? (ICharacter)gameObject : null;
 
             if (status == PartyMemberStatus.None && Character != null && MaxHP > 0 && HP <= 0)
             {
@@ -119,8 +119,8 @@ namespace DelvUI.Interface.Party
     {
         public static readonly Random RNG = new Random((int)ImGui.GetTime());
 
-        public uint ObjectId => GameObject.InvalidGameObjectId;
-        public Character? Character => null;
+        public uint ObjectId => 0xE0000000;
+        public ICharacter? Character => null;
 
         public int Order { get; set; }
         public string Name { get; private set; }
@@ -170,7 +170,7 @@ namespace DelvUI.Interface.Party
     public interface IPartyFramesMember
     {
         public uint ObjectId { get; }
-        public Character? Character { get; }
+        public ICharacter? Character { get; }
 
         public int Order { get; }
         public string Name { get; }

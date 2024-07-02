@@ -11,7 +11,7 @@ using ImGuiNET;
 using System.Collections.Generic;
 using System.Numerics;
 using Action = System.Action;
-using Character = Dalamud.Game.ClientState.Objects.Types.Character;
+using Character = Dalamud.Game.ClientState.Objects.Types.ICharacter;
 using StructsCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 
 namespace DelvUI.Interface.Nameplates
@@ -31,7 +31,7 @@ namespace DelvUI.Interface.Nameplates
             _titleLabelHud = new LabelHud(config.TitleLabelConfig);
         }
 
-        protected bool IsVisible(GameObject? actor)
+        protected bool IsVisible(IGameObject? actor)
         {
             if (!_config.Enabled ||
                 actor == null ||
@@ -107,7 +107,7 @@ namespace DelvUI.Interface.Nameplates
 
         public (bool, bool) GetMouseoverState(NameplateData data)
         {
-            if (data.GameObject is not Character character) { return (false, false); }
+            if (data.GameObject is not ICharacter character) { return (false, false); }
             if (!BarConfig.IsVisible(character.CurrentHp, character.MaxHp) || BarConfig.DisableInteraction)
             {
                 return (false, false);
@@ -360,7 +360,7 @@ namespace DelvUI.Interface.Nameplates
         protected override List<(StrataLevel, Action)> GetExtrasDrawActions(NameplateData data, NameplateExtrasAnchors anchors)
         {
             List<(StrataLevel, Action)> drawActions = new List<(StrataLevel, Action)>();
-            if (data.GameObject is not PlayerCharacter character) { return drawActions; }
+            if (data.GameObject is not IPlayerCharacter character) { return drawActions; }
 
             float alpha = _config.RangeConfig.AlphaForDistance(data.Distance);
 
@@ -535,7 +535,7 @@ namespace DelvUI.Interface.Nameplates
         {
             NameplateEnemyBarConfig config = (NameplateEnemyBarConfig)BarConfig;
 
-            bool targetingPlayer = character.TargetObjectId == Plugin.ClientState.LocalPlayer?.ObjectId;
+            bool targetingPlayer = character.TargetObjectId == Plugin.ClientState.LocalPlayer?.GameObjectId;
             if (targetingPlayer && config.UseCustomColorWhenBeingTargeted)
             {
                 return config.CustomColorWhenBeingTargeted;

@@ -36,7 +36,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             if (Config.PowderGauge.Enabled)
             {
@@ -49,7 +49,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawPowderGauge(Vector2 origin, PlayerCharacter player)
+        private void DrawPowderGauge(Vector2 origin, IPlayerCharacter player)
         {
             var gauge = Plugin.JobGauges.Get<GNBGauge>();
             if (!Config.PowderGauge.HideWhenInactive || gauge.Ammo > 0)
@@ -63,7 +63,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawNoMercyBar(Vector2 origin, PlayerCharacter player)
+        private void DrawNoMercyBar(Vector2 origin, IPlayerCharacter player)
         {
             float noMercyDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId == 1831 && o.RemainingTime > 0f)?.RemainingTime ?? 0f;
             if (!Config.NoMercy.HideWhenInactive || noMercyDuration > 0)

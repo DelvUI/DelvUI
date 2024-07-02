@@ -390,7 +390,7 @@ namespace DelvUI.Interface
         {
             if (!FontsManager.Instance.DefaultFontBuilt)
             {
-                Plugin.UiBuilder.RebuildFonts();
+                Plugin.UiBuilder.FontAtlas.BuildFontsAsync();
             }
 
             try
@@ -565,7 +565,7 @@ namespace DelvUI.Interface
         private void AssignActors()
         {
             // player
-            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             foreach (var element in _hudElementsUsingPlayer)
             {
                 element.Actor = player;
@@ -577,7 +577,7 @@ namespace DelvUI.Interface
             }
 
             // target
-            GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            IGameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             foreach (var element in _hudElementsUsingTarget)
             {
                 element.Actor = target;
@@ -589,14 +589,14 @@ namespace DelvUI.Interface
             }
 
             // target of target
-            GameObject? targetOfTarget = Utils.FindTargetOfTarget(target, player, Plugin.ObjectTable);
+            IGameObject? targetOfTarget = Utils.FindTargetOfTarget(target, player, Plugin.ObjectTable);
             foreach (var element in _hudElementsUsingTargetOfTarget)
             {
                 element.Actor = targetOfTarget;
             }
 
             // focus
-            GameObject? focusTarget = Plugin.TargetManager.FocusTarget;
+            IGameObject? focusTarget = Plugin.TargetManager.FocusTarget;
             foreach (var element in _hudElementsUsingFocusTarget)
             {
                 element.Actor = focusTarget;

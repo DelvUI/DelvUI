@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Interface.Internal;
+using Dalamud.Interface.Textures.TextureWraps;
 using DelvUI.Enums;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using ImGuiScene;

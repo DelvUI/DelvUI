@@ -17,7 +17,7 @@ namespace DelvUI.Interface.GeneralElements
         public VisibilityConfig VisibilityConfig => Config.VisibilityConfig;
 
         private MPTickHelper _mpTickHelper = null!;
-        public GameObject? Actor { get; set; } = null;
+        public IGameObject? Actor { get; set; } = null;
 
         public MPTickerHud(MPTickerConfig config, string displayName) : base(config, displayName) { }
 
@@ -34,7 +34,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public override void DrawChildren(Vector2 origin)
         {
-            if (!Config.Enabled || Actor == null || Actor is not PlayerCharacter player)
+            if (!Config.Enabled || Actor == null || Actor is not IPlayerCharacter player)
             {
                 return;
             }
@@ -86,7 +86,7 @@ namespace DelvUI.Interface.GeneralElements
 
         private MPTickerFire3ThresholdConfig? GetFire3ThresholdConfig()
         {
-            if (Actor is not PlayerCharacter player || player.ClassJob.Id != JobIDs.BLM)
+            if (Actor is not IPlayerCharacter player || player.ClassJob.Id != JobIDs.BLM)
             {
                 return null;
             }

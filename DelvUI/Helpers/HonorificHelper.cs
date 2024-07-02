@@ -17,12 +17,12 @@ namespace DelvUI.Helpers
 
     internal class HonorificHelper
     {
-        private ICallGateSubscriber<Character, string>? _getCharacterTitle;
+        private ICallGateSubscriber<ICharacter, string>? _getCharacterTitle;
 
         #region Singleton
         private HonorificHelper()
         {
-            _getCharacterTitle = Plugin.PluginInterface.GetIpcSubscriber<Character, string>("Honorific.GetCharacterTitle");
+            _getCharacterTitle = Plugin.PluginInterface.GetIpcSubscriber<ICharacter, string>("Honorific.GetCharacterTitle");
         }
 
         public static void Initialize() { Instance = new HonorificHelper(); }
@@ -51,9 +51,12 @@ namespace DelvUI.Helpers
         }
         #endregion
 
-        public TitleData? GetTitle(GameObject? actor)
+        public TitleData? GetTitle(IGameObject? actor)
         {
-            if (_getCharacterTitle == null || actor == null || actor.ObjectKind != ObjectKind.Player || actor is not Character character)
+            if (_getCharacterTitle == null || 
+                actor == null || 
+                actor.ObjectKind != ObjectKind.Player || 
+                actor is not ICharacter character)
             {
                 return null;
             }

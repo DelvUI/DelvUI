@@ -19,13 +19,13 @@ namespace DelvUI.Interface.GeneralElements
 
         public PrimaryResourceTypes ResourceType = PrimaryResourceTypes.MP;
 
-        private GameObject? _actor;
-        public GameObject? Actor
+        private IGameObject? _actor;
+        public IGameObject? Actor
         {
             get => _actor;
             set
             {
-                if (value is PlayerCharacter chara)
+                if (value is IPlayerCharacter chara)
                 {
                     _actor = value;
 
@@ -61,12 +61,12 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            if (PartyMember == null && (ResourceType == PrimaryResourceTypes.None || Actor == null || Actor is not PlayerCharacter))
+            if (PartyMember == null && (ResourceType == PrimaryResourceTypes.None || Actor == null || Actor is not IPlayerCharacter))
             {
                 return;
             }
 
-            Character? chara = Actor != null ? (Character)Actor : null;
+            ICharacter? chara = Actor != null ? (ICharacter)Actor : null;
             uint current = chara == null ? PartyMember?.MP ?? 0 : 0;
             uint max = chara == null ? PartyMember?.MaxMP ?? 0 : 0;
 
@@ -95,7 +95,7 @@ namespace DelvUI.Interface.GeneralElements
             AddDrawActions(bar.GetDrawActions(pos, Config.StrataLevel));
         }
 
-        private void GetResources(ref uint current, ref uint max, Character actor)
+        private void GetResources(ref uint current, ref uint max, ICharacter actor)
         {
             switch (ResourceType)
             {

@@ -6,6 +6,7 @@ using Dalamud.Plugin.Services;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
@@ -23,17 +24,19 @@ namespace DelvUI.Helpers
 {
     internal static class Utils
     {
-        public static GameObject? GetBattleChocobo(GameObject? player)
+        private static uint InvalidGameObjectId = 0xE0000000;
+
+        public static IGameObject? GetBattleChocobo(IGameObject? player)
         {
             if (player == null)
             {
                 return null;
             }
 
-            return GetBuddy(player.ObjectId, BattleNpcSubKind.Chocobo);
+            return GetBuddy(player.GameObjectId, BattleNpcSubKind.Chocobo);
         }
 
-        public static GameObject? GetBuddy(uint ownerId, BattleNpcSubKind kind)
+        public static IGameObject? GetBuddy(ulong ownerId, BattleNpcSubKind kind)
         {
             // only the first 200 elements in the array are relevant due to the order in which SE packs data into the array
             // we do a step of 2 because its always an actor followed by its companion
@@ -41,7 +44,7 @@ namespace DelvUI.Helpers
             {
                 var gameObject = Plugin.ObjectTable[i];
 
-                if (gameObject == null || gameObject.ObjectId == GameObject.InvalidGameObjectId || gameObject is not BattleNpc battleNpc)
+                if (gameObject == null || gameObject.GameObjectId == InvalidGameObjectId || gameObject is not IBattleNpc battleNpc)
                 {
                     continue;
                 }
@@ -55,15 +58,15 @@ namespace DelvUI.Helpers
             return null;
         }
 
-        public static GameObject? GetGameObjectByName(string name)
+        public static IGameObject? GetGameObjectByName(string name)
         {
             // only the first 200 elements in the array are relevant due to the order in which SE packs data into the array
             // we do a step of 2 because its always an actor followed by its companion
             for (int i = 0; i < 200; i += 2)
             {
-                GameObject? gameObject = Plugin.ObjectTable[i];
+                IGameObject? gameObject = Plugin.ObjectTable[i];
 
-                if (gameObject == null || gameObject.ObjectId == GameObject.InvalidGameObjectId || gameObject.ObjectId == 0)
+                if (gameObject == null || gameObject.GameObjectId == InvalidGameObjectId || gameObject.GameObjectId == 0)
                 {
                     continue;
                 }
@@ -77,7 +80,7 @@ namespace DelvUI.Helpers
             return null;
         }
 
-        public static unsafe bool IsHostile(Character character)
+        public static unsafe bool IsHostile(ICharacter character)
         {
             StructsCharacter* chara = (StructsCharacter*)character.Address;
 
@@ -86,9 +89,9 @@ namespace DelvUI.Helpers
                 && chara->CharacterData.Battalion > 0);
         }
 
-        public static unsafe float ActorShieldValue(GameObject? actor)
+        public static unsafe float ActorShieldValue(IGameObject? actor)
         {
-            if (actor == null || actor is not Character)
+            if (actor == null || actor is not ICharacter)
             {
                 return 0f;
             }
@@ -97,9 +100,9 @@ namespace DelvUI.Helpers
             return Math.Min(chara->CharacterData.ShieldValue, 100f) / 100f;
         }
 
-        public static bool IsActorCasting(GameObject? actor)
+        public static bool IsActorCasting(IGameObject? actor)
         {
-            if (actor is not BattleChara chara)
+            if (actor is not IBattleChara chara)
             {
                 return false;
             }
@@ -113,7 +116,7 @@ namespace DelvUI.Helpers
             return false;
         }
 
-        public static IEnumerable<Status> StatusListForBattleChara(BattleChara? chara)
+        public static IEnumerable<Status> StatusListForBattleChara(IBattleChara? chara)
         {
             List<Status> statusList = new List<Status>();
             if (chara == null)
@@ -146,19 +149,19 @@ namespace DelvUI.Helpers
             return duration.ToString("N" + decimalCount, ConfigurationManager.Instance.ActiveCultreInfo);
         }
 
-        public static Status? GetTankInvulnerabilityID(BattleChara actor)
+        public static Status? GetTankInvulnerabilityID(IBattleChara actor)
         {
             return StatusListForBattleChara(actor).FirstOrDefault(o => o.StatusId is 810 or 811 or 3255 or 1302 or 409 or 1836 or 82);
         }
 
         public static bool IsOnCleanseJob()
         {
-            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
 
             return player != null && JobsHelper.IsJobWithCleanse(player.ClassJob.Id, player.Level);
         }
 
-        public static GameObject? FindTargetOfTarget(GameObject? target, GameObject? player, IObjectTable actors)
+        public static IGameObject? FindTargetOfTarget(IGameObject? target, IGameObject? player, IObjectTable actors)
         {
             if (target == null)
             {
@@ -185,8 +188,8 @@ namespace DelvUI.Helpers
             // we do a step of 2 because its always an actor followed by its companion
             for (int i = 0; i < 200; i += 2)
             {
-                GameObject? actor = actors[i];
-                if (actor?.ObjectId == target.TargetObjectId)
+                IGameObject? actor = actors[i];
+                if (actor?.GameObjectId == target.TargetObjectId)
                 {
                     return actor;
                 }
@@ -200,7 +203,7 @@ namespace DelvUI.Helpers
         /// </summary>
         /// <param name="target">Your target</param>
         /// <returns>Target ID of your targets targer. Returns -1 if old code should be ran.</returns>
-        private static unsafe int GetActualTargetId(GameObject target)
+        private static unsafe int GetActualTargetId(IGameObject target)
         {
             // We only need to check for companions. 
             // Why not check target.TargetObject?.ObjectKind == ObjectKind.Companion?
@@ -211,7 +214,7 @@ namespace DelvUI.Helpers
             }
 
             // Here we get the ClientStruct Character of our target (aka the player we are targeting)
-            StructsCharacter targetChara = StructsCharacterManager.Instance()->LookupBattleCharaByObjectId(target.ObjectId)->Character;
+            StructsCharacter targetChara = StructsCharacterManager.Instance()->LookupBattleCharaByEntityId(target.EntityId)->Character;
 
             // This method is key. GetTargetId() returns the targets player target ID. If it is converted to a hex string and starts with the number 4, it is a minion.
             // Even though it is a minion, it still returns the players target ID.
@@ -222,14 +225,14 @@ namespace DelvUI.Helpers
             }
 
             // We look up the parents ClientStruct GameObject
-            StructsCharacter* realBattleChara = (StructsCharacter*)StructsCharacterManager.Instance()->LookupBattleCharaByObjectId((uint)realTargetID);
+            StructsCharacter* realBattleChara = (StructsCharacter*)StructsCharacterManager.Instance()->LookupBattleCharaByEntityId((uint)realTargetID);
             if (realBattleChara == null)
             {
                 return -1;
             }
 
             // And get the companion off of that
-            StructsGameObject* companionGameObject = (StructsGameObject*)realBattleChara->Companion.CompanionObject;
+            StructsGameObject* companionGameObject = (StructsGameObject*)realBattleChara->CompanionData.CompanionObject;
             if (companionGameObject == null)
             {
                 return -1;
@@ -308,7 +311,7 @@ namespace DelvUI.Helpers
             {
                 if (addon->UldManager.NodeListCount < 41) { return true; }
 
-                return addon->UldManager.NodeList[41]->IsVisible;
+                return addon->UldManager.NodeList[41]->IsVisible();
             }
 
             addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_TargetInfoCastBar", 1);
@@ -316,7 +319,7 @@ namespace DelvUI.Helpers
             {
                 if (addon->UldManager.NodeListCount < 2) { return true; }
 
-                return addon->UldManager.NodeList[2]->IsVisible;
+                return addon->UldManager.NodeList[2]->IsVisible();
             }
 
             return null;
@@ -329,7 +332,7 @@ namespace DelvUI.Helpers
             {
                 if (addon->UldManager.NodeListCount < 16) { return true; }
 
-                return addon->UldManager.NodeList[16]->IsVisible;
+                return addon->UldManager.NodeList[16]->IsVisible();
             }
 
             return null;
@@ -345,38 +348,38 @@ namespace DelvUI.Helpers
                 if (addon->UldManager.NodeListCount < 12) { return true; }
 
                 AtkResNode* node = addon->UldManager.NodeList[11 - index];
-                if (node == null || !node->IsVisible) { return false; }
+                if (node == null || !node->IsVisible()) { return false; }
 
                 AtkComponentBase* component = node->GetComponent();
                 if (component == null || component->UldManager.NodeListCount < 13) { return true; }
 
-                return component->UldManager.NodeList[12]->IsVisible;
+                return component->UldManager.NodeList[12]->IsVisible();
             }
 
             return null;
         }
 
-        public static unsafe uint? SignIconIDForActor(GameObject? actor)
+        public static unsafe uint? SignIconIDForActor(IGameObject? actor)
         {
             if (actor == null)
             {
                 return null;
             }
 
-            return SignIconIDForObjectID(actor.ObjectId);
+            return SignIconIDForObjectID(actor.GameObjectId);
         }
 
-        public static unsafe uint? SignIconIDForObjectID(uint objectId)
+        public static unsafe uint? SignIconIDForObjectID(ulong objectId)
         {
             MarkingController* markingController = MarkingController.Instance();
-            if (objectId == 0 || objectId == GameObject.InvalidGameObjectId || markingController == null)
+            if (objectId == 0 || objectId == InvalidGameObjectId || markingController == null)
             {
                 return null;
             }
 
             for (int i = 0; i < 17; i++)
             {
-                if (objectId == markingController->MarkerArray[i])
+                if (objectId == markingController->Markers[i])
                 {
                     // attack1-5
                     if (i <= 4)

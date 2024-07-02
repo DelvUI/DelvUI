@@ -28,7 +28,7 @@ namespace DelvUI.Interface.StatusEffects
 
         private LabelHud _durationLabel;
         private LabelHud _stacksLabel;
-        public GameObject? Actor { get; set; } = null;
+        public IGameObject? Actor { get; set; } = null;
 
         private bool _wasHovering = false;
         private bool NeedsSpecialInput => !ClipRectsHelper.Instance.Enabled || ClipRectsHelper.Instance.Mode == WindowClippingMode.Performance;
@@ -95,7 +95,7 @@ namespace DelvUI.Interface.StatusEffects
 
         protected string GetStatusActorName(StatusStruct status)
         {
-            var character = Plugin.ObjectTable.SearchById(status.SourceID);
+            var character = Plugin.ObjectTable.SearchById(status.SourceId);
             return character == null ? "" : character.Name.ToString();
         }
 
@@ -130,21 +130,21 @@ namespace DelvUI.Interface.StatusEffects
             return list;
         }
 
-        protected unsafe List<StatusEffectData> StatusEffectDataList(GameObject? actor)
+        protected unsafe List<StatusEffectData> StatusEffectDataList(IGameObject? actor)
         {
             List<StatusEffectData> list = new List<StatusEffectData>();
-            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
-            BattleChara? character = null;
+            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IBattleChara? character = null;
             int count = StatusEffectListsSize;
 
             if (_fakeEffects == null)
             {
-                if (actor == null || actor is not BattleChara battleChara || battleChara.IsDead || battleChara.CurrentHp <= 0)
+                if (actor == null || actor is not IBattleChara battleChara || battleChara.IsDead || battleChara.CurrentHp <= 0)
                 {
                     return list;
                 }
 
-                character = (BattleChara)actor;
+                character = (IBattleChara)actor;
 
                 try
                 {
@@ -176,7 +176,7 @@ namespace DelvUI.Interface.StatusEffects
                     catch { }
                 }
 
-                if (status == null || status->StatusID == 0)
+                if (status == null || status->StatusId == 0)
                 {
                     continue;
                 }
@@ -186,7 +186,7 @@ namespace DelvUI.Interface.StatusEffects
 
                 if (_fakeEffects != null)
                 {
-                    data = Plugin.DataManager.GetExcelSheet<LuminaStatus>()?.GetRow(status->StatusID);
+                    data = Plugin.DataManager.GetExcelSheet<LuminaStatus>()?.GetRow(status->StatusId);
                 }
                 else
                 {
@@ -233,11 +233,11 @@ namespace DelvUI.Interface.StatusEffects
                 }
 
                 // only mine
-                var mine = player?.ObjectId == status->SourceID;
+                var mine = player?.GameObjectId == status->SourceId;
 
                 if (Config.IncludePetAsOwn)
                 {
-                    mine = player?.ObjectId == status->SourceID || IsStatusFromPlayerPet(*status);
+                    mine = player?.GameObjectId == status->SourceId || IsStatusFromPlayerPet(*status);
                 }
 
                 if (Config.ShowOnlyMine && !mine)
@@ -266,7 +266,7 @@ namespace DelvUI.Interface.StatusEffects
                 return false;
             }
 
-            return buddy.ObjectId == status.SourceID;
+            return buddy.ObjectId == status.SourceId;
         }
 
         protected List<StatusEffectData> OrderByMineOrPermanentFirst(List<StatusEffectData> list)
@@ -279,15 +279,15 @@ namespace DelvUI.Interface.StatusEffects
 
             if (Config.ShowMineFirst && Config.ShowPermanentFirst)
             {
-                return list.OrderByDescending(x => x.Status.SourceID == player.ObjectId && x.Data.IsPermanent || x.Data.IsFcBuff)
-                    .ThenByDescending(x => x.Status.SourceID == player.ObjectId)
+                return list.OrderByDescending(x => x.Status.SourceId == player.GameObjectId && x.Data.IsPermanent || x.Data.IsFcBuff)
+                    .ThenByDescending(x => x.Status.SourceId == player.GameObjectId)
                     .ThenByDescending(x => x.Data.IsPermanent)
                     .ThenByDescending(x => x.Data.IsFcBuff)
                     .ToList();
             }
             else if (Config.ShowMineFirst && !Config.ShowPermanentFirst)
             {
-                return list.OrderByDescending(x => x.Status.SourceID == player.ObjectId)
+                return list.OrderByDescending(x => x.Status.SourceId == player.GameObjectId)
                     .ToList();
             }
             else if (!Config.ShowMineFirst && Config.ShowPermanentFirst)
@@ -408,7 +408,7 @@ namespace DelvUI.Interface.StatusEffects
             });
 
             StatusEffectData? hoveringData = null;
-            GameObject? character = Actor;
+            IGameObject? character = Actor;
 
             // labels need to be drawn separated since they have their own window for clipping
             for (var i = 0; i < count; i++)
@@ -465,7 +465,7 @@ namespace DelvUI.Interface.StatusEffects
                     TooltipsHelper.Instance.ShowTooltipOnCursor(
                         EncryptedStringsHelper.GetString(data.Data.Description.ToDalamudString().ToString()),
                         EncryptedStringsHelper.GetString(data.Data.Name),
-                        data.Status.StatusID,
+                        data.Status.StatusId,
                         GetStatusActorName(data.Status)
                     );
                 }
@@ -474,8 +474,8 @@ namespace DelvUI.Interface.StatusEffects
                 bool rightClick = InputsHelper.Instance.HandlingMouseInputs ? InputsHelper.Instance.RightButtonClicked : ImGui.GetIO().MouseClicked[1];
 
                 // remove buff on right click
-                bool isFromPlayer = data.Status.SourceID == Plugin.ClientState.LocalPlayer?.ObjectId;
-                bool isTheEcho = data.Status.StatusID is 42 or 239;
+                bool isFromPlayer = data.Status.SourceId == Plugin.ClientState.LocalPlayer?.GameObjectId;
+                bool isTheEcho = data.Status.SourceId is 42 or 239;
 
                 if (data.Data.StatusCategory == 1 && (isFromPlayer || isTheEcho) && rightClick)
                 {
@@ -519,7 +519,7 @@ namespace DelvUI.Interface.StatusEffects
                 isFromPlayerPet = IsStatusFromPlayerPet(statusEffectData.Status);
             }
 
-            if (Config.IconConfig.OwnedBorderConfig.Enabled && (statusEffectData.Status.SourceID == Plugin.ClientState.LocalPlayer?.ObjectId || isFromPlayerPet))
+            if (Config.IconConfig.OwnedBorderConfig.Enabled && (statusEffectData.Status.SourceId == Plugin.ClientState.LocalPlayer?.GameObjectId || isFromPlayerPet))
             {
                 borderConfig = Config.IconConfig.OwnedBorderConfig;
             }
@@ -559,10 +559,10 @@ namespace DelvUI.Interface.StatusEffects
                 var fakeStruct = new StatusStruct();
 
                 // forcing "triplecast" buff first to always be able to test stacks
-                fakeStruct.StatusID = i == 0 ? (ushort)1211 : (ushort)RNG.Next(1, 200);
+                fakeStruct.StatusId = i == 0 ? (ushort)1211 : (ushort)RNG.Next(1, 200);
                 fakeStruct.RemainingTime = RNG.Next(1, 30);
                 fakeStruct.StackCount = (byte)RNG.Next(1, 3);
-                fakeStruct.SourceID = 0;
+                fakeStruct.SourceId = 0;
 
                 _fakeEffects[i] = fakeStruct;
             }

@@ -95,7 +95,7 @@ namespace DelvUI.Helpers
             return null!;
         }
 
-        public string? GetPetName(GameObject? actor)
+        public string? GetPetName(IGameObject? actor)
         {
             if (!pluginEnabled)
             {

@@ -51,7 +51,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             Vector2 pos = origin + Config.Position;
             if (Config.BleedBar.Enabled)
@@ -93,7 +93,7 @@ namespace DelvUI.Interface.Jobs
         private static List<uint> BleedID = new List<uint> { 1714 };
         private static List<float> BleedDurations = new List<float> { 30, 60 };
 
-        protected void DrawBleedBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawBleedBar(Vector2 origin, IPlayerCharacter player)
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             BarHud? bar = BarUtilities.GetDoTBar(Config.BleedBar, player, target, BleedID, BleedDurations);
@@ -103,14 +103,14 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        protected void DrawWindburnBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawWindburnBar(Vector2 origin, IPlayerCharacter player)
         {
-            GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            IGameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             bool dotExists = false;
 
-            if (target != null && target is BattleChara targetChara)
+            if (target != null && target is IBattleChara targetChara)
             {
-                dotExists = Utils.StatusListForBattleChara(targetChara).FirstOrDefault(o => o.SourceId == player.ObjectId && o.StatusId == 1723) != null;
+                dotExists = Utils.StatusListForBattleChara(targetChara).FirstOrDefault(o => o.SourceId == player.GameObjectId && o.StatusId == 1723) != null;
             }
 
             if (dotExists)
@@ -141,7 +141,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        protected void DrawSurpanakhaBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawSurpanakhaBar(Vector2 origin, IPlayerCharacter player)
         {
             float surpanakhaCD = SpellHelper.Instance.GetSpellCooldown(18323);
             float max = 120f;
@@ -159,7 +159,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        protected void DrawOffGuardBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawOffGuardBar(Vector2 origin, IPlayerCharacter player)
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
@@ -170,7 +170,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        protected void DrawMoonFluteBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawMoonFluteBar(Vector2 origin, IPlayerCharacter player)
         {
             Status? buff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1718 or 1727 && o.RemainingTime > 0f);
             if (!Config.MoonFluteBar.HideWhenInactive || buff is not null)
@@ -191,7 +191,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        protected void DrawSpellAmpBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawSpellAmpBar(Vector2 origin, IPlayerCharacter player)
         {
             Status? buff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 2118 or 1716 && o.RemainingTime > 0f);
             if (!Config.SpellAmpBar.HideWhenInactive || buff is not null)
@@ -212,7 +212,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        protected void DrawTingleBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawTingleBar(Vector2 origin, IPlayerCharacter player)
         {
             BarHud? bar = BarUtilities.GetProcBar(Config.TingleBar, player, 2492, 15f);
             if (bar != null)

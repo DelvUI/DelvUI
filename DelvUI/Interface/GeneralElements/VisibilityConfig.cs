@@ -98,7 +98,7 @@ namespace DelvUI.Interface
 
             bool isInIslandSanctuary = IsInIslandSanctuary();
             bool isInDuty = IsInDuty() && !isInIslandSanctuary;
-            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
 
             // show
             if (ShowInDuty && isInDuty) { return true; }

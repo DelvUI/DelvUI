@@ -67,7 +67,7 @@ namespace DelvUI.Interface.Party
                     member.RaiseTime = null;
                 }
 
-                if (member.Character is not BattleChara battleChara)
+                if (member.Character is not IBattleChara battleChara)
                 {
                     continue;
                 }
@@ -86,16 +86,16 @@ namespace DelvUI.Interface.Party
                     // check regular raise
                     else if (IsRaiseAction(battleChara.CastActionId))
                     {
-                        if (raiseTimeMap.TryGetValue(battleChara.CastTargetObjectId, out float raiseTime))
+                        if (raiseTimeMap.TryGetValue((uint)battleChara.CastTargetObjectId, out float raiseTime))
                         {
                             if (raiseTime > remaining)
                             {
-                                raiseTimeMap[battleChara.CastTargetObjectId] = remaining;
+                                raiseTimeMap[(uint)battleChara.CastTargetObjectId] = remaining;
                             }
                         }
                         else
                         {
-                            raiseTimeMap.Add(battleChara.CastTargetObjectId, remaining);
+                            raiseTimeMap.Add((uint)battleChara.CastTargetObjectId, remaining);
                         }
                     }
                 }

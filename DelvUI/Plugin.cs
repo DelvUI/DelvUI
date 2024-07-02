@@ -4,6 +4,8 @@ using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.Command;
 using Dalamud.Interface;
 using Dalamud.Interface.Internal;
+using Dalamud.Interface.Textures;
+using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using DelvUI.Config;
@@ -26,7 +28,7 @@ namespace DelvUI
         public static IClientState ClientState { get; private set; } = null!;
         public static ICommandManager CommandManager { get; private set; } = null!;
         public static ICondition Condition { get; private set; } = null!;
-        public static DalamudPluginInterface PluginInterface { get; private set; } = null!;
+        public static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
         public static IDataManager DataManager { get; private set; } = null!;
         public static IFramework Framework { get; private set; } = null!;
         public static IGameGui GameGui { get; private set; } = null!;
@@ -35,13 +37,13 @@ namespace DelvUI
         public static ISigScanner SigScanner { get; private set; } = null!;
         public static IGameInteropProvider GameInteropProvider { get; private set; } = null!;
         public static ITargetManager TargetManager { get; private set; } = null!;
-        public static UiBuilder UiBuilder { get; private set; } = null!;
+        public static IUiBuilder UiBuilder { get; private set; } = null!;
         public static IPartyList PartyList { get; private set; } = null!;
         public static IPluginLog Logger { get; private set; } = null!;
         public static ITextureProvider TextureProvider { get; private set; } = null!;
         public static IAddonLifecycle AddonLifecycle { get; private set; } = null!;
 
-        public static IDalamudTextureWrap? BannerTexture;
+        public static ISharedImmediateTexture? BannerTexture;
 
         public static string AssemblyLocation { get; private set; } = "";
         public string Name => "DelvUI";
@@ -59,7 +61,7 @@ namespace DelvUI
             IClientState clientState,
             ICommandManager commandManager,
             ICondition condition,
-            DalamudPluginInterface pluginInterface,
+            IDalamudPluginInterface pluginInterface,
             IDataManager dataManager,
             IFramework framework,
             IGameGui gameGui,
@@ -102,7 +104,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.1.3.1";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.2.0.0";
 
             FontsManager.Initialize(AssemblyLocation);
             BarTexturesManager.Initialize(AssemblyLocation);
@@ -188,7 +190,7 @@ namespace DelvUI
             {
                 try
                 {
-                    BannerTexture = UiBuilder.LoadImage(bannerImage);
+                    BannerTexture = TextureProvider.GetFromFile(bannerImage);
                 }
                 catch (Exception ex)
                 {
@@ -349,7 +351,7 @@ namespace DelvUI
 
             UiBuilder.Draw -= Draw;
             UiBuilder.OpenConfigUi -= OpenConfigUi;
-            UiBuilder.RebuildFonts();
+            UiBuilder.FontAtlas.BuildFontsAsync();
 
             BarTexturesManager.Instance?.Dispose();
             ChatHelper.Instance?.Dispose();

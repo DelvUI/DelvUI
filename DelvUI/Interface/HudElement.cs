@@ -95,7 +95,7 @@ namespace DelvUI.Interface
 
     public interface IHudElementWithActor
     {
-        public GameObject? Actor { get; set; }
+        public IGameObject? Actor { get; set; }
     }
 
     public interface IHudElementWithAnchorableParent

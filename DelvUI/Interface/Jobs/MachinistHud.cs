@@ -51,7 +51,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             Vector2 pos = origin + Config.Position;
 
@@ -81,7 +81,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawHeatGauge(Vector2 origin, PlayerCharacter player)
+        private void DrawHeatGauge(Vector2 origin, IPlayerCharacter player)
         {
             MCHGauge gauge = Plugin.JobGauges.Get<MCHGauge>();
 
@@ -97,7 +97,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawBatteryGauge(Vector2 origin, PlayerCharacter player)
+        private void DrawBatteryGauge(Vector2 origin, IPlayerCharacter player)
         {
             MCHGauge gauge = Plugin.JobGauges.Get<MCHGauge>();
 
@@ -110,7 +110,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawAutomatonBar(Vector2 origin, PlayerCharacter player)
+        private void DrawAutomatonBar(Vector2 origin, IPlayerCharacter player)
         {
             MCHGauge gauge = Plugin.JobGauges.Get<MCHGauge>();
 
@@ -135,7 +135,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawOverheatBar(Vector2 origin, PlayerCharacter player)
+        private void DrawOverheatBar(Vector2 origin, IPlayerCharacter player)
         {
             MCHGauge gauge = Plugin.JobGauges.Get<MCHGauge>();
             byte stackCount = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 2688)?.StackCount ?? 0;
@@ -158,7 +158,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawWildfireBar(Vector2 origin, PlayerCharacter player)
+        private void DrawWildfireBar(Vector2 origin, IPlayerCharacter player)
         {
             float wildfireDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1946)?.RemainingTime ?? 0f;
 

@@ -22,26 +22,24 @@ using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Hooking;
-using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
 using FFXIVClientStructs.FFXIV.Client.Game;
-using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
+using FFXIVClientStructs.Interop.Generated;
 using ImGuiNET;
 using Lumina.Excel;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Action = Lumina.Excel.GeneratedSheets.Action;
-using GameObject = Dalamud.Game.ClientState.Objects.Types.GameObject;
 
 namespace DelvUI.Helpers
 {
     public unsafe class InputsHelper : IDisposable
     {
         public delegate void OnSetUIMouseoverActor(long arg1, long arg2);
-        private delegate bool UseActionDelegate(IntPtr manager, ActionType actionType, uint actionId, GameObjectID targetId, uint a4, uint a5, uint a6, IntPtr a7);
+        private delegate bool UseActionDelegate(IntPtr manager, ActionType actionType, uint actionId, uint targetId, uint a4, uint a5, uint a6, IntPtr a7);
 
         #region Singleton
         private InputsHelper()
@@ -98,6 +96,9 @@ namespace DelvUI.Helpers
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+
+            _requestActionHook?.Disable();
+            _requestActionHook?.Dispose();
         }
 
         protected void Dispose(bool disposing)
@@ -135,10 +136,10 @@ namespace DelvUI.Helpers
         private ExcelSheet<Action>? _sheet;
 
         public bool HandlingMouseInputs { get; private set; } = false;
-        private GameObject? _target = null;
+        private IGameObject? _target = null;
         private bool _ignoringMouseover = false;
 
-        public void SetTarget(GameObject? target, bool ignoreMouseover = false)
+        public void SetTarget(IGameObject? target, bool ignoreMouseover = false)
         {
             _target = target;
             HandlingMouseInputs = true;
@@ -146,7 +147,7 @@ namespace DelvUI.Helpers
 
             if (!_ignoringMouseover)
             {
-                long address = _target != null && _target.ObjectId != 0 ? (long)_target.Address : 0;
+                long address = _target != null && _target.GameObjectId != 0 ? (long)_target.Address : 0;
                 SetGameMouseoverTarget(address);
             }
         }
@@ -175,7 +176,7 @@ namespace DelvUI.Helpers
             // set mouseover target in-game
             if (_config.MouseoverEnabled && !_config.MouseoverAutomaticMode && !_ignoringMouseover)
             {
-                long pronounModuleAddress = (long)Framework.Instance()->GetUiModule()->GetPronounModule();
+                long pronounModuleAddress = (long)Framework.Instance()->GetUIModule()->GetPronounModule();
 
                 OnSetUIMouseoverActor func = Marshal.GetDelegateForFunctionPointer<OnSetUIMouseoverActor>(_setUIMouseOverActor);
                 func.Invoke(pronounModuleAddress, address);
@@ -189,25 +190,24 @@ namespace DelvUI.Helpers
 
         //private void HandleUIMouseOverActorId(long arg1, long arg2)
         //{
-            //Plugin.Logger.Log("MO: {0} - {1}", arg1.ToString("X"), arg2.ToString("X"));
-            //_uiMouseOverActorHook?.Original(arg1, arg2);
+        //Plugin.Logger.Log("MO: {0} - {1}", arg1.ToString("X"), arg2.ToString("X"));
+        //_uiMouseOverActorHook?.Original(arg1, arg2);
         //}
 
-        private bool HandleRequestAction(IntPtr manager, ActionType actionType, uint actionId, GameObjectID targetId, uint a4, uint a5,
+        private bool HandleRequestAction(IntPtr manager, ActionType actionType, uint actionId, uint targetId, uint a4, uint a5,
                                           uint a6, IntPtr a7)
         {
             if (_requestActionHook == null) { return false; }
 
             if (_config.MouseoverEnabled && _config.MouseoverAutomaticMode && IsActionValid(actionId, _target) && !_ignoringMouseover)
             {
-                GameObjectID target = new() { ObjectID = _target!.ObjectId };
-                return _requestActionHook.Original(manager, actionType, actionId, target, a4, a5, a6, a7);
+                return _requestActionHook.Original(manager, actionType, actionId, targetId, a4, a5, a6, a7);
             }
 
             return _requestActionHook.Original(manager, actionType, actionId, targetId, a4, a5, a6, a7);
         }
 
-        private bool IsActionValid(ulong actionID, GameObject? target)
+        private bool IsActionValid(ulong actionID, IGameObject? target)
         {
             if (target == null || actionID == 0 || _sheet == null)
             {
@@ -232,20 +232,20 @@ namespace DelvUI.Helpers
                 // special case for AST cards and SMN rekindle
                 if (actionID == 17055 || actionID == 7443 || actionID == 25822)
                 {
-                    return target is PlayerCharacter || target is BattleNpc battleNpc && battleNpc.BattleNpcKind == BattleNpcSubKind.Chocobo;
+                    return target is IPlayerCharacter || target is IBattleNpc battleNpc && battleNpc.BattleNpcKind == BattleNpcSubKind.Chocobo;
                 }
 
-                return target is BattleNpc npcTarget && npcTarget.BattleNpcKind == BattleNpcSubKind.Enemy;
+                return target is IBattleNpc npcTarget && npcTarget.BattleNpcKind == BattleNpcSubKind.Enemy;
             }
 
             // friendly player (TODO: pvp? lol)
-            if (target is PlayerCharacter)
+            if (target is IPlayerCharacter)
             {
                 return action.CanTargetFriendly || action.CanTargetParty || action.CanTargetSelf;
             }
 
             // friendly npc
-            if (target is BattleNpc npc)
+            if (target is IBattleNpc npc)
             {
                 if (npc.BattleNpcKind != BattleNpcSubKind.Enemy)
                 {

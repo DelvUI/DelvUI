@@ -67,7 +67,7 @@ namespace DelvUI.Interface.Nameplates
                 return;
             }
 
-            GameObject? mouseoveredActor = null;
+            IGameObject? mouseoveredActor = null;
             bool ignoreMouseover = false;
 
             foreach (NameplateData data in NameplatesManager.Instance.Data)
@@ -129,7 +129,7 @@ namespace DelvUI.Interface.Nameplates
                         return _playerHud;
                     }
 
-                    if (data.GameObject is Character character)
+                    if (data.GameObject is ICharacter character)
                     {
                         StructsCharacter* chara = (StructsCharacter*)character.Address;
 
@@ -150,7 +150,7 @@ namespace DelvUI.Interface.Nameplates
                     return _otherPlayersHud;
 
                 case ObjectKind.BattleNpc:
-                    if (data.GameObject is BattleNpc battleNpc)
+                    if (data.GameObject is IBattleNpc battleNpc)
                     {
                         if ((BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.Pet ||
                             (BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.Chocobo)
@@ -195,7 +195,7 @@ namespace DelvUI.Interface.Nameplates
             {
                 Vector3 direction = Vector3.Normalize(data.WorldPosition - cameraPos);
                 RaycastHit hit;
-                obstructed = collisionModule->RaycastEx(&hit, cameraPos, direction, data.Distance, 1, flags);
+                obstructed = collisionModule->RaycastMaterialFilter(&hit, cameraPos, direction, data.Distance, 1, flags);
             }
             // full mode
             else
@@ -212,7 +212,7 @@ namespace DelvUI.Interface.Nameplates
                     Ray ray = camera.ScreenPointToRay(point);
                     RaycastHit hit;
 
-                    if (collisionModule->RaycastEx(&hit, ray.Origin, ray.Direction, data.Distance, 1, flags))
+                    if (collisionModule->RaycastMaterialFilter(&hit, ray.Origin, ray.Direction, data.Distance, 1, flags))
                     {
                         obstructionCount++;
                     }

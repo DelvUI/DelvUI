@@ -47,7 +47,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             Vector2 pos = origin + Config.Position;
 
@@ -67,7 +67,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawSurgingTempestBar(Vector2 origin, PlayerCharacter player)
+        private void DrawSurgingTempestBar(Vector2 origin, IPlayerCharacter player)
         {
             float surgingTempestDuration = Math.Abs(Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 2677)?.RemainingTime ?? 0f);
 
@@ -80,7 +80,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawBeastGauge(Vector2 origin, PlayerCharacter player)
+        private void DrawBeastGauge(Vector2 origin, IPlayerCharacter player)
         {
             WARGauge gauge = Plugin.JobGauges.Get<WARGauge>();
             var nascentChaosDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1897)?.RemainingTime ?? 0f;
@@ -98,7 +98,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawInnerReleaseBar(Vector2 origin, PlayerCharacter player)
+        private void DrawInnerReleaseBar(Vector2 origin, IPlayerCharacter player)
         {
             var innerReleaseStatus = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1177 or 86);
 

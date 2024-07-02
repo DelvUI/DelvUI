@@ -12,7 +12,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         private PullTimerConfig Config => (PullTimerConfig)_config;
 
-        public GameObject? Actor { get; set; } = null;
+        public IGameObject? Actor { get; set; } = null;
 
         public PullTimerHud(PullTimerConfig config, string displayName) : base(config, displayName) { }
 

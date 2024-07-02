@@ -73,7 +73,7 @@ namespace DelvUI.Interface.Party
                     continue;
                 }
 
-                if (member.Character is not BattleChara battleChara || member.HP <= 0)
+                if (member.Character is not IBattleChara battleChara || member.HP <= 0)
                 {
                     member.InvulnStatus = null;
                     continue;

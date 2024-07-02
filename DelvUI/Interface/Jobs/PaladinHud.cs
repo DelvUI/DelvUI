@@ -55,7 +55,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             Vector2 pos = origin + Config.Position;
 
@@ -80,7 +80,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawOathGauge(Vector2 origin, PlayerCharacter player)
+        private void DrawOathGauge(Vector2 origin, IPlayerCharacter player)
         {
             PLDGauge gauge = Plugin.JobGauges.Get<PLDGauge>();
 
@@ -96,7 +96,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawFightOrFlightBar(Vector2 origin, PlayerCharacter player)
+        private void DrawFightOrFlightBar(Vector2 origin, IPlayerCharacter player)
         {
             float fightOrFlightDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 76)?.RemainingTime ?? 0f;
 
@@ -109,7 +109,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawRequiescatBar(Vector2 origin, PlayerCharacter player)
+        private void DrawRequiescatBar(Vector2 origin, IPlayerCharacter player)
         {
             Status? requiescatBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1368);
             float requiescatDuration = Math.Max(0f, requiescatBuff?.RemainingTime ?? 0f);
@@ -130,7 +130,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawAtonementBar(Vector2 origin, PlayerCharacter player)
+        private void DrawAtonementBar(Vector2 origin, IPlayerCharacter player)
         {
             byte stackCount = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1902)?.StackCount ?? 0;
 

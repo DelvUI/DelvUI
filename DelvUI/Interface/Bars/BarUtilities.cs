@@ -14,7 +14,7 @@ namespace DelvUI.Interface.Bars
 {
     public class BarUtilities
     {
-        public static BarHud GetProgressBar(ProgressBarConfig config, float current, float max, float min = 0f, GameObject? actor = null, PluginConfigColor? fillColor = null, BarGlowConfig? barGlowConfig = null)
+        public static BarHud GetProgressBar(ProgressBarConfig config, float current, float max, float min = 0f, IGameObject? actor = null, PluginConfigColor? fillColor = null, BarGlowConfig? barGlowConfig = null)
         {
             return GetProgressBar(config, config.ThresholdConfig, new LabelConfig[] { config.Label }, current, max, min, actor, fillColor, barGlowConfig);
         }
@@ -26,7 +26,7 @@ namespace DelvUI.Interface.Bars
             float current,
             float max,
             float min = 0f,
-            GameObject? actor = null,
+            IGameObject? actor = null,
             PluginConfigColor? fillColor = null,
             BarGlowConfig? glowConfig = null,
             PluginConfigColor? backgroundColor = null
@@ -57,7 +57,7 @@ namespace DelvUI.Interface.Bars
 
         public static BarHud? GetProcBar(
             ProgressBarConfig config,
-            PlayerCharacter player,
+            IPlayerCharacter player,
             uint statusId,
             float maxDuration,
             bool trackDuration = true)
@@ -67,7 +67,7 @@ namespace DelvUI.Interface.Bars
 
         public static BarHud? GetProcBar(
             ProgressBarConfig config,
-            PlayerCharacter player,
+            IPlayerCharacter player,
             List<uint> statusIDs,
             List<float> maxDurations,
             bool trackDuration = true)
@@ -95,8 +95,8 @@ namespace DelvUI.Interface.Bars
 
         public static BarHud? GetDoTBar(
             ProgressBarConfig config,
-            PlayerCharacter player,
-            GameObject? target,
+            IPlayerCharacter player,
+            IGameObject? target,
             uint statusId,
             float maxDuration)
         {
@@ -105,8 +105,8 @@ namespace DelvUI.Interface.Bars
 
         public static BarHud? GetDoTBar(
             ProgressBarConfig config,
-            PlayerCharacter player,
-            GameObject? target,
+            IPlayerCharacter player,
+            IGameObject? target,
             List<uint> statusIDs,
             List<float> maxDurations)
         {
@@ -114,9 +114,9 @@ namespace DelvUI.Interface.Bars
 
             Status? status = null;
 
-            if (target != null && target is BattleChara targetChara)
+            if (target != null && target is IBattleChara targetChara)
             {
-                status = Utils.StatusListForBattleChara(targetChara).FirstOrDefault(o => o.SourceId == player.ObjectId && statusIDs.Contains(o.StatusId));
+                status = Utils.StatusListForBattleChara(targetChara).FirstOrDefault(o => o.SourceId == player.GameObjectId && statusIDs.Contains(o.StatusId));
             }
 
             if (status == null && config.HideWhenInactive)
@@ -162,7 +162,7 @@ namespace DelvUI.Interface.Bars
         public static BarHud[] GetChunkedBars(
             ChunkedBarConfig config,
             Tuple<PluginConfigColor, float, LabelConfig?>[] chunks,
-            GameObject? actor,
+            IGameObject? actor,
             BarGlowConfig glowConfig)
         {
             List<bool> chunksToGlowList = new();
@@ -177,7 +177,7 @@ namespace DelvUI.Interface.Bars
         public static BarHud[] GetChunkedBars(
             ChunkedBarConfig config,
             Tuple<PluginConfigColor, float, LabelConfig?>[] chunks,
-            GameObject? actor,
+            IGameObject? actor,
             BarGlowConfig? glowConfig = null,
             bool[]? chunksToGlow = null)
         {
@@ -231,7 +231,7 @@ namespace DelvUI.Interface.Bars
             float current,
             float max,
             float min = 0f,
-            GameObject? actor = null,
+            IGameObject? actor = null,
             LabelConfig?[]? labels = null,
             PluginConfigColor? fillColor = null,
             PluginConfigColor? partialFillColor = null,
@@ -266,7 +266,7 @@ namespace DelvUI.Interface.Bars
             float current,
             float max,
             float min = 0f,
-            GameObject? actor = null,
+            IGameObject? actor = null,
             BarGlowConfig? glowConfig = null,
             PluginConfigColor? fillColor = null,
             int thresholdChunk = 1,
@@ -355,7 +355,7 @@ namespace DelvUI.Interface.Bars
             float current,
             float max,
             float min = 0f,
-            GameObject? actor = null,
+            IGameObject? actor = null,
             PluginConfigColor? fillColor = null,
             BarGlowConfig? glowConfig = null,
             LabelConfig[]? labels = null)
@@ -406,7 +406,7 @@ namespace DelvUI.Interface.Bars
                 ShowMarker = false
             };
 
-        public static void AddShield(BarHud bar, BarConfig config, ShieldConfig shieldConfig, Character character, Vector2 fillSize, PluginConfigColor? color = null)
+        public static void AddShield(BarHud bar, BarConfig config, ShieldConfig shieldConfig, ICharacter character, Vector2 fillSize, PluginConfigColor? color = null)
         {
             if (shieldConfig.Enabled)
             {

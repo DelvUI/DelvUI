@@ -50,6 +50,7 @@ namespace DelvUI.Helpers
             [JobIDs.RDM] = 7504,  // Riposte
             [JobIDs.BLM] = 142,   // Blizzard
             [JobIDs.THM] = 142,   // Blizzard
+            [JobIDs.PCT] = 34650, // Fire in Red
 
             [JobIDs.SAM] = 7477,  // Hakaze
             [JobIDs.NIN] = 2240,  // Spinning Edge
@@ -59,11 +60,12 @@ namespace DelvUI.Helpers
             [JobIDs.DRG] = 75,    // True Thrust
             [JobIDs.LNC] = 75,    // True Thrust
             [JobIDs.RPR] = 24373, // Slice
+            [JobIDs.VPR] = 34606, // Steel Fangs
 
             [JobIDs.BLU] = 11385  // Water Cannon
         };
 
-        public static unsafe bool GetGCDInfo(PlayerCharacter player, out float timeElapsed, out float timeTotal, ActionType actionType = ActionType.Action)
+        public static unsafe bool GetGCDInfo(IPlayerCharacter player, out float timeElapsed, out float timeTotal, ActionType actionType = ActionType.Action)
         {
             if (player is null || !JobActionIDs.TryGetValue(player.ClassJob.Id, out var actionId))
             {

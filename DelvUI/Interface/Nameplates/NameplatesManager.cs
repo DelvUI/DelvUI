@@ -91,7 +91,7 @@ namespace DelvUI.Interface.Nameplates
         {
             if (!_config.Enabled) { return; }
 
-            UIModule* uiModule = StructsFramework.Instance()->GetUiModule();
+            UIModule* uiModule = StructsFramework.Instance()->GetUIModule();
             if (uiModule == null) { return; }
 
             UI3DModule* ui3DModule = uiModule->GetUI3DModule();
@@ -104,10 +104,10 @@ namespace DelvUI.Interface.Nameplates
             if (atkModule == null || atkModule->AtkModule.AtkArrayDataHolder.StringArrayCount <= NameplateDataArrayIndex) { return; }
 
             StringArrayData* stringArray = atkModule->AtkModule.AtkArrayDataHolder.StringArrays[NameplateDataArrayIndex];
-            NamePlateInfo* infoArray = &atkModule->NamePlateInfoArray;
+            Span<NamePlateInfo> infoArray = atkModule->NamePlateInfoEntries;
             Camera camera = Control.Instance()->CameraManager.Camera->CameraBase.SceneCamera;
 
-            GameObject? target = Plugin.TargetManager.Target;
+            IGameObject? target = Plugin.TargetManager.Target;
             bool foundTarget = false;
             NameplateData? targetData = null;
 
@@ -118,7 +118,7 @@ namespace DelvUI.Interface.Nameplates
             {
                 try
                 {
-                    ObjectInfo* objectInfo = ((ObjectInfo**)ui3DModule->NamePlateObjectInfoPointerArray)[i];
+                    ObjectInfo* objectInfo = ui3DModule->NamePlateObjectInfoPointers[i];
                     if (objectInfo == null || objectInfo->NamePlateIndex >= NameplateCount) { continue; }
 
                     // actor
@@ -126,7 +126,7 @@ namespace DelvUI.Interface.Nameplates
                     if (obj == null) { continue; }
 
                     bool isTarget = false;
-                    GameObject? gameObject = Plugin.ObjectTable.CreateObjectReference(new IntPtr(obj));
+                    IGameObject? gameObject = Plugin.ObjectTable.CreateObjectReference(new IntPtr(obj));
                     if (target != null && new IntPtr(obj) == target.Address)
                     {
                         isTarget = true;
@@ -169,7 +169,7 @@ namespace DelvUI.Interface.Nameplates
                     AtkUldAsset* textureInfo = nameplateObject.IconImageNode->PartsList->Parts[nameplateObject.IconImageNode->PartId].UldAsset;
                     if (textureInfo != null && textureInfo->AtkTexture.Resource != null)
                     {
-                        iconId = textureInfo->AtkTexture.Resource->IconID;
+                        iconId = (int)textureInfo->AtkTexture.Resource->IconId;
                     }
 
                     // order
@@ -207,7 +207,7 @@ namespace DelvUI.Interface.Nameplates
                         _data.Add(data);
                     }
 
-                    _cache.Add(obj->ObjectID, data);
+                    _cache.Add(obj->GetGameObjectId().ObjectId, data);
                 }
                 catch { }
             }
@@ -223,7 +223,7 @@ namespace DelvUI.Interface.Nameplates
             else if (_config.AlwaysShowTargetNameplate && target != null && !foundTarget)
             {
                 StructsGameObject* obj = (StructsGameObject*)target.Address;
-                NameplateData? cachedData = _cache[target.ObjectId];
+                NameplateData? cachedData = _cache[(uint)target.GameObjectId];
 
                 Vector3 worldPos = new Vector3(target.Position.X, target.Position.Y + obj->Height * 2.2f, target.Position.Z);
                 float distance = Vector3.Distance(camera.Object.Position, worldPos);
@@ -297,7 +297,7 @@ namespace DelvUI.Interface.Nameplates
 
         public void Add(uint key, NameplateData data)
         {
-            if (key == 0 || key == GameObject.InvalidGameObjectId) { return; }
+            if (key == 0 || key == 0xE0000000) { return; }
 
             if (_dict.Count == _limit)
             {
@@ -338,7 +338,7 @@ namespace DelvUI.Interface.Nameplates
 
     public struct NameplateData
     {
-        public GameObject? GameObject;
+        public IGameObject? GameObject;
         public string Name;
         public string Title;
         public bool IsTitlePrefix;
@@ -351,7 +351,7 @@ namespace DelvUI.Interface.Nameplates
         public float Distance;
         public bool IgnoreOcclusion;
 
-        public NameplateData(GameObject? gameObject, string name, string title, bool isTitlePrefix, int namePlateIconId, string order, ObjectKind kind, byte subKind, Vector2 screenPosition, Vector3 worldPosition, float distance, bool ignoreOcclusion = false)
+        public NameplateData(IGameObject? gameObject, string name, string title, bool isTitlePrefix, int namePlateIconId, string order, ObjectKind kind, byte subKind, Vector2 screenPosition, Vector3 worldPosition, float distance, bool ignoreOcclusion = false)
         {
             GameObject = gameObject;
             Name = name;

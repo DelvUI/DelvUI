@@ -28,7 +28,7 @@ namespace DelvUI.Interface.Bars
 
         private DrawAnchor Anchor { get; set; }
 
-        private GameObject? Actor { get; set; }
+        private IGameObject? Actor { get; set; }
 
         private PluginConfigColor? GlowColor { get; set; }
 
@@ -48,7 +48,7 @@ namespace DelvUI.Interface.Bars
             PluginConfigColor? borderColor = null,
             int borderThickness = 1,
             DrawAnchor anchor = DrawAnchor.TopLeft,
-            GameObject? actor = null,
+            IGameObject? actor = null,
             PluginConfigColor? glowColor = null,
             int? glowSize = 1,
             float? current = null,
@@ -72,7 +72,7 @@ namespace DelvUI.Interface.Bars
             BarTextureDrawMode = barTextureDrawMode;
         }
 
-        public BarHud(BarConfig config, GameObject? actor = null, BarGlowConfig? glowConfig = null, float? current = null, float? max = null)
+        public BarHud(BarConfig config, IGameObject? actor = null, BarGlowConfig? glowConfig = null, float? current = null, float? max = null)
             : this(config.ID, 
                   config.DrawBorder, 
                   config.BorderColor, 

@@ -1,6 +1,7 @@
 ﻿using Dalamud.Hooking;
 using Dalamud.Logging;
 using Dalamud.Memory;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Info;
 using ImGuiNET;
 using System;
@@ -17,29 +18,28 @@ namespace DelvUI.Interface.Party
     public class PartyReadyCheckHelper : IDisposable
     {
         private delegate void ReadyCheckDelegate(IntPtr ptr);
-        private Hook<ReadyCheckDelegate>? _onReadyCheckStartHook;
-        private Hook<ReadyCheckDelegate>? _onReadyCheckEndHook;
+        private Hook<AgentReadyCheck.Delegates.InitiateReadyCheck>? _onReadyCheckStartHook;
+        private Hook<AgentReadyCheck.Delegates.EndReadyCheck>? _onReadyCheckEndHook;
 
         private delegate void ActorControlDelegate(uint entityId, uint id, uint unk1, uint type, uint unk2, uint unk3, uint unk4, uint unk5, UInt64 targetId, byte unk6);
         private Hook<ActorControlDelegate>? _actorControlHook;
 
-        private IntPtr _readyCheckData = IntPtr.Zero;
         private bool _readyCheckOngoing = false;
         private double _lastReadyCheckEndTime = -1;
 
 
-        public PartyReadyCheckHelper()
+        public unsafe PartyReadyCheckHelper()
         {
             try
             {
-                _onReadyCheckStartHook = Plugin.GameInteropProvider.HookFromSignature<ReadyCheckDelegate>(
-                    "40 ?? 48 83 ?? ?? 48 8B ?? E8 ?? ?? ?? ?? 48 ?? ?? ?? 33 C0 ?? 89",
+                _onReadyCheckStartHook = Plugin.GameInteropProvider.HookFromAddress<AgentReadyCheck.Delegates.InitiateReadyCheck>(
+                    AgentReadyCheck.MemberFunctionPointers.InitiateReadyCheck, 
                     OnReadyCheckStart
                 );
                 _onReadyCheckStartHook?.Enable();
 
-                _onReadyCheckEndHook = Plugin.GameInteropProvider.HookFromSignature<ReadyCheckDelegate>(
-                    "40 ?? 53 48 ?? ?? ?? ?? 48 81 ?? ?? ?? ?? ?? 48 8B ?? ?? ?? ?? ?? 48 33 ?? ?? 89 ?? ?? ?? 83 ?? ?? ?? 48 8B ?? 75 ?? 48",
+                _onReadyCheckEndHook = Plugin.GameInteropProvider.HookFromAddress<AgentReadyCheck.Delegates.EndReadyCheck>(
+                    AgentReadyCheck.MemberFunctionPointers.EndReadyCheck,
                     OnReadycheckEnd
                 );
                 _onReadyCheckEndHook?.Enable();
@@ -79,17 +79,15 @@ namespace DelvUI.Interface.Party
             _actorControlHook?.Dispose();
         }
 
-        private void OnReadyCheckStart(IntPtr ptr)
+        private unsafe void OnReadyCheckStart(AgentReadyCheck *ptr)
         {
             _onReadyCheckStartHook?.Original(ptr);
-            _readyCheckData = ptr;
             _readyCheckOngoing = true;
         }
 
-        private void OnReadycheckEnd(IntPtr ptr)
+        private unsafe void OnReadycheckEnd(AgentReadyCheck *ptr)
         {
             _onReadyCheckEndHook?.Original(ptr);
-            _readyCheckData = ptr;
             _readyCheckOngoing = false;
             _lastReadyCheckEndTime = ImGui.GetTime();
         }
@@ -102,60 +100,43 @@ namespace DelvUI.Interface.Party
             // which is all I care about
             if (id == 503)
             {
-                _readyCheckData = IntPtr.Zero;
+                _readyCheckOngoing = false;
             }
         }
 
         public void Update(double maxDuration)
         {
-            if (_readyCheckData != IntPtr.Zero && !_readyCheckOngoing && ImGui.GetTime() - _lastReadyCheckEndTime >= maxDuration)
+            if (ImGui.GetTime() - _lastReadyCheckEndTime >= maxDuration)
             {
-                _readyCheckData = IntPtr.Zero;
+                _readyCheckOngoing = false;
             }
         }
 
         public unsafe ReadyCheckStatus GetStatusForIndex(int index, bool isCrossWorld)
         {
-            if (_readyCheckData == IntPtr.Zero || index < 0 || index > 7)
+            if (!_readyCheckOngoing || index < 0 || index > 7)
             {
                 return ReadyCheckStatus.None;
             }
 
-            int rawStatus = -1;
-            if (!isCrossWorld)
+            try
             {
-                int* ptr = (int*)(_readyCheckData + 0xB8 + (0x10 * index));
-                rawStatus = *ptr;
+                ReadyCheckEntry entry = AgentReadyCheck.Instance()->ReadyCheckEntries[index];
+                return ParseStatus(entry);
             }
-            else
-            {
-                for (int i = 0; i < 8; i++)
-                {
-                    long* ptr = (long*)(_readyCheckData + 0xB0 + (0x10 * i));
-                    long id = *ptr;
+            catch { }
 
-                    CrossRealmMember* member = InfoProxyCrossRealm.GetMemberByContentId((ulong)id);
-                    if (member == null) { continue; }
-
-                    if (member->MemberIndex == index)
-                    {
-                        int* p = (int*)(_readyCheckData + 0xB8 + (0x10 * i));
-                        rawStatus = *p;
-                        break;
-                    }
-                }
-            }
-
-            return ParseStatus(rawStatus);
+            return ReadyCheckStatus.None;
         }
 
-        private ReadyCheckStatus ParseStatus(int rawValue)
+        private ReadyCheckStatus ParseStatus(ReadyCheckEntry entry)
         {
-            if (rawValue == 2)
+            if (entry.Status == FFXIVClientStructs.FFXIV.Client.UI.Agent.ReadyCheckStatus.Ready)
             {
                 return ReadyCheckStatus.Ready;
             }
-            else if (rawValue > 2 && rawValue < 5)
+            else if (entry.Status == FFXIVClientStructs.FFXIV.Client.UI.Agent.ReadyCheckStatus.NotReady ||
+                     entry.Status == FFXIVClientStructs.FFXIV.Client.UI.Agent.ReadyCheckStatus.MemberNotPresent)
             {
                 return ReadyCheckStatus.NotReady;
             }
