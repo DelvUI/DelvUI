@@ -76,7 +76,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             Vector2 pos = origin + Config.Position;
 
@@ -111,7 +111,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawAstrodyneBar(Vector2 origin, PlayerCharacter player)
+        private void DrawAstrodyneBar(Vector2 origin, IPlayerCharacter player)
         {
             List<PluginConfigColor> chunkColors = new();
             ASTGauge gauge = Plugin.JobGauges.Get<ASTGauge>();
@@ -194,7 +194,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawDraw(Vector2 origin, PlayerCharacter player)
+        private void DrawDraw(Vector2 origin, IPlayerCharacter player)
         {
             ASTGauge gauge = Plugin.JobGauges.Get<ASTGauge>();
 
@@ -311,7 +311,7 @@ namespace DelvUI.Interface.Jobs
             AddDrawActions(bar.GetDrawActions(origin, Config.DrawBar.StrataLevel));
         }
 
-        private void DrawMinorArcana(Vector2 pos, PlayerCharacter player)
+        private void DrawMinorArcana(Vector2 pos, IPlayerCharacter player)
         {
             ASTGauge gauge = Plugin.JobGauges.Get<ASTGauge>();
 
@@ -386,9 +386,9 @@ namespace DelvUI.Interface.Jobs
             AddDrawActions(bar.GetDrawActions(pos, Config.MinorArcanaBar.StrataLevel));
         }
 
-        private void DrawDot(Vector2 origin, PlayerCharacter player)
+        private void DrawDot(Vector2 origin, IPlayerCharacter player)
         {
-            GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            IGameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             BarHud? bar = BarUtilities.GetDoTBar(Config.DotBar, player, target, DotIDs, DotDuration);
             if (bar != null)
             {
@@ -396,9 +396,9 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawLightspeed(Vector2 origin, PlayerCharacter player)
+        private void DrawLightspeed(Vector2 origin, IPlayerCharacter player)
         {
-            float lightspeedDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 841 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
+            float lightspeedDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 841 && o.SourceId == player.GameObjectId)?.RemainingTime ?? 0f;
 
             if (Config.LightspeedBar.HideWhenInactive && !(lightspeedDuration > 0))
             {
@@ -411,10 +411,10 @@ namespace DelvUI.Interface.Jobs
             AddDrawActions(bar.GetDrawActions(origin, Config.LightspeedBar.StrataLevel));
         }
 
-        private void DrawStar(Vector2 origin, PlayerCharacter player)
+        private void DrawStar(Vector2 origin, IPlayerCharacter player)
         {
-            float starPreCookingBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1224 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
-            float starPostCookingBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1248 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
+            float starPreCookingBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1224 && o.SourceId == player.GameObjectId)?.RemainingTime ?? 0f;
+            float starPostCookingBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1248 && o.SourceId == player.GameObjectId)?.RemainingTime ?? 0f;
 
             if (Config.StarBar.HideWhenInactive && starPostCookingBuff == 0f && starPreCookingBuff == 0f)
             {

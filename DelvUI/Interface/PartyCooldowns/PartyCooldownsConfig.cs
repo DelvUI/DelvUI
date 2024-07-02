@@ -558,7 +558,7 @@ namespace DelvUI.Interface.PartyCooldowns
             // 5. Misc (Provoke, Shirk, Switcast, Rescue, etc)
 
             // TANKS -------------------------------------------------------------------------------------------------
-            [7535] = NewData(7535, JobRoles.Tank, 22, 60, 10, 100, 1, PartyCooldownEnabled.PartyFrames), // reprisal
+            [7535] = NewData(7535, JobRoles.Tank, 22, 60, 15, 100, 1, PartyCooldownEnabled.PartyFrames), // reprisal
             [7531] = NewData(7531, JobRoles.Tank, 8, 90, 20, 50, 4, PartyCooldownEnabled.PartyFrames), // rampart
             [7533] = NewData(7533, JobRoles.Tank, 15, 30, 1, 50, 5, PartyCooldownEnabled.PartyFrames), // provoke
             [7537] = NewData(7537, JobRoles.Tank, 48, 120, 1, 50, 5, PartyCooldownEnabled.PartyFrames), // shirk
@@ -605,7 +605,7 @@ namespace DelvUI.Interface.PartyCooldowns
             [7571] = NewData(7571, JobRoles.Healer, 48, 120, 0, 80, 5, PartyCooldownEnabled.Disabled), // rescue
 
             // AST
-            [16552] = NewData(16552, JobIDs.AST, 50, 120, 15, 30, 3, PartyCooldownEnabled.PartyCooldowns), // divination
+            [16552] = NewData(16552, JobIDs.AST, 50, 120, 20, 30, 3, PartyCooldownEnabled.PartyCooldowns), // divination
             [3613] = NewData(3613, JobIDs.AST, 58, 60, 18, 80, 2, PartyCooldownEnabled.PartyFrames), // collective unconscious
             [16553] = NewData(16553, JobIDs.AST, 60, 60, 15, 80, 2, PartyCooldownEnabled.PartyFrames), // celestial opposition
             [7439] = NewData(7439, JobIDs.AST, 62, 60, 20, 80, 2, PartyCooldownEnabled.PartyFrames), // earthly star (stellar detonation = 8324)
@@ -620,7 +620,7 @@ namespace DelvUI.Interface.PartyCooldowns
             [3585] = NewData(3585, JobIDs.SCH, 56, 90, 1, 80, 2, PartyCooldownEnabled.PartyFrames), // deployment tactics
             [25867] = NewData(25867, JobIDs.SCH, 86, 60, 10, 80, 2, PartyCooldownEnabled.PartyFrames), // protraction
             [25868] = NewData(25868, JobIDs.SCH, 90, 120, 20, 80, 2, PartyCooldownEnabled.PartyFrames), // expedient
-            [7436] = NewData(7436, JobIDs.SCH, 66, 120, 15, 30, 3, PartyCooldownEnabled.PartyCooldowns), // chain stratagem
+            [7436] = NewData(7436, JobIDs.SCH, 66, 120, 20, 30, 3, PartyCooldownEnabled.PartyCooldowns), // chain stratagem
             [7434] = NewData(7434, JobIDs.SCH, 62, 45, 1, 50, 4, PartyCooldownEnabled.PartyFrames), // excogitation
 
             // WHM
@@ -643,7 +643,7 @@ namespace DelvUI.Interface.PartyCooldowns
             [24317] = NewData(24317, JobIDs.SGE, 86, 60, 10, 10, 4, PartyCooldownEnabled.PartyFrames), // krasis
 
             // MELEE -------------------------------------------------------------------------------------------------
-            [7549] = NewData(7549, JobRoles.DPSMelee, 22, 90, 10, 100, 1, PartyCooldownEnabled.PartyFrames), // feint
+            [7549] = NewData(7549, JobRoles.DPSMelee, 22, 90, 15, 100, 1, PartyCooldownEnabled.PartyFrames), // feint
             [7542] = NewData(7542, JobRoles.DPSMelee, 12, 90, 20, 10, 4, PartyCooldownEnabled.PartyFrames), // bloodbath
 
             // SAM
@@ -655,13 +655,12 @@ namespace DelvUI.Interface.PartyCooldowns
             [2241] = NewData(2241, JobIDs.NIN, 2, 120, 20, 20, 4, PartyCooldownEnabled.PartyFrames), // shade shift
 
             // DRG
-            [3557] = NewData(3557, JobIDs.DRG, 52, 120, 15, 30, 3, PartyCooldownEnabled.PartyCooldowns), // battle litany
-            [7398] = NewData(7398, JobIDs.DRG, 66, 120, 20, 30, 3, PartyCooldownEnabled.PartyCooldowns), // dragon sight
+            [3557] = NewData(3557, JobIDs.DRG, 52, 120, 20, 30, 3, PartyCooldownEnabled.PartyCooldowns), // battle litany
             [85] = NewData(85, JobIDs.DRG, 30, 60, 20, 10, 3, PartyCooldownEnabled.PartyFrames), // lance charge
 
             // MNK
             [65] = NewData(65, JobIDs.MNK, 42, 90, 15, 50, 2, PartyCooldownEnabled.PartyFrames), // mantra
-            [7396] = NewData(7396, JobIDs.MNK, 70, 120, 15, 90, 3, PartyCooldownEnabled.PartyCooldowns), // brotherhood
+            [7396] = NewData(7396, JobIDs.MNK, 70, 120, 20, 90, 3, PartyCooldownEnabled.PartyCooldowns), // brotherhood
             [7395] = NewData(7395, JobIDs.MNK, 68, 60, 20, 10, 3, PartyCooldownEnabled.PartyFrames), // riddle of fire
             [7394] = NewData(7394, JobIDs.MNK, 64, 120, 15, 20, 4, PartyCooldownEnabled.PartyFrames), // riddle of earth
 
@@ -671,7 +670,7 @@ namespace DelvUI.Interface.PartyCooldowns
 
             // RANGED -------------------------------------------------------------------------------------------------
             // BRD
-            [118] = NewData(118, JobIDs.BRD, 50, 120, 15, 30, 3, PartyCooldownEnabled.PartyCooldowns), // battle voice
+            [118] = NewData(118, JobIDs.BRD, 50, 120, 20, 30, 3, PartyCooldownEnabled.PartyCooldowns), // battle voice
             [7405] = NewData(7405, JobIDs.BRD, 62, 90, 15, 70, 2, PartyCooldownEnabled.PartyFrames, "90-120"), // troubadour
             [7408] = NewData(7408, JobIDs.BRD, 66, 120, 15, 40, 2, PartyCooldownEnabled.PartyFrames), // nature's minne
             [25785] = NewData(25785, JobIDs.BRD, 90, 110, 15, 30, 3, PartyCooldownEnabled.PartyCooldowns), // radiant finale
@@ -687,14 +686,14 @@ namespace DelvUI.Interface.PartyCooldowns
             [2887] = NewData(2887, JobIDs.MCH, 62, 120, 10, 70, 2, PartyCooldownEnabled.PartyFrames), // dismantle
 
             // CASTER -------------------------------------------------------------------------------------------------
-            [7560] = NewData(7560, JobRoles.DPSCaster, 8, 90, 10, 100, 1, PartyCooldownEnabled.PartyFrames), // addle
+            [7560] = NewData(7560, JobRoles.DPSCaster, 8, 90, 15, 100, 1, PartyCooldownEnabled.PartyFrames), // addle
 
             // RDM
             [25857] = NewData(25857, JobIDs.RDM, 86, 120, 10, 70, 2, PartyCooldownEnabled.PartyCooldownsAndPartyFrames), // magick barrier
             [7520] = NewData(7520, JobIDs.RDM, 58, 120, 20, 30, 3, PartyCooldownEnabled.PartyCooldowns), // embolden
 
             // SMN
-            [25801] = NewData(25801, JobIDs.SMN, 66, 120, 30, 30, 3, PartyCooldownEnabled.PartyCooldowns), // searing light
+            [25801] = NewData(25801, JobIDs.SMN, 66, 120, 20, 30, 3, PartyCooldownEnabled.PartyCooldowns), // searing light
             [25799] = NewData(25799, JobIDs.SMN, 2, 60, 30, 10, 3, PartyCooldownEnabled.PartyFrames), // radiant aegis
 
             // BLM
@@ -703,7 +702,7 @@ namespace DelvUI.Interface.PartyCooldowns
 
             // MULTI-ROLE  -------------------------------------------------------------------------------------------------
             [7541] = NewData(7541, new List<JobRoles>() { JobRoles.DPSMelee, JobRoles.DPSRanged }, 8, 120, 0, 80, 4, PartyCooldownEnabled.PartyFrames), // second wind
-            [7561] = NewData(7561, new List<JobRoles>() { JobRoles.Healer, JobRoles.DPSCaster }, 18, 60, 1, 80, 5, PartyCooldownEnabled.PartyFrames, null, new HashSet<uint>() { JobIDs.BLM, JobIDs.SMN, JobIDs.RDM }), // swiftcast
+            [7561] = NewData(7561, new List<JobRoles>() { JobRoles.Healer, JobRoles.DPSCaster }, 18, 40, 1, 80, 5, PartyCooldownEnabled.PartyFrames, null, new HashSet<uint>() { JobIDs.BLM, JobIDs.SMN, JobIDs.RDM }), // swiftcast
             [7562] = NewData(7562, new List<JobRoles>() { JobRoles.Healer, JobRoles.DPSCaster }, 14, 60, 21, 80, 5, PartyCooldownEnabled.Disabled), // lucid dreaming
         };
 

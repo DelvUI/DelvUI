@@ -169,9 +169,9 @@ namespace DelvUI.Interface.PartyCooldowns
                 if (!_cooldownsMap.ContainsKey(actorId))
                 {
                     // check if its a party member's pet
-                    GameObject? actor = Plugin.ObjectTable.SearchById(actorId);
+                    IGameObject? actor = Plugin.ObjectTable.SearchById(actorId);
 
-                    if (actor is BattleNpc battleNpc && _cooldownsMap.ContainsKey(battleNpc.OwnerId))
+                    if (actor is IBattleNpc battleNpc && _cooldownsMap.ContainsKey(battleNpc.OwnerId))
                     {
                         actorId = battleNpc.OwnerId;
                     }
@@ -243,7 +243,7 @@ namespace DelvUI.Interface.PartyCooldowns
                 var player = Plugin.ClientState.LocalPlayer;
                 if (_config.ShowWhenSolo && player != null)
                 {
-                    _cooldownsMap.Add(player.ObjectId, CooldownsForMember(player.ObjectId, player.ClassJob.Id, player.Level, null));
+                    _cooldownsMap.Add((uint)player.GameObjectId, CooldownsForMember((uint)player.GameObjectId, player.ClassJob.Id, player.Level, null));
                 }
             }
             else if (!_config.ShowOnlyInDuties || Plugin.Condition[ConditionFlag.BoundByDuty])

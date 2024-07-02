@@ -24,7 +24,7 @@ namespace DelvUI.Helpers
             }
         }
 
-        public static Dictionary<string, Func<GameObject?, string?, int, bool?, string>> TextTags = new Dictionary<string, Func<GameObject?, string?, int, bool?, string>>()
+        public static Dictionary<string, Func<IGameObject?, string?, int, bool?, string>> TextTags = new Dictionary<string, Func<IGameObject?, string?, int, bool?, string>>()
         {
             #region generic names
             ["[name]"] = (actor, name, length, isPlayerName) =>
@@ -98,7 +98,7 @@ namespace DelvUI.Helpers
             #endregion
         };
 
-        public static Dictionary<string, Func<GameObject?, string?, string>> ExpTags = new Dictionary<string, Func<GameObject?, string?, string>>()
+        public static Dictionary<string, Func<IGameObject?, string?, string>> ExpTags = new Dictionary<string, Func<IGameObject?, string?, string>>()
         {
             #region experience
             ["[exp:current]"] = (actor, name) => ExperienceHelper.Instance.CurrentExp.ToString(),
@@ -197,7 +197,7 @@ namespace DelvUI.Helpers
             #endregion
         };
 
-        public static Dictionary<string, Func<Character, string>> CharaTextTags = new Dictionary<string, Func<Character, string>>()
+        public static Dictionary<string, Func<ICharacter, string>> CharaTextTags = new Dictionary<string, Func<ICharacter, string>>()
         {
             #region misc
             ["[distance]"] = (chara) => (chara.YalmDistanceX + 1).ToString(),
@@ -216,7 +216,7 @@ namespace DelvUI.Helpers
             {
                 unsafe
                 {
-                    if (chara is BattleNpc npc && npc.BattleNpcKind == BattleNpcSubKind.Chocobo)
+                    if (chara is IBattleNpc npc && npc.BattleNpcKind == BattleNpcSubKind.Chocobo)
                     {
                         float seconds = UIState.Instance()->Buddy.CompanionInfo.TimeLeft;
                         if (seconds <= 0)
@@ -254,7 +254,7 @@ namespace DelvUI.Helpers
 
         private static string ReplaceTagWithString(
             string tag,
-            GameObject? actor,
+            IGameObject? actor,
             string? name = null,
             uint? current = null,
             uint? max = null,
@@ -264,18 +264,18 @@ namespace DelvUI.Helpers
             int length = 0;
             ParseLength(ref tag, ref length);
 
-            if (TextTags.TryGetValue(tag, out Func<GameObject?, string?, int, bool?, string>? func) && func != null)
+            if (TextTags.TryGetValue(tag, out Func<IGameObject?, string?, int, bool?, string>? func) && func != null)
             {
                 return func(actor, name, length, isPlayerName);
             }
 
-            if (ExpTags.TryGetValue(tag, out Func<GameObject?, string?, string>? expFunc) && expFunc != null)
+            if (ExpTags.TryGetValue(tag, out Func<IGameObject?, string?, string>? expFunc) && expFunc != null)
             {
                 return expFunc(actor, name);
             }
 
-            if (actor is Character chara &&
-                CharaTextTags.TryGetValue(tag, out Func<Character, string>? charaFunc) && charaFunc != null)
+            if (actor is ICharacter chara &&
+                CharaTextTags.TryGetValue(tag, out Func<ICharacter, string>? charaFunc) && charaFunc != null)
             {
                 return charaFunc(chara);
             }
@@ -301,7 +301,7 @@ namespace DelvUI.Helpers
 
         public static string FormattedText(
             string text,
-            GameObject? actor,
+            IGameObject? actor,
             string? name = null,
             uint? current = null,
             uint? max = null,
@@ -428,7 +428,7 @@ namespace DelvUI.Helpers
             }
         }
 
-        private static string ValidateName(GameObject? actor, string? name)
+        private static string ValidateName(IGameObject? actor, string? name)
         {
             string? n = actor?.Name.ToString() ?? name;
 
@@ -443,7 +443,7 @@ namespace DelvUI.Helpers
             return (n == null || n == "") ? "" : n;
         }
 
-        private static string ValidatePlayerName(GameObject? actor, string? name, bool? isPlayerName = null)
+        private static string ValidatePlayerName(IGameObject? actor, string? name, bool? isPlayerName = null)
         {
             if (isPlayerName.HasValue && isPlayerName.Value == false)
             {
@@ -457,7 +457,7 @@ namespace DelvUI.Helpers
             return ValidateName(actor, name);
         }
 
-        private static string ValidateNPCName(GameObject? actor, string? name, bool? isPlayerName = null)
+        private static string ValidateNPCName(IGameObject? actor, string? name, bool? isPlayerName = null)
         {
             if (isPlayerName.HasValue && isPlayerName.Value == true)
             {

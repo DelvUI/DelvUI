@@ -1,5 +1,6 @@
 using Dalamud.Interface;
 using Dalamud.Interface.Internal;
+using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Interface.Utility;
 using DelvUI.Config;
 using DelvUI.Enums;

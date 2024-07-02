@@ -16,7 +16,7 @@ namespace DelvUI.Interface.GeneralElements
         private GCDIndicatorConfig Config => (GCDIndicatorConfig)_config;
         public VisibilityConfig VisibilityConfig => Config.VisibilityConfig;
 
-        public GameObject? Actor { get; set; } = null;
+        public IGameObject? Actor { get; set; } = null;
 
         private bool _wasBarEnabled = true;
         private bool _wasCircularModeEnabled = false;
@@ -64,12 +64,12 @@ namespace DelvUI.Interface.GeneralElements
         {
             CheckToggles();
 
-            if (!Config.Enabled || Actor == null || Actor is not PlayerCharacter)
+            if (!Config.Enabled || Actor == null || Actor is not IPlayerCharacter)
             {
                 return;
             }
 
-            GCDHelper.GetGCDInfo((PlayerCharacter)Actor, out var elapsed, out var total);
+            GCDHelper.GetGCDInfo((IPlayerCharacter)Actor, out var elapsed, out var total);
 
             if (!Config.AlwaysShow && total == 0)
             {
@@ -79,7 +79,7 @@ namespace DelvUI.Interface.GeneralElements
 
             if (_lastTotalCastTime == 0 && Utils.IsActorCasting(Actor))
             {
-                _lastTotalCastTime = ((BattleChara)Actor).TotalCastTime;
+                _lastTotalCastTime = ((IBattleChara)Actor).TotalCastTime;
             }
 
             var scale = elapsed / total;

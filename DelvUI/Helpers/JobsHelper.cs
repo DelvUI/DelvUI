@@ -136,7 +136,7 @@ namespace DelvUI.Helpers
             JobIDs.SGE
         };
 
-        public static uint CurrentPrimaryResource(Character? character)
+        public static uint CurrentPrimaryResource(ICharacter? character)
         {
             if (character == null)
             {
@@ -158,7 +158,7 @@ namespace DelvUI.Helpers
             return character.CurrentMp;
         }
 
-        public static uint MaxPrimaryResource(Character? character)
+        public static uint MaxPrimaryResource(ICharacter? character)
         {
             if (character == null)
             {
@@ -180,7 +180,7 @@ namespace DelvUI.Helpers
             return character.MaxMp;
         }
 
-        public static uint GPResourceRate(Character? character)
+        public static uint GPResourceRate(ICharacter? character)
         {
             if (character == null)
             {
@@ -210,7 +210,7 @@ namespace DelvUI.Helpers
             return 5;
         }
 
-        public static string TimeTillMaxGP(Character? character)
+        public static string TimeTillMaxGP(ICharacter? character)
         {
             if (character == null)
             {
@@ -327,6 +327,7 @@ namespace DelvUI.Helpers
             [JobIDs.RDM] = JobRoles.DPSCaster,
             [JobIDs.PCT] = JobRoles.DPSCaster,
             [JobIDs.BLU] = JobRoles.DPSCaster,
+            [JobIDs.PCT] = JobRoles.DPSCaster,
 
             // crafters
             [JobIDs.CRP] = JobRoles.Crafter,
@@ -398,6 +399,7 @@ namespace DelvUI.Helpers
                 JobIDs.RDM,
                 JobIDs.PCT,
                 JobIDs.BLU,
+                JobIDs.PCT
             },
 
             // crafters
@@ -460,6 +462,7 @@ namespace DelvUI.Helpers
             [JobIDs.RDM] = "RDM",
             [JobIDs.PCT] = "PCT",
             [JobIDs.BLU] = "BLU",
+            [JobIDs.PCT] = "PCT",
 
             // healers
             [JobIDs.CNJ] = "CNJ",
@@ -519,6 +522,7 @@ namespace DelvUI.Helpers
             [JobIDs.RDM] = "Red Mage",
             [JobIDs.PCT] = "Pictomancer",
             [JobIDs.BLU] = "Blue Mage",
+            [JobIDs.PCT] = "Pictomancer",
 
             // healers
             [JobIDs.CNJ] = "Conjurer",
@@ -580,8 +584,8 @@ namespace DelvUI.Helpers
             [JobIDs.BLM] = 62587,
             [JobIDs.SMN] = 62587,
             [JobIDs.RDM] = 62587,
-            [JobIDs.PCT] = 62587,
-            [JobIDs.BLU] = 62587
+            [JobIDs.BLU] = 62587,
+            [JobIDs.PCT] = 62587
         };
 
         public static Dictionary<uint, uint> ColorizedIconIDs = new Dictionary<uint, uint>()
@@ -619,6 +623,7 @@ namespace DelvUI.Helpers
             [JobIDs.RDM] = 92628,
             [JobIDs.PCT] = 92686,
             [JobIDs.BLU] = 92629,
+            [JobIDs.PCT] = 92686,
 
             // healers
             [JobIDs.CNJ] = 94528,
@@ -693,6 +698,7 @@ namespace DelvUI.Helpers
         public const uint RDM = 35;
         public const uint PCT = 42;
         public const uint BLU = 36;
+        public const uint PCT = 42;
 
         public const uint CRP = 8;
         public const uint BSM = 9;

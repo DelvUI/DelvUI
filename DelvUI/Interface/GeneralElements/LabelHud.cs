@@ -30,7 +30,7 @@ namespace DelvUI.Interface.GeneralElements
         public virtual void Draw(
             Vector2 origin,
             Vector2? parentSize = null,
-            GameObject? actor = null,
+            IGameObject? actor = null,
             string? actorName = null,
             uint? actorCurrentHp = null,
             uint? actorMaxHp = null,
@@ -49,7 +49,7 @@ namespace DelvUI.Interface.GeneralElements
             DrawLabel(text, origin, parentSize ?? Vector2.Zero, actor);
         }
 
-        protected virtual void DrawLabel(string text, Vector2 parentPos, Vector2 parentSize, GameObject? actor = null)
+        protected virtual void DrawLabel(string text, Vector2 parentPos, Vector2 parentSize, IGameObject? actor = null)
         {
             Vector2 size;
             Vector2 pos;
@@ -126,26 +126,26 @@ namespace DelvUI.Interface.GeneralElements
             });
         }
 
-        public virtual PluginConfigColor Color(GameObject? actor = null)
+        public virtual PluginConfigColor Color(IGameObject? actor = null)
         {
             switch (Config.UseJobColor)
             {
-                case true when (actor is Character || actor is BattleNpc battleNpc && battleNpc.ClassJob.Id > 0):
+                case true when (actor is ICharacter || actor is IBattleNpc battleNpc && battleNpc.ClassJob.Id > 0):
                     return ColorUtils.ColorForActor(actor);
-                case true when actor is not Character:
+                case true when actor is not ICharacter:
                     return GlobalColors.Instance.NPCFriendlyColor;
             }
 
             switch (Config.UseRoleColor)
             {
-                case true when (actor is Character || actor is BattleNpc battleNpc && battleNpc.ClassJob.Id > 0):
+                case true when (actor is ICharacter || actor is IBattleNpc battleNpc && battleNpc.ClassJob.Id > 0):
                     {
-                        Character? character = actor as Character;
+                        ICharacter? character = actor as ICharacter;
                         return character != null && character.ClassJob.Id > 0 ?
                             GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id) :
                             ColorUtils.ColorForActor(character);
                     }
-                case true when actor is not Character:
+                case true when actor is not ICharacter:
                     return GlobalColors.Instance.NPCFriendlyColor;
                 default:
                     return Config.Color;
@@ -155,7 +155,7 @@ namespace DelvUI.Interface.GeneralElements
         public virtual (string, Vector2, Vector2, PluginConfigColor) PreCalculate(
             Vector2 origin,
             Vector2? parentSize = null,
-            GameObject? actor = null,
+            IGameObject? actor = null,
             string? actorName = null,
             uint? actorCurrentHp = null,
             uint? actorMaxHp = null,
@@ -205,7 +205,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public override void Draw(Vector2 origin,
             Vector2? parentSize = null,
-            GameObject? actor = null,
+            IGameObject? actor = null,
             string? actorName = null,
             uint? actorCurrentHp = null,
             uint? actorMaxHp = null,
@@ -221,7 +221,7 @@ namespace DelvUI.Interface.GeneralElements
             DrawLabel(text, origin, parentSize ?? Vector2.Zero, actor);
         }
 
-        protected override void DrawLabel(string text, Vector2 parentPos, Vector2 parentSize, GameObject? actor = null)
+        protected override void DrawLabel(string text, Vector2 parentPos, Vector2 parentSize, IGameObject? actor = null)
         {
             ImGui.PushFont(UiBuilder.IconFont);
             Vector2 size = ImGui.CalcTextSize(text) * Config.GetFontScale();

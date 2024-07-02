@@ -68,7 +68,7 @@ namespace DelvUI.Interface.Jobs
 
             return (positions, sizes);
         }
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             Vector2 pos = origin + Config.Position;
 
@@ -95,7 +95,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawCodaBar(Vector2 origin, PlayerCharacter player)
+        private void DrawCodaBar(Vector2 origin, IPlayerCharacter player)
         {
             BRDGauge gauge = Plugin.JobGauges.Get<BRDGauge>();
             var containsCoda = new[] { gauge.Coda.Contains(Song.WANDERER) ? 1 : 0, gauge.Coda.Contains(Song.MAGE) ? 1 : 0, gauge.Coda.Contains(Song.ARMY) ? 1 : 0 };
@@ -123,7 +123,7 @@ namespace DelvUI.Interface.Jobs
         private static List<uint> CausticBiteDoTIDs = new List<uint> { 124, 1200 };
         private static List<float> CausticBiteDoTDurations = new List<float> { 45, 45 };
 
-        protected void DrawCausticBiteDoTBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawCausticBiteDoTBar(Vector2 origin, IPlayerCharacter player)
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
@@ -137,7 +137,7 @@ namespace DelvUI.Interface.Jobs
         private static List<uint> StormbiteDoTIDs = new List<uint> { 129, 1201 };
         private static List<float> StormbiteDoTDurations = new List<float> { 45, 45 };
 
-        protected void DrawStormbiteDoTBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawStormbiteDoTBar(Vector2 origin, IPlayerCharacter player)
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
@@ -148,7 +148,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void HandleCurrentSong(Vector2 origin, PlayerCharacter player)
+        private void HandleCurrentSong(Vector2 origin, IPlayerCharacter player)
         {
             BRDGauge gauge = Plugin.JobGauges.Get<BRDGauge>();
             byte songStacks = gauge.Repertoire;
@@ -216,7 +216,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawBloodletterReady(Vector2 origin, PlayerCharacter player)
+        private void DrawBloodletterReady(Vector2 origin, IPlayerCharacter player)
         {
             int maxStacks = player.Level < 84 ? 2 : 3;
             int maxCooldown = maxStacks * 15;
@@ -229,7 +229,7 @@ namespace DelvUI.Interface.Jobs
                 Config.StacksBar.MBGlowConfig.Enabled ? Config.StacksBar.MBGlowConfig : null);
         }
 
-        protected void DrawSongTimerBar(Vector2 origin, ushort songTimer, PluginConfigColor songColor, ThresholdConfig songThreshold, PlayerCharacter player)
+        protected void DrawSongTimerBar(Vector2 origin, ushort songTimer, PluginConfigColor songColor, ThresholdConfig songThreshold, IPlayerCharacter player)
         {
 
             if (Config.SongGaugeBar.HideWhenInactive && songTimer == 0 || !Config.SongGaugeBar.Enabled)
@@ -246,7 +246,7 @@ namespace DelvUI.Interface.Jobs
             AddDrawActions(bar.GetDrawActions(origin, Config.SongGaugeBar.StrataLevel));
         }
 
-        protected void DrawSoulVoiceBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawSoulVoiceBar(Vector2 origin, IPlayerCharacter player)
         {
             BardSoulVoiceBarConfig config = Config.SoulVoiceBar;
             byte soulVoice = Plugin.JobGauges.Get<BRDGauge>().SoulVoice;
@@ -273,7 +273,7 @@ namespace DelvUI.Interface.Jobs
             AddDrawActions(bar.GetDrawActions(origin, config.StrataLevel));
         }
 
-        private void DrawStacksBar(Vector2 origin, PlayerCharacter player, int amount, int max, PluginConfigColor stackColor, BarGlowConfig? glowConfig = null)
+        private void DrawStacksBar(Vector2 origin, IPlayerCharacter player, int amount, int max, PluginConfigColor stackColor, BarGlowConfig? glowConfig = null)
         {
             BardStacksBarConfig config = Config.StacksBar;
 

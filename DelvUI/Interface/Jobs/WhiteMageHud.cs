@@ -67,7 +67,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             Vector2 pos = origin + Config.Position;
 
@@ -102,7 +102,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawDiaBar(Vector2 origin, PlayerCharacter player)
+        private void DrawDiaBar(Vector2 origin, IPlayerCharacter player)
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
@@ -113,7 +113,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawLilyBar(Vector2 origin, PlayerCharacter player)
+        private void DrawLilyBar(Vector2 origin, IPlayerCharacter player)
         {
             WHMGauge gauge = Plugin.JobGauges.Get<WHMGauge>();
 
@@ -142,9 +142,9 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawAsylumBar(Vector2 origin, PlayerCharacter player)
+        private void DrawAsylumBar(Vector2 origin, IPlayerCharacter player)
         {
-            float asylymDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 739 or 1911 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
+            float asylymDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 739 or 1911 && o.SourceId == player.GameObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.AsylumBar.HideWhenInactive || asylymDuration > 0)
             {
@@ -155,9 +155,9 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawPresenceOfMindBar(Vector2 origin, PlayerCharacter player)
+        private void DrawPresenceOfMindBar(Vector2 origin, IPlayerCharacter player)
         {
-            float presenceOfMindDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 157 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
+            float presenceOfMindDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 157 && o.SourceId == player.GameObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.PresenceOfMindBar.HideWhenInactive || presenceOfMindDuration > 0)
             {
@@ -168,9 +168,9 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawPlenaryBar(Vector2 origin, PlayerCharacter player)
+        private void DrawPlenaryBar(Vector2 origin, IPlayerCharacter player)
         {
-            float plenaryDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1219 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
+            float plenaryDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1219 && o.SourceId == player.GameObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.PlenaryBar.HideWhenInactive || plenaryDuration > 0)
             {
@@ -181,9 +181,9 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawTemperanceBar(Vector2 origin, PlayerCharacter player)
+        private void DrawTemperanceBar(Vector2 origin, IPlayerCharacter player)
         {
-            float temperanceDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1872 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
+            float temperanceDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1872 && o.SourceId == player.GameObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.TemperanceBar.HideWhenInactive || temperanceDuration > 0)
             {

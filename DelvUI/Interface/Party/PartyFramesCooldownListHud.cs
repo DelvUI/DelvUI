@@ -24,7 +24,7 @@ namespace DelvUI.Interface.Party
         private List<PartyCooldown> _cooldowns = new List<PartyCooldown>();
         private List<PartyCooldown>? _fakeCooldowns = null;
 
-        public GameObject? Actor { get; set; }
+        public IGameObject? Actor { get; set; }
 
         protected override bool AnchorToParent => true;
         protected override DrawAnchor ParentAnchor => Config is PartyFramesCooldownListConfig config ? config.HealthBarAnchor : DrawAnchor.Center;
@@ -116,7 +116,7 @@ namespace DelvUI.Interface.Party
 
             if (Actor == null || PartyCooldownsManager.Instance?.CooldownsMap == null) { return; }
 
-            if (PartyCooldownsManager.Instance.CooldownsMap.TryGetValue(Actor.ObjectId, out Dictionary<uint, PartyCooldown>? dict) && dict != null)
+            if (PartyCooldownsManager.Instance.CooldownsMap.TryGetValue((uint)Actor.GameObjectId, out Dictionary<uint, PartyCooldown>? dict) && dict != null)
             {
                 _cooldowns = dict.Values.Where(o => o.Data.IsEnabledForPartyFrames()).ToList();
             }
@@ -227,7 +227,7 @@ namespace DelvUI.Interface.Party
             });
 
             PartyCooldown? hoveringCooldown = null;
-            GameObject? character = Actor;
+            IGameObject? character = Actor;
 
             // labels need to be drawn separated since they have their own window for clipping
             for (var i = 0; i < count; i++)

@@ -55,7 +55,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             Vector2 pos = origin + Config.Position;
             RPRGauge gauge = Plugin.JobGauges.Get<RPRGauge>();
@@ -81,14 +81,14 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawDeathsDesignBar(Vector2 origin, PlayerCharacter player)
+        private void DrawDeathsDesignBar(Vector2 origin, IPlayerCharacter player)
         {
-            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            IGameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             float duration = 0f;
 
-            if (actor is BattleChara target)
+            if (actor is IBattleChara target)
             {
-                duration = Utils.StatusListForBattleChara(target).FirstOrDefault(o => o.StatusId is 2586 && o.SourceId == player.ObjectId && o.RemainingTime > 0)?.RemainingTime ?? 0f;
+                duration = Utils.StatusListForBattleChara(target).FirstOrDefault(o => o.StatusId is 2586 && o.SourceId == player.GameObjectId && o.RemainingTime > 0)?.RemainingTime ?? 0f;
             }
 
             if (!Config.DeathsDesignBar.HideWhenInactive || duration > 0)
@@ -103,7 +103,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawSoulGauge(Vector2 origin, RPRGauge gauge, PlayerCharacter player)
+        private void DrawSoulGauge(Vector2 origin, RPRGauge gauge, IPlayerCharacter player)
         {
             float soul = gauge.Soul;
 
@@ -119,7 +119,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawShroudGauge(Vector2 origin, RPRGauge gauge, PlayerCharacter player)
+        private void DrawShroudGauge(Vector2 origin, RPRGauge gauge, IPlayerCharacter player)
         {
             float shroud = gauge.Shroud;
 
@@ -135,7 +135,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawDeathGauge(Vector2 origin, RPRGauge gauge, PlayerCharacter player)
+        private void DrawDeathGauge(Vector2 origin, RPRGauge gauge, IPlayerCharacter player)
         {
             var lemureShroud = gauge.LemureShroud;
             var voidShroud = gauge.VoidShroud;

@@ -67,7 +67,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             if (Config.KenkiBar.Enabled)
             {
@@ -100,7 +100,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawKenkiBar(Vector2 origin, PlayerCharacter player)
+        private void DrawKenkiBar(Vector2 origin, IPlayerCharacter player)
         {
             SAMGauge gauge = Plugin.JobGauges.Get<SAMGauge>();
 
@@ -113,7 +113,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawShifuBar(Vector2 origin, PlayerCharacter player)
+        private void DrawShifuBar(Vector2 origin, IPlayerCharacter player)
         {
             float shifuDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1299)?.RemainingTime ?? 0f;
 
@@ -126,7 +126,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawJinpuBar(Vector2 origin, PlayerCharacter player)
+        private void DrawJinpuBar(Vector2 origin, IPlayerCharacter player)
         {
             float jinpuDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1298)?.RemainingTime ?? 0f;
 
@@ -139,7 +139,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawHiganbanaBar(Vector2 origin, PlayerCharacter player)
+        private void DrawHiganbanaBar(Vector2 origin, IPlayerCharacter player)
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
@@ -150,7 +150,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawSenBar(Vector2 origin, PlayerCharacter player)
+        private void DrawSenBar(Vector2 origin, IPlayerCharacter player)
         {
             SAMGauge gauge = Plugin.JobGauges.Get<SAMGauge>();
             if (!Config.SenBar.HideWhenInactive || gauge.HasSetsu || gauge.HasGetsu || gauge.HasKa)
@@ -173,7 +173,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawMeditationBar(Vector2 origin, PlayerCharacter player)
+        private void DrawMeditationBar(Vector2 origin, IPlayerCharacter player)
         {
             SAMGauge gauge = Plugin.JobGauges.Get<SAMGauge>();
             if (!Config.MeditationBar.HideWhenInactive || gauge.MeditationStacks > 0)

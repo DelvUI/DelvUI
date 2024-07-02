@@ -77,7 +77,7 @@ namespace DelvUI.Helpers
             _clipRects.Clear();
             _extraClipRects.Clear();
 
-            AtkStage* stage = AtkStage.GetSingleton();
+            AtkStage* stage = AtkStage.Instance();
             if (stage == null) { return; }
 
             RaptureAtkUnitManager* manager = stage->RaptureAtkUnitManager;
@@ -90,14 +90,14 @@ namespace DelvUI.Helpers
             {
                 try
                 {
-                    AtkUnitBase* addon = *(AtkUnitBase**)Unsafe.AsPointer(ref loadedUnitsList->EntriesSpan[i]);
+                    AtkUnitBase* addon = *(AtkUnitBase**)Unsafe.AsPointer(ref loadedUnitsList->Entries[i]);
                     if (addon == null || !addon->IsVisible || addon->WindowNode == null || addon->Scale == 0)
                     {
                         continue;
                     }
 
-                    string? name = Marshal.PtrToStringAnsi(new IntPtr(addon->Name));
-                    if (name != null && _ignoredAddonNames.Contains(name))
+                    string name = addon->NameString;
+                    if (_ignoredAddonNames.Contains(name))
                     {
                         continue;
                     }
@@ -175,8 +175,8 @@ namespace DelvUI.Helpers
             AtkResNode* baseNode = addon->UldManager.NodeList[1];
             AtkResNode* imageNode = addon->UldManager.NodeList[2];
 
-            if (baseNode == null || !baseNode->IsVisible) { return null; }
-            if (imageNode == null || !imageNode->IsVisible) { return null; }
+            if (baseNode == null || !baseNode->IsVisible()) { return null; }
+            if (imageNode == null || !imageNode->IsVisible()) { return null; }
 
             Vector2 pos = new Vector2(
                 addon->X + (baseNode->X * addon->Scale),
@@ -236,7 +236,7 @@ namespace DelvUI.Helpers
             for (int i = 1; i <= 10; i++)
             {
                 AtkResNode* node = addon->UldManager.NodeList[i];
-                if (node == null || !node->IsVisible) { continue; }
+                if (node == null || !node->IsVisible()) { continue; }
 
                 AtkComponentNode* component = node->GetAsAtkComponentNode();
                 if (component == null) { continue; }

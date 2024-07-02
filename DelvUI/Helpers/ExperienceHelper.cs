@@ -86,7 +86,7 @@ namespace DelvUI.Helpers
 
         public unsafe bool IsMaxLevel()
         {
-            UIModule* uiModule = StructsFramework.Instance()->GetUiModule();
+            UIModule* uiModule = StructsFramework.Instance()->GetUIModule();
             if (uiModule != null)
             {
                 _raptureAtkModule = uiModule->GetRaptureAtkModule();

@@ -71,7 +71,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             Vector2 pos = origin + Config.Position;
 
@@ -111,7 +111,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawBalanceBar(Vector2 origin, PlayerCharacter player)
+        private void DrawBalanceBar(Vector2 origin, IPlayerCharacter player)
         {
             RDMGauge gauge = Plugin.JobGauges.Get<RDMGauge>();
             float whiteGauge = (float)Plugin.JobGauges.Get<RDMGauge>().WhiteMana;
@@ -145,7 +145,7 @@ namespace DelvUI.Interface.Jobs
             AddDrawActions(bar.GetDrawActions(origin, Config.BalanceBar.StrataLevel));
         }
 
-        private void DrawWhiteManaBar(Vector2 origin, PlayerCharacter player)
+        private void DrawWhiteManaBar(Vector2 origin, IPlayerCharacter player)
         {
             byte mana = Plugin.JobGauges.Get<RDMGauge>().WhiteMana;
             if (Config.WhiteManaBar.HideWhenInactive && mana == 0)
@@ -159,7 +159,7 @@ namespace DelvUI.Interface.Jobs
             AddDrawActions(bar.GetDrawActions(origin, Config.WhiteManaBar.StrataLevel));
         }
 
-        private void DrawBlackManaBar(Vector2 origin, PlayerCharacter player)
+        private void DrawBlackManaBar(Vector2 origin, IPlayerCharacter player)
         {
             byte mana = Plugin.JobGauges.Get<RDMGauge>().BlackMana;
             if (Config.BlackManaBar.HideWhenInactive && mana == 0)
@@ -173,7 +173,7 @@ namespace DelvUI.Interface.Jobs
             AddDrawActions(bar.GetDrawActions(origin, Config.BlackManaBar.StrataLevel));
         }
 
-        private void DrawManaStacksBarBar(Vector2 origin, PlayerCharacter player)
+        private void DrawManaStacksBarBar(Vector2 origin, IPlayerCharacter player)
         {
             byte manaStacks = Plugin.JobGauges.Get<RDMGauge>().ManaStacks;
             if (Config.ManaStacksBar.HideWhenInactive && manaStacks == 0)
@@ -188,7 +188,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawDualCastBar(Vector2 origin, PlayerCharacter player)
+        private void DrawDualCastBar(Vector2 origin, IPlayerCharacter player)
         {
             float duration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1249)?.RemainingTime ?? 0f;
 
@@ -203,7 +203,7 @@ namespace DelvUI.Interface.Jobs
             AddDrawActions(bar.GetDrawActions(origin, Config.DualcastBar.StrataLevel));
         }
 
-        private void DrawVerstoneBar(Vector2 origin, PlayerCharacter player)
+        private void DrawVerstoneBar(Vector2 origin, IPlayerCharacter player)
         {
             BarHud? bar = BarUtilities.GetProcBar(Config.VerstoneBar, player, 1235, 30);
             if (bar != null)
@@ -212,7 +212,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawVerfireBar(Vector2 origin, PlayerCharacter player)
+        private void DrawVerfireBar(Vector2 origin, IPlayerCharacter player)
         {
             BarHud? bar = BarUtilities.GetProcBar(Config.VerfireBar, player, 1234, 30);
             if (bar != null)

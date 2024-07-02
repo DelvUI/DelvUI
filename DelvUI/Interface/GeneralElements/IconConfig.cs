@@ -78,7 +78,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(35)]
         public bool Preview = false;
 
-        public uint? IconID(GameObject? actor)
+        public uint? IconID(IGameObject? actor)
         {
             if (Preview)
             {

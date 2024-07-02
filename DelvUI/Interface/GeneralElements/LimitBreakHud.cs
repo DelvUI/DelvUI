@@ -12,7 +12,7 @@ namespace DelvUI.Interface.GeneralElements
         private LimitBreakConfig Config => (LimitBreakConfig)_config;
         public VisibilityConfig VisibilityConfig => Config.VisibilityConfig;
 
-        public GameObject? Actor { get; set; } = null;
+        public IGameObject? Actor { get; set; } = null;
 
         public LimitBreakHud(LimitBreakConfig config, string displayName) : base(config, displayName) { }
 

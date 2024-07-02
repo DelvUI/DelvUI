@@ -55,7 +55,7 @@ namespace DelvUI.Interface.Party
             {
                 member.HasDispellableDebuff = false;
 
-                if (member.Character is not BattleChara battleChara)
+                if (member.Character is not IBattleChara battleChara)
                 {
                     continue;
                 }

@@ -15,8 +15,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using BattleChara = Dalamud.Game.ClientState.Objects.Types.BattleChara;
-using Character = Dalamud.Game.ClientState.Objects.Types.Character;
+using BattleChara = Dalamud.Game.ClientState.Objects.Types.IBattleChara;
+using Character = Dalamud.Game.ClientState.Objects.Types.ICharacter;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -29,7 +29,7 @@ namespace DelvUI.Interface.GeneralElements
 
         private SmoothHPHelper _smoothHPHelper = new SmoothHPHelper();
 
-        public GameObject? Actor { get; set; }
+        public IGameObject? Actor { get; set; }
 
         private bool _wasHovering = false;
 
@@ -107,7 +107,7 @@ namespace DelvUI.Interface.GeneralElements
                 }
                 else if (InputsHelper.Instance.RightButtonClicked)
                 {
-                    var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalId(AgentId.Hud));
+                    var agentHud = new IntPtr(Framework.Instance()->GetUIModule()->GetAgentModule()->GetAgentByInternalId(AgentId.Hud));
                     _openContextMenuFromTarget(agentHud, Actor.Address);
                 }
             }
@@ -118,7 +118,7 @@ namespace DelvUI.Interface.GeneralElements
             }
         }
 
-        protected virtual void DrawExtras(Vector2 origin, GameObject? actor)
+        protected virtual void DrawExtras(Vector2 origin, IGameObject? actor)
         {
             // override
         }
@@ -216,7 +216,7 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             // role/job icon
-            if (Config.RoleIconConfig.Enabled && character is PlayerCharacter)
+            if (Config.RoleIconConfig.Enabled && character is IPlayerCharacter)
             {
                 uint jobId = character.ClassJob.Id;
                 uint iconId = Config.RoleIconConfig.UseRoleIcons ?
@@ -299,7 +299,7 @@ namespace DelvUI.Interface.GeneralElements
             float currentAlpha = color.Vector.W * 100f;
             float alpha = Config.RangeConfig.AlphaForDistance(distance, currentAlpha) / 100f;
 
-            if (character is BattleNpc { BattleNpcKind: BattleNpcSubKind.Enemy or BattleNpcSubKind.BattleNpcPart } && Config.EnemyRangeConfig.Enabled)
+            if (character is IBattleNpc { BattleNpcKind: BattleNpcSubKind.Enemy or BattleNpcSubKind.BattleNpcPart } && Config.EnemyRangeConfig.Enabled)
             {
                 alpha = Config.EnemyRangeConfig.AlphaForDistance(distance, currentAlpha) / 100f;
             }
@@ -307,13 +307,13 @@ namespace DelvUI.Interface.GeneralElements
             return color.WithAlpha(alpha);
         }
 
-        private unsafe void GetNPCHpValues(GameObject? actor, out uint currentHp, out uint maxHp)
+        private unsafe void GetNPCHpValues(IGameObject? actor, out uint currentHp, out uint maxHp)
         {
             currentHp = 0;
             maxHp = 0;
 
             var player = Plugin.ClientState.LocalPlayer;
-            if (player == null || actor == null || player.TargetObject == null || actor.ObjectId != player.TargetObject.ObjectId)
+            if (player == null || actor == null || player.TargetObject == null || actor.GameObjectId != player.TargetObject.GameObjectId)
             {
                 return;
             }
@@ -339,7 +339,7 @@ namespace DelvUI.Interface.GeneralElements
             }
         }
 
-        private void DrawFriendlyNPC(Vector2 pos, GameObject? actor)
+        private void DrawFriendlyNPC(Vector2 pos, IGameObject? actor)
         {
             GetNPCHpValues(actor, out uint currentHp, out uint maxHp);
 
@@ -437,11 +437,11 @@ namespace DelvUI.Interface.GeneralElements
 
         }
 
-        protected override void DrawExtras(Vector2 origin, GameObject? actor)
+        protected override void DrawExtras(Vector2 origin, IGameObject? actor)
         {
             TankStanceIndicatorConfig config = Config.TankStanceIndicatorConfig;
 
-            if (!config.Enabled || actor is not PlayerCharacter chara) { return; }
+            if (!config.Enabled || actor is not IPlayerCharacter chara) { return; }
 
             uint jobId = chara.ClassJob.Id;
             if (JobsHelper.RoleForJob(jobId) != JobRoles.Tank) { return; }

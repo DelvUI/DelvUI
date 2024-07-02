@@ -30,8 +30,6 @@ namespace DelvUI.Config
     {
         public static ConfigurationManager Instance { get; private set; } = null!;
 
-        public readonly IDalamudTextureWrap? BannerImage;
-
         private BaseNode _configBaseNode;
         private Dictionary<string, BaseNode> _configBaseNodeByProfile;
         public BaseNode ConfigBaseNode
@@ -119,7 +117,6 @@ namespace DelvUI.Config
 
         public ConfigurationManager()
         {
-            BannerImage = Plugin.BannerTexture;
             ConfigDirectory = Plugin.PluginInterface.GetPluginConfigDirectory();
 
             _configBaseNodeByProfile = new Dictionary<string, BaseNode>();
@@ -182,7 +179,6 @@ namespace DelvUI.Config
 
             ConfigBaseNode.ConfigObjectResetEvent -= OnConfigObjectReset;
             Plugin.ClientState.Logout -= OnLogout;
-            BannerImage?.Dispose();
 
             Instance = null!;
         }

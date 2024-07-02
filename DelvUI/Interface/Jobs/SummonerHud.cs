@@ -64,7 +64,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             Vector2 pos = origin + Config.Position;
 
@@ -99,7 +99,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawIfritBar(Vector2 origin, PlayerCharacter player)
+        private void DrawIfritBar(Vector2 origin, IPlayerCharacter player)
         {
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
             int stackCount = gauge.IsIfritReady ? 1 : 0;
@@ -114,7 +114,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawTitanBar(Vector2 origin, PlayerCharacter player)
+        private void DrawTitanBar(Vector2 origin, IPlayerCharacter player)
         {
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
             int stackCount = gauge.IsTitanReady ? 1 : 0;
@@ -129,7 +129,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawGarudaBar(Vector2 origin, PlayerCharacter player)
+        private void DrawGarudaBar(Vector2 origin, IPlayerCharacter player)
         {
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
             int stackCount = gauge.IsGarudaReady ? 1 : 0;
@@ -144,7 +144,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void HandleAttunementStacks(Vector2 origin, PlayerCharacter player)
+        private void HandleAttunementStacks(Vector2 origin, IPlayerCharacter player)
         {
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
             byte attunementStacks = gauge.Attunement;
@@ -167,7 +167,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawAetherBar(Vector2 origin, PlayerCharacter player)
+        private void DrawAetherBar(Vector2 origin, IPlayerCharacter player)
         {
             byte stackCount = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId == 304)?.StackCount ?? 0;
 
@@ -183,7 +183,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawTranceBar(Vector2 origin, PlayerCharacter player)
+        private void DrawTranceBar(Vector2 origin, IPlayerCharacter player)
         {
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
             PluginConfigColor tranceColor;
@@ -252,7 +252,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawStacksBar(Vector2 origin, PlayerCharacter player, int amount, int max, PluginConfigColor stackColor, BarGlowConfig? glowConfig = null)
+        private void DrawStacksBar(Vector2 origin, IPlayerCharacter player, int amount, int max, PluginConfigColor stackColor, BarGlowConfig? glowConfig = null)
         {
             SummonerStacksBarConfig config = Config.StacksBar;
 

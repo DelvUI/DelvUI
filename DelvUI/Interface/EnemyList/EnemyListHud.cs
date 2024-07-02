@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Interface.Textures.TextureWraps;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
@@ -6,13 +7,10 @@ using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
-using ImGuiScene;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.Objects;
-using Dalamud.Interface.Internal;
 
 namespace DelvUI.Interface.EnemyList
 {
@@ -37,7 +35,7 @@ namespace DelvUI.Interface.EnemyList
         private StatusEffectsListHud _buffsListHud;
         private StatusEffectsListHud _debuffsListHud;
 
-        private IDalamudTextureWrap? _iconsTexture = null;
+        private IDalamudTextureWrap? _iconsTexture => TexturesHelper.GetTextureFromPath("ui/uld/enemylist_hr1.tex");
 
         public EnemyListHud(EnemyListConfig config, string displayName) : base(config, displayName)
         {
@@ -58,8 +56,6 @@ namespace DelvUI.Interface.EnemyList
                 _smoothHPHelpers.Add(new SmoothHPHelper());
                 _castbarHud.Add(new EnemyListCastbarHud(Configs.CastBar));
             }
-
-            _iconsTexture = TexturesHelper.GetTextureFromPath("ui/uld/enemylist_hr1.tex");
 
             UpdatePreview();
         }
@@ -102,7 +98,8 @@ namespace DelvUI.Interface.EnemyList
         {
             Config.Preview = false;
 
-            foreach (EnemyListCastbarHud castbar in _castbarHud) {
+            foreach (EnemyListCastbarHud castbar in _castbarHud)
+            {
                 castbar.StopPreview();
             }
 
@@ -130,13 +127,13 @@ namespace DelvUI.Interface.EnemyList
             int count = Math.Min(MaxEnemyCount, Config.Preview ? MaxEnemyCount : _helper.EnemyCount);
             uint fakeMaxHp = 100000;
 
-            Character? mouseoverTarget = null;
+            ICharacter? mouseoverTarget = null;
             bool hovered = false;
 
             for (int i = 0; i < count; i++)
             {
                 // hp bar
-                Character? character = Config.Preview ? null : Plugin.ObjectTable.SearchById((uint)_helper.EnemiesData.ElementAt(i).ObjectId) as Character;
+                ICharacter? character = Config.Preview ? null : Plugin.ObjectTable.SearchById((uint)_helper.EnemiesData.ElementAt(i).ObjectId) as ICharacter;
 
                 uint currentHp = Config.Preview ? (uint)(_previewValues[i] * fakeMaxHp) : character?.CurrentHp ?? fakeMaxHp;
                 uint maxHp = Config.Preview ? fakeMaxHp : character?.MaxHp ?? fakeMaxHp;
@@ -335,7 +332,7 @@ namespace DelvUI.Interface.EnemyList
             }
         }
 
-        private PluginConfigColor GetColor(Character? character, uint currentHp = 0, uint maxHp = 0)
+        private PluginConfigColor GetColor(ICharacter? character, uint currentHp = 0, uint maxHp = 0)
         {
             if (Configs.HealthBar.Colors.ColorByHealth.Enabled && (character != null || Config.Preview))
             {
@@ -346,9 +343,9 @@ namespace DelvUI.Interface.EnemyList
             return Configs.HealthBar.FillColor;
         }
 
-        private PluginConfigColor GetBorderColor(Character? character, int enmityLevel)
+        private PluginConfigColor GetBorderColor(ICharacter? character, int enmityLevel)
         {
-            GameObject? target = Plugin.TargetManager.Target;
+            IGameObject? target = Plugin.TargetManager.Target;
             if (character != null && character == target)
             {
                 return Configs.HealthBar.Colors.TargetBordercolor;
@@ -367,9 +364,9 @@ namespace DelvUI.Interface.EnemyList
             };
         }
 
-        private int GetBorderThickness(Character? character)
+        private int GetBorderThickness(ICharacter? character)
         {
-            GameObject? target = Plugin.TargetManager.Target;
+            IGameObject? target = Plugin.TargetManager.Target;
             if (character != null && character == target)
             {
                 return Configs.HealthBar.Colors.TargetBorderThickness;
@@ -378,7 +375,7 @@ namespace DelvUI.Interface.EnemyList
             return Configs.HealthBar.BorderThickness;
         }
 
-        private PluginConfigColor GetDistanceColor(Character? character, PluginConfigColor color)
+        private PluginConfigColor GetDistanceColor(ICharacter? character, PluginConfigColor color)
         {
             byte distance = character != null ? character.YalmDistanceX : byte.MaxValue;
             float currentAlpha = color.Vector.W * 100f;

@@ -2,7 +2,7 @@
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Statuses;
-using Dalamud.Interface.Internal;
+using Dalamud.Interface.Textures.TextureWraps;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
@@ -10,10 +10,8 @@ using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
-using ImGuiScene;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Numerics;
 
 namespace DelvUI.Interface.Party
@@ -38,7 +36,9 @@ namespace DelvUI.Interface.Party
         private StatusEffectsListHud _debuffsListHud;
         private PartyFramesCooldownListHud _cooldownListHud;
 
-        private IDalamudTextureWrap? _readyCheckTexture = null;
+        private IDalamudTextureWrap? _readyCheckTexture =>
+            TexturesHelper.GetTextureFromPath("ui/uld/ReadyCheck_hr1.tex") ??
+            TexturesHelper.GetTextureFromPath("ui/uld/ReadyCheck.tex");
 
         public bool Visible = false;
         public Vector2 Position;
@@ -66,8 +66,6 @@ namespace DelvUI.Interface.Party
             _debuffsListHud = new StatusEffectsListHud(_configs.Debuffs);
 
             _cooldownListHud = new PartyFramesCooldownListHud(_configs.CooldownList);
-
-            _readyCheckTexture = TexturesHelper.GetTextureFromPath("ui/uld/ReadyCheck_hr1.tex") ?? TexturesHelper.GetTextureFromPath("ui/uld/ReadyCheck.tex");
         }
 
         public PluginConfigColor GetColor(float scale)
@@ -149,7 +147,7 @@ namespace DelvUI.Interface.Party
             var (areaStart, areaEnd) = _configs.HealthBar.MouseoverAreaConfig.GetArea(Position, _configs.HealthBar.Size);
             bool isHovering = ImGui.IsMouseHoveringRect(areaStart, areaEnd);
             bool ignoreMouseover = _configs.HealthBar.MouseoverAreaConfig.Enabled && _configs.HealthBar.MouseoverAreaConfig.Ignore;
-            Character? character = Member.Character;
+            ICharacter? character = Member.Character;
 
             if (isHovering)
             {
@@ -198,11 +196,11 @@ namespace DelvUI.Interface.Party
                     ? GetDistanceColor(character, _configs.HealthBar.ColorsConfig.DeathIndicatorBackgroundColor)
                     : _configs.HealthBar.ColorsConfig.DeathIndicatorBackgroundColor;
             }
-            else if (_configs.HealthBar.ColorsConfig.UseJobColorAsBackgroundColor && character is BattleChara)
+            else if (_configs.HealthBar.ColorsConfig.UseJobColorAsBackgroundColor && character is IBattleChara)
             {
                 bgColor = GlobalColors.Instance.SafeColorForJobId(character.ClassJob.Id);
             }
-            else if (_configs.HealthBar.ColorsConfig.UseRoleColorAsBackgroundColor && character is BattleChara)
+            else if (_configs.HealthBar.ColorsConfig.UseRoleColorAsBackgroundColor && character is IBattleChara)
             {
                 bgColor = _configs.HealthBar.RangeConfig.Enabled
                     ? GetDistanceColor(character, GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id))
@@ -259,9 +257,9 @@ namespace DelvUI.Interface.Party
                 Vector2 healthMissingSize = _configs.HealthBar.Size - BarUtilities.GetFillDirectionOffset(healthFill.Size, _configs.HealthBar.FillDirection);
                 Vector2 healthMissingPos = _configs.HealthBar.FillDirection.IsInverted() ? Position : Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, _configs.HealthBar.FillDirection);
 
-                PluginConfigColor? missingHealthColor = _configs.HealthBar.ColorsConfig.UseJobColorAsMissingHealthColor && character is BattleChara
+                PluginConfigColor? missingHealthColor = _configs.HealthBar.ColorsConfig.UseJobColorAsMissingHealthColor && character is IBattleChara
                     ? GlobalColors.Instance.SafeColorForJobId(character!.ClassJob.Id)
-                    : _configs.HealthBar.ColorsConfig.UseRoleColorAsMissingHealthColor && character is BattleChara
+                    : _configs.HealthBar.ColorsConfig.UseRoleColorAsMissingHealthColor && character is IBattleChara
                         ? GlobalColors.Instance.SafeRoleColorForJobId(character!.ClassJob.Id)
                         : _configs.HealthBar.ColorsConfig.HealthMissingColor;
 
@@ -270,7 +268,7 @@ namespace DelvUI.Interface.Party
                     missingHealthColor = _configs.HealthBar.ColorsConfig.DeathIndicatorBackgroundColor;
                 }
 
-                if (_configs.Trackers.Invuln.ChangeBackgroundColorWhenInvuln && character is BattleChara battleChara)
+                if (_configs.Trackers.Invuln.ChangeBackgroundColorWhenInvuln && character is IBattleChara battleChara)
                 {
                     Status? tankInvuln = Utils.GetTankInvulnerabilityID(battleChara);
                     if (tankInvuln is not null)
@@ -332,14 +330,14 @@ namespace DelvUI.Interface.Party
             return drawActions;
         }
 
-        private PluginConfigColor GetBorderColor(Character? character)
+        private PluginConfigColor GetBorderColor(ICharacter? character)
         {
-            GameObject? target = Plugin.TargetManager.Target ?? Plugin.TargetManager.SoftTarget;
+            IGameObject? target = Plugin.TargetManager.Target ?? Plugin.TargetManager.SoftTarget;
 
             return character != null && character == target ? _configs.HealthBar.ColorsConfig.TargetBordercolor : _configs.HealthBar.ColorsConfig.BorderColor;
         }
 
-        private PluginConfigColor GetDistanceColor(Character? character, PluginConfigColor color)
+        private PluginConfigColor GetDistanceColor(ICharacter? character, PluginConfigColor color)
         {
             byte distance = character != null ? character.YalmDistanceX : byte.MaxValue;
             float currentAlpha = color.Vector.W * 100f;
@@ -353,14 +351,14 @@ namespace DelvUI.Interface.Party
         {
             List<(StrataLevel, Action)> drawActions = new List<(StrataLevel, Action)>();
 
-            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (!Visible || Member is null || player == null)
             {
                 StopMouseover();
                 return drawActions;
             }
 
-            Character? character = Member.Character;
+            ICharacter? character = Member.Character;
 
             // who's talking
             bool drawingWhosTalking = false;
@@ -393,7 +391,7 @@ namespace DelvUI.Interface.Party
                 uint iconId = 0;
 
                 // chocobo icon
-                if (character is BattleNpc battleNpc && battleNpc.BattleNpcKind == BattleNpcSubKind.Chocobo)
+                if (character is IBattleNpc battleNpc && battleNpc.BattleNpcKind == BattleNpcSubKind.Chocobo)
                 {
                     iconId = JobsHelper.RoleIconIDForBattleCompanion + (uint)RoleIcon.Style * 100;
                 }
@@ -612,7 +610,7 @@ namespace DelvUI.Interface.Party
             // order
             if (character == null || character?.ObjectKind != ObjectKind.BattleNpc)
             {
-                int order = Member.ObjectId == player.ObjectId ? 1 : Member.Order;
+                int order = Member.ObjectId == player.GameObjectId ? 1 : Member.Order;
                 string str = char.ConvertFromUtf32(0xE090 + order - 1).ToString();
 
                 drawActions.Add((_configs.HealthBar.OrderNumberConfig.StrataLevel, () =>
@@ -664,7 +662,7 @@ namespace DelvUI.Interface.Party
             return drawActions;
         }
 
-        private bool ShouldDrawName(Character? character, bool showingRaise, bool showingInvuln)
+        private bool ShouldDrawName(ICharacter? character, bool showingRaise, bool showingInvuln)
         {
             if (showingRaise && RaiseTracker.HideNameWhenRaised)
             {

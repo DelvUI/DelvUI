@@ -66,7 +66,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             Vector2 pos = origin + Config.Position;
 
@@ -101,7 +101,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawManaBar(Vector2 origin, PlayerCharacter player)
+        private void DrawManaBar(Vector2 origin, IPlayerCharacter player)
         {
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
 
@@ -129,7 +129,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawDarkside(Vector2 origin, PlayerCharacter player)
+        private void DrawDarkside(Vector2 origin, IPlayerCharacter player)
         {
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
             if (Config.DarksideBar.HideWhenInactive && gauge.DarksideTimeRemaining == 0) { return; };
@@ -142,7 +142,7 @@ namespace DelvUI.Interface.Jobs
             AddDrawActions(bar.GetDrawActions(origin, Config.DarksideBar.StrataLevel));
         }
 
-        private void DrawBloodGauge(Vector2 origin, PlayerCharacter player)
+        private void DrawBloodGauge(Vector2 origin, IPlayerCharacter player)
         {
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
             if (!Config.BloodGauge.HideWhenInactive || gauge.Blood > 0)
@@ -157,7 +157,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawBloodWeaponBar(Vector2 origin, PlayerCharacter player)
+        private void DrawBloodWeaponBar(Vector2 origin, IPlayerCharacter player)
         {
             Status? bloodWeaponBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 742);
             float duration = bloodWeaponBuff?.RemainingTime ?? 0f;
@@ -186,7 +186,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawDeliriumBar(Vector2 origin, PlayerCharacter player)
+        private void DrawDeliriumBar(Vector2 origin, IPlayerCharacter player)
         {
             Status? deliriumBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1972);
             float deliriumDuration = Math.Max(0f, deliriumBuff?.RemainingTime ?? 0f);
@@ -216,7 +216,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawLivingShadowBar(Vector2 origin, PlayerCharacter player)
+        private void DrawLivingShadowBar(Vector2 origin, IPlayerCharacter player)
         {
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
             if (Config.LivingShadowBar.HideWhenInactive && gauge.ShadowTimeRemaining == 0) { return; }

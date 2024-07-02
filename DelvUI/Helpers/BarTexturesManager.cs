@@ -6,6 +6,8 @@ using System.Linq;
 using Dalamud.Interface;
 using Dalamud.Interface.GameFonts;
 using Dalamud.Interface.Internal;
+using Dalamud.Interface.Textures;
+using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
@@ -97,16 +99,16 @@ namespace DelvUI.Helpers
         private List<string> _textureNames = new List<string>();
         public IReadOnlyCollection<string> BarTextureNames => _textureNames.AsReadOnly();
 
-        private Dictionary<string, IDalamudTextureWrap> _cache = new();
+        private Dictionary<string, ISharedImmediateTexture> _cache = new();
 
         public IDalamudTextureWrap? GetBarTexture(string? name)
         {
             if (name == null || name == DefaultBarTextureName) { return null; }
 
             // get cached texture
-            if (_cache.TryGetValue(name, out IDalamudTextureWrap? cachedTexture) && cachedTexture != null)
+            if (_cache.TryGetValue(name, out ISharedImmediateTexture? cachedTexture) && cachedTexture != null)
             {
-                return cachedTexture;
+                return cachedTexture.GetWrapOrDefault();
             }
 
             // lazy load
@@ -117,15 +119,18 @@ namespace DelvUI.Helpers
             {
                 try
                 {
-                    IDalamudTextureWrap? texture = Plugin.UiBuilder.LoadImage(data.Value.Path);
-                    _cache.Add(name, texture);
+                    ISharedImmediateTexture? texture = Plugin.TextureProvider.GetFromFile(data.Value.Path);
+                    if (texture != null)
+                    {
+                        _cache.Add(name, texture);
+                    }
 
-                    return texture;
+                    return texture?.GetWrapOrDefault();
                 }
                 catch
-                //(Exception ex)
+                (Exception ex)
                 {
-                    //Plugin.Logger.Log($"Image failed to load. {data.Value.Path}: " + ex.Message);
+                    Plugin.Logger.Warning($"Image failed to load. {data.Value.Path}: " + ex.Message);
                 }
             }
 

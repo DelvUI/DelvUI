@@ -226,9 +226,9 @@ namespace DelvUI.Helpers
             return new(Vector4.One);
         }
 
-        public static PluginConfigColor ColorForActor(GameObject? actor)
+        public static PluginConfigColor ColorForActor(IGameObject? actor)
         {
-            if (actor == null || actor is not Character character)
+            if (actor == null || actor is not ICharacter character)
             {
                 return GlobalColors.Instance.NPCNeutralColor;
             }
@@ -241,7 +241,7 @@ namespace DelvUI.Helpers
 
             bool isHostile = Utils.IsHostile(character);
 
-            if (character is BattleNpc npc)
+            if (character is IBattleNpc npc)
             {
                 if ((npc.BattleNpcKind == BattleNpcSubKind.Enemy || npc.BattleNpcKind == BattleNpcSubKind.BattleNpcPart) && isHostile)
                 {
@@ -257,14 +257,14 @@ namespace DelvUI.Helpers
         }
 
         public static PluginConfigColor? ColorForCharacter(
-            GameObject? gameObject,
+            IGameObject? gameObject,
             uint currentHp = 0,
             uint maxHp = 0,
             bool useJobColor = false,
             bool useRoleColor = false,
             ColorByHealthValueConfig? colorByHealthConfig = null)
         {
-            Character? character = gameObject as Character;
+            ICharacter? character = gameObject as ICharacter;
 
             if (useJobColor && character != null)
             {
@@ -272,7 +272,7 @@ namespace DelvUI.Helpers
             }
             else if (useRoleColor)
             {
-                return character is PlayerCharacter ?
+                return character is IPlayerCharacter ?
                     GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id) :
                     ColorForActor(character);
             }
@@ -298,7 +298,7 @@ namespace DelvUI.Helpers
                         colorByHealthConfig.LowHealthColorThreshold / 100f,
                         colorByHealthConfig.FullHealthColorThreshold / 100f,
                         colorByHealthConfig.LowHealthColor, colorByHealthConfig.FullHealthColor,
-                        character is PlayerCharacter ? GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id) : ColorForActor(character),
+                        character is IPlayerCharacter ? GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id) : ColorForActor(character),
                         colorByHealthConfig.UseMaxHealthColor,
                         colorByHealthConfig.BlendMode
                     );

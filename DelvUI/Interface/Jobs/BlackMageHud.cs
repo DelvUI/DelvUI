@@ -94,7 +94,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             Vector2 pos = origin + Config.Position;
 
@@ -149,7 +149,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        protected void DrawManaBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawManaBar(Vector2 origin, IPlayerCharacter player)
         {
             BlackMageManaBarConfig config = Config.ManaBar;
             BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
@@ -231,7 +231,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        protected void DrawTripleCastBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawTripleCastBar(Vector2 origin, IPlayerCharacter player)
         {
             byte stackCount = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1211)?.StackCount ?? 0;
             int maxCount = 3;
@@ -258,7 +258,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        protected void DrawEnochianBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawEnochianBar(Vector2 origin, IPlayerCharacter player)
         {
             BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
 
@@ -274,7 +274,7 @@ namespace DelvUI.Interface.Jobs
             AddDrawActions(bar.GetDrawActions(origin, Config.EnochianBar.StrataLevel));
         }
 
-        protected void DrawPolyglotBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawPolyglotBar(Vector2 origin, IPlayerCharacter player)
         {
             BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
 
@@ -302,7 +302,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        protected void DrawParadoxBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawParadoxBar(Vector2 origin, IPlayerCharacter player)
         {
             BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
 
@@ -322,7 +322,7 @@ namespace DelvUI.Interface.Jobs
             AddDrawActions(bar.GetDrawActions(origin, Config.ParadoxBar.StrataLevel));
         }
 
-        protected void DrawThundercloudBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawThundercloudBar(Vector2 origin, IPlayerCharacter player)
         {
             BarHud? bar = BarUtilities.GetProcBar(Config.ThundercloudBar, player, 164, 40f);
             if (bar != null)
@@ -331,7 +331,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        protected void DrawFirestarterBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawFirestarterBar(Vector2 origin, IPlayerCharacter player)
         {
             BarHud? bar = BarUtilities.GetProcBar(Config.FirestarterBar, player, 165, 30f);
             if (bar != null)
@@ -340,9 +340,9 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        protected void DrawThunderDoTBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawThunderDoTBar(Vector2 origin, IPlayerCharacter player)
         {
-            GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            IGameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
             BarHud? bar = BarUtilities.GetDoTBar(Config.ThunderDoTBar, player, target, ThunderDoTIDs, ThunderDoTDurations);
             if (bar != null)

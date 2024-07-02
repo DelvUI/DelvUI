@@ -73,7 +73,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             Vector2 pos = origin + Config.Position;
 
@@ -115,7 +115,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawProcBar(Vector2 origin, PlayerCharacter player, DancerProcBarConfig config, params uint[] statusIDs)
+        private void DrawProcBar(Vector2 origin, IPlayerCharacter player, DancerProcBarConfig config, params uint[] statusIDs)
         {
             List<float> durations = new List<float>();
             for (int i = 0; i < statusIDs.Length; i++)
@@ -130,7 +130,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private unsafe bool DrawStepBar(Vector2 origin, PlayerCharacter player)
+        private unsafe bool DrawStepBar(Vector2 origin, IPlayerCharacter player)
         {
             DNCGauge gauge = Plugin.JobGauges.Get<DNCGauge>();
             if (!gauge.IsDancing)
@@ -203,7 +203,7 @@ namespace DelvUI.Interface.Jobs
             return true;
         }
 
-        private void DrawEspritBar(Vector2 origin, PlayerCharacter player)
+        private void DrawEspritBar(Vector2 origin, IPlayerCharacter player)
         {
             DNCGauge gauge = Plugin.JobGauges.Get<DNCGauge>();
 
@@ -218,7 +218,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawFeathersBar(Vector2 origin, PlayerCharacter player)
+        private void DrawFeathersBar(Vector2 origin, IPlayerCharacter player)
         {
             DNCGauge gauge = Plugin.JobGauges.Get<DNCGauge>();
             bool hasFlourishingBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1820 or 2021) != null;
@@ -242,11 +242,11 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawTechnicalBar(Vector2 origin, PlayerCharacter player)
+        private void DrawTechnicalBar(Vector2 origin, IPlayerCharacter player)
         {
-            IEnumerable<Status> devilmentBuff = Utils.StatusListForBattleChara(player).Where(o => o.StatusId is 1825 && o.SourceId == player.ObjectId);
+            IEnumerable<Status> devilmentBuff = Utils.StatusListForBattleChara(player).Where(o => o.StatusId is 1825 && o.SourceId == player.GameObjectId);
 
-            float technicalFinishDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1822 or 2050 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
+            float technicalFinishDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1822 or 2050 && o.SourceId == player.GameObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.TechnicalFinishBar.HideWhenInactive || technicalFinishDuration > 0)
             {
@@ -257,9 +257,9 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawDevilmentBar(Vector2 origin, PlayerCharacter player)
+        private void DrawDevilmentBar(Vector2 origin, IPlayerCharacter player)
         {
-            float devilmentDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1825 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
+            float devilmentDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1825 && o.SourceId == player.GameObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.DevilmentBar.HideWhenInactive || devilmentDuration > 0)
             {
@@ -270,9 +270,9 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawStandardBar(Vector2 origin, PlayerCharacter player)
+        private void DrawStandardBar(Vector2 origin, IPlayerCharacter player)
         {
-            float standardFinishDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1821 or 2024 or 2105 or 2113 && o.SourceId == player.ObjectId)?.RemainingTime ?? 0f;
+            float standardFinishDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1821 or 2024 or 2105 or 2113 && o.SourceId == player.GameObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.StandardFinishBar.HideWhenInactive || standardFinishDuration > 0)
             {

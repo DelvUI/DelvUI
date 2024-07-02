@@ -126,7 +126,7 @@ namespace DelvUI.Interface.PartyCooldowns
         {
             if (!Config.Enabled) { return; }
 
-            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (player == null) { return; }
 
             float offset = 0;
@@ -251,8 +251,8 @@ namespace DelvUI.Interface.PartyCooldowns
                     // name
                     PluginConfigColor? labelColor = effectTime > 0 && _barConfig.ChangeLabelsColorWhenActive ? _barConfig.LabelsActiveColor : null;
 
-                    Character? character = cooldown.Member?.Character;
-                    if (character == null && cooldown.SourceId == player.ObjectId)
+                    ICharacter? character = cooldown.Member?.Character;
+                    if (character == null && cooldown.SourceId == player.GameObjectId)
                     {
                         character = player;
                     }
@@ -313,16 +313,16 @@ namespace DelvUI.Interface.PartyCooldowns
             }
         }
 
-        private uint? GetJobId(PartyCooldown cooldown, PlayerCharacter player)
+        private uint? GetJobId(PartyCooldown cooldown, IPlayerCharacter player)
         {
             uint jobId = cooldown.Data.JobId;
             if (jobId != 0) { return jobId; }
 
             if (cooldown.Member != null) { return cooldown.Member.JobId; }
 
-            if (cooldown.SourceId == player.ObjectId) { return player.ClassJob.Id; }
+            if (cooldown.SourceId == player.GameObjectId) { return player.ClassJob.Id; }
 
-            Character? chara = Plugin.ObjectTable.SearchById(cooldown.SourceId) as Character;
+            ICharacter? chara = Plugin.ObjectTable.SearchById(cooldown.SourceId) as ICharacter;
             return chara?.ClassJob.Id;
         }
     }

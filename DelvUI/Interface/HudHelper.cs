@@ -77,7 +77,7 @@ namespace DelvUI.Interface
             else
             {
                 // detect job change
-                PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+                IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
                 if (player != null)
                 {
                     uint job = player.ClassJob.Id;
@@ -193,7 +193,7 @@ namespace DelvUI.Interface
 
                     if (!_hidingCastBar)
                     {
-                        _castBarPos = new Vector2(addon->RootNode->GetX(), addon->RootNode->GetY());
+                        _castBarPos = new Vector2(addon->RootNode->GetXFloat(), addon->RootNode->GetYFloat());
                     }
 
                     addon->RootNode->SetPositionFloat(-9999.0f, -9999.0f);
@@ -227,7 +227,7 @@ namespace DelvUI.Interface
 
                     if (!_hidingPullTimer)
                     {
-                        _pullTimerPos = new Vector2(addon->RootNode->GetX(), addon->RootNode->GetY());
+                        _pullTimerPos = new Vector2(addon->RootNode->GetXFloat(), addon->RootNode->GetYFloat());
                     }
 
                     addon->RootNode->SetPositionFloat(-9999.0f, -9999.0f);
@@ -236,7 +236,7 @@ namespace DelvUI.Interface
                 AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("ScreenInfo_CountDown", 1);
                 if (addon != null)
                 {
-                    _pullTimerPos = new Vector2(addon->RootNode->GetX(), addon->RootNode->GetY());
+                    _pullTimerPos = new Vector2(addon->RootNode->GetXFloat(), addon->RootNode->GetYFloat());
                     addon->RootNode->SetPositionFloat(-9999, -9999);
                 }
 
@@ -260,7 +260,7 @@ namespace DelvUI.Interface
 
         private unsafe void UpdateJobGauges(bool forceVisible = false)
         {
-            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (player == null) { return; }
 
             string jobName = JobsHelper.JobNames[player.ClassJob.Id];
@@ -281,7 +281,7 @@ namespace DelvUI.Interface
                     }
                     else
                     {
-                        _jobGaugePos[addonName] = new Vector2(addon->RootNode->GetX(), addon->RootNode->GetY());
+                        _jobGaugePos[addonName] = new Vector2(addon->RootNode->GetXFloat(), addon->RootNode->GetYFloat());
                         addon->RootNode->SetPositionFloat(-9999, -9999);
 
                         Plugin.AddonLifecycle.RegisterListener(AddonEvent.PreDraw, addonName, (addonEvent, args) =>

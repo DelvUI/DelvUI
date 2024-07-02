@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game.ClientState.Party;
 using Dalamud.Interface;
 using Dalamud.Interface.Internal;
+using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Plugin.Ipc;
 using DelvUI.Config;
 using DelvUI.Config.Tree;
@@ -42,15 +43,15 @@ namespace DelvUI.Helpers
 
                 // speaking
                 string speakingPath = Path.Combine(imagesPath, "speaking.png");
-                _speakingTexture = Plugin.UiBuilder.LoadImage(speakingPath);
+                _speakingTexture = Plugin.TextureProvider.GetFromFile(speakingPath).GetWrapOrDefault();
 
                 // muted
                 string mutedPath = Path.Combine(imagesPath, "muted.png");
-                _mutedTexture = Plugin.UiBuilder.LoadImage(mutedPath);
+                _mutedTexture = Plugin.TextureProvider.GetFromFile(mutedPath).GetWrapOrDefault();
                 
                 // deafened
                 string deafenedPath = Path.Combine(imagesPath, "deafened.png");
-                _deafenedTexture = Plugin.UiBuilder.LoadImage(deafenedPath);
+                _deafenedTexture = Plugin.TextureProvider.GetFromFile(deafenedPath).GetWrapOrDefault();
             }
             catch { }
         }

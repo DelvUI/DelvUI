@@ -1,3 +1,6 @@
+# 2.2.0.0
+- Added support for Dawntrail and Dalamud API 10.
+
 # 2.1.3.1
 - Fixed "Hide Default Castbar" and "Hide Default Job Gauges" not working properly.
 

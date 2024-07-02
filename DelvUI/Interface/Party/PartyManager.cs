@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Party;
 using Dalamud.Memory;
 using DelvUI.Config;
 using DelvUI.Helpers;
@@ -12,7 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using DalamudPartyMember = Dalamud.Game.ClientState.Party.PartyMember;
+using DalamudPartyMember = Dalamud.Game.ClientState.Party.IPartyMember;
 using StructsFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework;
 using StructsPartyMember = FFXIVClientStructs.FFXIV.Client.Game.Group.PartyMember;
 
@@ -118,7 +119,7 @@ namespace DelvUI.Interface.Party
         private string? _partyTitle = null;
         public string PartyTitle => _partyTitle ?? "";
 
-        private uint _groupMemberCount => GroupManager.Instance()->MemberCount;
+        private uint _groupMemberCount => GroupManager.Instance()->MainGroup.MemberCount;
         private int _realMemberCount => PartyListAddon != null ? PartyListAddon->MemberCount : Plugin.PartyList.Length;
 
         private PartyReadyCheckHelper _readyCheckHelper;
@@ -136,7 +137,7 @@ namespace DelvUI.Interface.Party
 
             return _groupMembers.Count <= 1 ||
                 (_groupMembers.Count == 2 && _config.ShowChocobo &&
-                _groupMembers[1].Character is BattleNpc npc && npc.BattleNpcKind == BattleNpcSubKind.Chocobo);
+                _groupMembers[1].Character is IBattleNpc npc && npc.BattleNpcKind == BattleNpcSubKind.Chocobo);
         }
 
         public void Update()
@@ -158,7 +159,7 @@ namespace DelvUI.Interface.Party
                 return;
             }
 
-            UIModule* uiModule = StructsFramework.Instance()->GetUiModule();
+            UIModule* uiModule = StructsFramework.Instance()->GetUIModule();
             RaptureAtkModule = uiModule != null ? uiModule->GetRaptureAtkModule() : null;
 
             // no need to update on preview mode
@@ -172,8 +173,8 @@ namespace DelvUI.Interface.Party
 
         private void InternalUpdate()
         {
-            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
-            if (player is null || player is not PlayerCharacter)
+            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            if (player is null || player is not IPlayerCharacter)
             {
                 return;
             }
@@ -236,8 +237,8 @@ namespace DelvUI.Interface.Party
 
                     foreach (IPartyFramesMember member in _groupMembers)
                     {
-                        int index = member.ObjectId == player.ObjectId ? 0 : member.Order - 1;
-                        ReadyCheckStatus readyCheckStatus = ReadyCheckStatusForMember(member, index, player.ObjectId);
+                        int index = member.ObjectId == player.GameObjectId ? 0 : member.Order - 1;
+                        ReadyCheckStatus readyCheckStatus = ReadyCheckStatusForMember(member, index, (uint)player.GameObjectId);
 
                         uint jobId = JobIdForIndex(index);
                         jobsChanged = jobsChanged || jobId != member.JobId;
@@ -316,7 +317,7 @@ namespace DelvUI.Interface.Party
             return ReadyCheckStatus.None;
         }
 
-        private void UpdateTrustParty(PlayerCharacter player, int trustCount)
+        private void UpdateTrustParty(IPlayerCharacter player, int trustCount)
         {
             bool needsUpdate = _dirty || _groupMembers.Count != trustCount + 1;
 
@@ -344,7 +345,7 @@ namespace DelvUI.Interface.Party
 
                 for (int i = 0; i < trustCount; i++)
                 {
-                    Character? trustChara = Utils.GetGameObjectByName(names[i]) as Character;
+                    ICharacter? trustChara = Utils.GetGameObjectByName(names[i]) as ICharacter;
                     if (trustChara != null)
                     {
                         _groupMembers.Add(new PartyFramesMember(trustChara, order, EnmityForTrustMemberIndex(i), PartyMemberStatus.None, ReadyCheckStatus.None, false));
@@ -358,7 +359,7 @@ namespace DelvUI.Interface.Party
             {
                 for (int i = 0; i < _groupMembers.Count; i++)
                 {
-                    if (_groupMembers[i].ObjectId == player.ObjectId)
+                    if (_groupMembers[i].ObjectId == player.GameObjectId)
                     {
                         _groupMembers[i].Update(EnmityForIndex(0), PartyMemberStatus.None, ReadyCheckStatus.None, true, player.ClassJob.Id);
                     }
@@ -370,15 +371,15 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        private void UpdateSoloParty(PlayerCharacter player)
+        private void UpdateSoloParty(IPlayerCharacter player)
         {
-            Character? chocobo = null;
+            ICharacter? chocobo = null;
             if (_config.ShowChocobo)
             {
                 var gameObject = Utils.GetBattleChocobo(player);
-                if (gameObject != null && gameObject is Character)
+                if (gameObject != null && gameObject is ICharacter)
                 {
-                    chocobo = (Character)gameObject;
+                    chocobo = (ICharacter)gameObject;
                 }
             }
 
@@ -387,7 +388,7 @@ namespace DelvUI.Interface.Party
                 (_groupMembers.Count != 2 && _config.ShowChocobo && chocobo != null) ||
                 (_groupMembers.Count > 1 && !_config.ShowChocobo) ||
                 (_groupMembers.Count > 1 && chocobo == null) ||
-                (_groupMembers.Count == 2 && _config.ShowChocobo && _groupMembers[1].ObjectId != chocobo?.ObjectId);
+                (_groupMembers.Count == 2 && _config.ShowChocobo && _groupMembers[1].ObjectId != chocobo?.GameObjectId);
 
             EnmityLevel playerEnmity = PartyListAddon->EnmityLeaderIndex == 0 ? EnmityLevel.Leader : EnmityLevel.Last;
 
@@ -396,7 +397,7 @@ namespace DelvUI.Interface.Party
             // we can pretty much deduce that the chocobo is the one with aggro
             // this might fail on some cases when there are other players not in party hitting the same thing
             // but the edge case is so minor we should be fine
-            EnmityLevel chocoboEnmity = PartyListAddon->EnmityLeaderIndex == -1 && PartyListAddon->PartyMember[0].EmnityByte == 1 ? EnmityLevel.Leader : EnmityLevel.Last;
+            EnmityLevel chocoboEnmity = PartyListAddon->EnmityLeaderIndex == -1 && PartyListAddon->PartyMembers[0].EmnityByte == 1 ? EnmityLevel.Leader : EnmityLevel.Last;
 
             if (needsUpdate)
             {
@@ -473,7 +474,7 @@ namespace DelvUI.Interface.Party
             return partyChanged;
         }
 
-        private void UpdateCrossWorldParty(PlayerCharacter player)
+        private void UpdateCrossWorldParty(IPlayerCharacter player)
         {
             // create new members array with cross world data
             _groupMembers.Clear();
@@ -496,7 +497,7 @@ namespace DelvUI.Interface.Party
             Sort(player, null);
         }
 
-        private void UpdateRegularParty(PlayerCharacter player)
+        private void UpdateRegularParty(IPlayerCharacter player)
         {
             // create new members array with dalamud's data
             _groupMembers.Clear();
@@ -508,7 +509,7 @@ namespace DelvUI.Interface.Party
                 DalamudPartyMember? partyMember = GetPartyMemberForIndex(i);
                 if (partyMember == null) { continue; }
 
-                bool isPlayer = partyMember.ObjectId == player.ObjectId;
+                bool isPlayer = partyMember.ObjectId == player.GameObjectId;
                 int order = isPlayer ? 1 : (IndexForPartyMember(partyMember) ?? 9);
                 int index = isPlayer ? 0 : order - 1;
                 EnmityLevel enmity = EnmityForIndex(index);
@@ -525,10 +526,10 @@ namespace DelvUI.Interface.Party
                 _groupMembers.Add(member);
 
                 // player's chocobo (always last)
-                if (_config.ShowChocobo && member.ObjectId == player.ObjectId)
+                if (_config.ShowChocobo && member.ObjectId == player.GameObjectId)
                 {
                     var companion = Utils.GetBattleChocobo(player);
-                    if (companion is Character companionCharacter)
+                    if (companion is ICharacter companionCharacter)
                     {
                         _groupMembers.Add(new PartyFramesMember(companionCharacter, 10, EnmityLevel.Last, PartyMemberStatus.None, ReadyCheckStatus.None, false));
                     }
@@ -545,11 +546,11 @@ namespace DelvUI.Interface.Party
                 return null;
             }
 
-            StructsPartyMember* memberStruct = GroupManager.Instance()->GetPartyMemberByIndex(index);
+            StructsPartyMember* memberStruct = GroupManager.Instance()->GetGroup()->GetPartyMemberByIndex(index);
             return Plugin.PartyList.CreatePartyMemberReference(new IntPtr(memberStruct));
         }
 
-        private void Sort(PlayerCharacter player, PartyFramesMember? playerMember)
+        private void Sort(IPlayerCharacter player, PartyFramesMember? playerMember)
         {
             // calculate player overriden position
             if (playerMember != null && _config.PlayerOrderOverrideEnabled)
@@ -655,7 +656,7 @@ namespace DelvUI.Interface.Party
                 return EnmityLevel.Last;
             }
 
-            EnmityLevel enmityLevel = (EnmityLevel)PartyListAddon->PartyMember[index].EmnityByte;
+            EnmityLevel enmityLevel = (EnmityLevel)PartyListAddon->PartyMembers[index].EmnityByte;
             if (enmityLevel == EnmityLevel.Leader && PartyListAddon->EnmityLeaderIndex != index)
             {
                 enmityLevel = EnmityLevel.Last;
@@ -671,7 +672,7 @@ namespace DelvUI.Interface.Party
                 return EnmityLevel.Last;
             }
 
-            return (EnmityLevel)PartyListAddon->TrustMember[index].EmnityByte;
+            return (EnmityLevel)PartyListAddon->TrustMembers[index].EmnityByte;
         }
 
         private bool IsPartyLeader(int index)
@@ -686,7 +687,7 @@ namespace DelvUI.Interface.Party
             return index == partyLeadIndex;
         }
 
-        private int? IndexForPartyMember(Dalamud.Game.ClientState.Party.PartyMember member)
+        private int? IndexForPartyMember(IPartyMember member)
         {
             if (_partyMembersInfo == null || _partyMembersInfo.Count == 0)
             {
@@ -697,17 +698,17 @@ namespace DelvUI.Interface.Party
             return _partyMembersInfo.FindIndex(o => (member.ObjectId != 0 && o.ObjectId == member.ObjectId) || o.Name == name) + 1;
         }
 
-        private void SortGroupMembers(PlayerCharacter player)
+        private void SortGroupMembers(IPlayerCharacter player)
         {
             _groupMembers.Sort((a, b) =>
             {
                 if (a.Order == b.Order)
                 {
-                    if (a.ObjectId == player.ObjectId)
+                    if (a.ObjectId == player.GameObjectId)
                     {
                         return 1;
                     }
-                    else if (b.ObjectId == player.ObjectId)
+                    else if (b.ObjectId == player.GameObjectId)
                     {
                         return -1;
                     }

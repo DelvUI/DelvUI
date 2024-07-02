@@ -13,7 +13,7 @@ namespace DelvUI.Interface.GeneralElements
         private ExperienceBarConfig Config => (ExperienceBarConfig)_config;
         public VisibilityConfig VisibilityConfig => Config.VisibilityConfig;
 
-        public GameObject? Actor { get; set; } = null;
+        public IGameObject? Actor { get; set; } = null;
 
         private ExperienceHelper _helper = new ExperienceHelper();
         private IconLabelHud _sanctuaryLabel;
@@ -72,7 +72,7 @@ namespace DelvUI.Interface.GeneralElements
             if (addon == null) { return false; }
             if (addon->AtkUnitBase.UldManager.NodeListCount < 4) { return false; }
 
-            return addon->AtkUnitBase.UldManager.NodeList[4]->IsVisible;
+            return addon->AtkUnitBase.UldManager.NodeList[4]->IsVisible();
         }
     }
 }
