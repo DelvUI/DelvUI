@@ -32,28 +32,10 @@ namespace DelvUI.Helpers
         {
             PullTimerState = new PullTimerState();
 
-            /*
-             Part of Countdown disassembly Signature
-            .text:00007FF647F88F20                   CountdownPointer proc near
-            .text:00007FF647F88F20
-            .text:00007FF647F88F20                   var_28= xmmword ptr -28h
-            .text:00007FF647F88F20                   var_18= xmmword ptr -18h
-            .text:00007FF647F88F20                   arg_0= qword ptr  8
-            .text:00007FF647F88F20
-            .text:00007FF647F88F20 48 89 5C 24 08    mov     [rsp+arg_0], rbx
-            .text:00007FF647F88F25 57                push    rdi
-            .text:00007FF647F88F26 48 83 EC 40       sub     rsp, 40h
-            .text:00007FF647F88F2A 8B 41 28          mov     eax, [rcx+28h]
-            .text:00007FF647F88F2D 48 8B D9          mov     rbx, rcx
-            .text:00007FF647F88F30 89 41 2C          mov     [rcx+2Ch], eax
-            .text:00007FF647F88F33 48 8B 05 1E 3C AE+mov     rax, cs:g_Framework_2
-            */
-
-            IntPtr countdownPtr = Plugin.SigScanner.ScanText("48 89 5C 24 ?? 57 48 83 EC 40 8B 41");
             try
             {
                 _countdownTimerHook = Plugin.GameInteropProvider.HookFromSignature<CountdownTimer>(
-                    "48 89 5C 24 ?? 57 48 83 EC 40 8B 41",
+                    "40 53 48 83 EC 40 80 79 38 00",
                     CountdownTimerFunc
                 );
                 _countdownTimerHook?.Enable();
@@ -94,7 +76,7 @@ namespace DelvUI.Helpers
         private DateTime _combatTimeEnd;
         private DateTime _combatTimeStart;
 
-        private ulong _countDown;
+        private ulong _agentData;
         public bool CountDownRunning;
 
         private int _countDownStallTicks;
@@ -120,7 +102,7 @@ namespace DelvUI.Helpers
 
         private IntPtr CountdownTimerFunc(ulong value)
         {
-            _countDown = value;
+            _agentData = value;
             return _countdownTimerHook!.Original(value);
         }
 
@@ -152,12 +134,18 @@ namespace DelvUI.Helpers
         {
             PullTimerState.CountingDown = false;
 
-            if (_countDown == 0)
+            if (_agentData == 0)
             {
                 return;
             }
 
-            var countDownPointerValue = Marshal.PtrToStructure<float>((IntPtr)_countDown + 0x2c);
+            byte countdownActive = Marshal.PtrToStructure<byte>((IntPtr)_agentData + 0x38);
+            if (countdownActive == 0)
+            {
+                return;
+            } 
+
+            float countDownPointerValue = Marshal.PtrToStructure<float>((IntPtr)_agentData + 0x2c);
 
             // is last value close enough (workaround for floating point approx)
             if (Math.Abs(countDownPointerValue - LastCountDownValue) < 0.001f)
@@ -177,13 +165,13 @@ namespace DelvUI.Helpers
 
             if (countDownPointerValue > 0 && CountDownRunning)
             {
-                PullTimerState.CountDownValue = Marshal.PtrToStructure<float>((IntPtr)_countDown + 0x2c);
+                PullTimerState.CountDownValue = countDownPointerValue;
                 PullTimerState.CountingDown = true;
             }
 
             if (!_lastMaxValueSet && CountDownRunning)
             {
-                PullTimerState.CountDownMax = Marshal.PtrToStructure<float>((IntPtr)_countDown + 0x2c);
+                PullTimerState.CountDownMax = countDownPointerValue;
                 _lastMaxValueSet = true;
             }
 

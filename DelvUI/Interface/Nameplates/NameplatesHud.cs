@@ -186,6 +186,11 @@ namespace DelvUI.Interface.Nameplates
             Vector3 cameraPos = camera.Object.Position;
 
             BGCollisionModule* collisionModule = Framework.Instance()->BGCollisionModule;
+            if (collisionModule == null)
+            {
+                return false;
+            }
+
             int flag = Config.RaycastFlag();
             int* flags = stackalloc int[] { flag, 0, flag, 0 };
             bool obstructed = false;
@@ -195,7 +200,7 @@ namespace DelvUI.Interface.Nameplates
             {
                 Vector3 direction = Vector3.Normalize(data.WorldPosition - cameraPos);
                 RaycastHit hit;
-                obstructed = collisionModule->RaycastMaterialFilter(&hit, cameraPos, direction, data.Distance, 1, flags);
+                obstructed = collisionModule->RaycastMaterialFilter(&hit, &cameraPos, &direction, data.Distance, 1, flags);
             }
             // full mode
             else
@@ -212,7 +217,10 @@ namespace DelvUI.Interface.Nameplates
                     Ray ray = camera.ScreenPointToRay(point);
                     RaycastHit hit;
 
-                    if (collisionModule->RaycastMaterialFilter(&hit, ray.Origin, ray.Direction, data.Distance, 1, flags))
+                    Vector3 origin = new Vector3(ray.Origin.X, ray.Origin.Y, ray.Origin.Z);
+                    Vector3 direction = new Vector3(ray.Direction.X, ray.Direction.Y, ray.Direction.Z);
+
+                    if (collisionModule->RaycastMaterialFilter(&hit, &origin, &direction, data.Distance, 1, flags))
                     {
                         obstructionCount++;
                     }
