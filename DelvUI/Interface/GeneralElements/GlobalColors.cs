@@ -243,7 +243,7 @@ namespace DelvUI.Interface.GeneralElements
         
         [ColorEdit4("Viper")]   // TODO: Update when colors are finalized, prob needs to be a green?
         [Order(25)]
-        public PluginConfigColor VPRColor = new PluginConfigColor(new(150f / 255f, 90f / 255f, 144f / 255f, 100f / 100f));
+        public PluginConfigColor VPRColor = new PluginConfigColor(new(16f / 255f, 130f / 255f, 16f / 255f, 100f / 100f));
 
         [ColorEdit4("Pugilist", spacing = true)]
         [Order(30)]
