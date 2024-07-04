@@ -153,9 +153,9 @@ namespace DelvUI.Interface.PartyCooldowns
                     float cooldownTime = cooldown.CooldownTimeRemaining();
                     float effectTime = cooldown.EffectTimeRemaining();
 
-                    float max = effectTime > 0 ? cooldown.Data.EffectDuration : cooldown.Data.CooldownDuration;
+                    float max = effectTime > 0 ? cooldown.GetEffectDuration() : cooldown.GetCooldown();
                     float current = effectTime > 0 ? effectTime : cooldownTime;
-
+                    
                     float sizeX = Math.Max(1, _barConfig.Size.X - _barConfig.Size.Y);
                     Vector2 size = new Vector2(sizeX, _barConfig.Size.Y);
 
@@ -234,7 +234,7 @@ namespace DelvUI.Interface.PartyCooldowns
 
                                 if (_barConfig.ShowIconCooldownAnimation && effectTime == 0 && cooldownTime > 0)
                                 {
-                                    DrawHelper.DrawIconCooldown(iconPos, iconSize, cooldownTime, cooldown.Data.CooldownDuration, drawList);
+                                    DrawHelper.DrawIconCooldown(iconPos, iconSize, cooldownTime, cooldown.GetCooldown(), drawList);
                                 }
 
                                 if (_barConfig.DrawBorder)

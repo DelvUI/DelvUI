@@ -250,6 +250,18 @@ namespace DelvUI.Interface.PartyCooldowns
                     cooldown.OverriddenCooldownText = "90-120";
                 }
 
+                // reprisal, feint, addle
+                else if (cooldown.ActionId == 7535 || cooldown.ActionId == 7549 || cooldown.ActionId == 7560)
+                {
+                    cooldown.OverriddenDurationText = "10-15";
+                }
+
+                // swiftcast
+                else if (cooldown.ActionId == 7561)
+                {
+                    cooldown.OverriddenCooldownText = "40-60";
+                }
+
                 cooldown.IconId = action.Icon;
                 cooldown.Name = action.Name;
             }
@@ -363,7 +375,8 @@ namespace DelvUI.Interface.PartyCooldowns
                     // duration
                     if (ImGui.TableSetColumnIndex(4))
                     {
-                        ImGui.Text($"{cooldown.EffectDuration}");
+                        string durationText = cooldown.OverriddenDurationText != null ? cooldown.OverriddenDurationText : $"{cooldown.EffectDuration}";
+                        ImGui.Text(durationText);
                     }
 
                     // priority
@@ -558,7 +571,7 @@ namespace DelvUI.Interface.PartyCooldowns
             // 5. Misc (Provoke, Shirk, Switcast, Rescue, etc)
 
             // TANKS -------------------------------------------------------------------------------------------------
-            [7535] = NewData(7535, JobRoles.Tank, 22, 60, 15, 100, 1, PartyCooldownEnabled.PartyFrames), // reprisal
+            [7535] = NewData(7535, JobRoles.Tank, 22, 60, 10, 100, 1, PartyCooldownEnabled.PartyFrames), // reprisal
             [7531] = NewData(7531, JobRoles.Tank, 8, 90, 20, 50, 4, PartyCooldownEnabled.PartyFrames), // rampart
             [7533] = NewData(7533, JobRoles.Tank, 15, 30, 1, 50, 5, PartyCooldownEnabled.PartyFrames), // provoke
             [7537] = NewData(7537, JobRoles.Tank, 48, 120, 1, 50, 5, PartyCooldownEnabled.PartyFrames), // shirk
@@ -643,7 +656,7 @@ namespace DelvUI.Interface.PartyCooldowns
             [24317] = NewData(24317, JobIDs.SGE, 86, 60, 10, 10, 4, PartyCooldownEnabled.PartyFrames), // krasis
 
             // MELEE -------------------------------------------------------------------------------------------------
-            [7549] = NewData(7549, JobRoles.DPSMelee, 22, 90, 15, 100, 1, PartyCooldownEnabled.PartyFrames), // feint
+            [7549] = NewData(7549, JobRoles.DPSMelee, 22, 90, 10, 100, 1, PartyCooldownEnabled.PartyFrames), // feint
             [7542] = NewData(7542, JobRoles.DPSMelee, 12, 90, 20, 10, 4, PartyCooldownEnabled.PartyFrames), // bloodbath
 
             // SAM
@@ -667,7 +680,7 @@ namespace DelvUI.Interface.PartyCooldowns
             // RPR
             [24405] = NewData(24405, JobIDs.RPR, 72, 120, 20, 30, 3, PartyCooldownEnabled.PartyCooldowns), // arcane circle
             [24404] = NewData(24404, JobIDs.RPR, 40, 30, 5, 10, 4, PartyCooldownEnabled.PartyFrames), // arcane crest
-
+            
             // RANGED -------------------------------------------------------------------------------------------------
             // BRD
             [118] = NewData(118, JobIDs.BRD, 50, 120, 20, 30, 3, PartyCooldownEnabled.PartyCooldowns), // battle voice
@@ -686,7 +699,7 @@ namespace DelvUI.Interface.PartyCooldowns
             [2887] = NewData(2887, JobIDs.MCH, 62, 120, 10, 70, 2, PartyCooldownEnabled.PartyFrames), // dismantle
 
             // CASTER -------------------------------------------------------------------------------------------------
-            [7560] = NewData(7560, JobRoles.DPSCaster, 8, 90, 15, 100, 1, PartyCooldownEnabled.PartyFrames), // addle
+            [7560] = NewData(7560, JobRoles.DPSCaster, 8, 90, 10, 100, 1, PartyCooldownEnabled.PartyFrames), // addle
 
             // RDM
             [25857] = NewData(25857, JobIDs.RDM, 86, 120, 10, 70, 2, PartyCooldownEnabled.PartyCooldownsAndPartyFrames), // magick barrier
@@ -700,9 +713,13 @@ namespace DelvUI.Interface.PartyCooldowns
             [3573] = NewData(3573, JobIDs.BLM, 52, 120, 30, 90, 3, PartyCooldownEnabled.PartyFrames), // ley lines
             [157] = NewData(157, JobIDs.BLM, 38, 120, 20, 10, 4, PartyCooldownEnabled.PartyFrames), // manaward
 
+            // PCT
+            [34675] = NewData(34675, JobIDs.PCT, 70, 120, 20, 30, 3, PartyCooldownEnabled.PartyFrames), // starry muse
+            [34685] = NewData(34685, JobIDs.PCT, 10, 120, 10, 10, 4, PartyCooldownEnabled.PartyFrames), // tempera coat
+
             // MULTI-ROLE  -------------------------------------------------------------------------------------------------
             [7541] = NewData(7541, new List<JobRoles>() { JobRoles.DPSMelee, JobRoles.DPSRanged }, 8, 120, 0, 80, 4, PartyCooldownEnabled.PartyFrames), // second wind
-            [7561] = NewData(7561, new List<JobRoles>() { JobRoles.Healer, JobRoles.DPSCaster }, 18, 40, 1, 80, 5, PartyCooldownEnabled.PartyFrames, null, new HashSet<uint>() { JobIDs.BLM, JobIDs.SMN, JobIDs.RDM }), // swiftcast
+            [7561] = NewData(7561, new List<JobRoles>() { JobRoles.Healer, JobRoles.DPSCaster }, 18, 60, 1, 80, 5, PartyCooldownEnabled.PartyFrames, null, new HashSet<uint>() { JobIDs.BLM, JobIDs.SMN, JobIDs.RDM }), // swiftcast
             [7562] = NewData(7562, new List<JobRoles>() { JobRoles.Healer, JobRoles.DPSCaster }, 14, 60, 21, 80, 5, PartyCooldownEnabled.Disabled), // lucid dreaming
         };
 

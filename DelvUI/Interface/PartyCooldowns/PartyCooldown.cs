@@ -35,13 +35,14 @@ namespace DelvUI.Interface.PartyCooldowns
 
         public float EffectTimeRemaining()
         {
+            int duration = GetEffectDuration();
             double timeSinceUse = ImGui.GetTime() - LastTimeUsed;
-            if (timeSinceUse > Data.EffectDuration)
+            if (timeSinceUse > duration)
             {
                 return 0;
             }
 
-            return Data.EffectDuration - (float)timeSinceUse;
+            return duration - (float)timeSinceUse;
         }
 
         public float CooldownTimeRemaining()
@@ -59,19 +60,35 @@ namespace DelvUI.Interface.PartyCooldowns
             return cooldown - (float)timeSinceUse;
         }
 
-        private int GetCooldown()
+        public int GetCooldown()
         {
-            // not happy about this but didn't want to over-complicate things
             // special case for troubadour, shield samba and tactician
-            if (MemberLevel < 88) { return Data.CooldownDuration; }
-            if (Data.ActionId != 7405 && Data.ActionId != 16012 && Data.ActionId != 16889) { return Data.CooldownDuration; }
+            if (Data.ActionId == 7405 || Data.ActionId == 16012 || Data.ActionId == 16889)
+            {
+                return MemberLevel < 88 ? Data.CooldownDuration : 90;
+            }
+            // special case for swiftcast
+            else if (Data.ActionId == 7561)
+            {
+                return MemberLevel < 94 ? Data.CooldownDuration : 40;
+            }
 
-            return 90;
+            return Data.CooldownDuration;
+        }
+
+        public int GetEffectDuration()
+        {
+            // special case for reprisal, feint and addle
+            if (MemberLevel < 98) { return Data.EffectDuration; }
+            if (Data.ActionId != 7535 && Data.ActionId != 7549 && Data.ActionId != 7560) { return Data.EffectDuration; }
+
+            return 15;
         }
 
         public string TooltipText()
         {
-            string effectDuration = Data.EffectDuration > 0 ? $"Duration: {Data.EffectDuration}s \n" : "";
+            int duration = GetEffectDuration();
+            string effectDuration = duration > 0 ? $"Duration: {duration}s \n" : "";
             return $"{effectDuration}Recast Time: {GetCooldown()}s";
         }
     }
@@ -100,6 +117,7 @@ namespace DelvUI.Interface.PartyCooldowns
         [JsonIgnore] public uint IconId = 0;
         [JsonIgnore] public string Name = "";
         [JsonIgnore] public string? OverriddenCooldownText = null;
+        [JsonIgnore] public string? OverriddenDurationText = null;
 
         public virtual bool IsUsableBy(uint jobId)
         {
