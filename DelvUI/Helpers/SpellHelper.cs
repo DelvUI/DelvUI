@@ -46,6 +46,8 @@ namespace DelvUI.Helpers
 
         public unsafe float GetRecastTime(uint actionId) => _actionManager->GetRecastTime(ActionType.Action, GetSpellActionId(actionId));
         public unsafe float GetRealRecastTime(uint actionId) => _actionManager->GetRecastTime(ActionType.Action, actionId);
+        
+        public unsafe uint GetLastUsedActionId() => _actionManager->Combo.Action;
 
         public float GetSpellCooldown(uint actionId) => Math.Abs(GetRecastTime(GetSpellActionId(actionId)) - GetRecastTimeElapsed(GetSpellActionId(actionId)));
         public float GetRealSpellCooldown(uint actionId) => Math.Abs(GetRealRecastTime(actionId) - GetRealRecastTimeElapsed(actionId));

@@ -631,6 +631,7 @@ namespace DelvUI.Interface
                 [JobIDs.NIN] = new JobHudTypes(typeof(NinjaHud), typeof(NinjaConfig), "Ninja HUD"),
                 [JobIDs.SAM] = new JobHudTypes(typeof(SamuraiHud), typeof(SamuraiConfig), "Samurai HUD"),
                 [JobIDs.RPR] = new JobHudTypes(typeof(ReaperHud), typeof(ReaperConfig), "Reaper HUD"),
+                [JobIDs.VPR] = new JobHudTypes(typeof(ViperHud), typeof(ViperConfig), "Viper HUD"),
 
                 // ranged
                 [JobIDs.BRD] = new JobHudTypes(typeof(BardHud), typeof(BardConfig), "Bard HUD"),
@@ -671,10 +672,7 @@ namespace DelvUI.Interface
                 // gatherers
                 [JobIDs.MIN] = typeof(MinerConfig),
                 [JobIDs.BOT] = typeof(BotanistConfig),
-                [JobIDs.FSH] = typeof(FisherConfig),
-                
-                // not implemented yet,
-                [JobIDs.VPR] = typeof(ViperConfig),
+                [JobIDs.FSH] = typeof(FisherConfig)
             };
 
             _jobTypes = new List<Type>()
@@ -694,6 +692,7 @@ namespace DelvUI.Interface
                 typeof(NinjaConfig),
                 typeof(SamuraiConfig),
                 typeof(ReaperConfig),
+                typeof(ViperConfig),
 
                 typeof(BardConfig),
                 typeof(MachinistConfig),

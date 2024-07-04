@@ -633,6 +633,7 @@ namespace DelvUI.Config
             typeof(NinjaConfig),
             typeof(SamuraiConfig),
             typeof(ReaperConfig),
+            typeof(ViperConfig),
 
             typeof(BardConfig),
             typeof(MachinistConfig),
