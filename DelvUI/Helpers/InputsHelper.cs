@@ -228,9 +228,9 @@ namespace DelvUI.Helpers
                 (action.CanTargetDead && !action.CanTargetFriendly && !action.CanTargetHostile && !action.CanTargetParty && action.CanTargetSelf))
             {
                 // special case for AST cards and SMN rekindle
-                if (actionID == 17055 || actionID == 7443 || actionID == 25822)
+                if (actionID is 37019 or 37020 or 37021 or 25822)
                 {
-                    return target is IPlayerCharacter || target is IBattleNpc battleNpc && battleNpc.BattleNpcKind == BattleNpcSubKind.Chocobo;
+                    return target is IPlayerCharacter or IBattleNpc { BattleNpcKind: BattleNpcSubKind.Chocobo };
                 }
 
                 return target is IBattleNpc npcTarget && npcTarget.BattleNpcKind == BattleNpcSubKind.Enemy;
