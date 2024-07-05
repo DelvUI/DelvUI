@@ -75,7 +75,7 @@ namespace DelvUI.Interface.GeneralElements
         public GCDBarConfig Bar = new GCDBarConfig(
             new Vector2(0, HUDConstants.BaseHUDOffsetY + 21),
             new Vector2(254, 8),
-            new PluginConfigColor(Vector4.Zero)
+            PluginConfigColor.Empty
         );
 
         [NestedConfig("Visibility", 70)]

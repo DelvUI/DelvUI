@@ -86,7 +86,7 @@ namespace DelvUI.Interface.Party
     {
         public new static PartyFramesHealthBarsConfig DefaultConfig()
         {
-            var config = new PartyFramesHealthBarsConfig(Vector2.Zero, new(180, 80), new PluginConfigColor(Vector4.Zero));
+            var config = new PartyFramesHealthBarsConfig(Vector2.Zero, new(180, 80), PluginConfigColor.Empty);
             config.MouseoverAreaConfig.Enabled = false;
 
             return config;

@@ -4,16 +4,16 @@ using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
-using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
+using DelvUI.Interface.GeneralElements;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using DelvUI.Enums;
-using DelvUI.Interface.GeneralElements;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -37,22 +37,10 @@ namespace DelvUI.Interface.Jobs
             List<Vector2> positions = new();
             List<Vector2> sizes = new();
 
-            if (Config.DrawBar.Enabled)
+            if (Config.CardsBar.Enabled)
             {
-                positions.Add(Config.Position + Config.DrawBar.Position);
-                sizes.Add(Config.DrawBar.Size);
-            }
-
-            if (Config.MinorArcanaBar.Enabled)
-            {
-                positions.Add(Config.Position + Config.MinorArcanaBar.Position);
-                sizes.Add(Config.MinorArcanaBar.Size);
-            }
-
-            if (Config.AstrodyneBar.Enabled)
-            {
-                positions.Add(Config.Position + Config.AstrodyneBar.Position);
-                sizes.Add(Config.AstrodyneBar.Size);
+                positions.Add(Config.Position + Config.CardsBar.Position);
+                sizes.Add(Config.CardsBar.Size);
             }
 
             if (Config.DotBar.Enabled)
@@ -80,21 +68,10 @@ namespace DelvUI.Interface.Jobs
         {
             Vector2 pos = origin + Config.Position;
 
-            if (Config.AstrodyneBar.Enabled)
+            if (Config.CardsBar.Enabled)
             {
-                DrawAstrodyneBar(pos, player);
+                DrawCardsBar(pos, player);
             }
-
-            if (Config.DrawBar.Enabled)
-            {
-                DrawDraw(pos, player);
-            }
-
-            if (Config.MinorArcanaBar.Enabled)
-            {
-                DrawMinorArcana(pos, player);
-            }
-
             if (Config.DotBar.Enabled)
             {
                 DrawDot(pos, player);
@@ -111,279 +88,37 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawAstrodyneBar(Vector2 origin, IPlayerCharacter player)
+        private unsafe void DrawCardsBar(Vector2 origin, IPlayerCharacter player)
         {
-            List<PluginConfigColor> chunkColors = new();
-            ASTGauge gauge = Plugin.JobGauges.Get<ASTGauge>();
-            bool[] chucksToGlow = new bool[3];
+            AstrologianCardsBarConfig config = Config.CardsBar;
+            PluginConfigColor emptyColor = PluginConfigColor.Empty;
 
-            for (int ix = 0; ix < 3; ++ix)
+            List<Tuple<PluginConfigColor, float, LabelConfig?>> chunks = new();
+            
+            uint play1 = ActionManager.Instance()->GetAdjustedActionId(37019);
+            PluginConfigColor play1Color = play1 == 37023 ? config.TheBalanceColor : (play1 == 37026 ? config.TheSpearColor : emptyColor);
+            chunks.Add(new(play1Color, 1, null));
+
+            uint play2 = ActionManager.Instance()->GetAdjustedActionId(37020);
+            PluginConfigColor play2Color = play2 == 37024 ? config.TheArrowColor : (play2 == 37027 ? config.TheBoleColor : emptyColor);
+            chunks.Add(new(play2Color, 1, null));
+
+            uint play3 = ActionManager.Instance()->GetAdjustedActionId(37021);
+            PluginConfigColor play3Color = play3 == 37025 ? config.TheSpireColor : (play3 == 37028 ? config.TheEwerColor : emptyColor);
+            chunks.Add(new(play3Color, 1, null));
+
+            if (player.Level >= 70)
             {
-                SealType type = gauge.Seals[ix];
-
-                switch (type)
-                {
-                    case SealType.NONE:
-                        chunkColors.Add(EmptyColor);
-
-                        break;
-
-                    case SealType.MOON:
-                        chunkColors.Add(Config.AstrodyneBar.SealLunarColor);
-
-                        break;
-
-                    case SealType.SUN:
-                        chunkColors.Add(Config.AstrodyneBar.SealSunColor);
-
-                        break;
-
-                    case SealType.CELESTIAL:
-                        chunkColors.Add(Config.AstrodyneBar.SealCelestialColor);
-
-                        break;
-                }
-
-                int sealNumbers = 0;
-                Config.AstrodyneBar.Label.SetText("");
-
-                if (gauge.ContainsSeal(SealType.NONE))
-                {
-                    continue;
-                }
-
-                if (gauge.ContainsSeal(SealType.SUN))
-                {
-                    sealNumbers++;
-                }
-
-                if (gauge.ContainsSeal(SealType.MOON))
-                {
-                    sealNumbers++;
-                }
-
-                if (gauge.ContainsSeal(SealType.CELESTIAL))
-                {
-                    sealNumbers++;
-                }
-
-                Config.AstrodyneBar.Label.SetText(sealNumbers.ToString());
-
-
-                for (int i = 0; i < sealNumbers; i++)
-                {
-                    chucksToGlow[i] = true;
-                }
-
+                uint minorArcana = ActionManager.Instance()->GetAdjustedActionId(37021);
+                PluginConfigColor minorArcanaColor = play3 == 7444 ? config.TheLordOfCrownsColor : (play3 == 7445 ? config.TheLadyOfCrownsColor : emptyColor);
+                chunks.Add(new(minorArcanaColor, 1, null));
             }
 
-            if (chunkColors.All(n => n == EmptyColor) && Config.AstrodyneBar.HideWhenInactive)
-            {
-                return;
-            }
-
-            Tuple<PluginConfigColor, float, LabelConfig?>[] astrodyneChunks = {
-                new(chunkColors[0], chunkColors[0] != EmptyColor ? 1f : 0f, null),
-                new(chunkColors[1], chunkColors[1] != EmptyColor ? 1f : 0f, Config.AstrodyneBar.Label),
-                new(chunkColors[2], chunkColors[2] != EmptyColor ? 1f : 0f, null) };
-
-            BarHud[] bars = BarUtilities.GetChunkedBars(Config.AstrodyneBar, astrodyneChunks, player, Config.AstrodyneBar.AstrodyneGlowConfig, chucksToGlow);
+            BarHud[] bars = BarUtilities.GetChunkedBars(config, chunks.ToArray(), player);
             foreach (BarHud bar in bars)
             {
-                AddDrawActions(bar.GetDrawActions(origin, Config.AstrodyneBar.StrataLevel));
+                AddDrawActions(bar.GetDrawActions(origin, config.StrataLevel));
             }
-        }
-
-        private void DrawDraw(Vector2 origin, IPlayerCharacter player)
-        {
-            ASTGauge gauge = Plugin.JobGauges.Get<ASTGauge>();
-
-            string cardJob = "";
-            PluginConfigColor cardColor = EmptyColor;
-
-            if (gauge.DrawnCard == CardType.NONE && Config.DrawBar.HideWhenInactive)
-            {
-                return;
-            }
-
-            switch (gauge.DrawnCard)
-            {
-                case CardType.BALANCE:
-                    cardColor = Config.AstrodyneBar.SealSunColor;
-                    cardJob = "MELEE";
-                    Config.DrawBar.DrawGlowConfig.Color = new PluginConfigColor(Config.DrawBar.DrawMeleeGlowColor.Vector);
-                    break;
-
-                case CardType.BOLE:
-                    cardColor = Config.AstrodyneBar.SealSunColor;
-                    cardJob = "RANGED";
-                    Config.DrawBar.DrawGlowConfig.Color = new PluginConfigColor(Config.DrawBar.DrawRangedGlowColor.Vector);
-                    break;
-
-                case CardType.ARROW:
-                    cardColor = Config.AstrodyneBar.SealLunarColor;
-                    cardJob = "MELEE";
-                    Config.DrawBar.DrawGlowConfig.Color = new PluginConfigColor(Config.DrawBar.DrawMeleeGlowColor.Vector);
-                    break;
-
-                case CardType.EWER:
-                    cardColor = Config.AstrodyneBar.SealLunarColor;
-                    cardJob = "RANGED";
-                    Config.DrawBar.DrawGlowConfig.Color = new PluginConfigColor(Config.DrawBar.DrawRangedGlowColor.Vector);
-                    break;
-
-                case CardType.SPEAR:
-                    cardColor = Config.AstrodyneBar.SealCelestialColor;
-                    cardJob = "MELEE";
-                    Config.DrawBar.DrawGlowConfig.Color = new PluginConfigColor(Config.DrawBar.DrawMeleeGlowColor.Vector);
-                    break;
-
-                case CardType.SPIRE:
-                    cardColor = Config.AstrodyneBar.SealCelestialColor;
-                    cardJob = "RANGED";
-                    Config.DrawBar.DrawGlowConfig.Color = new PluginConfigColor(Config.DrawBar.DrawRangedGlowColor.Vector);
-                    break;
-
-                case CardType.NONE:
-                    Config.DrawBar.DrawGlowConfig.Color = new PluginConfigColor(Vector4.Zero);
-                    break;
-            }
-
-            float cardPresent;
-            float cardMax;
-            float drawCastInfo = _spellHelper.GetSpellCooldown(3590);
-            int drawCharges = _spellHelper.GetStackCount(2, 3590);
-            float current = drawCastInfo % 30 + 0.75f;
-
-            if (cardJob != "")
-            {
-                cardPresent = 1f;
-                cardMax = 1f;
-                Config.DrawBar.Label.SetText(cardJob);
-
-                if (Config.DrawBar.DrawDrawLabel.Enabled)
-                {
-                    if (drawCastInfo > 0 && drawCharges == 0)
-                    {
-                        Config.DrawBar.DrawDrawLabel.SetValue(current);
-                    }
-                    else if (drawCastInfo > 0 && drawCharges > 0)
-                    {
-                        Config.DrawBar.DrawDrawLabel.SetText("READY (" + current.ToString("0") + ")");
-                    }
-                    else
-                    {
-                        Config.DrawBar.DrawDrawLabel.SetText("READY");
-                    }
-                }
-                else
-                {
-                    Config.DrawBar.DrawDrawLabel.SetText("");
-                }
-            }
-            else
-            {
-                cardPresent = drawCastInfo > 0 ? current : 1f;
-
-                switch (drawCastInfo)
-                {
-                    case > 0 when drawCharges == 0:
-                        Config.DrawBar.Label.SetValue(current);
-                        break;
-                    case > 0 when drawCharges > 0:
-                        Config.DrawBar.Label.SetText("READY (" + current.ToString("0") + ")");
-                        break;
-                    default:
-                        Config.DrawBar.Label.SetText("READY");
-                        break;
-                }
-
-                Config.DrawBar.DrawDrawLabel.SetText("");
-                cardColor = drawCharges > 0 ? Config.DrawBar.DrawCdReadyColor : Config.DrawBar.DrawCdColor;
-                cardMax = drawCastInfo > 0 ? 60f : 1f;
-            }
-
-            Config.DrawBar.DrawDrawChargesLabel.SetValue(drawCharges);
-            LabelConfig[] labels = new LabelConfig[] { Config.DrawBar.Label, Config.DrawBar.DrawDrawChargesLabel, Config.DrawBar.DrawDrawLabel };
-            BarGlowConfig? glowConfig = Config.DrawBar.DrawGlowConfig.Enabled && Math.Abs(cardMax - 1f) == 0f ? Config.DrawBar.DrawGlowConfig : null;
-
-            BarHud bar = BarUtilities.GetBar(Config.DrawBar, cardPresent, cardMax, 0f, player, cardColor, glowConfig, labels);
-            AddDrawActions(bar.GetDrawActions(origin, Config.DrawBar.StrataLevel));
-        }
-
-        private void DrawMinorArcana(Vector2 pos, IPlayerCharacter player)
-        {
-            ASTGauge gauge = Plugin.JobGauges.Get<ASTGauge>();
-
-            string crownCardDrawn = "";
-            PluginConfigColor crownCardColor = EmptyColor;
-
-            if (gauge.DrawnCrownCard == CardType.NONE && Config.MinorArcanaBar.HideWhenInactive)
-            {
-                return;
-            }
-
-            switch (gauge.DrawnCrownCard)
-            {
-                case CardType.LADY:
-                    crownCardColor = Config.MinorArcanaBar.LadyDrawnColor;
-                    crownCardDrawn = "LADY";
-                    break;
-
-                case CardType.LORD:
-                    crownCardColor = Config.MinorArcanaBar.LordDrawnColor;
-                    crownCardDrawn = "LORD";
-                    break;
-            }
-
-            float crownCardPresent;
-            float crownCardMax;
-            float cooldown = _spellHelper.GetRealSpellCooldown(7443);
-
-            if (crownCardDrawn != "")
-            {
-                crownCardPresent = 1f;
-                crownCardMax = 1f;
-                Config.MinorArcanaBar.Label.SetText(crownCardDrawn);
-
-                if (Config.MinorArcanaBar.CrownDrawTimerLabel.Enabled)
-                {
-                    switch (cooldown)
-                    {
-                        case > 0:
-                            Config.MinorArcanaBar.CrownDrawTimerLabel.SetValue(cooldown);
-                            break;
-                        default:
-                            Config.MinorArcanaBar.CrownDrawTimerLabel.SetText("READY");
-                            break;
-                    }
-                }
-                else
-                {
-                    Config.MinorArcanaBar.CrownDrawTimerLabel.SetText("");
-                }
-            }
-            else
-            {
-                crownCardPresent = cooldown > 0 ? cooldown : 1f;
-
-                if (cooldown > 0)
-                {
-                    Config.MinorArcanaBar.Label.SetValue(cooldown);
-                }
-                else
-                {
-                    Config.MinorArcanaBar.Label.SetText("READY");
-                }
-
-                Config.MinorArcanaBar.CrownDrawTimerLabel.SetText("");
-                crownCardColor = cooldown > 0 ? Config.MinorArcanaBar.CrownDrawCdColor : Config.MinorArcanaBar.CrownDrawCdReadyColor;
-                crownCardMax = cooldown > 0 ? 60f : 1f;
-            }
-
-            LabelConfig[] labels = { Config.MinorArcanaBar.Label, Config.MinorArcanaBar.CrownDrawTimerLabel };
-            BarHud bar = BarUtilities.GetBar(Config.MinorArcanaBar, crownCardPresent, crownCardMax, 0f, player, crownCardColor, labels: labels);
-            AddDrawActions(bar.GetDrawActions(pos, Config.MinorArcanaBar.StrataLevel));
         }
 
         private void DrawDot(Vector2 origin, IPlayerCharacter player)
@@ -400,7 +135,7 @@ namespace DelvUI.Interface.Jobs
         {
             float lightspeedDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 841 && o.SourceId == player.GameObjectId)?.RemainingTime ?? 0f;
 
-            if (Config.LightspeedBar.HideWhenInactive && !(lightspeedDuration > 0))
+            if (Config.LightspeedBar.HideWhenInactive && lightspeedDuration <= 0)
             {
                 return;
             }
@@ -416,7 +151,7 @@ namespace DelvUI.Interface.Jobs
             float starPreCookingBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1224 && o.SourceId == player.GameObjectId)?.RemainingTime ?? 0f;
             float starPostCookingBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1248 && o.SourceId == player.GameObjectId)?.RemainingTime ?? 0f;
 
-            if (Config.StarBar.HideWhenInactive && starPostCookingBuff == 0f && starPreCookingBuff == 0f)
+            if (Config.StarBar.HideWhenInactive && starPostCookingBuff <= 0f && starPreCookingBuff <= 0f)
             {
                 return;
             }
@@ -442,165 +177,97 @@ namespace DelvUI.Interface.Jobs
         public new static AstrologianConfig DefaultConfig()
         {
             var config = new AstrologianConfig();
-
             config.UseDefaultPrimaryResourceBar = true;
-            config.AstrodyneBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
 
             return config;
         }
 
-        [NestedConfig("Draw Bar", 100)]
-        public AstrologianDrawBarConfig DrawBar = new(
-            new Vector2(0, -32),
-            new Vector2(254, 20),
-            new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 0f / 100f))
+        [NestedConfig("Cards Bar", 40)]
+        public AstrologianCardsBarConfig CardsBar = new(
+            new Vector2(0, 0),
+            new Vector2(254, 20)
         );
 
-        [NestedConfig("Minor Arcana Bar", 150)]
-        public AstrologianCrownDrawBarConfig MinorArcanaBar = new(
-            new Vector2(64, -71),
-            new Vector2(126, 10),
-            new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 0f / 100f))
-        );
-
-        [NestedConfig("Astrodyne Bar", 200)]
-        public AstrologianAstrodyneBarConfig AstrodyneBar = new(
-            new Vector2(-64, -71),
-            new Vector2(126, 10)
-        );
-
-        [NestedConfig("Dot Bar", 300)]
+        [NestedConfig("Dot Bar", 40)]
         public ProgressBarConfig DotBar = new(
-            new Vector2(-85, -54),
-            new Vector2(84, 20),
+            new Vector2(-85, -29),
+            new Vector2(84, 14),
             new PluginConfigColor(new Vector4(20f / 255f, 80f / 255f, 168f / 255f, 255f / 100f))
         );
 
-        [NestedConfig("Star Bar", 400)]
+        [NestedConfig("Star Bar", 45)]
         public AstrologianStarBarConfig StarBar = new(
-            new Vector2(0, -54),
-            new Vector2(84, 20)
+            new Vector2(0, -29),
+            new Vector2(84, 14)
         );
 
-        [NestedConfig("Lightspeed Bar", 500)]
+        [NestedConfig("Lightspeed Bar", 50)]
         public ProgressBarConfig LightspeedBar = new(
-            new Vector2(85, -54),
-            new Vector2(84, 20),
+            new Vector2(85, -29),
+            new Vector2(84, 14),
             new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 173f / 255f, 100f / 100f))
         );
+    }
 
-        [DisableParentSettings("FillColor", "Color")]
-        [Exportable(false)]
-        public class AstrologianDrawBarConfig : ProgressBarConfig
+    [Exportable(false)]
+    [DisableParentSettings("FillColor", "UsePartialFillColor", "UseChunks", "PartialFillColor", "LabelMode", "HideWhenInactive")]
+    public class AstrologianCardsBarConfig : ChunkedBarConfig
+    {
+        [ColorEdit4("The Balance Color", spacing = true)]
+        [Order(201)]
+        public PluginConfigColor TheBalanceColor = PluginConfigColor.FromHex(0xFFBE423F);
+
+        [ColorEdit4("The Arrow Color")]
+        [Order(201)]
+        public PluginConfigColor TheArrowColor = PluginConfigColor.FromHex(0xFF628AA7);
+
+        [ColorEdit4("The Spire Color")]
+        [Order(201)]
+        public PluginConfigColor TheSpireColor = PluginConfigColor.FromHex(0xFFC8A348);
+
+        [ColorEdit4("The Spear Color")]
+        [Order(201)]
+        public PluginConfigColor TheSpearColor = PluginConfigColor.FromHex(0xFF5673DF);
+
+        [ColorEdit4("The Bole Color")]
+        [Order(201)]
+        public PluginConfigColor TheBoleColor = PluginConfigColor.FromHex(0xFF9ACB77);
+
+        [ColorEdit4("The Ewer Color")]
+        [Order(201)]
+        public PluginConfigColor TheEwerColor = PluginConfigColor.FromHex(0xFF7FBDFF);
+
+        [ColorEdit4("The Lord of Crowns Color")]
+        [Order(201)]
+        public PluginConfigColor TheLordOfCrownsColor = PluginConfigColor.FromHex(0xFFCA3640);
+
+        [ColorEdit4("The Lady of Crowns Color")]
+        [Order(201)]
+        public PluginConfigColor TheLadyOfCrownsColor = PluginConfigColor.FromHex(0xFF974A97);
+
+        public AstrologianCardsBarConfig(Vector2 position, Vector2 size)
+            : base(position, size, PluginConfigColor.Empty)
         {
-
-            [NestedConfig("Draw Side Timer Label" + "##Draw", 101, separator = false, spacing = true)]
-            public NumericLabelConfig DrawDrawLabel = new(new Vector2(0, 0), "", DrawAnchor.Left, DrawAnchor.Left);
-
-            [NestedConfig("Draw Charges Label" + "##Draw", 104, separator = false, spacing = true)]
-            public NumericLabelConfig DrawDrawChargesLabel = new(new Vector2(0, 0), "", DrawAnchor.Right, DrawAnchor.Right);
-
-            [ColorEdit4("Draw on CD" + "##Draw")]
-            [Order(109)]
-            public PluginConfigColor DrawCdColor = new(new Vector4(26f / 255f, 167f / 255f, 109f / 255f, 100f / 100f));
-
-            [ColorEdit4("Draw Ready" + "##Draw")]
-            [Order(110)]
-            public PluginConfigColor DrawCdReadyColor = new(new Vector4(137f / 255f, 26f / 255f, 42f / 255f, 100f / 100f));
-
-
-            [NestedConfig("Card Preferred Target with Glow" + "##Astrodyne", 111, separator = false, spacing = true)]
-            //[DisableParentSettings("Color")]
-            //TODO: Remove Color from GlowConfig
-            public BarGlowConfig DrawGlowConfig = new();
-
-            [ColorEdit4("Melee Glow" + "##Draw")]
-            [Order(112)]
-            public PluginConfigColor DrawMeleeGlowColor = new(new Vector4(83f / 255f, 34f / 255f, 120f / 255f, 100f / 100f));
-
-            [ColorEdit4("Ranged Glow" + "##Draw")]
-            [Order(113)]
-            public PluginConfigColor DrawRangedGlowColor = new(new Vector4(124f / 255f, 34f / 255f, 120f / 255f, 100f / 100f));
-
-            public AstrologianDrawBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
-                : base(position, size, fillColor)
-            {
-            }
         }
+    }
 
-        [DisableParentSettings("FillColor", "Color")]
-        [Exportable(false)]
-        public class AstrologianCrownDrawBarConfig : ProgressBarConfig
+    [Exportable(false)]
+    [DisableParentSettings("FillColor")]
+    public class AstrologianStarBarConfig : ProgressBarConfig
+    {
+        [ColorEdit4("Earthly" + "##Star")]
+        [Order(402)]
+        public PluginConfigColor StarEarthlyColor = new(new Vector4(37f / 255f, 181f / 255f, 177f / 255f, 100f / 100f));
+
+        [ColorEdit4("Giant" + "##Star")]
+        [Order(403)]
+        public PluginConfigColor StarGiantColor = new(new Vector4(198f / 255f, 154f / 255f, 199f / 255f, 100f / 100f));
+
+        [NestedConfig("Giant Dominance Glow" + "##Star", 404, separator = false, spacing = true)]
+        public BarGlowConfig StarGlowConfig = new();
+        public AstrologianStarBarConfig(Vector2 position, Vector2 size)
+            : base(position, size, PluginConfigColor.Empty)
         {
-            [NestedConfig("Minor Arcana Side Timer Label" + "##CrownDraw", 119, separator = false, spacing = true)]
-            public NumericLabelConfig CrownDrawTimerLabel = new(new Vector2(0, 0), "", DrawAnchor.Left, DrawAnchor.Left);
-
-            [ColorEdit4("Minor Arcana on CD" + "##CrownDraw")]
-            [Order(120)]
-            public PluginConfigColor CrownDrawCdColor = new(new Vector4(26f / 255f, 167f / 255f, 109f / 255f, 100f / 100f));
-
-            [ColorEdit4("Minor Arcana Ready" + "##CrownDraw")]
-            [Order(121)]
-            public PluginConfigColor CrownDrawCdReadyColor = new(new Vector4(65f / 255f, 100f / 255f, 205f / 255f, 100f / 100f));
-
-            [ColorEdit4("Lord Color" + "##CrownDraw")]
-            [Order(112)]
-            public PluginConfigColor LordDrawnColor = new(new Vector4(182f / 255f, 92f / 255f, 72f / 255f, 100f / 100f));
-
-            [ColorEdit4("Lady Color" + "##CrownDraw")]
-            [Order(113)]
-            public PluginConfigColor LadyDrawnColor = new(new Vector4(252f / 255f, 209f / 255f, 239f / 255f, 100f / 100f));
-
-            public AstrologianCrownDrawBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
-                : base(position, size, fillColor)
-            {
-            }
-        }
-
-        [Exportable(false)]
-        [DisableParentSettings("FillColor", "UsePartialFillColor", "UseChunks", "PartialFillColor", "LabelMode")]
-        public class AstrologianAstrodyneBarConfig : ChunkedProgressBarConfig
-        {
-
-            [ColorEdit4("Sun" + "##Astrodyne")]
-            [Order(201)]
-            public PluginConfigColor SealSunColor = new(new Vector4(213f / 255f, 124f / 255f, 97f / 255f, 100f / 100f));
-
-            [ColorEdit4("Lunar" + "##Astrodyne")]
-            [Order(202)]
-            public PluginConfigColor SealLunarColor = new(new Vector4(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f));
-
-            [ColorEdit4("Celestial" + "##Astrodyne")]
-            [Order(203)]
-            public PluginConfigColor SealCelestialColor = new(new Vector4(100f / 255f, 207f / 255f, 211f / 255f, 100f / 100f));
-
-            [NestedConfig("Glow" + "##Astrodyne", 205, separator = false, spacing = true)]
-            public BarGlowConfig AstrodyneGlowConfig = new();
-
-            public AstrologianAstrodyneBarConfig(Vector2 position, Vector2 size)
-                : base(position, size, new PluginConfigColor(Vector4.Zero))
-            {
-            }
-        }
-
-        [Exportable(false)]
-        [DisableParentSettings("FillColor")]
-        public class AstrologianStarBarConfig : ProgressBarConfig
-        {
-            [ColorEdit4("Earthly" + "##Star")]
-            [Order(402)]
-            public PluginConfigColor StarEarthlyColor = new(new Vector4(37f / 255f, 181f / 255f, 177f / 255f, 100f / 100f));
-
-            [ColorEdit4("Giant" + "##Star")]
-            [Order(403)]
-            public PluginConfigColor StarGiantColor = new(new Vector4(198f / 255f, 154f / 255f, 199f / 255f, 100f / 100f));
-
-            [NestedConfig("Giant Dominance Glow" + "##Star", 404, separator = false, spacing = true)]
-            public BarGlowConfig StarGlowConfig = new();
-            public AstrologianStarBarConfig(Vector2 position, Vector2 size)
-                : base(position, size, new PluginConfigColor(Vector4.Zero))
-            {
-            }
         }
     }
 }
