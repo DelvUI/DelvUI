@@ -258,18 +258,20 @@ namespace DelvUI.Interface
             return;
         }
 
+        private static Dictionary<string, string> _specialCases = new()
+        {
+            ["JobHudPCT0"] = "JobHudRPM0",
+            ["JobHudPCT1"] = "JobHudRPM1",
+
+            ["JobHudNIN1"] = "JobHudNIN1v70"
+        };
+
         private unsafe void UpdateJobGauges(bool forceVisible = false)
         {
             IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (player == null) { return; }
 
             string jobName = JobsHelper.JobNames[player.ClassJob.Id];
-
-            // special case for pictomancer
-            if (jobName == "PCT")
-            {
-                jobName = "RPM";
-            }
 
             if (Config.HideDefaultJobGauges && !_hidingJobGauge)
             {
@@ -279,6 +281,10 @@ namespace DelvUI.Interface
                 do
                 {
                     string addonName = $"JobHud{jobName}{i}";
+                    if (_specialCases.TryGetValue(addonName, out string? name) && name != null)
+                    {
+                        addonName = name;
+                    }
 
                     AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName(addonName, 1);
                     if (addon == null)
