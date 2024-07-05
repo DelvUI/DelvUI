@@ -1,10 +1,11 @@
-﻿using Dalamud.Game.ClientState.Objects.SubKinds;
+﻿using Dalamud.Game.ClientState.JobGauge.Enums;
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
-using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -104,22 +105,22 @@ namespace DelvUI.Interface.Jobs
         protected unsafe void DrawPaletteBar(Vector2 origin, IPlayerCharacter player)
         {
             PictomancerPaletteBarConfig config = Config.PaletteBar;
-            PictomancerGauge* gauge = (PictomancerGauge*)Plugin.JobGauges.Address;
+            PCTGauge gauge = Plugin.JobGauges.Get<PCTGauge>();
 
-            if (config.HideWhenInactive && gauge->PalleteGauge == 0)
+            if (config.HideWhenInactive && gauge.PalleteGauge == 0)
             {
                 return;
             }
 
-            config.Label.SetValue(gauge->PalleteGauge);
-            
+            config.Label.SetValue(gauge.PalleteGauge);
+
             bool isSubstractive = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3674) != null;
             PluginConfigColor fillColor = isSubstractive ? config.SubtractiveColor : config.FillColor;
 
             BarHud[] bars = BarUtilities.GetChunkedProgressBars(
                 config,
                 2,
-                gauge->PalleteGauge,
+                gauge.PalleteGauge,
                 100,
                 0,
                 player,
@@ -135,9 +136,9 @@ namespace DelvUI.Interface.Jobs
         private unsafe void DrawPaintBar(Vector2 origin, IPlayerCharacter player)
         {
             PictomancerPaintBarConfig config = Config.PaintBar;
-            PictomancerGauge* gauge = (PictomancerGauge*)Plugin.JobGauges.Address;
+            PCTGauge gauge = Plugin.JobGauges.Get<PCTGauge>();
 
-            if (config.HideWhenInactive && gauge->Paint == 0)
+            if (config.HideWhenInactive && gauge.Paint == 0)
             {
                 return;
             }
@@ -145,7 +146,7 @@ namespace DelvUI.Interface.Jobs
             BarHud[] bars = BarUtilities.GetChunkedBars(
                 Config.PaintBar,
                 5,
-                gauge->Paint,
+                gauge.Paint,
                 5,
                 0,
                 player,
@@ -160,28 +161,28 @@ namespace DelvUI.Interface.Jobs
         private unsafe void DrawCreatureCanvasBar(Vector2 origin, IPlayerCharacter player)
         {
             PictomancerCreatureCanvasBarConfig config = Config.CreatureCanvasBar;
-            PictomancerGauge* gauge = (PictomancerGauge*)Plugin.JobGauges.Address;
+            PCTGauge gauge = Plugin.JobGauges.Get<PCTGauge>();
 
-            if (config.HideWhenInactive && !gauge->CreatureMotifDrawn && gauge->CreatureFlags != 0)
+            if (config.HideWhenInactive && !gauge.CreatureMotifDrawn && gauge.CreatureFlags != 0)
             {
                 return;
             }
 
             // canvas
             PluginConfigColor? canvasColor = null;
-            if (gauge->CanvasFlags.HasFlag(CanvasFlags.Pom))
+            if (gauge.CanvasFlags.HasFlag(CanvasFlags.Pom))
             {
                 canvasColor = config.PomColor;
             }
-            else if (gauge->CanvasFlags.HasFlag(CanvasFlags.Wing))
+            else if (gauge.CanvasFlags.HasFlag(CanvasFlags.Wing))
             {
                 canvasColor = config.WingsColor;
             }
-            else if (gauge->CanvasFlags.HasFlag(CanvasFlags.Claw))
+            else if (gauge.CanvasFlags.HasFlag(CanvasFlags.Claw))
             {
                 canvasColor = config.ClawColor;
             }
-            else if (gauge->CanvasFlags.HasFlag(CanvasFlags.Maw))
+            else if (gauge.CanvasFlags.HasFlag(CanvasFlags.Maw))
             {
                 canvasColor = config.FangsColor;
             }
@@ -193,15 +194,15 @@ namespace DelvUI.Interface.Jobs
 
             // part drawing
             PluginConfigColor? drawingColor = null;
-            if (gauge->CreatureFlags.HasFlag(CreatureFlags.Pom))
+            if (gauge.CreatureFlags.HasFlag(CreatureFlags.Pom))
             {
                 drawingColor = config.PomColor;
             }
-            else if (gauge->CreatureFlags.HasFlag(CreatureFlags.Wings))
+            else if (gauge.CreatureFlags.HasFlag(CreatureFlags.Wings))
             {
                 drawingColor = config.WingsColor;
             }
-            else if (gauge->CreatureFlags.HasFlag(CreatureFlags.Claw))
+            else if (gauge.CreatureFlags.HasFlag(CreatureFlags.Claw))
             {
                 drawingColor = config.ClawColor;
             }
@@ -213,11 +214,11 @@ namespace DelvUI.Interface.Jobs
 
             // portrait
             PluginConfigColor? portraitColor = null;
-            if (gauge->CreatureFlags.HasFlag(CreatureFlags.MooglePortait))
+            if (gauge.CreatureFlags.HasFlag(CreatureFlags.MooglePortait))
             {
                 portraitColor = config.MoogleColor;
             }
-            else if (gauge->CreatureFlags.HasFlag(CreatureFlags.MadeenPortrait))
+            else if (gauge.CreatureFlags.HasFlag(CreatureFlags.MadeenPortrait))
             {
                 portraitColor = config.MadeenColor;
             }
@@ -242,9 +243,9 @@ namespace DelvUI.Interface.Jobs
         private unsafe void DrawWeaponCanvasBar(Vector2 origin, IPlayerCharacter player)
         {
             ChunkedBarConfig config = Config.WeaponCanvasBar;
-            PictomancerGauge* gauge = (PictomancerGauge*)Plugin.JobGauges.Address;
+            PCTGauge gauge = Plugin.JobGauges.Get<PCTGauge>();
 
-            bool active = gauge->CanvasFlags.HasFlag(CanvasFlags.Weapon);
+            bool active = gauge.CanvasFlags.HasFlag(CanvasFlags.Weapon);
 
             if (config.HideWhenInactive && !active)
             {
@@ -261,9 +262,9 @@ namespace DelvUI.Interface.Jobs
         private unsafe void DrawLandscapeCanvasBar(Vector2 origin, IPlayerCharacter player)
         {
             ChunkedBarConfig config = Config.LandscapeCanvasBar;
-            PictomancerGauge* gauge = (PictomancerGauge*)Plugin.JobGauges.Address;
+            PCTGauge gauge = Plugin.JobGauges.Get<PCTGauge>();
 
-            bool active = gauge->CanvasFlags.HasFlag(CanvasFlags.Landscape);
+            bool active = gauge.CanvasFlags.HasFlag(CanvasFlags.Landscape);
 
             if (config.HideWhenInactive && !active)
             {

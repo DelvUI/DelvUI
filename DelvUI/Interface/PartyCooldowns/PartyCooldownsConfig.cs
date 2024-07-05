@@ -4,6 +4,7 @@ using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
+using FFXIVClientStructs.FFXIV.Common.Lua;
 using ImGuiNET;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
@@ -172,6 +173,8 @@ namespace DelvUI.Interface.PartyCooldowns
     {
         public List<PartyCooldownData> Cooldowns = new List<PartyCooldownData>();
 
+        private List<uint> _removedIds = new() { 7398 };
+
         private JobRoles _roleFilter = JobRoles.Unknown;
         private uint _tankFilter = 0;
         private uint _healerFilter = 0;
@@ -204,6 +207,17 @@ namespace DelvUI.Interface.PartyCooldowns
         {
             bool needsSave = false;
 
+            // remove old cooldowns that are not valid anymore
+            foreach (uint id in _removedIds)
+            {
+                PartyCooldownData? data = Cooldowns.FirstOrDefault(data => data.ActionId == id);
+                if (data != null)
+                {
+                    Cooldowns.Remove(data);
+                }
+            }
+
+            // update data using the game files
             foreach (uint key in DefaultCooldowns.Keys)
             {
                 PartyCooldownData? data = Cooldowns.FirstOrDefault(data => data.ActionId == key);

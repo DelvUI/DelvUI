@@ -25,8 +25,6 @@ using Dalamud.Hooking;
 using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
 using FFXIVClientStructs.FFXIV.Client.Game;
-using FFXIVClientStructs.FFXIV.Client.System.Framework;
-using FFXIVClientStructs.Interop.Generated;
 using ImGuiNET;
 using Lumina.Excel;
 using System;
@@ -46,24 +44,24 @@ namespace DelvUI.Helpers
         {
             _sheet = Plugin.DataManager.GetExcelSheet<Action>();
 
-            try
-            {
-                /*
-                 Part of setUIMouseOverActorId disassembly signature
-                .text:00007FF64830FD70                   sub_7FF64830FD70 proc near
-                .text:00007FF64830FD70 48 89 91 90 02 00+mov     [rcx+290h], rdx
-                .text:00007FF64830FD70 00
-                */
-                _setUIMouseOverActor = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 48 8B 7C 24 50 4C 8B 74 24 58 83 FD 02");
-                //_uiMouseOverActorHook = Plugin.GameInteropProvider.HookFromSignature<OnSetUIMouseoverActor>(
-                //    "E8 ?? ?? ?? ?? 48 8B 5C 24 40 4C 8B 74 24 58 83 FD 02",
-                //    HandleUIMouseOverActorId
-                //);
-            }
-            catch
-            {
-                Plugin.Logger.Error("InputsHelper OnSetUIMouseoverActor Hook failed!!!");
-            }
+            //try
+            //{
+            //    /*
+            //     Part of setUIMouseOverActorId disassembly signature
+            //    .text:00007FF64830FD70                   sub_7FF64830FD70 proc near
+            //    .text:00007FF64830FD70 48 89 91 90 02 00+mov     [rcx+290h], rdx
+            //    .text:00007FF64830FD70 00
+            //    */
+
+            //    _uiMouseOverActorHook = Plugin.GameInteropProvider.HookFromSignature<OnSetUIMouseoverActor>(
+            //        "E8 ?? ?? ?? ?? 48 8B 7C 24 ?? 4C 8B 74 24 ?? 83 FD 02",
+            //        HandleUIMouseOverActorId
+            //    );
+            //}
+            //catch
+            //{
+            //    Plugin.Logger.Error("InputsHelper OnSetUIMouseoverActor Hook failed!!!");
+            //}
 
             try
             {
@@ -128,7 +126,6 @@ namespace DelvUI.Helpers
 
         private HUDOptionsConfig _config = null!;
 
-        private IntPtr _setUIMouseOverActor;
         //private Hook<OnSetUIMouseoverActor>? _uiMouseOverActorHook;
 
         private Hook<UseActionDelegate>? _requestActionHook;
@@ -176,10 +173,7 @@ namespace DelvUI.Helpers
             // set mouseover target in-game
             if (_config.MouseoverEnabled && !_config.MouseoverAutomaticMode && !_ignoringMouseover)
             {
-                long pronounModuleAddress = (long)Framework.Instance()->GetUIModule()->GetPronounModule();
-
-                OnSetUIMouseoverActor func = Marshal.GetDelegateForFunctionPointer<OnSetUIMouseoverActor>(_setUIMouseOverActor);
-                func.Invoke(pronounModuleAddress, address);
+                Plugin.TargetManager.MouseOverTarget = _target;
             }
         }
 
@@ -199,9 +193,13 @@ namespace DelvUI.Helpers
         {
             if (_requestActionHook == null) { return false; }
 
-            if (_config.MouseoverEnabled && _config.MouseoverAutomaticMode && IsActionValid(actionId, _target) && !_ignoringMouseover)
+            if (_config.MouseoverEnabled &&
+                _config.MouseoverAutomaticMode &&
+                _target != null &&
+                IsActionValid(actionId, _target) &&
+                !_ignoringMouseover)
             {
-                return _requestActionHook.Original(manager, actionType, actionId, targetId, a4, a5, a6, a7);
+                return _requestActionHook.Original(manager, actionType, actionId, (uint)_target.GameObjectId, a4, a5, a6, a7);
             }
 
             return _requestActionHook.Original(manager, actionType, actionId, targetId, a4, a5, a6, a7);

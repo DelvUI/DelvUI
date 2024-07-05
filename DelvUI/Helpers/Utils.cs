@@ -116,6 +116,16 @@ namespace DelvUI.Helpers
             return false;
         }
 
+        public static IEnumerable<Status> StatusListForActor(IGameObject? obj)
+        {
+            if (obj is IBattleChara chara)
+            {
+                return StatusListForBattleChara(chara);
+            }
+
+            return new List<Status>();
+        }
+
         public static IEnumerable<Status> StatusListForBattleChara(IBattleChara? chara)
         {
             List<Status> statusList = new List<Status>();
