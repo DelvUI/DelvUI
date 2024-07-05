@@ -139,51 +139,27 @@ namespace DelvUI.Interface.Jobs
         {
             PictomancerPaintBarConfig config = Config.PaintBar;
             PCTGauge gauge = Plugin.JobGauges.Get<PCTGauge>();
-            
-            bool hasBlackPaint = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3691) != null;
-            
-            var empty = new Tuple<PluginConfigColor, float, LabelConfig?>(EmptyColor, 1, null);
-            var white = new Tuple<PluginConfigColor, float, LabelConfig?>(config.WhitePaintColor, 1, null);
-            var black = new Tuple<PluginConfigColor, float, LabelConfig?>(config.BlackPaintColor, 1, null);
-            
-            List<Tuple<PluginConfigColor, float, LabelConfig?>> chunks = new List<Tuple<PluginConfigColor, float, LabelConfig?>>();
-            
-            for (int i = 1; i <= 5; i++)
-            {
-                if (i < gauge.Paint)
-                {
-                    chunks.Add(white);
-                }
-                else if (i == gauge.Paint)
-                {
-                    chunks.Add(hasBlackPaint ? black : white);
-                }
-                else
-                {
-                    chunks.Add(empty);
-                }
-            }
 
             if (config.HideWhenInactive && gauge.Paint == 0)
             {
                 return;
             }
-            BarHud[] bars = BarUtilities.GetChunkedBars(
-                Config.PaintBar, 
-                chunks.ToArray(), 
-                player
-            );
-            /*
-            BarHud[] bars = BarUtilities.GetChunkedBars(
-                Config.PaintBar,
-                5,
-                gauge.Paint,
-                5,
-                0,
-                player,
-                fillColor: config.WhitePaintColor
-            );
-            */
+
+            bool hasBlackPaint = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3691) != null;
+            
+            var empty = new Tuple<PluginConfigColor, float, LabelConfig?>(EmptyColor, 1, null);
+            var white = new Tuple<PluginConfigColor, float, LabelConfig?>(config.WhitePaintColor, 1, null);
+            var black = new Tuple<PluginConfigColor, float, LabelConfig?>(config.BlackPaintColor, 1, null);
+
+            Tuple<PluginConfigColor, float, LabelConfig?>[] chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[3];
+            
+            for (int i = 0; i < 5; i++)
+            {
+                PluginConfigColor color = i == gauge.Paint - 1 && hasBlackPaint ? config.BlackPaintColor : config.WhitePaintColor;
+                chunks[i] = new(color, 1, null);
+            }
+
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.PaintBar, chunks, player);
             foreach (BarHud bar in bars)
             {
                 AddDrawActions(bar.GetDrawActions(origin, config.StrataLevel));
