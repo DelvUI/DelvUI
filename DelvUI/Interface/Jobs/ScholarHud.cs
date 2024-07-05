@@ -93,14 +93,9 @@ namespace DelvUI.Interface.Jobs
 
         private unsafe void DrawFairyGaugeBar(Vector2 origin, IPlayerCharacter player)
         {
-            // TODO: Clean this up when CS fixes the offsets
-            //byte fairyGauge = Plugin.JobGauges.Get<SCHGauge>().FairyGauge;
-            //short seraphDuration = Math.Abs(Plugin.JobGauges.Get<SCHGauge>().SeraphTimer);
-            // +
             SCHGauge gauge = Plugin.JobGauges.Get<SCHGauge>();
-            byte fairyGauge = *((byte *)(new IntPtr(gauge.Address) + 0x9));
-            float seraphDuration = *((short*)(new IntPtr(gauge.Address) + 0xA));
-            // -
+            byte fairyGauge = gauge.FairyGauge;
+            float seraphDuration = gauge.SeraphTimer;
 
             if (Config.FairyGaugeBar.HideWhenInactive && fairyGauge == 0 && (seraphDuration == 0 || !Config.FairyGaugeBar.ShowSeraph))
             {
