@@ -306,6 +306,7 @@ namespace DelvUI.Interface.Jobs
         {
             var config = new PictomancerConfig();
             config.PaletteBar.UseChunks = false;
+            config.PaletteBar.Label.Enabled = true;
 
             return config;
         }
