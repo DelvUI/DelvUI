@@ -642,6 +642,7 @@ namespace DelvUI.Config
             typeof(SummonerConfig),
             typeof(RedMageConfig),
             typeof(BlueMageConfig),
+            typeof(PictomancerConfig),
 
             // Other Elements
             typeof(ExperienceBarConfig),

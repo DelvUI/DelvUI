@@ -265,6 +265,12 @@ namespace DelvUI.Interface
 
             string jobName = JobsHelper.JobNames[player.ClassJob.Id];
 
+            // special case for pictomancer
+            if (jobName == "PCT")
+            {
+                jobName = "RPM";
+            }
+
             if (Config.HideDefaultJobGauges && !_hidingJobGauge)
             {
                 int i = 0;

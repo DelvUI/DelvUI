@@ -641,7 +641,8 @@ namespace DelvUI.Interface
                 [JobIDs.BLM] = new JobHudTypes(typeof(BlackMageHud), typeof(BlackMageConfig), "Black Mage HUD"),
                 [JobIDs.SMN] = new JobHudTypes(typeof(SummonerHud), typeof(SummonerConfig), "Summoner HUD"),
                 [JobIDs.RDM] = new JobHudTypes(typeof(RedMageHud), typeof(RedMageConfig), "Red Mage HUD"),
-                [JobIDs.BLU] = new JobHudTypes(typeof(BlueMageHud), typeof(BlueMageConfig), "Blue Mage HUD")
+                [JobIDs.BLU] = new JobHudTypes(typeof(BlueMageHud), typeof(BlueMageConfig), "Blue Mage HUD"),
+                [JobIDs.PCT] = new JobHudTypes(typeof(PictomancerHud), typeof(PictomancerConfig), "Pictomancer HUD")
             };
 
             _unsupportedJobsMap = new Dictionary<uint, Type>()
@@ -674,8 +675,6 @@ namespace DelvUI.Interface
                 
                 // not implemented yet,
                 [JobIDs.VPR] = typeof(ViperConfig),
-                [JobIDs.PCT] = typeof(PictomancerConfig),
-                
             };
 
             _jobTypes = new List<Type>()
@@ -703,7 +702,8 @@ namespace DelvUI.Interface
                 typeof(BlackMageConfig),
                 typeof(SummonerConfig),
                 typeof(RedMageConfig),
-                typeof(BlueMageConfig)
+                typeof(BlueMageConfig),
+                typeof(PictomancerConfig)
             };
         }
     }
