@@ -110,7 +110,7 @@ namespace DelvUI.Interface.Jobs
             if (player.Level >= 70)
             {
                 uint minorArcana = ActionManager.Instance()->GetAdjustedActionId(37021);
-                PluginConfigColor minorArcanaColor = play3 == 7444 ? config.TheLordOfCrownsColor : (play3 == 7445 ? config.TheLadyOfCrownsColor : emptyColor);
+                PluginConfigColor minorArcanaColor = minorArcana == 7444 ? config.TheLordOfCrownsColor : (minorArcana == 7445 ? config.TheLadyOfCrownsColor : emptyColor);
                 chunks.Add(new(minorArcanaColor, 1, null));
             }
 
