@@ -146,11 +146,6 @@ namespace DelvUI.Interface.Jobs
             }
 
             bool hasBlackPaint = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3691) != null;
-            
-            var empty = new Tuple<PluginConfigColor, float, LabelConfig?>(EmptyColor, 1, null);
-            var white = new Tuple<PluginConfigColor, float, LabelConfig?>(config.WhitePaintColor, 1, null);
-            var black = new Tuple<PluginConfigColor, float, LabelConfig?>(config.BlackPaintColor, 1, null);
-
             Tuple<PluginConfigColor, float, LabelConfig?>[] chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[3];
             
             for (int i = 0; i < 5; i++)
