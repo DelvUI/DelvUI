@@ -150,11 +150,15 @@ namespace DelvUI.Interface.Jobs
             
             for (int i = 0; i < 5; i++)
             {
-                PluginConfigColor color = i == gauge.Paint - 1 && hasBlackPaint ? config.BlackPaintColor : config.WhitePaintColor;
+                PluginConfigColor color = PluginConfigColor.Empty;
+                if (i < gauge.Paint)
+                {
+                    color = i == gauge.Paint - 1 && hasBlackPaint ? config.BlackPaintColor : config.WhitePaintColor;
+                }
                 chunks[i] = new(color, 1, null);
             }
 
-            BarHud[] bars = BarUtilities.GetChunkedBars(Config.PaintBar, chunks, player);
+            BarHud[] bars = BarUtilities.GetChunkedBars(config, chunks, player);
             foreach (BarHud bar in bars)
             {
                 AddDrawActions(bar.GetDrawActions(origin, config.StrataLevel));
@@ -190,7 +194,7 @@ namespace DelvUI.Interface.Jobs
                 canvasColor = config.FangsColor;
             }
             Tuple<PluginConfigColor, float, LabelConfig?> canvas = new(
-                canvasColor ?? new(Vector4.Zero),
+                canvasColor ?? PluginConfigColor.Empty,
                 canvasColor != null ? 1 : 0,
                 null
             );
@@ -210,7 +214,7 @@ namespace DelvUI.Interface.Jobs
                 drawingColor = config.ClawColor;
             }
             Tuple<PluginConfigColor, float, LabelConfig?> drawing = new(
-                drawingColor ?? new(Vector4.Zero),
+                drawingColor ?? PluginConfigColor.Empty,
                 drawingColor != null ? 1 : 0,
                 null
             );
@@ -226,7 +230,7 @@ namespace DelvUI.Interface.Jobs
                 portraitColor = config.MadeenColor;
             }
             Tuple<PluginConfigColor, float, LabelConfig?> portrait = new(
-                portraitColor ?? new(Vector4.Zero),
+                portraitColor ?? PluginConfigColor.Empty,
                 portraitColor != null ? 1 : 0,
                 null
             );
@@ -382,7 +386,7 @@ namespace DelvUI.Interface.Jobs
         public PluginConfigColor BlackPaintColor = PluginConfigColor.FromHex(0xFFDB57DB);
 
         public PictomancerPaintBarConfig(Vector2 position, Vector2 size)
-             : base(position, size, new(Vector4.Zero))
+             : base(position, size, PluginConfigColor.Empty)
         {
         }
     }
@@ -416,7 +420,7 @@ namespace DelvUI.Interface.Jobs
         public PluginConfigColor MadeenColor = PluginConfigColor.FromHex(0xFF93Cf7D);
 
         public PictomancerCreatureCanvasBarConfig(Vector2 position, Vector2 size)
-             : base(position, size, new(Vector4.Zero))
+             : base(position, size, PluginConfigColor.Empty)
         {
         }
     }

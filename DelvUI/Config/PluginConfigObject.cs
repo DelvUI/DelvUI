@@ -235,6 +235,8 @@ namespace DelvUI.Config
             return new PluginConfigColor(Vector.WithNewAlpha(alpha));
         }
 
+        public static PluginConfigColor Empty => new(Vector4.Zero);
+
         public Vector4 Vector
         {
             get => _vector;
