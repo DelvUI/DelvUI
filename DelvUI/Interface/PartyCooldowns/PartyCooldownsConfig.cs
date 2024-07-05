@@ -714,7 +714,7 @@ namespace DelvUI.Interface.PartyCooldowns
             [157] = NewData(157, JobIDs.BLM, 38, 120, 20, 10, 4, PartyCooldownEnabled.PartyFrames), // manaward
 
             // PCT
-            [34675] = NewData(34675, JobIDs.PCT, 70, 120, 20, 30, 3, PartyCooldownEnabled.PartyFrames), // starry muse
+            [35349] = NewData(35349, JobIDs.PCT, 70, 120, 20, 30, 3, PartyCooldownEnabled.PartyCooldowns), // scenic muse
             [34685] = NewData(34685, JobIDs.PCT, 10, 120, 10, 10, 4, PartyCooldownEnabled.PartyFrames), // tempera coat
 
             // MULTI-ROLE  -------------------------------------------------------------------------------------------------

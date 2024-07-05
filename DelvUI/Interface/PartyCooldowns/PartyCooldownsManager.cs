@@ -186,6 +186,13 @@ namespace DelvUI.Interface.PartyCooldowns
                 {
                     uint actionID = *((uint*)effect.ToPointer() + 0x2);
 
+                    Plugin.Logger.Debug("ACTION " + actionID.ToString());
+                    // special case for starry muse > set id to scenic muse
+                    if (actionID == 34675)
+                    {
+                        actionID = 35349;
+                    }
+
                     // special case for technical step / finish
                     // we detect when technical step is pressed and save the time
                     // so we can properly calculate the cooldown once finish is pressed
