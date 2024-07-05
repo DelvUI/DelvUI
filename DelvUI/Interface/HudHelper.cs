@@ -270,6 +270,12 @@ namespace DelvUI.Interface
             {
                 jobName = "RPM";
             }
+            
+            // special case for viper
+            if (jobName == "VPR")
+            {
+                jobName = "RDB";
+            }
 
             if (Config.HideDefaultJobGauges && !_hidingJobGauge)
             {
