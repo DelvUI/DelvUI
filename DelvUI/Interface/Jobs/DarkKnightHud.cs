@@ -101,26 +101,29 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawManaBar(Vector2 origin, IPlayerCharacter player)
+        private unsafe void DrawManaBar(Vector2 origin, IPlayerCharacter player)
         {
+            // TODO: Clean up with CS commit
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
+            byte darkArtsState = *((byte *)(new IntPtr(gauge.Address) + 0x9));
+            bool hasDarkArts = darkArtsState > 0;
 
-            if (Config.ManaBar.HideWhenInactive && !gauge.HasDarkArts && player.CurrentMp == player.MaxMp) { return; }
+            if (Config.ManaBar.HideWhenInactive && !hasDarkArts && player.CurrentMp == player.MaxMp) { return; }
 
-            Config.ManaBar.UsePartialFillColor = !gauge.HasDarkArts;
+            Config.ManaBar.UsePartialFillColor = !hasDarkArts;
 
             Config.ManaBar.Label.SetValue(player.CurrentMp);
 
             // hardcoded 9k as maxMP so the chunks are each 3k since that's what a DRK wants to see
             BarHud[] bars = BarUtilities.GetChunkedProgressBars(
                 Config.ManaBar,
-                gauge.HasDarkArts ? 1 : 3,
+                hasDarkArts ? 1 : 3,
                 player.CurrentMp,
                 Config.ManaBar.ShowFullMana ? player.MaxMp : 9000,
                 0f,
                 player,
                 null,
-                gauge.HasDarkArts ? Config.ManaBar.DarkArtsColor : Config.ManaBar.FillColor
+                hasDarkArts ? Config.ManaBar.DarkArtsColor : Config.ManaBar.FillColor
             );
 
             foreach (BarHud bar in bars)
@@ -216,15 +219,18 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawLivingShadowBar(Vector2 origin, IPlayerCharacter player)
+        private unsafe void DrawLivingShadowBar(Vector2 origin, IPlayerCharacter player)
         {
+            // TODO: Clean up with CS commit
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
-            if (Config.LivingShadowBar.HideWhenInactive && gauge.ShadowTimeRemaining == 0) { return; }
+            ushort shadowTime = *((ushort *)(new IntPtr(gauge.Address) + 0xC));
+            
+            if (Config.LivingShadowBar.HideWhenInactive && shadowTime == 0) { return; }
 
-            float timer = Math.Abs(gauge.ShadowTimeRemaining) / 1000;
+            float timer = Math.Abs(shadowTime) / 1000;
             Config.LivingShadowBar.Label.SetValue(timer);
 
-            BarHud bar = BarUtilities.GetProgressBar(Config.LivingShadowBar, timer, 24, 0, player);
+            BarHud bar = BarUtilities.GetProgressBar(Config.LivingShadowBar, timer, 20, 0, player);
             AddDrawActions(bar.GetDrawActions(origin, Config.LivingShadowBar.StrataLevel));
         }
     }
