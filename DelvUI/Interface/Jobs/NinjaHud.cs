@@ -11,7 +11,6 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Runtime.InteropServices;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -26,10 +25,10 @@ namespace DelvUI.Interface.Jobs
             List<Vector2> positions = new List<Vector2>();
             List<Vector2> sizes = new List<Vector2>();
 
-            if (Config.HutonBar.Enabled)
+            if (Config.KazematoiBar.Enabled)
             {
-                positions.Add(Config.Position + Config.HutonBar.Position);
-                sizes.Add(Config.HutonBar.Size);
+                positions.Add(Config.Position + Config.KazematoiBar.Position);
+                sizes.Add(Config.KazematoiBar.Size);
             }
 
             if (Config.NinkiBar.Enabled)
@@ -67,9 +66,9 @@ namespace DelvUI.Interface.Jobs
                 DrawMudraBars(pos, player);
             }
 
-            if (Config.HutonBar.Enabled)
+            if (Config.KazematoiBar.Enabled)
             {
-                DrawHutonGauge(pos, player);
+                DrawKazematoiBar(pos, player);
             }
 
             if (Config.NinkiBar.Enabled)
@@ -171,17 +170,22 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawHutonGauge(Vector2 origin, IPlayerCharacter player)
+        private unsafe void DrawKazematoiBar(Vector2 origin, IPlayerCharacter player)
         {
             NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
-            float hutonDuration = gauge.HutonTimer / 1000f;
 
-            if (!Config.HutonBar.HideWhenInactive || gauge.HutonTimer > 0)
+            // TODO: clean after dalamud updates
+            int stacks = gauge.Ninki;
+
+            if (Config.KazematoiBar.HideWhenInactive && stacks == 0)
             {
-                Config.HutonBar.Label.SetValue(hutonDuration);
+                return;
+            }
 
-                BarHud bar = BarUtilities.GetProgressBar(Config.HutonBar, hutonDuration, 60f, 0f, player);
-                AddDrawActions(bar.GetDrawActions(origin, Config.HutonBar.StrataLevel));
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.KazematoiBar, 5, stacks, 5, 0, player);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.KazematoiBar.StrataLevel));
             }
         }
 
@@ -189,48 +193,57 @@ namespace DelvUI.Interface.Jobs
         {
             NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
 
-            if (!Config.NinkiBar.HideWhenInactive || gauge.Ninki > 0)
-            {
-                Config.NinkiBar.Label.SetValue(gauge.Ninki);
+            // TODO: clean after dalamud updates
+            int ninki = gauge.HutonTimer;
 
-                BarHud[] bars = BarUtilities.GetChunkedProgressBars(Config.NinkiBar, 2, gauge.Ninki, 100, 0, player);
-                foreach (BarHud bar in bars)
-                {
-                    AddDrawActions(bar.GetDrawActions(origin, Config.NinkiBar.StrataLevel));
-                }
+            if (Config.NinkiBar.HideWhenInactive && ninki == 0)
+            {
+                return;
+            }
+
+            Config.NinkiBar.Label.SetValue(ninki);
+
+            BarHud[] bars = BarUtilities.GetChunkedProgressBars(Config.NinkiBar, 2, ninki, 100, 0, player);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.NinkiBar.StrataLevel));
             }
         }
 
         private void DrawTrickAttackBar(Vector2 origin, IPlayerCharacter player)
         {
             IGameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            float trickDuration = 0f;
 
-            if (actor is IBattleChara target)
+            float trickDuration = Utils.StatusListForActor(actor).FirstOrDefault(
+                o => o.StatusId is 3254 && o.SourceId == player.GameObjectId && o.RemainingTime > 0
+            )?.RemainingTime ?? 0f;
+
+            if (Config.TrickAttackBar.HideWhenInactive && trickDuration == 0)
             {
-                trickDuration = Utils.StatusListForBattleChara(target).FirstOrDefault(o => o.StatusId is 3254 && o.SourceId == player.GameObjectId && o.RemainingTime > 0)?.RemainingTime ?? 0f;
+                return;
             }
 
-            if (!Config.TrickAttackBar.HideWhenInactive || trickDuration > 0)
-            {
-                Config.TrickAttackBar.Label.SetValue(trickDuration);
+            Config.TrickAttackBar.Label.SetValue(trickDuration);
 
-                BarHud bar = BarUtilities.GetProgressBar(Config.TrickAttackBar, trickDuration, 15f, 0f, player);
-                AddDrawActions(bar.GetDrawActions(origin, Config.TrickAttackBar.StrataLevel));
-            }
+            BarHud bar = BarUtilities.GetProgressBar(Config.TrickAttackBar, trickDuration, 15f, 0f, player);
+            AddDrawActions(bar.GetDrawActions(origin, Config.TrickAttackBar.StrataLevel));
         }
 
         private void DrawSuitonBar(Vector2 origin, IPlayerCharacter player)
         {
-            float suitonDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId == 507 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
+            float suitonDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(
+                o => o.StatusId == 507 && o.RemainingTime > 0
+            )?.RemainingTime ?? 0f;
 
-            if (!Config.SuitonBar.HideWhenInactive || suitonDuration > 0)
+            if (Config.SuitonBar.HideWhenInactive && suitonDuration == 0)
             {
-                Config.SuitonBar.Label.SetValue(suitonDuration);
-
-                BarHud bar = BarUtilities.GetProgressBar(Config.SuitonBar, suitonDuration, 20f, 0f, player);
-                AddDrawActions(bar.GetDrawActions(origin, Config.SuitonBar.StrataLevel));
+                return;
             }
+
+            Config.SuitonBar.Label.SetValue(suitonDuration);
+
+            BarHud bar = BarUtilities.GetProgressBar(Config.SuitonBar, suitonDuration, 20f, 0f, player);
+            AddDrawActions(bar.GetDrawActions(origin, Config.SuitonBar.StrataLevel));
         }
 
         private string GenerateNinjutsuText(byte param, bool haveKassatsuBuff, bool haveTCJBuff)
@@ -269,8 +282,6 @@ namespace DelvUI.Interface.Jobs
             config.SuitonBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
             config.SuitonBar.Enabled = false;
 
-            config.HutonBar.ThresholdConfig.Enabled = true;
-
             config.NinkiBar.UsePartialFillColor = true;
 
             return config;
@@ -283,15 +294,13 @@ namespace DelvUI.Interface.Jobs
             new PluginConfigColor(new Vector4(211f / 255f, 166f / 255f, 75f / 242f, 100f / 100f))
         );
 
-        [NestedConfig("Huton Bar", 35)]
-        public ProgressBarConfig HutonBar = new ProgressBarConfig(
+        [NestedConfig("Kazematoi Bar", 35)]
+        public ChunkedBarConfig KazematoiBar = new ChunkedBarConfig(
             new(0, -10),
             new(254, 20),
-            new PluginConfigColor(new Vector4(110f / 255f, 197f / 255f, 207f / 255f, 100f / 100f)),
-            BarDirection.Right,
-            new PluginConfigColor(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f)),
-            40f
+            PluginConfigColor.FromHex(0xFFABB6BD)
         );
+
 
         [NestedConfig("Ninki Bar", 40)]
         public ChunkedProgressBarConfig NinkiBar = new ChunkedProgressBarConfig(
