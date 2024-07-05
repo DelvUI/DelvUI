@@ -99,8 +99,8 @@ namespace DelvUI.Interface.Jobs
             var huntersInstinctDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3668)?.RemainingTime ?? 0f;
             var swiftScaledDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3669)?.RemainingTime ?? 0f;
             
-            var isDreadFangsEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3646 or 3648);
-            var isSteelFangsEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3645 or 3647);
+            var isDreadFangsEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3646 or 3648 or 3650);
+            var isSteelFangsEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3645 or 3647 or 3649);
             
             var lastUsedActionId = SpellHelper.Instance.GetLastUsedActionId();
 
@@ -116,14 +116,12 @@ namespace DelvUI.Interface.Jobs
                 case ViperCombo.SteelMaw:
                 case ViperCombo.DreadMaw:
                     comboState = 1;
-                    Plugin.Logger.Info("Combo started");
                     break;
                 case ViperCombo.HuntersSting:
                 case ViperCombo.SwiftskinsSting:
                 case ViperCombo.HuntersBite:
                 case ViperCombo.SwiftskinsBite:
                     comboState = 2;
-                    Plugin.Logger.Info("Combo part 2");
                     break;
                 default:
                     comboState = 0;
@@ -146,6 +144,13 @@ namespace DelvUI.Interface.Jobs
                 case 1: // Combo started
                 {
                     chunks = [empty, start, start, empty];
+
+                    if ((ViperCombo)lastUsedActionId == ViperCombo.DreadMaw || (ViperCombo)lastUsedActionId == ViperCombo.DreadMaw)
+                    {   // Glow both, 2nd step AoE always suggests both
+                        glows = [false, true, true, false];
+
+                        break;
+                    }
                     if (swiftScaledDuration > huntersInstinctDuration)
                     {   // Glow left
                         glows = [false, true, false, false];
@@ -276,34 +281,34 @@ namespace DelvUI.Interface.Jobs
         [NestedConfig("Vipersight Bar", 30)]
         public VipersightBarConfig Vipersight = new VipersightBarConfig(
             new(0, -10),
-            new(254, 12),
+            new(254, 10),
             new(new Vector4(237f / 255f, 141f / 255f, 7f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Noxious Gnash Bar", 35)]
         public ProgressBarConfig NoxiousGnash = new ProgressBarConfig(
-            new(0, -32),
-            new(254, 8),
+            new(0, -22),
+            new(254, 10),
             new(new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 1f))
         );
 
         [NestedConfig("Rattling Coil Bar", 40)]
         public ChunkedBarConfig RattlingCoilGauge = new ChunkedBarConfig(
-            new(0, -44),
+            new(0, -34),
             new(254, 10),
             new(new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 1f))
         );
         
         [NestedConfig("Serpent Offerings Bar", 45)]
         public ProgressBarConfig SerpentOfferings = new ProgressBarConfig(
-            new(0, -66),
-            new(254, 20),
+            new(0, -46),
+            new(254, 10),
             new(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 1f))
         );
 
         [NestedConfig("Anguine Tribute Bar", 50)]
         public ChunkedBarConfig AnguineTribute = new ChunkedBarConfig(
-            new(0, -78),
+            new(0, -58),
             new(254, 10),
             new(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 1f))
         );
