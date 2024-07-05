@@ -270,7 +270,7 @@ namespace DelvUI.Interface.GeneralElements
             MouseoverAreaConfig.Enabled = false;
         }
 
-        public UnitFrameConfig() : base(Vector2.Zero, Vector2.Zero, new(Vector4.Zero)) { } // don't remove
+        public UnitFrameConfig() : base(Vector2.Zero, Vector2.Zero, PluginConfigColor.Empty) { } // don't remove
     }
 
     [Exportable(false)]

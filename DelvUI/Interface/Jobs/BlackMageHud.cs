@@ -562,7 +562,7 @@ namespace DelvUI.Interface.Jobs
         public PluginConfigColor FireColor = new PluginConfigColor(new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
 
         public BlackMageStacksBarConfig(Vector2 position, Vector2 size)
-             : base(position, size, new(Vector4.Zero))
+             : base(position, size, PluginConfigColor.Empty)
         {
         }
     }

@@ -577,7 +577,7 @@ namespace DelvUI.Interface.GeneralElements
             return targeted && UseDifferentSizeWhenTargeted ? SizeWhenTargeted : Size;
         }
 
-        public NameplateBarConfig() : base(Vector2.Zero, Vector2.Zero, new(Vector4.Zero)) { } // don't remove
+        public NameplateBarConfig() : base(Vector2.Zero, Vector2.Zero, PluginConfigColor.Empty) { } // don't remove
     }
 
     public class NameplatePlayerBarConfig : NameplateBarConfig

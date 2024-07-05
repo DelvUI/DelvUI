@@ -161,7 +161,7 @@ namespace DelvUI.Interface.Jobs
                     glows.Add(false);
                 }
 
-                PluginConfigColor color = new(Vector4.Zero);
+                PluginConfigColor color = PluginConfigColor.Empty;
 
                 switch (step)
                 {
@@ -423,7 +423,7 @@ namespace DelvUI.Interface.Jobs
         public BarGlowConfig GlowConfig = new BarGlowConfig();
 
         public DancerStepsBarConfig(Vector2 position, Vector2 size)
-            : base(position, size, new(Vector4.Zero))
+            : base(position, size, PluginConfigColor.Empty)
         {
         }
     }

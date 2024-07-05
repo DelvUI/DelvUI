@@ -134,7 +134,7 @@ namespace DelvUI.Interface.PartyCooldowns
         {
             Vector2 size = new Vector2(150, 24);
 
-            var config = new PartyCooldownsBarConfig(Vector2.Zero, size, new(Vector4.Zero));
+            PartyCooldownsBarConfig config = new PartyCooldownsBarConfig(Vector2.Zero, size, PluginConfigColor.Empty);
 
             config.NameLabel.FontID = FontsConfig.DefaultMediumFontKey;
             config.TimeLabel.FontID = FontsConfig.DefaultMediumFontKey;

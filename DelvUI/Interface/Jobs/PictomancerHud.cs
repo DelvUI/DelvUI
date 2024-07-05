@@ -340,7 +340,7 @@ namespace DelvUI.Interface.Jobs
 
         [NestedConfig("Weapon Canvas Bar", 40)]
         public ChunkedBarConfig WeaponCanvasBar = new ChunkedBarConfig(
-            new(102.5f, -10),
+            new(-102.5f, -10),
             new(49, 18),
             PluginConfigColor.FromHex(0xFFC5616C)
         );
