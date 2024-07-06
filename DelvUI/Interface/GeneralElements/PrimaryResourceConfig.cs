@@ -1,5 +1,4 @@
-﻿using DelvUI.Config;
-using DelvUI.Config.Attributes;
+﻿using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Interface.Bars;
 using System.Numerics;
@@ -108,6 +107,9 @@ namespace DelvUI.Interface.GeneralElements
         [Order(17, collapseWith = nameof(AnchorToUnitFrame))]
         public DrawAnchor UnitFrameAnchor = DrawAnchor.Bottom;
 
+        [NestedConfig("Visibility", 1200)]
+        public VisibilityConfig VisibilityConfig = new VisibilityConfig();
+
         public UnitFramePrimaryResourceConfig(Vector2 position, Vector2 size)
             : base(position, size)
         {
@@ -131,7 +133,7 @@ namespace DelvUI.Interface.GeneralElements
         public PrimaryResourceConfig(Vector2 position, Vector2 size)
             : base(position, size, new(new(0 / 255f, 162f / 255f, 252f / 255f, 100f / 100f)))
         {
-
+            Strata = StrataLevel.LOW;
         }
     }
 }

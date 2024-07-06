@@ -1,6 +1,10 @@
-﻿using FFXIVClientStructs.FFXIV.Component.GUI;
+﻿using Dalamud.Logging;
+using Dalamud.Memory;
+using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
 using System.Runtime.InteropServices;
+using StructsFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework;
 
 namespace DelvUI.Helpers
 {
@@ -8,6 +12,8 @@ namespace DelvUI.Helpers
     {
         #region singleton
         private static Lazy<ExperienceHelper> _lazyInstance = new Lazy<ExperienceHelper>(() => new ExperienceHelper());
+        private RaptureAtkModule* _raptureAtkModule = null;
+        private const int ExperienceIndex = 2;
 
         public static ExperienceHelper Instance => _lazyInstance.Value;
 
@@ -77,19 +83,33 @@ namespace DelvUI.Helpers
                 return addon != null ? addon->CurrentExpPercent : 0;
             }
         }
-    }
 
-    [StructLayout(LayoutKind.Explicit, Size = 0x290)]
-    public struct AddonExp
-    {
-        [FieldOffset(0x0)] public AtkUnitBase AtkUnitBase;
+        public unsafe bool IsMaxLevel()
+        {
+            UIModule* uiModule = StructsFramework.Instance()->GetUIModule();
+            if (uiModule != null)
+            {
+                _raptureAtkModule = uiModule->GetRaptureAtkModule();
+            }
 
-        [FieldOffset(0x270)] public byte ClassJob;
+            if (_raptureAtkModule == null || _raptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrayCount <= ExperienceIndex)
+            {
+                return false;
+            }
 
-        [FieldOffset(0x278)] public uint CurrentExp;
-        [FieldOffset(0x27C)] public uint RequiredExp;
-        [FieldOffset(0x280)] public uint RestedExp;
+            try
+            {
+                var stringArrayData = _raptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrays[ExperienceIndex];
+                var expStringArray = stringArrayData->StringArray[69];
+                var expInfoString = MemoryHelper.ReadSeStringNullTerminated(new IntPtr(expStringArray));
+                return expInfoString.TextValue.Contains("-/-");
 
-        public float CurrentExpPercent => (float)CurrentExp / RequiredExp * 100;
+            }
+            catch (Exception e)
+            {
+                Plugin.Logger.Error("Error when receiving experience information: " + e.Message);
+                return false;
+            }
+        }
     }
 }

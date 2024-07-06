@@ -1,9 +1,10 @@
+using Dalamud.Game.ClientState.JobGauge.Enums;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
@@ -19,23 +20,16 @@ namespace DelvUI.Interface.Jobs
     {
         private new MonkConfig Config => (MonkConfig)_config;
 
+        private string[] _chunkTexts = new string[] { "I", "II", "III" };
+
         public MonkHud(MonkConfig config, string? displayName = null) : base(config, displayName)
         {
         }
-
-        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
-
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
             List<Vector2> positions = new List<Vector2>();
             List<Vector2> sizes = new List<Vector2>();
-
-            if (Config.DemolishBar.Enabled)
-            {
-                positions.Add(Config.Position + Config.DemolishBar.Position);
-                sizes.Add(Config.DemolishBar.Size);
-            }
 
             if (Config.ChakraBar.Enabled)
             {
@@ -43,22 +37,22 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.ChakraBar.Size);
             }
 
-            if (Config.LeadenFistBar.Enabled)
+            if (Config.BeastChakraStacksBar.Enabled)
             {
-                positions.Add(Config.Position + Config.LeadenFistBar.Position);
-                sizes.Add(Config.LeadenFistBar.Size);
+                positions.Add(Config.Position + Config.BeastChakraStacksBar.Position);
+                sizes.Add(Config.BeastChakraStacksBar.Size);
             }
 
-            if (Config.TwinSnakesBar.Enabled)
+            if (Config.MastersGauge.Enabled)
             {
-                positions.Add(Config.Position + Config.TwinSnakesBar.Position);
-                sizes.Add(Config.TwinSnakesBar.Size);
+                positions.Add(Config.Position + Config.MastersGauge.Position);
+                sizes.Add(Config.MastersGauge.Size);
             }
 
-            if (Config.RiddleofEarthBar.Enabled)
+            if (Config.StancesBar.Enabled)
             {
-                positions.Add(Config.Position + Config.RiddleofEarthBar.Position);
-                sizes.Add(Config.RiddleofEarthBar.Size);
+                positions.Add((Config.Position + Config.StancesBar.Position));
+                sizes.Add(Config.StancesBar.Size);
             }
 
             if (Config.PerfectBalanceBar.Enabled)
@@ -67,156 +61,235 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.PerfectBalanceBar.Size);
             }
 
-            if (Config.TrueNorthBar.Enabled)
-            {
-                positions.Add(Config.Position + Config.TrueNorthBar.Position);
-                sizes.Add(Config.TrueNorthBar.Size);
-            }
-
-            if (Config.FormsBar.Enabled)
-            {
-                positions.Add((Config.Position + Config.FormsBar.Position));
-                sizes.Add(Config.FormsBar.Size);
-            }
-
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             var position = origin + Config.Position;
-            if (Config.FormsBar.Enabled)
+
+            if (Config.ChakraBar.Enabled)
             {
-                DrawFormsBar(position, player);
+                DrawChakraGauge(position, player);
             }
 
-            if (Config.RiddleofEarthBar.Enabled)
+            if (Config.BeastChakraStacksBar.Enabled)
             {
-                DrawRiddleOfEarthBar(position, player);
+                DrawBeastChakraStacksBar(position, player);
+            }
+
+            if (Config.MastersGauge.Enabled)
+            {
+                DrawMastersGauge(position, player);
+            }
+
+            if (Config.StancesBar.Enabled)
+            {
+                DrawFormsBar(position, player);
             }
 
             if (Config.PerfectBalanceBar.Enabled)
             {
                 DrawPerfectBalanceBar(position, player);
             }
-
-            if (Config.TrueNorthBar.Enabled)
-            {
-                DrawTrueNorthBar(position, player);
-            }
-
-            if (Config.ChakraBar.Enabled)
-            {
-                DrawChakraGauge(position);
-            }
-
-            if (Config.LeadenFistBar.Enabled)
-            {
-                DrawLeadenFistBar(position, player);
-            }
-
-            if (Config.TwinSnakesBar.Enabled)
-            {
-                DrawTwinSnakesBar(position, player);
-            }
-
-            if (Config.DemolishBar.Enabled)
-            {
-                DrawDemolishBar(position, player);
-            }
         }
 
-        private void DrawFormsBar(Vector2 origin, PlayerCharacter player)
+        private void DrawChakraGauge(Vector2 origin, IPlayerCharacter player)
         {
-            Status? form = player.StatusList.FirstOrDefault(o => o.StatusId is 107 or 108 or 109 or 2513 && o.RemainingTime > 0f);
-
-            if (!Config.FormsBar.HideWhenInactive || form is not null)
+            MNKGauge gauge = Plugin.JobGauges.Get<MNKGauge>();
+            if (Config.ChakraBar.HideWhenInactive && gauge.Chakra == 0)
             {
-                float formDuration = form?.RemainingTime ?? 0f;
-                string label = form is not null ? form.StatusId switch
-                {
-                    107 => "Opo-Opo Form",
-                    108 => "Raptor Form",
-                    109 => "Coeurl Form",
-                    2513 => "Formless Fist",
-                    _ => ""
-                } : "";
+                return;
+            }
 
-                Config.FormsBar.Label.SetText(label);
-                BarUtilities.GetProgressBar(Config.FormsBar, formDuration, 15f, 0, player).Draw(origin);
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.ChakraBar, 5, gauge.Chakra, 5, 0, player);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.ChakraBar.StrataLevel));
             }
         }
 
-        private void DrawTrueNorthBar(Vector2 origin, PlayerCharacter player)
+        private unsafe void DrawBeastChakraStacksBar(Vector2 origin, IPlayerCharacter player)
         {
-            float trueNorthDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1250 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
-            if (!Config.TrueNorthBar.HideWhenInactive || trueNorthDuration > 0)
+            MonkBeastChakraStacksBar config = Config.BeastChakraStacksBar;
+            MNKGauge gauge = Plugin.JobGauges.Get<MNKGauge>();
+            ushort stacks = *((ushort*)(new IntPtr(gauge.Address) + 0xC));
+
+            if (config.HideWhenInactive && stacks == 0)
             {
-                Config.TrueNorthBar.Label.SetText(Math.Truncate(trueNorthDuration).ToString());
-                BarUtilities.GetProgressBar(Config.TrueNorthBar, trueNorthDuration, 10f, 0f, player).Draw(origin);
+                return;
+            }
+
+            int opoOpoStacks = stacks & 1;
+            int raptorStacks = ((stacks >> 2) & 3);
+            int coeurlStacks = ((stacks >> 4) & 3);
+
+            PluginConfigColor empty = PluginConfigColor.Empty;
+            Tuple<PluginConfigColor, float, LabelConfig?>[] chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[6];
+            chunks[0] = new(opoOpoStacks > 0 ? config.OpoopoColor : empty, 1, null);
+            chunks[1] = new(raptorStacks > 0 ? config.RaptorColor : empty, 1, null);
+            chunks[2] = new(raptorStacks > 1 ? config.RaptorColor : empty, 1, null);
+            chunks[3] = new(coeurlStacks > 0 ? config.CoeurlColor : empty, 1, null);
+            chunks[4] = new(coeurlStacks > 1 ? config.CoeurlColor : empty, 1, null);
+            chunks[5] = new(coeurlStacks > 2 ? config.CoeurlColor : empty, 1, null);
+
+            BarHud[] bars = BarUtilities.GetChunkedBars(config, chunks, player);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, config.StrataLevel));
             }
         }
 
-        private void DrawPerfectBalanceBar(Vector2 origin, PlayerCharacter player)
+        private unsafe void DrawMastersGauge(Vector2 origin, IPlayerCharacter player)
         {
-            Status? perfectBalance = player.StatusList.Where(o => o.StatusId is 110 && o.RemainingTime > 0f).FirstOrDefault();
-            if (!Config.PerfectBalanceBar.HideWhenInactive || perfectBalance is not null)
+            MNKGauge gauge = Plugin.JobGauges.Get<MNKGauge>();
+            ushort nadi = *((ushort*)(new IntPtr(gauge.Address) + 0xD));
+            const int kLunar = 1;
+            const int kSolar = 2;
+
+            if (Config.MastersGauge.HideWhenInactive &&
+                nadi == 0 &&
+                gauge.BeastChakra[0] == BeastChakra.NONE &&
+                gauge.BeastChakra[1] == BeastChakra.NONE &&
+                gauge.BeastChakra[2] == BeastChakra.NONE)
             {
-                float duration = perfectBalance?.RemainingTime ?? 0f;
-                float stacks = perfectBalance?.StackCount ?? 0f;
-                Config.PerfectBalanceBar.Label.SetText(stacks.ToString());
-                BarUtilities.GetProgressBar(Config.PerfectBalanceBar, duration, 15f, 0, player).Draw(origin);
+                return;
+            }
+
+            int[] order = Config.MastersGauge.ChakraOrder;
+            int[] hasChakra = new[]
+            {
+                (nadi & kLunar) != 0 ? 1 : 0,
+                gauge.BeastChakra[0] != BeastChakra.NONE ? 1 : 0,
+                gauge.BeastChakra[0] != BeastChakra.NONE ? 1 : 0,
+                gauge.BeastChakra[0] != BeastChakra.NONE ? 1 : 0,
+                (nadi & kSolar) != 0 ? 1 : 0,
+            };
+
+            PluginConfigColor[] colors = new[]
+            {
+                Config.MastersGauge.LunarNadiColor,
+                GetChakraColor(gauge.BeastChakra[0]),
+                GetChakraColor(gauge.BeastChakra[1]),
+                GetChakraColor(gauge.BeastChakra[2]),
+                Config.MastersGauge.SolarNadiColor
+            };
+
+            var chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[5];
+            for (int i = 0; i < chunks.Length; i++)
+            {
+                chunks[i] = new(colors[order[i]], hasChakra[order[i]], i == 2 ? Config.MastersGauge.BlitzTimerLabel : null);
+            }
+
+            Config.MastersGauge.BlitzTimerLabel.SetValue(gauge.BlitzTimeRemaining / 1000);
+
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.MastersGauge, chunks, player);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.MastersGauge.StrataLevel));
             }
         }
 
-        private void DrawRiddleOfEarthBar(Vector2 origin, PlayerCharacter player)
+        private void DrawFormsBar(Vector2 origin, IPlayerCharacter player)
         {
-            Status? riddleOfEarth = player.StatusList.Where(o => o.StatusId is 1179 && o.RemainingTime > 0f).FirstOrDefault();
-            if (!Config.PerfectBalanceBar.HideWhenInactive || riddleOfEarth is not null)
+            // formless fist
+            Status? formlessFist = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId == 2513);
+            if (formlessFist != null)
             {
-                float duration = riddleOfEarth?.RemainingTime ?? 0f;
-                float stacks = riddleOfEarth?.StackCount ?? 0f;
-                Config.RiddleofEarthBar.Label.SetText(stacks.ToString());
-                BarUtilities.GetProgressBar(Config.RiddleofEarthBar, duration, 10f, 0, player).Draw(origin);
+                float remaining = Math.Abs(formlessFist.RemainingTime);
+
+                BarHud bar = BarUtilities.GetProgressBar(
+                    Config.StancesBar,
+                    null,
+                    new LabelConfig[] { Config.StancesBar.FormlessFistLabel },
+                    remaining,
+                    30f,
+                    0,
+                    player,
+                    Config.StancesBar.FormlessFistColor
+                );
+
+                Config.StancesBar.FormlessFistLabel.SetValue(remaining);
+
+                AddDrawActions(bar.GetDrawActions(origin, Config.StancesBar.StrataLevel));
+                return;
+            }
+
+            // forms
+            Status? form = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 107 or 108 or 109);
+            if (Config.StancesBar.HideWhenInactive && form is null)
+            {
+                return;
+            }
+
+            int activeFormIndex = form != null ? (int)form.StatusId - 107 : -1;
+            PluginConfigColor[] chunkColors = new PluginConfigColor[]
+            {
+                Config.StancesBar.OpoOpoColor,
+                Config.StancesBar.RaptorColor,
+                Config.StancesBar.CoeurlColor
+            };
+
+            LabelConfig[] chunkLabels = new LabelConfig[]
+            {
+                Config.StancesBar.FormLabel.Clone(0),
+                Config.StancesBar.FormLabel.Clone(1),
+                Config.StancesBar.FormLabel.Clone(2)
+            };
+
+            var chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[3];
+            for (int i = 0; i < chunks.Length; i++)
+            {
+                LabelConfig label = chunkLabels[i];
+                label.SetText(_chunkTexts[i]);
+
+                chunks[i] = new(chunkColors[i], activeFormIndex == i ? 1 : 0, label);
+            }
+
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.StancesBar, chunks, player);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.StancesBar.StrataLevel));
             }
         }
 
-        private void DrawChakraGauge(Vector2 origin)
+        private void DrawPerfectBalanceBar(Vector2 origin, IPlayerCharacter player)
         {
-            var gauge = Plugin.JobGauges.Get<MNKGauge>();
-            if (!Config.ChakraBar.HideWhenInactive || gauge.Chakra > 0)
+            Status? perfectBalance = Utils.StatusListForBattleChara(player).Where(o => o.StatusId is 110 && o.RemainingTime > 0f).FirstOrDefault();
+            float duration = perfectBalance?.RemainingTime ?? 0f;
+            float stacks = perfectBalance?.StackCount ?? 0f;
+
+            if (Config.PerfectBalanceBar.HideWhenInactive && duration <= 0)
             {
-                BarUtilities.GetChunkedBars(Config.ChakraBar, 5, gauge.Chakra, 5).Draw(origin);
+                return;
+            }
+
+            Tuple<PluginConfigColor, float, LabelConfig?>[] chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[3];
+            for (int i = 0; i < chunks.Length; i++)
+            {
+                chunks[i] = new(
+                    Config.PerfectBalanceBar.FillColor,
+                    i < stacks ? 1f : 0,
+                    i == 1 ? Config.PerfectBalanceBar.PerfectBalanceLabel : null
+                );
+            }
+
+            Config.PerfectBalanceBar.PerfectBalanceLabel.SetValue(duration);
+
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.PerfectBalanceBar, chunks, player);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.PerfectBalanceBar.StrataLevel));
             }
         }
 
-        private void DrawTwinSnakesBar(Vector2 origin, PlayerCharacter player)
+        private PluginConfigColor GetChakraColor(BeastChakra chakra) => chakra switch
         {
-            float twinSnakesDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 101 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
-            if (!Config.TwinSnakesBar.HideWhenInactive || twinSnakesDuration > 0)
-            {
-                Config.TwinSnakesBar.Label.SetText(Math.Truncate(twinSnakesDuration).ToString());
-                BarUtilities.GetProgressBar(Config.TwinSnakesBar, twinSnakesDuration, 15f, 0f, player).Draw(origin);
-            }
-        }
-
-        private void DrawLeadenFistBar(Vector2 origin, PlayerCharacter player)
-        {
-            float leadenFistDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1861 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
-            if (!Config.LeadenFistBar.HideWhenInactive || leadenFistDuration > 0)
-            {
-                Config.LeadenFistBar.Label.SetText(Math.Truncate(leadenFistDuration).ToString());
-                BarUtilities.GetProgressBar(Config.LeadenFistBar, leadenFistDuration, 30f, 0f, player).Draw(origin);
-            }
-        }
-
-        private void DrawDemolishBar(Vector2 origin, PlayerCharacter player)
-        {
-            GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-
-            BarUtilities.GetDoTBar(Config.DemolishBar, player, target, 246, 18f)?.
-                Draw(origin);
-        }
+            BeastChakra.RAPTOR => Config.MastersGauge.RaptorChakraColor,
+            BeastChakra.COEURL => Config.MastersGauge.CoeurlChakraColor,
+            BeastChakra.OPOOPO => Config.MastersGauge.OpoopoChakraColor,
+            _ => new PluginConfigColor(new(0, 0, 0, 0))
+        };
     }
 
     [Section("Job Specific Bars")]
@@ -225,70 +298,152 @@ namespace DelvUI.Interface.Jobs
     public class MonkConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.MNK;
+
         public new static MonkConfig DefaultConfig()
         {
             var config = new MonkConfig();
 
-            config.PerfectBalanceBar.FillDirection = BarDirection.Up;
-            config.LeadenFistBar.FillDirection = BarDirection.Up;
+            config.StancesBar.Enabled = false;
+            config.MastersGauge.BlitzTimerLabel.HideIfZero = true;
+            config.PerfectBalanceBar.PerfectBalanceLabel.HideIfZero = true;
 
             return config;
         }
 
-        [NestedConfig("Demolish", 30)]
-        public ProgressBarConfig DemolishBar = new ProgressBarConfig(
-            new(71, -10),
-            new(111, 20),
-            new(new Vector4(246f / 255f, 169f / 255f, 255f / 255f, 100f / 100f))
-        );
-
-        [NestedConfig("Chakra", 35)]
+        [NestedConfig("Chakra Bar", 35)]
         public ChunkedBarConfig ChakraBar = new ChunkedBarConfig(
             new(0, -32),
             new(254, 20),
             new(new Vector4(204f / 255f, 115f / 255f, 0f, 100f / 100f))
         );
 
-        [NestedConfig("Leaden Fist", 40)]
-        public ProgressBarConfig LeadenFistBar = new ProgressBarConfig(
-            new(0, -10),
-            new(28, 20),
-            new(new Vector4(255f / 255f, 0f, 0f, 100f / 100f))
+        [NestedConfig("Beast Chakra Stacks Bar", 40)]
+        public MonkBeastChakraStacksBar BeastChakraStacksBar = new MonkBeastChakraStacksBar(
+            new(0, -32),
+            new(254, 20)
         );
 
-        [NestedConfig("Twin Snakes", 45)]
-        public ProgressBarConfig TwinSnakesBar = new ProgressBarConfig(
-            new(-71, -10),
-            new(111, 20),
-            new(new Vector4(227f / 255f, 255f / 255f, 64f / 255f, 100f / 100f))
-        );
-
-        [NestedConfig("Riddle of Earth", 50)]
-        public ProgressBarConfig RiddleofEarthBar = new ProgressBarConfig(
-            new(-69, -54),
-            new(115, 20),
-            new(new Vector4(157f / 255f, 59f / 255f, 255f / 255f, 100f / 100f))
-        );
-
-        [NestedConfig("Perfect Balance", 55)]
-        public ProgressBarConfig PerfectBalanceBar = new ProgressBarConfig(
+        [NestedConfig("Masterful Blitz Bar", 45)]
+        public MastersGauge MastersGauge = new MastersGauge(
             new(0, -54),
-            new(20, 20),
-            new(new Vector4(150f / 255f, 255f / 255f, 255f / 255f, 100f / 100f))
+            new(254, 20)
         );
 
-        [NestedConfig("True North", 60)]
-        public ProgressBarConfig TrueNorthBar = new ProgressBarConfig(
-            new(69, -54),
-            new(115, 20),
-            new(new Vector4(255f / 255f, 225f / 255f, 189f / 255f, 100f / 100f))
+        [NestedConfig("Forms Bar", 50)]
+        public MonkStancesBarConfig StancesBar = new MonkStancesBarConfig(
+            new(0, -98),
+            new(254, 20)
         );
 
-        [NestedConfig("Forms", 65)]
-        public ProgressBarConfig FormsBar = new ProgressBarConfig(
+        [NestedConfig("Perfect Balance Bar", 55)]
+        public PerfectBalanceBar PerfectBalanceBar = new PerfectBalanceBar(
             new(0, -76),
             new(254, 20),
-            new(new Vector4(36f / 255f, 131f / 255f, 255f / 255f, 100f / 100f))
+            new(new Vector4(150f / 255f, 255f / 255f, 255f / 255f, 100f / 100f))
         );
+    }
+
+    public class PerfectBalanceBar : ChunkedBarConfig
+    {
+        [NestedConfig("Perfect Balance Duration Text", 50, spacing = true)]
+        public NumericLabelConfig PerfectBalanceLabel;
+
+        public PerfectBalanceBar(Vector2 position, Vector2 size, PluginConfigColor fillColor, int padding = 2) : base(position, size, fillColor, padding)
+        {
+            PerfectBalanceLabel = new NumericLabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+        }
+    }
+
+    [DisableParentSettings("FillColor", "FillDirection")]
+    public class MonkBeastChakraStacksBar : ChunkedBarConfig
+    {
+        [ColorEdit4("Opo-opo Color")]
+        [Order(19)]
+        public PluginConfigColor OpoopoColor = PluginConfigColor.FromHex(0xFFFFB3D3);
+
+        [ColorEdit4("Raptor Color")]
+        [Order(20)]
+        public PluginConfigColor RaptorColor = PluginConfigColor.FromHex(0xFFBF89E5);
+
+        [ColorEdit4("Coeurl Color")]
+        [Order(21)]
+        public PluginConfigColor CoeurlColor = PluginConfigColor.FromHex(0xFF9AE7C0);
+
+        public MonkBeastChakraStacksBar(Vector2 position, Vector2 size)
+            : base(position, size, PluginConfigColor.Empty)
+        {
+        }
+    }
+
+    [DisableParentSettings("FillColor", "FillDirection")]
+    public class MastersGauge : ChunkedBarConfig
+    {
+        [ColorEdit4("Lunar Nadi Color")]
+        [Order(19)]
+        public PluginConfigColor LunarNadiColor = PluginConfigColor.FromHex(0xFFDA87FF);
+
+        [ColorEdit4("Solar Nadi Color")]
+        [Order(20)]
+        public PluginConfigColor SolarNadiColor = PluginConfigColor.FromHex(0xFFFFFFCA);
+
+        [ColorEdit4("Opo-opo Color")]
+        [Order(21)]
+        public PluginConfigColor OpoopoChakraColor = PluginConfigColor.FromHex(0xFFC1527E);
+
+        [ColorEdit4("Raptor Color")]
+        [Order(22)]
+        public PluginConfigColor RaptorChakraColor = PluginConfigColor.FromHex(0xFF8C67BA);
+
+        [ColorEdit4("Coeurl Color")]
+        [Order(23)]
+        public PluginConfigColor CoeurlChakraColor = PluginConfigColor.FromHex(0xFF326D5A);
+
+        [DragDropHorizontal("Chakra Order", "Lunar Nadi", "Chakra 1", "Chakra 2", "Chakra 3", "Solar Nadi")]
+        [Order(24)]
+        public int[] ChakraOrder = new int[] { 0, 1, 2, 3, 4 };
+
+        [NestedConfig("Blitz Timer Text", 50, spacing = true)]
+        public NumericLabelConfig BlitzTimerLabel;
+
+        public MastersGauge(Vector2 position, Vector2 size)
+            : base(position, size, PluginConfigColor.Empty)
+        {
+            BlitzTimerLabel = new NumericLabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+        }
+    }
+
+    [DisableParentSettings("FillColor")]
+    public class MonkStancesBarConfig : ChunkedBarConfig
+    {
+        [ColorEdit4("Opo-opo Color")]
+        [Order(19)]
+        public PluginConfigColor OpoOpoColor = PluginConfigColor.FromHex(0xFFFFB3D3);
+
+        [ColorEdit4("Raptor Color")]
+        [Order(20)]
+        public PluginConfigColor RaptorColor = PluginConfigColor.FromHex(0xFFBF89E5);
+
+        [ColorEdit4("Coeurl Color")]
+        [Order(21)]
+        public PluginConfigColor CoeurlColor = PluginConfigColor.FromHex(0xFF9AE7C0);
+
+        [ColorEdit4("Formless Fist Color")]
+        [Order(22)]
+        public PluginConfigColor FormlessFistColor = PluginConfigColor.FromHex(0xFF514793);
+
+        [NestedConfig("Form Number Text", 500, spacing = true)]
+        public LabelConfig FormLabel;
+
+        [NestedConfig("Formless Fist Duration Text", 1000, separator = false, spacing = true)]
+        public NumericLabelConfig FormlessFistLabel;
+
+        public MonkStancesBarConfig(Vector2 position, Vector2 size)
+            : base(position, size, PluginConfigColor.Empty)
+        {
+            FormLabel = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+
+            FormlessFistLabel = new NumericLabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+            FormlessFistLabel.Enabled = false;
+        }
     }
 }

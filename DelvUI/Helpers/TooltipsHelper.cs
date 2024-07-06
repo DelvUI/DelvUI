@@ -1,4 +1,6 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Interface;
+using Dalamud.Interface.Utility;
+using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using ImGuiNET;
 using System;
@@ -39,8 +41,8 @@ namespace DelvUI.Helpers
         }
         #endregion
 
-        private static float MaxWidth = 300;
-        private static float Margin = 5;
+        private float MaxWidth => 300 * ImGuiHelpers.GlobalScale;
+        private float Margin => 5 * ImGuiHelpers.GlobalScale;
 
         private TooltipsConfig _config => ConfigurationManager.Instance.GetConfigObject<TooltipsConfig>();
 
@@ -55,12 +57,12 @@ namespace DelvUI.Helpers
 
         private bool _dataIsValid = false;
 
-        public void ShowTooltipOnCursor(string text, string? title = null, uint id = 0)
+        public void ShowTooltipOnCursor(string text, string? title = null, uint id = 0, string name = "")
         {
-            ShowTooltip(text, ImGui.GetMousePos(), title, id);
+            ShowTooltip(text, ImGui.GetMousePos(), title, id, name);
         }
 
-        public void ShowTooltip(string text, Vector2 position, string? title = null, uint id = 0)
+        public void ShowTooltip(string text, Vector2 position, string? title = null, uint id = 0, string name = "")
         {
             if (text == null)
             {
@@ -80,23 +82,28 @@ namespace DelvUI.Helpers
             {
                 _currentTooltipTitle = title;
 
+                if (_config.ShowSourceName && name.Length > 0)
+                {
+                    _currentTooltipTitle += $" ({name})";
+                }
+
                 if (_config.ShowStatusIDs)
                 {
                     _currentTooltipTitle += " (ID: " + id + ")";
                 }
 
-                bool titleFontPushed = FontsManager.Instance.PushFont(_config.TitleFontID);
-
-                _titleSize = ImGui.CalcTextSize(_currentTooltipTitle, MaxWidth);
-                _titleSize.Y += Margin;
-
-                if (titleFontPushed) { ImGui.PopFont(); }
+                using (FontsManager.Instance.PushFont(_config.TitleFontID))
+                {
+                    _titleSize = ImGui.CalcTextSize(_currentTooltipTitle, MaxWidth);
+                    _titleSize.Y += Margin;
+                }
             }
 
             // calculate text size
-            bool fontPushed = FontsManager.Instance.PushFont(_config.TextFontID);
-            _textSize = ImGui.CalcTextSize(_currentTooltipText, MaxWidth);
-            if (fontPushed) { ImGui.PopFont(); }
+            using (FontsManager.Instance.PushFont(_config.TextFontID))
+            {
+                _textSize = ImGui.CalcTextSize(_currentTooltipText, MaxWidth);
+            }
 
             _size = new Vector2(Math.Max(_titleSize.X, _textSize.X) + Margin * 2, _titleSize.Y + _textSize.Y + Margin * 2);
 
@@ -128,7 +135,9 @@ namespace DelvUI.Helpers
                 | ImGuiWindowFlags.NoMove
                 | ImGuiWindowFlags.NoDecoration
                 | ImGuiWindowFlags.NoBackground
-                | ImGuiWindowFlags.NoInputs;
+                | ImGuiWindowFlags.NoInputs
+                | ImGuiWindowFlags.NoSavedSettings
+                | ImGuiWindowFlags.NoFocusOnAppearing;
 
             // imgui clips the left and right borders inside windows for some reason
             // we make the window bigger so the actual drawable size is the expected one
@@ -137,7 +146,6 @@ namespace DelvUI.Helpers
 
             ImGui.SetNextWindowPos(windowPos, ImGuiCond.Always);
             ImGui.SetNextWindowSize(_size + windowMargin * 2);
-            ImGui.SetNextWindowFocus();
 
             ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
             ImGui.Begin("DelvUI_tooltip", windowFlags);
@@ -145,44 +153,50 @@ namespace DelvUI.Helpers
 
             drawList.AddRectFilled(_position, _position + _size, _config.BackgroundColor.Base);
 
+            if (_config.BorderConfig.Enabled)
+            {
+                drawList.AddRect(_position, _position + _size, _config.BorderConfig.Color.Base, 0, ImDrawFlags.None, _config.BorderConfig.Thickness);
+            }
+
+            // no idea why i have to do this
+            float globalScaleCorrection = -15 + 15 * ImGuiHelpers.GlobalScale;
+
             if (_currentTooltipTitle != null)
             {
                 // title
-                bool fontPushed = FontsManager.Instance.PushFont(_config.TitleFontID);
-
-                var cursorPos = new Vector2(windowMargin.X + _size.X / 2f - _titleSize.X / 2f, Margin);
-                ImGui.SetCursorPos(cursorPos);
-                ImGui.PushTextWrapPos(cursorPos.X + _titleSize.X);
-                ImGui.TextColored(_config.TitleColor.Vector, _currentTooltipTitle);
-                ImGui.PopTextWrapPos();
-
-                if (fontPushed) { ImGui.PopFont(); }
+                Vector2 cursorPos;
+                using (FontsManager.Instance.PushFont(_config.TitleFontID))
+                {
+                    cursorPos = new Vector2(windowMargin.X + _size.X / 2f - _titleSize.X / 2f, Margin);
+                    ImGui.SetCursorPos(cursorPos);
+                    ImGui.PushTextWrapPos(cursorPos.X + _titleSize.X + globalScaleCorrection + Margin);
+                    ImGui.TextColored(_config.TitleColor.Vector, _currentTooltipTitle);
+                    ImGui.PopTextWrapPos();
+                }
 
                 // text
-                fontPushed = FontsManager.Instance.PushFont(_config.TextFontID);
-
-                cursorPos = new Vector2(windowMargin.X + _size.X / 2f - _textSize.X / 2f, Margin + _titleSize.Y);
-                ImGui.SetCursorPos(cursorPos);
-                ImGui.PushTextWrapPos(cursorPos.X + _textSize.X);
-                ImGui.TextColored(_config.TextColor.Vector, _currentTooltipText);
-                ImGui.PopTextWrapPos();
-
-                if (fontPushed) { ImGui.PopFont(); }
+                using (FontsManager.Instance.PushFont(_config.TextFontID))
+                {
+                    cursorPos = new Vector2(windowMargin.X + _size.X / 2f - _textSize.X / 2f, Margin + _titleSize.Y);
+                    ImGui.SetCursorPos(cursorPos);
+                    ImGui.PushTextWrapPos(cursorPos.X + _textSize.X + globalScaleCorrection + Margin);
+                    ImGui.TextColored(_config.TextColor.Vector, _currentTooltipText);
+                    ImGui.PopTextWrapPos();
+                }
             }
             else
             {
                 // text
-                bool fontPushed = FontsManager.Instance.PushFont(_config.TextFontID);
+                using (FontsManager.Instance.PushFont(_config.TextFontID))
+                {
+                    var cursorPos = windowMargin + new Vector2(Margin, Margin);
+                    var textWidth = _size.X - Margin * 2;
 
-                var cursorPos = windowMargin + new Vector2(Margin, Margin);
-                var textWidth = _size.X - Margin * 2;
-
-                ImGui.SetCursorPos(cursorPos);
-                ImGui.PushTextWrapPos(cursorPos.X + textWidth);
-                ImGui.TextColored(_config.TextColor.Vector, _currentTooltipText);
-                ImGui.PopTextWrapPos();
-
-                if (fontPushed) { ImGui.PopFont(); }
+                    ImGui.SetCursorPos(cursorPos);
+                    ImGui.PushTextWrapPos(cursorPos.X + textWidth + globalScaleCorrection + Margin);
+                    ImGui.TextColored(_config.TextColor.Vector, _currentTooltipText);
+                    ImGui.PopTextWrapPos();
+                }
             }
 
             ImGui.End();
@@ -223,24 +237,53 @@ namespace DelvUI.Helpers
         [Order(5)]
         public bool ShowStatusIDs = false;
 
-        [ColorEdit4("Background Color")]
+        [Checkbox("Show Source Name")]
         [Order(10)]
+        public bool ShowSourceName = false;
+
+        [ColorEdit4("Background Color")]
+        [Order(15)]
         public PluginConfigColor BackgroundColor = new PluginConfigColor(new(19f / 255f, 19f / 255f, 19f / 255f, 190f / 250f));
 
         [Font("Title Font and Size", spacing = true)]
-        [Order(15)]
+        [Order(20)]
         public string? TitleFontID = null;
 
         [ColorEdit4("Title Color")]
-        [Order(20)]
+        [Order(25)]
         public PluginConfigColor TitleColor = new PluginConfigColor(new(255f / 255f, 210f / 255f, 31f / 255f, 100f / 100f));
 
         [Font("Text Font and Size", spacing = true)]
-        [Order(25)]
+        [Order(30)]
         public string? TextFontID = null;
 
         [ColorEdit4("Text Color")]
-        [Order(30)]
+        [Order(35)]
         public PluginConfigColor TextColor = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+
+        [NestedConfig("Border", 40, separator = false, spacing = true, collapsingHeader = false)]
+        public TooltipBorderConfig BorderConfig = new();
+    }
+
+    [Exportable(false)]
+    public class TooltipBorderConfig : PluginConfigObject
+    {
+        [ColorEdit4("Color")]
+        [Order(5)]
+        public PluginConfigColor Color = new(new Vector4(10f / 255f, 10f / 255f, 10f / 255f, 160f / 255f));
+
+        [DragInt("Thickness", min = 1, max = 100)]
+        [Order(10)]
+        public int Thickness = 4;
+
+        public TooltipBorderConfig()
+        {
+        }
+
+        public TooltipBorderConfig(PluginConfigColor color, int thickness)
+        {
+            Color = color;
+            Thickness = thickness;
+        }
     }
 }

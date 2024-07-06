@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Text;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.Text.SeStringHandling;
+using DelvUI.Config;
 using DelvUI.Interface.Bars;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using static System.Globalization.CultureInfo;
@@ -54,14 +55,9 @@ namespace DelvUI
             return initials;
         }
 
-        public static string Truncate(this string str, int maxLength)
+        public static string Truncated(this string str, int length = 0)
         {
-            if (string.IsNullOrEmpty(str))
-            {
-                return str;
-            }
-
-            return str.Length <= maxLength ? str : str[..maxLength];
+            return length > 0 ? str.Substring(0, Math.Min(str.Length, length)) : str;
         }
 
         public static Vector4 AdjustColor(this Vector4 vec, float correctionFactor)
@@ -96,11 +92,11 @@ namespace DelvUI
         {
             return num switch
             {
-                >= 100000000 => (num / 1000000.0).ToString("#,0M", CultureInfo.InvariantCulture),
-                >= 1000000 => (num / 1000000.0).ToString("0.0", CultureInfo.InvariantCulture) + "M",
-                >= 100000 => (num / 1000.0).ToString("#,0K", CultureInfo.InvariantCulture),
-                >= 10000 => (num / 1000.0).ToString("0.0", CultureInfo.InvariantCulture) + "K",
-                _ => num.ToString("#,0", CultureInfo.InvariantCulture)
+                >= 100000000 => (num / 1000000.0).ToString("#,0M", ConfigurationManager.Instance.ActiveCultreInfo),
+                >= 1000000 => (num / 1000000.0).ToString("0.0", ConfigurationManager.Instance.ActiveCultreInfo) + "M",
+                >= 100000 => (num / 1000.0).ToString("#,0K", ConfigurationManager.Instance.ActiveCultreInfo),
+                >= 10000 => (num / 1000.0).ToString("0.0", ConfigurationManager.Instance.ActiveCultreInfo) + "K",
+                _ => num.ToString("#,0", ConfigurationManager.Instance.ActiveCultreInfo)
             };
         }
 
@@ -132,5 +128,8 @@ namespace DelvUI
 
             return str;
         }
+
+        public static string Repeat(this string s, int n)
+            => new StringBuilder(s.Length * n).Insert(0, s, n).ToString();
     }
 }

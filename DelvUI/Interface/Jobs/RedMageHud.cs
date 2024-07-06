@@ -15,7 +15,7 @@ namespace DelvUI.Interface.Jobs
 {
     public class RedMageHud : JobHud
     {
-        private new RedMageConfig Config => (RedMageConfig)_config;        
+        private new RedMageConfig Config => (RedMageConfig)_config;
 
         public RedMageHud(RedMageConfig config, string? displayName = null) : base(config, displayName)
         {
@@ -44,10 +44,10 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.BlackManaBar.Size);
             }
 
-            if (Config.AccelerationBar.Enabled)
+            if (Config.ManaStacksBar.Enabled)
             {
-                positions.Add(Config.Position + Config.AccelerationBar.Position);
-                sizes.Add(Config.AccelerationBar.Size);
+                positions.Add(Config.Position + Config.ManaStacksBar.Position);
+                sizes.Add(Config.ManaStacksBar.Size);
             }
 
             if (Config.DualcastBar.Enabled)
@@ -71,28 +71,28 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             Vector2 pos = origin + Config.Position;
 
             if (Config.BalanceBar.Enabled)
             {
-                DrawBalanceBar(pos);
+                DrawBalanceBar(pos, player);
             }
 
             if (Config.WhiteManaBar.Enabled)
             {
-                DrawWhiteManaBar(pos);
+                DrawWhiteManaBar(pos, player);
             }
 
             if (Config.BlackManaBar.Enabled)
             {
-                DrawBlackManaBar(pos);
+                DrawBlackManaBar(pos, player);
             }
 
-            if (Config.AccelerationBar.Enabled)
+            if (Config.ManaStacksBar.Enabled)
             {
-                DrawAccelerationBar(pos, player);
+                DrawManaStacksBarBar(pos, player);
             }
 
             if (Config.DualcastBar.Enabled)
@@ -111,7 +111,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawBalanceBar(Vector2 origin)
+        private void DrawBalanceBar(Vector2 origin, IPlayerCharacter player)
         {
             RDMGauge gauge = Plugin.JobGauges.Get<RDMGauge>();
             float whiteGauge = (float)Plugin.JobGauges.Get<RDMGauge>().WhiteMana;
@@ -121,7 +121,7 @@ namespace DelvUI.Interface.Jobs
             PluginConfigColor color = Config.BalanceBar.FillColor;
             int value = 0;
 
-            if (whiteGauge >= 80 && blackGauge >= 80)
+            if (whiteGauge >= 50 && blackGauge >= 50)
             {
                 value = 1;
             }
@@ -141,11 +141,11 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            BarUtilities.GetBar(Config.BalanceBar, value, 1, fillColor: color)
-                .Draw(origin);
+            BarHud bar = BarUtilities.GetBar(Config.BalanceBar, value, 1, 0, player, color);
+            AddDrawActions(bar.GetDrawActions(origin, Config.BalanceBar.StrataLevel));
         }
 
-        private void DrawWhiteManaBar(Vector2 origin)
+        private void DrawWhiteManaBar(Vector2 origin, IPlayerCharacter player)
         {
             byte mana = Plugin.JobGauges.Get<RDMGauge>().WhiteMana;
             if (Config.WhiteManaBar.HideWhenInactive && mana == 0)
@@ -153,12 +153,13 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            Config.WhiteManaBar.Label.SetText($"{mana}");
-            BarUtilities.GetProgressBar(Config.WhiteManaBar, mana, 100).
-                Draw(origin);
+            Config.WhiteManaBar.Label.SetValue(mana);
+
+            BarHud bar = BarUtilities.GetProgressBar(Config.WhiteManaBar, mana, 100, 0, player);
+            AddDrawActions(bar.GetDrawActions(origin, Config.WhiteManaBar.StrataLevel));
         }
 
-        private void DrawBlackManaBar(Vector2 origin)
+        private void DrawBlackManaBar(Vector2 origin, IPlayerCharacter player)
         {
             byte mana = Plugin.JobGauges.Get<RDMGauge>().BlackMana;
             if (Config.BlackManaBar.HideWhenInactive && mana == 0)
@@ -166,48 +167,58 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            Config.BlackManaBar.Label.SetText($"{mana}");
-            BarUtilities.GetProgressBar(Config.BlackManaBar, mana, 100).
-                Draw(origin);
+            Config.BlackManaBar.Label.SetValue(mana);
+
+            BarHud bar = BarUtilities.GetProgressBar(Config.BlackManaBar, mana, 100, 0, player);
+            AddDrawActions(bar.GetDrawActions(origin, Config.BlackManaBar.StrataLevel));
         }
 
-        private void DrawAccelerationBar(Vector2 origin, PlayerCharacter player)
+        private void DrawManaStacksBarBar(Vector2 origin, IPlayerCharacter player)
         {
-            byte stackCount = player.StatusList.FirstOrDefault(o => o.StatusId is 1238)?.StackCount ?? 0;
-
-            if (Config.AccelerationBar.HideWhenInactive && stackCount == 0)
+            byte manaStacks = Plugin.JobGauges.Get<RDMGauge>().ManaStacks;
+            if (Config.ManaStacksBar.HideWhenInactive && manaStacks == 0)
             {
                 return;
-            };
+            }
 
-            BarUtilities.GetChunkedBars(Config.AccelerationBar, 3, stackCount, 3f)
-                .Draw(origin);
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.ManaStacksBar, 3, manaStacks, 3f, 0, player);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.ManaStacksBar.StrataLevel));
+            }
         }
 
-        private void DrawDualCastBar(Vector2 origin, PlayerCharacter player)
+        private void DrawDualCastBar(Vector2 origin, IPlayerCharacter player)
         {
-            float duration = player.StatusList.FirstOrDefault(o => o.StatusId is 1249)?.RemainingTime ?? 0f;
+            float duration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1249)?.RemainingTime ?? 0f;
 
             if (Config.DualcastBar.HideWhenInactive && duration == 0)
             {
                 return;
             };
 
-            Config.DualcastBar.Label.SetText($"{(int)duration}");
-            BarUtilities.GetProgressBar(Config.DualcastBar, duration, 15f).
-                Draw(origin);
+            Config.DualcastBar.Label.SetValue(duration);
+
+            BarHud bar = BarUtilities.GetProgressBar(Config.DualcastBar, duration, 15f, 0, player);
+            AddDrawActions(bar.GetDrawActions(origin, Config.DualcastBar.StrataLevel));
         }
 
-        private void DrawVerstoneBar(Vector2 origin, PlayerCharacter player)
+        private void DrawVerstoneBar(Vector2 origin, IPlayerCharacter player)
         {
-            BarUtilities.GetProcBar(Config.VerstoneBar, player, 1235, 30)?
-                .Draw(origin);
+            BarHud? bar = BarUtilities.GetProcBar(Config.VerstoneBar, player, 1235, 30);
+            if (bar != null)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.VerstoneBar.StrataLevel));
+            }
         }
 
-        private void DrawVerfireBar(Vector2 origin, PlayerCharacter player)
+        private void DrawVerfireBar(Vector2 origin, IPlayerCharacter player)
         {
-            BarUtilities.GetProcBar(Config.VerfireBar, player, 1234, 30)?
-                .Draw(origin);
+            BarHud? bar = BarUtilities.GetProcBar(Config.VerfireBar, player, 1234, 30);
+            if (bar != null)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.VerfireBar.StrataLevel));
+            }
         }
     }
 
@@ -276,11 +287,11 @@ namespace DelvUI.Interface.Jobs
             threshold: 80
         );
 
-        [NestedConfig("Acceleration Bar", 45)]
-        public ChunkedBarConfig AccelerationBar = new ChunkedBarConfig(
+        [NestedConfig("Mana Stacks Bar", 45)]
+        public ChunkedBarConfig ManaStacksBar = new ChunkedBarConfig(
             new(0, -27),
             new(254, 10),
-            new PluginConfigColor(new(194f / 255f, 74f / 255f, 74f / 255f, 100f / 100f))
+            new PluginConfigColor(new(200f / 255f, 45f / 255f, 40f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Dualcast Bar", 50)]

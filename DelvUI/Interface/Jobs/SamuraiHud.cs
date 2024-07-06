@@ -67,7 +67,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             if (Config.KenkiBar.Enabled)
             {
@@ -91,7 +91,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.MeditationBar.Enabled)
             {
-                DrawMeditationBar(origin + Config.Position);
+                DrawMeditationBar(origin + Config.Position, player);
             }
 
             if (Config.HiganbanaBar.Enabled)
@@ -100,45 +100,57 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawKenkiBar(Vector2 pos, PlayerCharacter player)
+        private void DrawKenkiBar(Vector2 origin, IPlayerCharacter player)
         {
             SAMGauge gauge = Plugin.JobGauges.Get<SAMGauge>();
+
             if (!Config.KenkiBar.HideWhenInactive || gauge.Kenki > 0)
             {
-                Config.KenkiBar.Label.SetText(gauge.Kenki.ToString("N0"));
-                BarUtilities.GetProgressBar(Config.KenkiBar, gauge.Kenki, 100f, 0f, player).Draw(pos);
+                Config.KenkiBar.Label.SetValue(gauge.Kenki);
+
+                BarHud bar = BarUtilities.GetProgressBar(Config.KenkiBar, gauge.Kenki, 100f, 0f, player);
+                AddDrawActions(bar.GetDrawActions(origin, Config.KenkiBar.StrataLevel));
             }
         }
 
-        private void DrawShifuBar(Vector2 pos, PlayerCharacter player)
+        private void DrawShifuBar(Vector2 origin, IPlayerCharacter player)
         {
-            float shifuDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1299)?.RemainingTime ?? 0f;
+            float shifuDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1299)?.RemainingTime ?? 0f;
+
             if (!Config.ShifuBar.HideWhenInactive || shifuDuration > 0)
             {
-                Config.ShifuBar.Label.SetText(Math.Truncate(shifuDuration).ToString());
-                BarUtilities.GetProgressBar(Config.ShifuBar, shifuDuration, 40f, 0f, player).Draw(pos);
+                Config.ShifuBar.Label.SetValue(shifuDuration);
+
+                BarHud bar = BarUtilities.GetProgressBar(Config.ShifuBar, shifuDuration, 40f, 0f, player);
+                AddDrawActions(bar.GetDrawActions(origin, Config.ShifuBar.StrataLevel));
             }
         }
 
-        private void DrawJinpuBar(Vector2 pos, PlayerCharacter player)
+        private void DrawJinpuBar(Vector2 origin, IPlayerCharacter player)
         {
-            float jinpuDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1298)?.RemainingTime ?? 0f;
+            float jinpuDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1298)?.RemainingTime ?? 0f;
+
             if (!Config.JinpuBar.HideWhenInactive || jinpuDuration > 0)
             {
-                Config.JinpuBar.Label.SetText(Math.Truncate(jinpuDuration).ToString());
-                BarUtilities.GetProgressBar(Config.JinpuBar, jinpuDuration, 40f, 0f, player).Draw(pos);
+                Config.JinpuBar.Label.SetValue(jinpuDuration);
+
+                BarHud bar = BarUtilities.GetProgressBar(Config.JinpuBar, jinpuDuration, 40f, 0f, player);
+                AddDrawActions(bar.GetDrawActions(origin, Config.JinpuBar.StrataLevel));
             }
         }
 
-        private void DrawHiganbanaBar(Vector2 pos, PlayerCharacter player)
+        private void DrawHiganbanaBar(Vector2 origin, IPlayerCharacter player)
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            BarUtilities.GetDoTBar(Config.HiganbanaBar, player, target, HiganbanaIDs, HiganabaDurations)?.
-                Draw(pos);
+            BarHud? bar = BarUtilities.GetDoTBar(Config.HiganbanaBar, player, target, HiganbanaIDs, HiganabaDurations);
+            if (bar != null)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.HiganbanaBar.StrataLevel));
+            }
         }
 
-        private void DrawSenBar(Vector2 pos, PlayerCharacter player)
+        private void DrawSenBar(Vector2 origin, IPlayerCharacter player)
         {
             SAMGauge gauge = Plugin.JobGauges.Get<SAMGauge>();
             if (!Config.SenBar.HideWhenInactive || gauge.HasSetsu || gauge.HasGetsu || gauge.HasKa)
@@ -153,16 +165,24 @@ namespace DelvUI.Interface.Jobs
                     sen[i] = new Tuple<PluginConfigColor, float, LabelConfig?>(colors[order[i]], hasSen[order[i]], null);
                 }
 
-                BarUtilities.GetChunkedBars(Config.SenBar, sen, player).Draw(pos);
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.SenBar, sen, player);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.SenBar.StrataLevel));
+                }
             }
         }
 
-        private void DrawMeditationBar(Vector2 pos)
+        private void DrawMeditationBar(Vector2 origin, IPlayerCharacter player)
         {
             SAMGauge gauge = Plugin.JobGauges.Get<SAMGauge>();
             if (!Config.MeditationBar.HideWhenInactive || gauge.MeditationStacks > 0)
             {
-                BarUtilities.GetChunkedBars(Config.MeditationBar, 3, gauge.MeditationStacks, 3f).Draw(pos);
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.MeditationBar, 3, gauge.MeditationStacks, 3f, 0, player);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.MeditationBar.StrataLevel));
+                }
             }
         }
     }
@@ -190,14 +210,14 @@ namespace DelvUI.Interface.Jobs
             new PluginConfigColor(new Vector4(0, 0, 0, 0))
         );
 
-        [NestedConfig("Shifu Bar", 45)]
+        [NestedConfig("Fuka Bar", 45)]
         public ProgressBarConfig ShifuBar = new ProgressBarConfig(
             new(-64, -56),
             new(126, 20),
             new PluginConfigColor(new(219f / 255f, 211f / 255f, 136f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Jinpu Bar", 50)]
+        [NestedConfig("Fugetsu Bar", 50)]
         public ProgressBarConfig JinpuBar = new ProgressBarConfig(
             new(64, -56),
             new(126, 20),
@@ -221,7 +241,7 @@ namespace DelvUI.Interface.Jobs
             15f
         );
 
-        [NestedConfig("Meditation Bar", 65, separator = true)]
+        [NestedConfig("Meditation Bar", 65)]
         public ChunkedBarConfig MeditationBar = new ChunkedBarConfig(
             new(0, -5),
             new(254, 10),

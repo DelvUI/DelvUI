@@ -1,8 +1,9 @@
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
+using DelvUI.Config;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -10,201 +11,470 @@ namespace DelvUI.Helpers
 {
     public static class TextTagsHelper
     {
-        public static Dictionary<string, Func<GameObject?, string?, string>> TextTags = new Dictionary<string, Func<GameObject?, string?, string>>()
+        public static void Initialize()
         {
-            #region name
-            ["[name]"] = (actor, name) => ValidateName(actor, name).CheckForUpperCase(),
-
-            ["[name:first]"] = (actor, name) => ValidateName(actor, name).FirstName().CheckForUpperCase(),
-
-            ["[name:first-initial]"] = (actor, name) =>
+            foreach (string key in HealthTextTags.Keys)
             {
-                name = ValidateName(actor, name).FirstName().CheckForUpperCase();
-                return name.Length > 0 ? name[..1] : "";
-            },
+                CharaTextTags.Add(key, (chara) => HealthTextTags[key](chara.CurrentHp, chara.MaxHp));
+            }
 
-            ["[name:first-npcmedium]"] = (actor, name) =>
+            foreach (string key in ManaTextTags.Keys)
             {
-                name = ValidateName(actor, name);
-                return actor?.ObjectKind == ObjectKind.Player ?
-                    name.FirstName().CheckForUpperCase() :
-                    name.Truncate(15).CheckForUpperCase();
-            },
+                CharaTextTags.Add(key, (chara) => ManaTextTags[key](JobsHelper.CurrentPrimaryResource(chara), JobsHelper.MaxPrimaryResource(chara)));
+            }
+        }
 
-            ["[name:first-npclong]"] = (actor, name) =>
-            {
-                name = ValidateName(actor, name);
-                return actor?.ObjectKind == ObjectKind.Player ?
-                    name.FirstName().CheckForUpperCase() :
-                    name.Truncate(15).CheckForUpperCase();
-            },
+        public static Dictionary<string, Func<IGameObject?, string?, int, bool?, string>> TextTags = new Dictionary<string, Func<IGameObject?, string?, int, bool?, string>>()
+        {
+            #region generic names
+            ["[name]"] = (actor, name, length, isPlayerName) =>
+                ValidateName(actor, name).
+                Truncated(length).
+                CheckForUpperCase(),
 
-            ["[name:first-npcfull]"] = (actor, name) =>
-            {
-                name = ValidateName(actor, name);
-                return actor?.ObjectKind == ObjectKind.Player ?
-                    name.FirstName().CheckForUpperCase() :
-                    name.CheckForUpperCase();
-            },
+            ["[name:first]"] = (actor, name, length, isPlayerName) =>
+                ValidateName(actor, name).
+                FirstName().
+                Truncated(length).
+                CheckForUpperCase(),
 
-            ["[name:last]"] = (actor, name) => ValidateName(actor, name).LastName().CheckForUpperCase(),
+            ["[name:last]"] = (actor, name, length, isPlayerName) =>
+                ValidateName(actor, name).
+                LastName().
+                Truncated(length).
+                CheckForUpperCase(),
 
-            ["[name:last-initial]"] = (actor, name) =>
-            {
-                name = ValidateName(actor, name).LastName().CheckForUpperCase();
-                return name.Length > 0 ? name[..1] : "";
-            },
-
-            ["[name:initials]"] = (actor, name) => ValidateName(actor, name).Initials().CheckForUpperCase(),
-
-            ["[name:abbreviate]"] = (actor, name) => ValidateName(actor, name).Abbreviate().CheckForUpperCase(),
-
-            ["[name:veryshort]"] = (actor, name) => ValidateName(actor, name).Truncate(5).CheckForUpperCase(),
-
-            ["[name:short]"] = (actor, name) => ValidateName(actor, name).Truncate(10).CheckForUpperCase(),
-
-            ["[name:medium]"] = (actor, name) => ValidateName(actor, name).Truncate(15).CheckForUpperCase(),
-
-            ["[name:long]"] = (actor, name) => ValidateName(actor, name).Truncate(20).CheckForUpperCase(),
+            ["[name:initials]"] = (actor, name, length, isPlayerName) =>
+                ValidateName(actor, name).
+                Initials().
+                Truncated(length).
+                CheckForUpperCase(),
             #endregion
 
-            #region experience
-            ["[exp:current]"] = (actor, name) => ExperienceHelper.Instance.CurrentExp.ToString("N0", CultureInfo.InvariantCulture),
+            #region player names
+            ["[player_name]"] = (actor, name, length, isPlayerName) =>
+                ValidatePlayerName(actor, name, isPlayerName).
+                Truncated(length).
+                CheckForUpperCase(),
 
-            ["[exp:current-short]"] = (actor, name) => ExperienceHelper.Instance.CurrentExp.KiloFormat(),
+            ["[player_name:first]"] = (actor, name, length, isPlayerName) =>
+                ValidatePlayerName(actor, name, isPlayerName).
+                FirstName().
+                Truncated(length).
+                CheckForUpperCase(),
 
-            ["[exp:required]"] = (actor, name) => ExperienceHelper.Instance.RequiredExp.ToString("N0", CultureInfo.InvariantCulture),
+            ["[player_name:last]"] = (actor, name, length, isPlayerName) =>
+                ValidatePlayerName(actor, name, isPlayerName).
+                LastName().
+                Truncated(length).
+                CheckForUpperCase(),
 
-            ["[exp:required-short]"] = (actor, name) => ExperienceHelper.Instance.RequiredExp.KiloFormat(),
+            ["[player_name:initials]"] = (actor, name, length, isPlayerName) =>
+                ValidatePlayerName(actor, name, isPlayerName).
+                Initials().
+                Truncated(length).
+                CheckForUpperCase(),
+            #endregion
 
-            ["[exp:rested]"] = (actor, name) => ExperienceHelper.Instance.RestedExp.ToString("N0", CultureInfo.InvariantCulture),
+            #region npc names
+            ["[npc_name]"] = (actor, name, length, isPlayerName) =>
+                ValidateNPCName(actor, name, isPlayerName).
+                CheckForUpperCase(),
 
-            ["[exp:rested-short]"] = (actor, name) => ExperienceHelper.Instance.RestedExp.KiloFormat(),
+            ["[npc_name:first]"] = (actor, name, length, isPlayerName) =>
+                ValidateNPCName(actor, name, isPlayerName).
+                FirstName().
+                CheckForUpperCase(),
 
-            ["[exp:percent]"] = (actor, name) => ExperienceHelper.Instance.PercentExp.ToString("N1", CultureInfo.InvariantCulture),
+            ["[npc_name:last]"] = (actor, name, length, isPlayerName) =>
+                ValidateNPCName(actor, name, isPlayerName).
+                LastName().
+                CheckForUpperCase(),
+
+            ["[npc_name:initials]"] = (actor, name, length, isPlayerName) =>
+                ValidateNPCName(actor, name, isPlayerName).
+                Initials().
+                CheckForUpperCase(),
             #endregion
         };
 
-        public static Dictionary<string, Func<Character, string>> CharaTextTags = new Dictionary<string, Func<Character, string>>()
+        public static Dictionary<string, Func<IGameObject?, string?, string>> ExpTags = new Dictionary<string, Func<IGameObject?, string?, string>>()
+        {
+            #region experience
+            ["[exp:current]"] = (actor, name) => ExperienceHelper.Instance.CurrentExp.ToString(),
+
+            ["[exp:current-formatted]"] = (actor, name) => ExperienceHelper.Instance.CurrentExp.ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
+
+            ["[exp:current-short]"] = (actor, name) => ExperienceHelper.Instance.CurrentExp.KiloFormat(),
+
+            ["[exp:required]"] = (actor, name) => ExperienceHelper.Instance.RequiredExp.ToString(),
+
+            ["[exp:required-formatted]"] = (actor, name) => ExperienceHelper.Instance.RequiredExp.ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
+
+            ["[exp:required-short]"] = (actor, name) => ExperienceHelper.Instance.RequiredExp.KiloFormat(),
+
+            ["[exp:required-to-level]"] = (actor, name) => (ExperienceHelper.Instance.RequiredExp - ExperienceHelper.Instance.CurrentExp).ToString(),
+
+            ["[exp:required-to-level-formatted]"] = (actor, name) => (ExperienceHelper.Instance.RequiredExp - ExperienceHelper.Instance.CurrentExp).ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
+
+            ["[exp:required-to-level-short]"] = (actor, name) => (ExperienceHelper.Instance.RequiredExp - ExperienceHelper.Instance.CurrentExp).KiloFormat(),
+
+            ["[exp:rested]"] = (actor, name) => ExperienceHelper.Instance.RestedExp.ToString(),
+
+            ["[exp:rested-formatted]"] = (actor, name) => ExperienceHelper.Instance.RestedExp.ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
+
+            ["[exp:rested-short]"] = (actor, name) => ExperienceHelper.Instance.RestedExp.KiloFormat(),
+
+            ["[exp:percent]"] = (actor, name) => ExperienceHelper.Instance.PercentExp.ToString("N0"),
+
+            ["[exp:percent-decimal]"] = (actor, name) => ExperienceHelper.Instance.PercentExp.ToString("N1", ConfigurationManager.Instance.ActiveCultreInfo),
+            #endregion
+        };
+
+        public static Dictionary<string, Func<uint, uint, string>> HealthTextTags = new Dictionary<string, Func<uint, uint, string>>()
         {
             #region health
-            ["[health:current]"] = (chara) => chara.CurrentHp.ToString(),
+            ["[health:current]"] = (currentHp, maxHp) => currentHp.ToString(),
 
-            ["[health:current-short]"] = (chara) => chara.CurrentHp.KiloFormat(),
+            ["[health:current-formatted]"] = (currentHp, maxHp) => currentHp.ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
 
-            ["[health:current-percent]"] = (chara) =>
-                chara.CurrentHp == chara.MaxHp ?
-                    chara.CurrentHp.ToString() :
-                    (100f * chara.CurrentHp / Math.Max(1, chara.MaxHp)).ToString("N0"),
+            ["[health:current-short]"] = (currentHp, maxHp) => currentHp.KiloFormat(),
 
-            ["[health:current-percent-short]"] = (chara) =>
-                chara.CurrentHp == chara.MaxHp ?
-                    chara.CurrentHp.KiloFormat() :
-                    (100f * chara.CurrentHp / Math.Max(1, chara.MaxHp)).ToString("N0"),
+            ["[health:current-percent]"] = (currentHp, maxHp) => currentHp == maxHp ? currentHp.ToString() : (100f * currentHp / Math.Max(1, maxHp)).ToString("N0"),
 
-            ["[health:current-max]"] = (chara) => $"{chara.CurrentHp}  |  {chara.MaxHp}",
+            ["[health:current-percent-short]"] = (currentHp, maxHp) => currentHp == maxHp ? currentHp.KiloFormat() : (100f * currentHp / Math.Max(1, maxHp)).ToString("N0"),
 
-            ["[health:current-max-short]"] = (chara) => $"{chara.CurrentHp.KiloFormat()}  |  {chara.MaxHp.KiloFormat()}",
+            ["[health:max]"] = (currentHp, maxHp) => maxHp.ToString(),
 
-            ["[health:chara.max]"] = (chara) => chara.CurrentHp.ToString(),
+            ["[health:max-formatted]"] = (currentHp, maxHp) => maxHp.ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
 
-            ["[health:chara.max-short]"] = (chara) => chara.CurrentHp.KiloFormat(),
+            ["[health:max-short]"] = (currentHp, maxHp) => maxHp.KiloFormat(),
 
-            ["[health:percent]"] = (chara) => (100f * chara.CurrentHp / Math.Max(1, chara.MaxHp)).ToString("N0"),
+            ["[health:percent]"] = (currentHp, maxHp) => (100f * currentHp / Math.Max(1, maxHp)).ToString("N0"),
 
-            ["[health:percent-decimal]"] = (chara) => FormattableString.Invariant($"{100f * chara.CurrentHp / Math.Max(1f, chara.MaxHp):##0.#}"),
+            ["[health:percent-decimal]"] = (currentHp, maxHp) => (100f * currentHp / Math.Max(1f, maxHp)).ToString("N1", ConfigurationManager.Instance.ActiveCultreInfo),
 
-            ["[health:deficit]"] = (chara) => chara.CurrentHp == chara.MaxHp ? "0" : $"-{chara.MaxHp - chara.CurrentHp}",
+            ["[health:percent-decimal-uniform]"] = (currentHp, maxHp) => ConsistentDigitPercentage(currentHp, maxHp),
 
-            ["[health:deficit-short]"] = (chara) => chara.CurrentHp == chara.MaxHp ? "0" : $"-{(chara.MaxHp - chara.CurrentHp).KiloFormat()}",
+            ["[health:deficit]"] = (currentHp, maxHp) => currentHp == maxHp ? "0" : $"-{maxHp - currentHp}",
+
+            ["[health:deficit-formatted]"] = (currentHp, maxHp) => currentHp == maxHp ? "0" : "-" + (maxHp - currentHp).ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
+
+            ["[health:deficit-short]"] = (currentHp, maxHp) => currentHp == maxHp ? "0" : $"-{(maxHp - currentHp).KiloFormat()}",
             #endregion
+        };
 
+        public static Dictionary<string, Func<uint, uint, string>> ManaTextTags = new Dictionary<string, Func<uint, uint, string>>()
+        {
             #region mana
-            ["[mana:current]"] = (chara) => JobsHelper.CurrentPrimaryResource(chara).ToString(),
+            ["[mana:current]"] = (currentMp, maxMp) => currentMp.ToString(),
 
-            ["[mana:current-short]"] = (chara) => JobsHelper.CurrentPrimaryResource(chara).KiloFormat(),
+            ["[mana:current-formatted]"] = (currentMp, maxMp) => currentMp.ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
 
-            ["[mana:current-percent]"] = (chara) =>
-            {
-                uint mp = JobsHelper.CurrentPrimaryResource(chara);
-                uint max = JobsHelper.MaxPrimaryResource(chara);
-                return mp == max ? mp.ToString() : (100f * mp / Math.Max(1, max)).ToString("N0");
-            },
+            ["[mana:current-short]"] = (currentMp, maxMp) => currentMp.KiloFormat(),
 
-            ["[mana:current-percent-short]"] = (chara) =>
-            {
-                uint mp = JobsHelper.CurrentPrimaryResource(chara);
-                uint max = JobsHelper.MaxPrimaryResource(chara);
-                return mp == max ? mp.KiloFormat() : (100f * mp / Math.Max(1, max)).ToString("N0");
-            },
+            ["[mana:current-percent]"] = (currentMp, maxMp) => currentMp == maxMp ? currentMp.ToString() : (100f * currentMp / Math.Max(1, maxMp)).ToString("N0"),
 
-            ["[mana:current-max]"] = (chara) => $"{JobsHelper.CurrentPrimaryResource(chara)}  |  {JobsHelper.MaxPrimaryResource(chara)}",
+            ["[mana:current-percent-short]"] = (currentMp, maxMp) => currentMp == maxMp ? currentMp.KiloFormat() : (100f * currentMp / Math.Max(1, maxMp)).ToString("N0"),
 
-            ["[mana:current-max-short]"] = (chara) => $"{JobsHelper.CurrentPrimaryResource(chara).KiloFormat()}  |  {JobsHelper.MaxPrimaryResource(chara).KiloFormat()}",
+            ["[mana:max]"] = (currentMp, maxMp) => maxMp.ToString(),
 
-            ["[mana:max]"] = (chara) => JobsHelper.CurrentPrimaryResource(chara).ToString(),
+            ["[mana:max-formatted]"] = (currentMp, maxMp) => maxMp.ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
 
-            ["[mana:max-short]"] = (chara) => JobsHelper.CurrentPrimaryResource(chara).KiloFormat(),
+            ["[mana:max-short]"] = (currentMp, maxMp) => maxMp.KiloFormat(),
 
-            ["[mana:percent]"] = (chara) => (100f * JobsHelper.CurrentPrimaryResource(chara) / Math.Max(1, JobsHelper.MaxPrimaryResource(chara))).ToString("N0"),
+            ["[mana:percent]"] = (currentMp, maxMp) => (100f * currentMp / Math.Max(1, maxMp)).ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
 
-            ["[mana:percent-decimal]"] = (chara) => FormattableString.Invariant($"{100f * JobsHelper.CurrentPrimaryResource(chara) / Math.Max(1, JobsHelper.MaxPrimaryResource(chara)):##0.#}"),
+            ["[mana:percent-decimal]"] = (currentMp, maxMp) => (100f * currentMp / Math.Max(1, maxMp)).ToString("N1", ConfigurationManager.Instance.ActiveCultreInfo),
 
-            ["[mana:deficit]"] = (chara) =>
-            {
-                uint mp = JobsHelper.CurrentPrimaryResource(chara);
-                uint max = JobsHelper.MaxPrimaryResource(chara);
-                return mp == max ? "0" : $"-{mp - max}";
-            },
+            ["[mana:percent-decimal-uniform]"] = (currentMp, maxMp) => ConsistentDigitPercentage(currentMp, maxMp),
 
-            ["[mana:deficit-short]"] = (chara) =>
-            {
-                uint mp = JobsHelper.CurrentPrimaryResource(chara);
-                uint max = JobsHelper.MaxPrimaryResource(chara);
-                return mp == max ? "0" : $"-{(mp - max).KiloFormat()}";
-            },
+            ["[mana:deficit]"] = (currentMp, maxMp) => currentMp == maxMp ? "0" : $"-{maxMp - currentMp}",
+
+            ["[mana:deficit-formatted]"] = (currentMp, maxMp) => currentMp == maxMp ? "0" : "-" + (maxMp - currentMp).ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
+
+            ["[mana:deficit-short]"] = (currentMp, maxMp) => currentMp == maxMp ? "0" : $"-{(maxMp - currentMp).KiloFormat()}",
             #endregion
+        };
 
+        public static Dictionary<string, Func<ICharacter, string>> CharaTextTags = new Dictionary<string, Func<ICharacter, string>>()
+        {
             #region misc
             ["[distance]"] = (chara) => (chara.YalmDistanceX + 1).ToString(),
 
             ["[company]"] = (chara) => chara.CompanyTag.ToString(),
 
-            ["[level]"] = (chara) => chara.Level.ToString(),
+            ["[level]"] = (chara) => chara.Level > 0 ? chara.Level.ToString() : "-",
 
             ["[job]"] = (chara) => JobsHelper.JobNames.TryGetValue(chara.ClassJob.Id, out var jobName) ? jobName : "",
+
+            ["[job-full]"] = (chara) => JobsHelper.JobFullNames.TryGetValue(chara.ClassJob.Id, out var jobName) ? jobName : "",
+
+            ["[time-till-max-gp]"] = JobsHelper.TimeTillMaxGP,
+
+            ["[chocobo-time]"] = (chara) =>
+            {
+                unsafe
+                {
+                    if (chara is IBattleNpc npc && npc.BattleNpcKind == BattleNpcSubKind.Chocobo)
+                    {
+                        float seconds = UIState.Instance()->Buddy.CompanionInfo.TimeLeft;
+                        if (seconds <= 0)
+                        {
+                            return "";
+                        }
+
+                        TimeSpan time = TimeSpan.FromSeconds(seconds);
+                        return time.ToString(@"mm\:ss");
+                    }
+                }
+                return "";
+            }
             #endregion
         };
 
-        private static string ReplaceTagWithString(string tag, GameObject? actor, string? name = null)
+        public static Dictionary<string, Func<string, int, string>> TitleTextTags = new Dictionary<string, Func<string, int, string>>()
         {
-            if (TextTags.TryGetValue(tag, out Func<GameObject?, string?, string>? func) && func != null)
+            #region title
+            ["[title]"] = (title, length) => title.Truncated(length).CheckForUpperCase(),
+
+            ["[title:first]"] = (title, length) => title.FirstName().Truncated(length).CheckForUpperCase(),
+
+            ["[title:last]"] = (title, length) => title.LastName().Truncated(length).CheckForUpperCase(),
+
+            ["[title:initials]"] = (title, length) => title.Initials().Truncated(length).CheckForUpperCase(),
+            #endregion
+        };
+
+        private static List<Dictionary<string, Func<uint, uint, string>>> NumericValuesTagMaps = new List<Dictionary<string, Func<uint, uint, string>>>()
+        {
+            HealthTextTags,
+            ManaTextTags
+        };
+
+        private static string ReplaceTagWithString(
+            string tag,
+            IGameObject? actor,
+            string? name = null,
+            uint? current = null,
+            uint? max = null,
+            bool? isPlayerName = null,
+            string? title = null)
+        {
+            int length = 0;
+            ParseLength(ref tag, ref length);
+
+            if (TextTags.TryGetValue(tag, out Func<IGameObject?, string?, int, bool?, string>? func) && func != null)
             {
-                return func(actor, name);
+                return func(actor, name, length, isPlayerName);
             }
 
-            if (actor is Character chara &&
-                CharaTextTags.TryGetValue(tag, out Func<Character, string>? charaFunc) && charaFunc != null)
+            if (ExpTags.TryGetValue(tag, out Func<IGameObject?, string?, string>? expFunc) && expFunc != null)
+            {
+                return expFunc(actor, name);
+            }
+
+            if (actor is ICharacter chara &&
+                CharaTextTags.TryGetValue(tag, out Func<ICharacter, string>? charaFunc) && charaFunc != null)
             {
                 return charaFunc(chara);
+            }
+            else if (current.HasValue && max.HasValue)
+            {
+                foreach (var map in NumericValuesTagMaps)
+                {
+                    if (map.TryGetValue(tag, out Func<uint, uint, string>? numericFunc) && numericFunc != null)
+                    {
+                        return numericFunc(current.Value, max.Value);
+                    }
+                }
+            }
+
+            if (title != null &&
+                TitleTextTags.TryGetValue(tag, out Func<string, int, string>? titlefunc) && titlefunc != null)
+            {
+                return titlefunc(title, length);
             }
 
             return "";
         }
 
-        public static string FormattedText(string text, GameObject? actor, string? name = null)
+        public static string FormattedText(
+            string text,
+            IGameObject? actor,
+            string? name = null,
+            uint? current = null,
+            uint? max = null,
+            bool? isPlayerName = null,
+            string? title = null)
         {
-            MatchCollection matches = Regex.Matches(text, @"\[(.*?)\]");
-            return matches.Aggregate(text, (current, m) =>
+            bool isPlayer = (isPlayerName.HasValue && isPlayerName.Value == true) ||
+                            (actor != null && actor.ObjectKind == ObjectKind.Player);
+
+            try
             {
-                string formattedText = ReplaceTagWithString(m.Value, actor, name);
-                return current.Replace(m.Value, formattedText);
-            });
+                // grouping
+                List<string> groups = ParseGroups(text);
+                string result = "";
+
+                foreach (string group in groups)
+                {
+                    // tags
+                    string groupText = ParseGroup(group, isPlayer);
+
+                    MatchCollection matches = Regex.Matches(groupText, @"\[(.*?)\]");
+                    string formattedGroupText = matches.Aggregate(groupText, (c, m) =>
+                    {
+                        string formattedText = ReplaceTagWithString(m.Value, actor, name, current, max, isPlayerName, title);
+                        return c.Replace(m.Value, formattedText);
+                    });
+
+                    result += formattedGroupText;
+                }
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                Plugin.Logger.Error(e.Message);
+                return text;
+            }
         }
 
-        private static string ValidateName(GameObject? actor, string? name)
+        private static List<string> ParseGroups(string text)
         {
-            return actor != null ? actor.Name.ToString() : (name ?? "");
+            MatchCollection matches = Regex.Matches(text, @"\{(.*?)\}");
+            if (matches.Count == 0)
+            {
+                return new List<string>() { text };
+            }
+
+            List<string> result = new List<string>();
+            int index = 0;
+
+            foreach (Match match in matches)
+            {
+                if (index < match.Index)
+                {
+                    result.Add(text.Substring(0, match.Index - index));
+                }
+
+                result.Add(text.Substring(match.Index, match.Length));
+                index = match.Index + match.Length;
+            }
+
+            if (index < text.Length)
+            {
+                result.Add(text.Substring(index));
+            }
+
+            return result;
+        }
+
+        private static string ParseGroup(string text, bool isPlayer)
+        {
+            if (!text.Contains("="))
+            {
+                return text;
+            }
+
+            if (isPlayer)
+            {
+                if (text.StartsWith("{player="))
+                {
+                    text = text.Substring(8);
+                }
+                else
+                {
+                    return "";
+                }
+            }
+            else
+            {
+                if (text.StartsWith("{npc="))
+                {
+                    text = text.Substring(5);
+                }
+                else
+                {
+                    return "";
+                }
+            }
+
+            int groupEndIndex = text.IndexOf("}");
+            if (groupEndIndex > 0)
+            {
+                text = text.Remove(groupEndIndex, 1);
+            }
+
+            return text;
+        }
+
+        private static void ParseLength(ref string tag, ref int length)
+        {
+            int index = tag.IndexOf(".");
+            if (index != -1)
+            {
+                string lengthString = tag.Substring(index + 1);
+                lengthString = lengthString.Substring(0, lengthString.Length - 1);
+
+                try
+                {
+                    length = int.Parse(lengthString);
+                }
+                catch { }
+
+                tag = tag.Substring(0, tag.Length - lengthString.Length - 2) + "]";
+            }
+        }
+
+        private static string ValidateName(IGameObject? actor, string? name)
+        {
+            string? n = actor?.Name.ToString() ?? name;
+
+            // Detour for PetRenamer
+            try
+            {
+                string? customPetName = PetRenamerHelper.Instance.GetPetName(actor);
+                n = customPetName ?? n;
+            }
+            catch { }
+
+            return (n == null || n == "") ? "" : n;
+        }
+
+        private static string ValidatePlayerName(IGameObject? actor, string? name, bool? isPlayerName = null)
+        {
+            if (isPlayerName.HasValue && isPlayerName.Value == false)
+            {
+                return "";
+            }
+            else if (!isPlayerName.HasValue && actor?.ObjectKind != ObjectKind.Player)
+            {
+                return "";
+            }
+
+            return ValidateName(actor, name);
+        }
+
+        private static string ValidateNPCName(IGameObject? actor, string? name, bool? isPlayerName = null)
+        {
+            if (isPlayerName.HasValue && isPlayerName.Value == true)
+            {
+                return "";
+            }
+            else if (!isPlayerName.HasValue && actor?.ObjectKind == ObjectKind.Player)
+            {
+                return "";
+            }
+
+            return ValidateName(actor, name);
+        }
+
+        private static string ConsistentDigitPercentage(float currentVal, float maxVal)
+        {
+            var rawPercentage = 100f * currentVal / Math.Max(1f, maxVal);
+            return rawPercentage >= 100 || rawPercentage <= 0 ? rawPercentage.ToString("N0") : rawPercentage.ToString("N1");
         }
     }
 }

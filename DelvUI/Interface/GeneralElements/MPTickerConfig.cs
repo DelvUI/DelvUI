@@ -6,7 +6,7 @@ using System.Numerics;
 namespace DelvUI.Interface.GeneralElements
 {
     [DisableParentSettings("Position")]
-    [Section("Misc")]
+    [Section("Other Elements")]
     [SubSection("MP Ticker", 0)]
     public class MPTickerConfig : MovablePluginConfigObject
     {
@@ -29,6 +29,9 @@ namespace DelvUI.Interface.GeneralElements
             new PluginConfigColor(new(240f / 255f, 92f / 255f, 232f / 255f, 100f / 100f))
         );
 
+        [NestedConfig("Visibility", 70)]
+        public VisibilityConfig VisibilityConfig = new VisibilityConfig();
+
         public new static MPTickerConfig DefaultConfig()
         {
             var config = new MPTickerConfig();
@@ -39,6 +42,7 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
+    [Disableable(false)]
     [DisableParentSettings("HideWhenInactive")]
     [Exportable(false)]
     public class MPTickerBarConfig : BarConfig

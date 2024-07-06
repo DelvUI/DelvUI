@@ -1,4 +1,5 @@
 ﻿using DelvUI.Config;
+using DelvUI.Enums;
 using DelvUI.Interface;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Jobs;
@@ -89,35 +90,96 @@ namespace DelvUI.Helpers
         public static void DrawElements(
             Vector2 origin,
             HudHelper hudHelper,
-            List<DraggableHudElement> elements,
+            IList<DraggableHudElement> elements,
+            JobHud? jobHud,
+            DraggableHudElement? selectedElement)
+        {
+            foreach (DraggableHudElement element in elements)
+            {
+                if (!hudHelper.IsElementHidden(element))
+                {
+                    element.PrepareForDraw(origin);
+                }
+            }
+
+            jobHud?.PrepareForDraw(origin);
+
+            bool clip = ConfigurationManager.Instance?.LockHUD == true &&
+                ClipRectsHelper.Instance?.Enabled == true &&
+                ClipRectsHelper.Instance?.Mode == WindowClippingMode.Performance;
+
+            bool needsDraw = true;
+
+            if (clip)
+            {
+                ClipRect? clipRect = ClipRectsHelper.Instance?.GetClipRectForArea(Vector2.Zero, ImGui.GetMainViewport().Size);
+                if (clipRect.HasValue)
+                {
+                    needsDraw = false;
+
+                    ClipRect[] invertedClipRects = ClipRectsHelper.GetInvertedClipRects(clipRect.Value);
+                    for (int i = 0; i < invertedClipRects.Length; i++)
+                    {
+                        ImGui.PushClipRect(invertedClipRects[i].Min, invertedClipRects[i].Max, false);
+                        Draw(origin, hudHelper, elements, jobHud, selectedElement);
+                        ImGui.PopClipRect();
+                    }
+                }
+            }
+
+            if (needsDraw)
+            {
+                Draw(origin, hudHelper, elements, jobHud, selectedElement);
+            }
+        }
+
+        private static void Draw(
+            Vector2 origin,
+            HudHelper hudHelper,
+            IList<DraggableHudElement> elements,
             JobHud? jobHud,
             DraggableHudElement? selectedElement)
         {
             bool canTakeInput = true;
+            bool jobHudNeedsDraw = jobHud != null && jobHud != selectedElement && !hudHelper.IsElementHidden(jobHud);
 
             // selected
-            if (selectedElement != null && !hudHelper.IsElementHidden(selectedElement))
+            if (selectedElement != null)
             {
-                selectedElement.CanTakeInputForDrag = true;
-                selectedElement.Draw(origin);
-                canTakeInput = !selectedElement.NeedsInputForDrag;
+                if (!hudHelper.IsElementHidden(selectedElement))
+                {
+                    selectedElement.CanTakeInputForDrag = true;
+                    selectedElement.Draw(origin);
+                    canTakeInput = !selectedElement.NeedsInputForDrag;
+                }
+                else if (selectedElement is IHudElementWithMouseOver elementWithMouseOver)
+                {
+                    elementWithMouseOver.StopMouseover();
+                }
             }
 
             // all
             foreach (DraggableHudElement element in elements)
             {
-                if (element == selectedElement || hudHelper.IsElementHidden(element)) { continue; }
+                if (element == selectedElement) { continue; }
 
-                element.CanTakeInputForDrag = canTakeInput;
-                element.Draw(origin);
-                canTakeInput = !canTakeInput ? false : !element.NeedsInputForDrag;
-            }
+                if (jobHudNeedsDraw && jobHud != null && element.GetConfig().StrataLevel > jobHud.GetConfig().StrataLevel)
+                {
+                    jobHud.CanTakeInputForDrag = canTakeInput;
+                    jobHud.Draw(origin);
+                    jobHudNeedsDraw = false;
+                }
 
-            // job hud
-            if (jobHud != null && jobHud != selectedElement && !hudHelper.IsElementHidden(jobHud))
-            {
-                jobHud.CanTakeInputForDrag = canTakeInput;
-                jobHud.Draw(origin);
+                if (!hudHelper.IsElementHidden(element))
+                {
+                    element.CanTakeInputForDrag = canTakeInput;
+                    element.Draw(origin);
+                    canTakeInput = !canTakeInput ? false : !element.NeedsInputForDrag;
+                }
+                else if (element is IHudElementWithMouseOver elementWithMouseOver)
+                {
+                    elementWithMouseOver.StopMouseover();
+                }
             }
         }
 
@@ -129,7 +191,8 @@ namespace DelvUI.Helpers
                 | ImGuiWindowFlags.NoTitleBar
                 | ImGuiWindowFlags.NoResize
                 | ImGuiWindowFlags.NoBackground
-                | ImGuiWindowFlags.NoDecoration;
+                | ImGuiWindowFlags.NoDecoration
+                | ImGuiWindowFlags.NoSavedSettings;
 
             var margin = new Vector2(4, 0);
             var windowSize = ArrowSize + margin * 2;
@@ -190,48 +253,6 @@ namespace DelvUI.Helpers
                 new Vector2(position.X + size.X / 2f - arrowSize.X / 2f + 2, position.Y - arrowSize.Y + 1),
                 new Vector2(position.X + size.X / 2f - arrowSize.X / 2f + 2, position.Y + size.Y - 7)
             };
-        }
-
-        public static void DrawGridWindow()
-        {
-            var configManager = ConfigurationManager.Instance;
-            var node = configManager.GetConfigPageNode<GridConfig>();
-            if (node == null)
-            {
-                return;
-            }
-
-            GridConfig config = (GridConfig)node.ConfigObject;
-
-            ImGui.SetNextWindowSize(new Vector2(340, 300), ImGuiCond.Appearing);
-            ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(10f / 255f, 10f / 255f, 10f / 255f, 0.95f));
-
-            if (!ImGui.Begin("Grid", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse))
-            {
-                ImGui.End();
-                return;
-            }
-
-            ImGui.PushItemWidth(150);
-            var changed = false;
-            node.Draw(ref changed);
-
-            ImGui.SetCursorPos(new Vector2(8, 260));
-
-            if (ImGui.Button("Lock HUD", new Vector2(ImGui.GetWindowContentRegionWidth(), 30)))
-            {
-                changed = true;
-                config.Enabled = false;
-                configManager.LockHUD = true;
-            }
-
-            if (changed)
-            {
-                configManager.SaveConfigurations();
-            }
-
-            ImGui.End();
-            ImGui.PopStyleColor();
         }
     }
 }

@@ -1,20 +1,18 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
-using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Logging;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class LimitBreakHud : DraggableHudElement, IHudElementWithActor
+    public class LimitBreakHud : DraggableHudElement, IHudElementWithActor, IHudElementWithVisibilityConfig
     {
         private LimitBreakConfig Config => (LimitBreakConfig)_config;
+        public VisibilityConfig VisibilityConfig => Config.VisibilityConfig;
 
-        public GameObject? Actor { get; set; } = null;
+        public IGameObject? Actor { get; set; } = null;
 
         public LimitBreakHud(LimitBreakConfig config, string displayName) : base(config, displayName) { }
 
@@ -26,7 +24,7 @@ namespace DelvUI.Interface.GeneralElements
         public override void DrawChildren(Vector2 origin)
         {
             LimitBreakHelper helper = LimitBreakHelper.Instance;
-            
+
             Config.Label.SetText("");
 
             if (!Config.Enabled)
@@ -38,16 +36,19 @@ namespace DelvUI.Interface.GeneralElements
             {
                 return;
             }
-            
+
             int currentLimitBreak = helper.LimitBreakActive ? helper.LimitBreakBarWidth.Sum() : 0;
             int maxLimitBreak = helper.LimitBreakMaxLevel * helper.MaxLimitBarWidth;
             int limitBreakChunks = helper.LimitBreakActive ? helper.LimitBreakMaxLevel : 3;
-            
-            Config.Label.SetText($"{helper.LimitBreakLevel} / {limitBreakChunks}");
-            
-            BarUtilities.GetChunkedProgressBars(Config, limitBreakChunks, currentLimitBreak, maxLimitBreak).Draw(origin);
+
+            Config.Label.SetValue(helper.LimitBreakLevel / limitBreakChunks);
+
+            BarHud[] bars = BarUtilities.GetChunkedProgressBars(Config, limitBreakChunks, currentLimitBreak, maxLimitBreak);
+
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.StrataLevel));
+            }
         }
     }
-
-
 }

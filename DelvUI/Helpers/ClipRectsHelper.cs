@@ -1,9 +1,14 @@
-﻿using FFXIVClientStructs.FFXIV.Component.GUI;
+using DelvUI.Config;
+using DelvUI.Interface.GeneralElements;
+using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace DelvUI.Helpers
 {
@@ -12,6 +17,8 @@ namespace DelvUI.Helpers
         #region Singleton
         private ClipRectsHelper()
         {
+            ConfigurationManager.Instance.ResetEvent += OnConfigReset;
+            OnConfigReset(ConfigurationManager.Instance);
         }
 
         public static void Initialize() { Instance = new ClipRectsHelper(); }
@@ -36,127 +43,230 @@ namespace DelvUI.Helpers
                 return;
             }
 
+            ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
+
             Instance = null!;
         }
         #endregion
 
-        // these are ordered by priority, if 2 game windows are on top of a DelvUI element
-        // the one that comes first in this list is the one that will be clipped around
-        internal static string[] AddonNames = new string[]
+        private WindowClippingConfig _config = null!;
+
+        private void OnConfigReset(ConfigurationManager sender)
         {
-            "ContextMenu",
-            "ItemDetail", // tooltip
-            "ActionDetail", // tooltip
-            "AreaMap",
-            "JournalAccept",
-            "Talk",
-            "Teleport",
-            "ActionMenu",
-            "Character",
-            "ArmouryBoard",
-            "RecommendList",
-            "GearSetList",
-            "MiragePrismMiragePlate",
-            "ItemSearch",
-            "RetainerList",
-            "Bank",
-            "RetainerSellList",
-            "RetainerSell",
-            "Shop",
-            "ShopExchangeCurrency",
-            "ShopExchangeItem",
-            "CollectablesShop",
-            "MateriaAttach",
-            "Repair",
-            "Inventory",
-            "InventoryLarge",
-            "InventoryExpansion",
-            "InventoryEvent",
-            "InventoryBuddy",
-            "Buddy",
-            "Currency",
-            "Macro",
-            "PcSearchDetail",
-            "Social",
-            "SocialDetailA",
-            "SocialDetailB",
-            "LookingForGroup",
-            "Marker",
-            "FieldMarker",
-            "CountdownSettingDialog",
-            "CircleFinder",
-            "CircleList",
-            "Emote",
-            "FreeCompany",
-            "HousingMenu",
-            "HousingSubmenu",
-            "HousingSignBoard",
-            "CrossWorldLinkshell",
-            "ContactList",
-            "MonsterNote",
-            "RecipeNote",
-            "GatheringNote",
-            "ContentsNote",
-            "Orchestrion",
-            "MountNoteBook",
-            "MinionNoteBook",
-            "AetherCurrent",
-            "MountSpeed",
-            "FateProgress",
-            "SystemMenu",
-            "ConfigCharacter",
-            "ConfigSystem",
-            "ConfigKeybind",
-            "AOZNotebook",
-            "PvpProfile",
-            "GoldSaucerInfo",
-            "Achievement",
-            "RecommendList",
-            "JournalDetail",
-            "ContentsFinder",
-            "ContentsFinderSetting",
-            "ContentsInfo",
-            "Dawn",
-            "BeginnersMansionProblem",
-            "BeginnersMansionProblemCompList",
-            "SupportDesk",
-            "HowToList"
-        };
+            _config = sender.GetConfigObject<WindowClippingConfig>();
+        }
+
+        public bool Enabled => _config.Enabled;
+        public WindowClippingMode? Mode => _config.Enabled ? _config.Mode : null;
 
         private List<ClipRect> _clipRects = new List<ClipRect>();
+        private List<ClipRect> _extraClipRects = new List<ClipRect>();
+
+
+        private static List<string> _ignoredAddonNames = new List<string>()
+        {
+            "_FocusTargetInfo",
+        };
+
+        private readonly string[] _hotbarAddonNames = { "_ActionBar", "_ActionBar01", "_ActionBar02", "_ActionBar03", "_ActionBar04", "_ActionBar05", "_ActionBar06", "_ActionBar07", "_ActionBar08", "_ActionBar09" };
 
         public unsafe void Update()
         {
+            if (!_config.Enabled) { return; }
+
             _clipRects.Clear();
+            _extraClipRects.Clear();
 
-            foreach (string addonName in AddonNames)
+            AtkStage* stage = AtkStage.Instance();
+            if (stage == null) { return; }
+
+            RaptureAtkUnitManager* manager = stage->RaptureAtkUnitManager;
+            if (manager == null) { return; }
+
+            AtkUnitList* loadedUnitsList = &manager->AtkUnitManager.AllLoadedUnitsList;
+            if (loadedUnitsList == null) { return; }
+
+            for (int i = 0; i < loadedUnitsList->Count; i++)
             {
-                var addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName(addonName, 1);
-                if (addon == null || !addon->IsVisible || addon->WindowNode == null)
+                try
                 {
-                    continue;
+                    AtkUnitBase* addon = *(AtkUnitBase**)Unsafe.AsPointer(ref loadedUnitsList->Entries[i]);
+                    if (addon == null || !addon->IsVisible || addon->WindowNode == null || addon->Scale == 0)
+                    {
+                        continue;
+                    }
+
+                    string name = addon->NameString;
+                    if (_ignoredAddonNames.Contains(name))
+                    {
+                        continue;
+                    }
+
+                    float margin = 5 * addon->Scale;
+                    float bottomMargin = 13 * addon->Scale;
+
+                    Vector2 pos = new Vector2(addon->X + margin, addon->Y + margin);
+                    Vector2 size = new Vector2(
+                        addon->WindowNode->AtkResNode.Width * addon->Scale - margin,
+                        addon->WindowNode->AtkResNode.Height * addon->Scale - bottomMargin
+                    );
+
+                    // special case for duty finder
+                    if (name == "ContentsFinder")
+                    {
+                        size.X += size.X + (16 * addon->Scale);
+                        size.Y += (30 * addon->Scale);
+                    }
+
+                    // just in case this causes weird issues / crashes (doubt it though...)
+                    ClipRect clipRect = new ClipRect(pos, pos + size);
+                    if (clipRect.Max.X < clipRect.Min.X || clipRect.Max.Y < clipRect.Min.Y)
+                    {
+                        continue;
+                    }
+
+                    _clipRects.Add(clipRect);
                 }
+                catch { }
+            }
+        }
 
-                var margin = 5 * addon->Scale;
-                var bottomMargin = 13 * addon->Scale;
+        private List<ClipRect> ActiveClipRects()
+        {
+            List<ClipRect> rects = new List<ClipRect>();
+            rects.AddRange(_clipRects);
+            rects.AddRange(_extraClipRects);
 
-                var clipRect = new ClipRect(
-                    new Vector2(addon->X + margin, addon->Y + margin),
-                    new Vector2(
-                        addon->X + addon->WindowNode->AtkResNode.Width * addon->Scale - margin,
-                        addon->Y + addon->WindowNode->AtkResNode.Height * addon->Scale - bottomMargin
-                    )
+            return rects;
+        }
+
+        public void AddNameplatesClipRects()
+        {
+            if (!_config.NameplatesClipRectsEnabled) { return; }
+
+            // target cast bar
+            ClipRect? targetCastbarClipRect = GetTargetCastbarClipRect();
+            if (targetCastbarClipRect.HasValue)
+            {
+                _extraClipRects.Add(targetCastbarClipRect.Value);
+            }
+
+            // hotbars
+            _extraClipRects.AddRange(GetHotbarsClipRects());
+
+            // chat bubbles
+            _extraClipRects.AddRange(GetChatBubbleClipRect());
+        }
+
+        public void RemoveNameplatesClipRects()
+        {
+            _extraClipRects.Clear();
+        }
+
+        private unsafe ClipRect? GetTargetCastbarClipRect()
+        {
+            if (!_config.TargetCastbarClipRectEnabled) { return null; }
+
+            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_TargetInfoCastBar", 1);
+            if (addon == null || !addon->IsVisible) { return null; }
+
+            if (addon->UldManager.NodeListCount < 2) { return null; }
+
+            AtkResNode* baseNode = addon->UldManager.NodeList[1];
+            AtkResNode* imageNode = addon->UldManager.NodeList[2];
+
+            if (baseNode == null || !baseNode->IsVisible()) { return null; }
+            if (imageNode == null || !imageNode->IsVisible()) { return null; }
+
+            Vector2 pos = new Vector2(
+                addon->X + (baseNode->X * addon->Scale),
+                addon->Y + (baseNode->Y * addon->Scale)
+            );
+            Vector2 size = new Vector2(
+                imageNode->Width * addon->Scale,
+                imageNode->Height * addon->Scale
+            );
+
+            return new ClipRect(pos, pos + size);
+        }
+
+        private unsafe List<ClipRect> GetHotbarsClipRects()
+        {
+            List<ClipRect> rects = new List<ClipRect>();
+            if (!_config.HotbarsClipRectsEnabled) { return rects; }
+
+            foreach (string addonName in _hotbarAddonNames)
+            {
+                AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName(addonName, 1);
+                if (addon == null || !addon->IsVisible) { continue; }
+
+                if (addon->UldManager.NodeListCount < 20) { continue; }
+
+                AtkResNode* firstNode = addon->UldManager.NodeList[20];
+                AtkResNode* lastNode = addon->UldManager.NodeList[9];
+
+                if (firstNode == null || lastNode == null) { continue; }
+
+                float margin = 10f * addon->Scale;
+
+                Vector2 min = new Vector2(
+                    addon->X + (firstNode->X * addon->Scale) + margin,
+                    addon->Y + (firstNode->Y * addon->Scale) + margin
+                );
+                Vector2 max = new Vector2(
+                    addon->X + (lastNode->X * addon->Scale) + (lastNode->Width * addon->Scale) - margin,
+                    addon->Y + (lastNode->Y * addon->Scale) + (lastNode->Height * addon->Scale) - margin
                 );
 
-                _clipRects.Add(clipRect);
+                rects.Add(new ClipRect(min, max));
             }
+
+            return rects;
+        }
+
+        private unsafe List<ClipRect> GetChatBubbleClipRect()
+        {
+            List<ClipRect> rects = new List<ClipRect>();
+            if (!_config.ChatBubblesClipRectsEnabled) { return rects; }
+
+            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_MiniTalk", 1);
+            if (addon == null || !addon->IsVisible) { return rects; }
+            if (addon->UldManager.NodeListCount < 10) { return rects; }
+
+            for (int i = 1; i <= 10; i++)
+            {
+                AtkResNode* node = addon->UldManager.NodeList[i];
+                if (node == null || !node->IsVisible()) { continue; }
+
+                AtkComponentNode* component = node->GetAsAtkComponentNode();
+                if (component == null) { continue; }
+                if (component->Component->UldManager.NodeListCount < 1) { continue; }
+
+                AtkResNode* bubble = component->Component->UldManager.NodeList[1];
+                Vector2 pos = new Vector2(
+                    node->X + (bubble->X * addon->Scale),
+                    node->Y + (bubble->Y * addon->Scale)
+                );
+                Vector2 size = new Vector2(
+                    bubble->Width * addon->Scale,
+                    bubble->Height * addon->Scale
+                );
+
+                rects.Add(new ClipRect(pos, pos + size));
+            }
+
+            return rects;
         }
 
         public ClipRect? GetClipRectForArea(Vector2 pos, Vector2 size)
         {
-            foreach (ClipRect clipRect in _clipRects)
+            if (!_config.Enabled) { return null; }
+
+            List<ClipRect> rects = ActiveClipRects();
+
+            foreach (ClipRect clipRect in rects)
             {
-                var area = new ClipRect(pos, pos + size);
+                ClipRect area = new ClipRect(pos, pos + size);
                 if (clipRect.IntersectsWith(area))
                 {
                     return clipRect;
@@ -168,18 +278,18 @@ namespace DelvUI.Helpers
 
         public static ClipRect[] GetInvertedClipRects(ClipRect clipRect)
         {
-            var maxX = ImGui.GetMainViewport().Size.X;
-            var maxY = ImGui.GetMainViewport().Size.Y;
+            float maxX = ImGui.GetMainViewport().Size.X;
+            float maxY = ImGui.GetMainViewport().Size.Y;
 
-            var aboveMin = new Vector2(0, 0);
-            var aboveMax = new Vector2(maxX, clipRect.Min.Y);
-            var leftMin = new Vector2(0, clipRect.Min.Y);
-            var leftMax = new Vector2(clipRect.Min.X, maxY);
+            Vector2 aboveMin = new Vector2(0, 0);
+            Vector2 aboveMax = new Vector2(maxX, clipRect.Min.Y);
+            Vector2 leftMin = new Vector2(0, clipRect.Min.Y);
+            Vector2 leftMax = new Vector2(clipRect.Min.X, maxY);
 
-            var rightMin = new Vector2(clipRect.Max.X, clipRect.Min.Y);
-            var rightMax = new Vector2(maxX, clipRect.Max.Y);
-            var belowMin = new Vector2(clipRect.Min.X, clipRect.Max.Y);
-            var belowMax = new Vector2(maxX, maxY);
+            Vector2 rightMin = new Vector2(clipRect.Max.X, clipRect.Min.Y);
+            Vector2 rightMax = new Vector2(maxX, clipRect.Max.Y);
+            Vector2 belowMin = new Vector2(clipRect.Min.X, clipRect.Max.Y);
+            Vector2 belowMax = new Vector2(maxX, maxY);
 
             ClipRect[] invertedClipRects = new ClipRect[4];
             invertedClipRects[0] = new ClipRect(aboveMin, aboveMax);
@@ -188,6 +298,23 @@ namespace DelvUI.Helpers
             invertedClipRects[3] = new ClipRect(belowMin, belowMax);
 
             return invertedClipRects;
+        }
+
+        public bool IsPointClipped(Vector2 point)
+        {
+            if (!_config.Enabled) { return false; }
+
+            List<ClipRect> rects = ActiveClipRects();
+
+            foreach (ClipRect clipRect in rects)
+            {
+                if (clipRect.Contains(point))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 
@@ -200,12 +327,12 @@ namespace DelvUI.Helpers
 
         public ClipRect(Vector2 min, Vector2 max)
         {
-            var screenSize = ImGui.GetMainViewport().Size;
+            Vector2 screenSize = ImGui.GetMainViewport().Size;
 
             Min = Clamp(min, Vector2.Zero, screenSize);
             Max = Clamp(max, Vector2.Zero, screenSize);
 
-            var size = Max - Min;
+            Vector2 size = Max - Min;
 
             Rectangle = new Rectangle((int)Min.X, (int)Min.Y, (int)size.X, (int)size.Y);
         }

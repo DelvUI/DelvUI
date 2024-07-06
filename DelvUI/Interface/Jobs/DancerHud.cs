@@ -3,7 +3,6 @@ using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
-using DelvUI.GameStructs;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
@@ -71,28 +70,16 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.FountainBar.Position);
             }
 
-            if (Config.WindmillBar.Enabled)
-            {
-                positions.Add(Config.Position + Config.WindmillBar.Position);
-                sizes.Add(Config.WindmillBar.Position);
-            }
-
-            if (Config.ShowerBar.Enabled)
-            {
-                positions.Add(Config.Position + Config.ShowerBar.Position);
-                sizes.Add(Config.ShowerBar.Position);
-            }
-
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             Vector2 pos = origin + Config.Position;
 
             if (Config.EspritGauge.Enabled)
             {
-                DrawEspritBar(pos);
+                DrawEspritBar(pos, player);
             }
 
             if (Config.FeatherGauge.Enabled)
@@ -118,32 +105,34 @@ namespace DelvUI.Interface.Jobs
             bool showingStepBar = false;
             if (Config.StepsBar.Enabled)
             {
-                showingStepBar = DrawStepBar(pos);
+                showingStepBar = DrawStepBar(pos, player);
             }
 
             if (!showingStepBar || !Config.StepsBar.HideProcs)
             {
-                DrawProcBar(pos, player, Config.CascadeBar, 1814);
-                DrawProcBar(pos, player, Config.FountainBar, 1815);
-                DrawProcBar(pos, player, Config.WindmillBar, 1816);
-                DrawProcBar(pos, player, Config.ShowerBar, 1817);
+                if (Config.CascadeBar.Enabled) { DrawProcBar(pos, player, Config.CascadeBar, 2693, 3017); }
+                if (Config.FountainBar.Enabled) { DrawProcBar(pos, player, Config.FountainBar, 2694, 3018); }
             }
         }
 
-        private void DrawProcBar(Vector2 origin, PlayerCharacter player, DancerProcBarConfig config, uint statusId)
+        private void DrawProcBar(Vector2 origin, IPlayerCharacter player, DancerProcBarConfig config, params uint[] statusIDs)
         {
-            if (!config.Enabled)
+            List<float> durations = new List<float>();
+            for (int i = 0; i < statusIDs.Length; i++)
             {
-                return;
+                durations.Add(30f);
             }
 
-            BarUtilities.GetProcBar(config, player, statusId, 20f, !config.IgnoreBuffDuration)?.
-                Draw(origin);
+            BarHud? bar = BarUtilities.GetProcBar(config, player, statusIDs.ToList(), durations, !config.IgnoreBuffDuration);
+            if (bar != null)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, config.StrataLevel));
+            }
         }
 
-        private unsafe bool DrawStepBar(Vector2 origin)
+        private unsafe bool DrawStepBar(Vector2 origin, IPlayerCharacter player)
         {
-            var gauge = Plugin.JobGauges.Get<DNCGauge>();
+            DNCGauge gauge = Plugin.JobGauges.Get<DNCGauge>();
             if (!gauge.IsDancing)
             {
                 return false;
@@ -172,7 +161,7 @@ namespace DelvUI.Interface.Jobs
                     glows.Add(false);
                 }
 
-                PluginConfigColor color = new(Vector4.Zero);
+                PluginConfigColor color = PluginConfigColor.Empty;
 
                 switch (step)
                 {
@@ -205,78 +194,103 @@ namespace DelvUI.Interface.Jobs
                 }
             }
 
-            BarUtilities.GetChunkedBars(Config.StepsBar, chunks.ToArray(), null, Config.StepsBar.GlowConfig, glows.ToArray())
-                .Draw(origin);
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.StepsBar, chunks.ToArray(), player, Config.StepsBar.GlowConfig, glows.ToArray());
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.StepsBar.StrataLevel));
+            }
 
             return true;
         }
 
-        private void DrawEspritBar(Vector2 origin)
+        private void DrawEspritBar(Vector2 origin, IPlayerCharacter player)
         {
             DNCGauge gauge = Plugin.JobGauges.Get<DNCGauge>();
 
             if (Config.EspritGauge.HideWhenInactive && gauge.Esprit is 0) { return; }
 
-            Config.EspritGauge.Label.SetText($"{gauge.Esprit,0}");
-            BarUtilities.GetChunkedProgressBars(Config.EspritGauge, 2, gauge.Esprit, 100, 0f).Draw(origin);
+            Config.EspritGauge.Label.SetValue(gauge.Esprit);
+
+            BarHud[] bars = BarUtilities.GetChunkedProgressBars(Config.EspritGauge, 2, gauge.Esprit, 100, 0f, player);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.EspritGauge.StrataLevel));
+            }
         }
 
-        private void DrawFeathersBar(Vector2 origin, PlayerCharacter player)
+        private void DrawFeathersBar(Vector2 origin, IPlayerCharacter player)
         {
             DNCGauge gauge = Plugin.JobGauges.Get<DNCGauge>();
-            if (Config.FeatherGauge.HideWhenInactive && gauge.Feathers is 0)
+            bool hasFlourishingBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1820 or 2021) != null;
+            bool[]? glows = null;
+
+            if (Config.FeatherGauge.HideWhenInactive && gauge.Feathers is 0 && !hasFlourishingBuff)
             {
                 return;
             }
 
-            bool hasFlourishingBuff = false;
-            bool[]? glows = null;
-
             if (Config.FeatherGauge.GlowConfig.Enabled)
             {
-                hasFlourishingBuff = player.StatusList.FirstOrDefault(o => o.StatusId is 1820 or 2021) != null;
                 glows = new bool[] { hasFlourishingBuff, hasFlourishingBuff, hasFlourishingBuff, hasFlourishingBuff };
             }
 
             BarGlowConfig? config = hasFlourishingBuff ? Config.FeatherGauge.GlowConfig : null;
-            BarUtilities.GetChunkedBars(Config.FeatherGauge, 4, gauge.Feathers, 4, glowConfig: config, chunksToGlow: glows)
-                .Draw(origin);
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.FeatherGauge, 4, gauge.Feathers, 4, 0, player, glowConfig: config, chunksToGlow: glows);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.FeatherGauge.StrataLevel));
+            }
         }
 
-        private void DrawTechnicalBar(Vector2 origin, PlayerCharacter player)
+        private void DrawTechnicalBar(Vector2 origin, IPlayerCharacter player)
         {
-            IEnumerable<Status> devilmentBuff = player.StatusList.Where(o => o.StatusId is 1825 && o.SourceID == player.ObjectId);
+            IEnumerable<Status> devilmentBuff = Utils.StatusListForBattleChara(player).Where(o => o.StatusId is 1825 && o.SourceId == player.GameObjectId);
 
-            float technicalFinishDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1822 or 2050 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
+            float technicalFinishDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1822 or 2050 && o.SourceId == player.GameObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.TechnicalFinishBar.HideWhenInactive || technicalFinishDuration > 0)
             {
-                Config.TechnicalFinishBar.Label.SetText(Math.Abs(technicalFinishDuration).ToString("N0"));
-                BarUtilities.GetProgressBar(Config.TechnicalFinishBar, technicalFinishDuration, 20f, 0f, player).Draw(origin);
+                Config.TechnicalFinishBar.Label.SetValue(Math.Abs(technicalFinishDuration));
+
+                BarHud bar = BarUtilities.GetProgressBar(Config.TechnicalFinishBar, technicalFinishDuration, 20f, 0f, player);
+                AddDrawActions(bar.GetDrawActions(origin, Config.TechnicalFinishBar.StrataLevel));
             }
         }
 
-        private void DrawDevilmentBar(Vector2 origin, PlayerCharacter player)
+        private void DrawDevilmentBar(Vector2 origin, IPlayerCharacter player)
         {
-            float devilmentDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1825 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
+            float devilmentDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1825 && o.SourceId == player.GameObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.DevilmentBar.HideWhenInactive || devilmentDuration > 0)
             {
-                Config.DevilmentBar.Label.SetText(Math.Abs(devilmentDuration).ToString("N0"));
-                BarUtilities.GetProgressBar(Config.DevilmentBar, devilmentDuration, 20f, 0f, player).Draw(origin);
+                Config.DevilmentBar.Label.SetValue(Math.Abs(devilmentDuration));
+
+                BarHud bar = BarUtilities.GetProgressBar(Config.DevilmentBar, devilmentDuration, 20f, 0f, player);
+                AddDrawActions(bar.GetDrawActions(origin, Config.DevilmentBar.StrataLevel));
             }
         }
 
-        private void DrawStandardBar(Vector2 origin, PlayerCharacter player)
+        private void DrawStandardBar(Vector2 origin, IPlayerCharacter player)
         {
-            float standardFinishDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1821 or 2024 or 2105 or 2113 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
+            float standardFinishDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1821 or 2024 or 2105 or 2113 && o.SourceId == player.GameObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.StandardFinishBar.HideWhenInactive || standardFinishDuration > 0)
             {
-                Config.StandardFinishBar.Label.SetText(Math.Abs(standardFinishDuration).ToString("N0"));
-                BarUtilities.GetProgressBar(Config.StandardFinishBar, standardFinishDuration, 60f, 0f, player).Draw(origin);
+                Config.StandardFinishBar.Label.SetValue(Math.Abs(standardFinishDuration));
+
+                BarHud bar = BarUtilities.GetProgressBar(Config.StandardFinishBar, standardFinishDuration, 60f, 0f, player);
+                AddDrawActions(bar.GetDrawActions(origin, Config.StandardFinishBar.StrataLevel));
             }
         }
+    }
+
+    public enum DNCStep : uint
+    {
+        None = 15998,
+        Emboite = 15999,
+        Entrechat = 16000,
+        Jete = 16001,
+        Pirouette = 16002
     }
 
     [Section("Job Specific Bars")]
@@ -294,8 +308,6 @@ namespace DelvUI.Interface.Jobs
 
             config.CascadeBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
             config.FountainBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
-            config.WindmillBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
-            config.ShowerBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
 
             return config;
         }
@@ -336,32 +348,18 @@ namespace DelvUI.Interface.Jobs
             new PluginConfigColor(new Vector4(175f / 255f, 229f / 255f, 29f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Flourishing Cascade Bar", 60)]
+        [NestedConfig("Flourishing Symmetry Bar", 60)]
         public DancerProcBarConfig CascadeBar = new DancerProcBarConfig(
             new(-96, -83),
             new(62, 10),
             new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Flourishing Fountain Bar", 65)]
+        [NestedConfig("Flourishing Flow Bar", 65)]
         public DancerProcBarConfig FountainBar = new DancerProcBarConfig(
             new(-32, -83),
             new(62, 10),
             new(new Vector4(255f / 255f, 215f / 255f, 0f / 255f, 100f / 100f))
-        );
-
-        [NestedConfig("Flourishing Windmill Bar", 70)]
-        public DancerProcBarConfig WindmillBar = new DancerProcBarConfig(
-            new(32, -83),
-            new(62, 10),
-            new(new Vector4(0f / 255f, 215f / 255f, 215f / 255f, 100f / 100f))
-        );
-
-        [NestedConfig("Flourishing Shower Bar", 75)]
-        public DancerProcBarConfig ShowerBar = new DancerProcBarConfig(
-            new(96, -83),
-            new(62, 10),
-            new(new Vector4(255f / 255f, 100f / 255f, 0f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Steps Bar", 80)]
@@ -425,7 +423,7 @@ namespace DelvUI.Interface.Jobs
         public BarGlowConfig GlowConfig = new BarGlowConfig();
 
         public DancerStepsBarConfig(Vector2 position, Vector2 size)
-            : base(position, size, new(Vector4.Zero))
+            : base(position, size, PluginConfigColor.Empty)
         {
         }
     }

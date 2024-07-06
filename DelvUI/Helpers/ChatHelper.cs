@@ -132,6 +132,5 @@ namespace DelvUI.Helpers
         }
     }
 
-    public delegate IntPtr UiModuleDelegate(IntPtr baseUiPtr);
     public delegate IntPtr ChatDelegate(IntPtr uiModulePtr, IntPtr message, IntPtr unknown1, byte unknown2);
 }

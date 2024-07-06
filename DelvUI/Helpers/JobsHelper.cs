@@ -1,6 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace DelvUI.Helpers
 {
@@ -51,6 +50,29 @@ namespace DelvUI.Helpers
             return IsJobARole(jobId, JobRoles.Tank);
         }
 
+        public static bool IsJobWithCleanse(uint jobId, int level)
+        {
+            var isOnCleanseJob = _cleanseJobs.Contains(jobId);
+
+            if (jobId == JobIDs.BRD && level < 35)
+            {
+                isOnCleanseJob = false;
+            }
+
+            return isOnCleanseJob;
+        }
+
+        private static readonly List<uint> _cleanseJobs = new List<uint>()
+        {
+            JobIDs.CNJ,
+            JobIDs.WHM,
+            JobIDs.SCH,
+            JobIDs.AST,
+            JobIDs.SGE,
+            JobIDs.BRD,
+            JobIDs.BLU
+        };
+
         public static bool IsJobHealer(uint jobId)
         {
             return IsJobARole(jobId, JobRoles.Healer);
@@ -91,7 +113,30 @@ namespace DelvUI.Helpers
             return IsJobARole(jobId, JobRoles.Gatherer);
         }
 
-        public static uint CurrentPrimaryResource(Character? character)
+        public static bool IsJobWithRaise(uint jobId, uint level)
+        {
+            var isOnRaiseJob = _raiseJobs.Contains(jobId);
+
+            if ((jobId == JobIDs.RDM && level < 64) || level < 12)
+            {
+                isOnRaiseJob = false;
+            }
+
+            return isOnRaiseJob;
+        }
+
+        private static readonly List<uint> _raiseJobs = new List<uint>()
+        {
+            JobIDs.CNJ,
+            JobIDs.WHM,
+            JobIDs.SCH,
+            JobIDs.AST,
+            JobIDs.RDM,
+            JobIDs.SMN,
+            JobIDs.SGE
+        };
+
+        public static uint CurrentPrimaryResource(ICharacter? character)
         {
             if (character == null)
             {
@@ -113,7 +158,7 @@ namespace DelvUI.Helpers
             return character.CurrentMp;
         }
 
-        public static uint MaxPrimaryResource(Character? character)
+        public static uint MaxPrimaryResource(ICharacter? character)
         {
             if (character == null)
             {
@@ -135,9 +180,78 @@ namespace DelvUI.Helpers
             return character.MaxMp;
         }
 
+        public static uint GPResourceRate(ICharacter? character)
+        {
+            if (character == null)
+            {
+                return 0;
+            }
+
+            // Preferably I'd want to check the active traits because these traits are locked behind job quests, but no idea how to check traits.
+
+            // Level 83 Trait 239 (MIN), 240 (BTN), 241 (FSH)
+            if (character.Level >= 83)
+            {
+                return 8;
+            }
+
+            // Level 80 Trait 236 (MIN), 237 (BTN), 238 (FSH)
+            if (character.Level >= 80)
+            {
+                return 7;
+            }
+
+            // Level 70 Trait 192 (MIN), 193 (BTN), 194 (FSH)
+            if (character.Level >= 70)
+            {
+                return 6;
+            }
+
+            return 5;
+        }
+
+        public static string TimeTillMaxGP(ICharacter? character)
+        {
+            if (character == null)
+            {
+                return "";
+            }
+
+            uint jobId = character.ClassJob.Id;
+
+            if (!IsJobGatherer(jobId))
+            {
+                return "";
+            }
+
+            uint gpRate = GPResourceRate(character);
+
+            if (character.CurrentGp == character.MaxGp)
+            {
+                return "";
+            }
+
+            // Since I'm not using a stopwatch or anything like MPTickHelper here the time will only update every 3 seconds, would be nice if the time ticks down every second.
+            float gpPerSecond = gpRate / 3f;
+            float secondsTillMax = (character.MaxGp - character.CurrentGp) / gpPerSecond;
+
+            return $"{Utils.DurationToString(secondsTillMax)}";
+        }
+
         public static uint IconIDForJob(uint jobId)
         {
             return jobId + 62000;
+        }
+
+        public static uint IconIDForJob(uint jobId, uint style)
+        {
+            if (style < 2)
+            {
+                return IconIDForJob(jobId) + style * 100;
+            }
+
+            ColorizedIconIDs.TryGetValue(jobId, out var iconID);
+            return iconID;
         }
 
         public static uint RoleIconIDForJob(uint jobId, bool specificDPSIcons = false)
@@ -169,12 +283,12 @@ namespace DelvUI.Helpers
             return 0;
         }
 
-        public static uint RoleIconIDForBattleCompanion => 62039;
+        public static uint RoleIconIDForBattleCompanion => 62041;
 
         public static Dictionary<uint, JobRoles> JobRolesMap = new Dictionary<uint, JobRoles>()
         {
             // tanks
-            [JobIDs.GLD] = JobRoles.Tank,
+            [JobIDs.GLA] = JobRoles.Tank,
             [JobIDs.MRD] = JobRoles.Tank,
             [JobIDs.PLD] = JobRoles.Tank,
             [JobIDs.WAR] = JobRoles.Tank,
@@ -186,6 +300,7 @@ namespace DelvUI.Helpers
             [JobIDs.WHM] = JobRoles.Healer,
             [JobIDs.SCH] = JobRoles.Healer,
             [JobIDs.AST] = JobRoles.Healer,
+            [JobIDs.SGE] = JobRoles.Healer,
 
             // melee dps
             [JobIDs.PGL] = JobRoles.DPSMelee,
@@ -195,6 +310,8 @@ namespace DelvUI.Helpers
             [JobIDs.DRG] = JobRoles.DPSMelee,
             [JobIDs.NIN] = JobRoles.DPSMelee,
             [JobIDs.SAM] = JobRoles.DPSMelee,
+            [JobIDs.RPR] = JobRoles.DPSMelee,
+            [JobIDs.VPR] = JobRoles.DPSMelee,
 
             // ranged phys dps
             [JobIDs.ARC] = JobRoles.DPSRanged,
@@ -209,6 +326,7 @@ namespace DelvUI.Helpers
             [JobIDs.SMN] = JobRoles.DPSCaster,
             [JobIDs.RDM] = JobRoles.DPSCaster,
             [JobIDs.BLU] = JobRoles.DPSCaster,
+            [JobIDs.PCT] = JobRoles.DPSCaster,
 
             // crafters
             [JobIDs.CRP] = JobRoles.Crafter,
@@ -230,7 +348,7 @@ namespace DelvUI.Helpers
         {
             // tanks
             [JobRoles.Tank] = new List<uint>() {
-                JobIDs.GLD,
+                JobIDs.GLA,
                 JobIDs.MRD,
                 JobIDs.PLD,
                 JobIDs.WAR,
@@ -245,6 +363,7 @@ namespace DelvUI.Helpers
                 JobIDs.WHM,
                 JobIDs.SCH,
                 JobIDs.AST,
+                JobIDs.SGE
             },
 
             // melee dps
@@ -256,6 +375,8 @@ namespace DelvUI.Helpers
                 JobIDs.DRG,
                 JobIDs.NIN,
                 JobIDs.SAM,
+                JobIDs.RPR,
+                JobIDs.VPR
             },
 
             // ranged phys dps
@@ -276,6 +397,7 @@ namespace DelvUI.Helpers
                 JobIDs.SMN,
                 JobIDs.RDM,
                 JobIDs.BLU,
+                JobIDs.PCT
             },
 
             // crafters
@@ -306,7 +428,7 @@ namespace DelvUI.Helpers
         public static Dictionary<uint, string> JobNames = new Dictionary<uint, string>()
         {
             // tanks
-            [JobIDs.GLD] = "GLD",
+            [JobIDs.GLA] = "GLA",
             [JobIDs.MRD] = "MRD",
             [JobIDs.PLD] = "PLD",
             [JobIDs.WAR] = "WAR",
@@ -321,6 +443,8 @@ namespace DelvUI.Helpers
             [JobIDs.DRG] = "DRG",
             [JobIDs.NIN] = "NIN",
             [JobIDs.SAM] = "SAM",
+            [JobIDs.RPR] = "RPR",
+            [JobIDs.VPR] = "VPR",
 
             // ranged phys dps
             [JobIDs.ARC] = "ARC",
@@ -335,11 +459,13 @@ namespace DelvUI.Helpers
             [JobIDs.SMN] = "SMN",
             [JobIDs.RDM] = "RDM",
             [JobIDs.BLU] = "BLU",
+            [JobIDs.PCT] = "PCT",
 
             // healers
             [JobIDs.CNJ] = "CNJ",
             [JobIDs.WHM] = "WHM",
             [JobIDs.SCH] = "SCH",
+            [JobIDs.SGE] = "SGE",
             [JobIDs.AST] = "AST",
 
             // crafters
@@ -356,6 +482,65 @@ namespace DelvUI.Helpers
             [JobIDs.MIN] = "MIN",
             [JobIDs.BOT] = "BOT",
             [JobIDs.FSH] = "FSH",
+        };
+        
+        public static Dictionary<uint, string> JobFullNames = new Dictionary<uint, string>()
+        {
+            // tanks
+            [JobIDs.GLA] = "Gladiator",
+            [JobIDs.MRD] = "Marauder",
+            [JobIDs.PLD] = "Paladin",
+            [JobIDs.WAR] = "Warrior",
+            [JobIDs.DRK] = "Dark Knight",
+            [JobIDs.GNB] = "Gunbreaker",
+
+            // melee dps
+            [JobIDs.PGL] = "Pugilist",
+            [JobIDs.LNC] = "Lancer",
+            [JobIDs.ROG] = "Rogue",
+            [JobIDs.MNK] = "Monk",
+            [JobIDs.DRG] = "Dragoon",
+            [JobIDs.NIN] = "Ninja",
+            [JobIDs.SAM] = "Samurai",
+            [JobIDs.RPR] = "Reaper",
+            [JobIDs.VPR] = "Viper",
+
+            // ranged phys dps
+            [JobIDs.ARC] = "Archer",
+            [JobIDs.BRD] = "Bard",
+            [JobIDs.MCH] = "Machinist",
+            [JobIDs.DNC] = "Dancer",
+
+            // ranged magic dps
+            [JobIDs.THM] = "Thaumaturge",
+            [JobIDs.ACN] = "Arcanist",
+            [JobIDs.BLM] = "Black Mage",
+            [JobIDs.SMN] = "Summoner",
+            [JobIDs.RDM] = "Red Mage",
+            [JobIDs.BLU] = "Blue Mage",
+            [JobIDs.PCT] = "Pictomancer",
+
+            // healers
+            [JobIDs.CNJ] = "Conjurer",
+            [JobIDs.WHM] = "White Mage",
+            [JobIDs.SCH] = "Scholar",
+            [JobIDs.SGE] = "Sage",
+            [JobIDs.AST] = "Astrologian",
+
+            // crafters
+            [JobIDs.CRP] = "Carpenter",
+            [JobIDs.BSM] = "Blacksmith",
+            [JobIDs.ARM] = "Armorer",
+            [JobIDs.GSM] = "Goldsmith",
+            [JobIDs.LTW] = "Leatherworker",
+            [JobIDs.WVR] = "Weaver",
+            [JobIDs.ALC] = "Alchemist",
+            [JobIDs.CUL] = "Culinarian",
+
+            // gatherers
+            [JobIDs.MIN] = "Miner",
+            [JobIDs.BOT] = "Botanist",
+            [JobIDs.FSH] = "Fisher",
         };
 
         public static Dictionary<JobRoles, string> RoleNames = new Dictionary<JobRoles, string>()
@@ -380,6 +565,8 @@ namespace DelvUI.Helpers
             [JobIDs.DRG] = 62584,
             [JobIDs.NIN] = 62584,
             [JobIDs.SAM] = 62584,
+            [JobIDs.RPR] = 62584,
+            [JobIDs.VPR] = 62584,
 
             // ranged phys dps
             [JobIDs.ARC] = 62586,
@@ -393,7 +580,67 @@ namespace DelvUI.Helpers
             [JobIDs.BLM] = 62587,
             [JobIDs.SMN] = 62587,
             [JobIDs.RDM] = 62587,
-            [JobIDs.BLU] = 62587
+            [JobIDs.BLU] = 62587,
+            [JobIDs.PCT] = 62587
+        };
+
+        public static Dictionary<uint, uint> ColorizedIconIDs = new Dictionary<uint, uint>()
+        {
+            // tanks
+            [JobIDs.GLA] = 94022,
+            [JobIDs.MRD] = 94024,
+            [JobIDs.PLD] = 94079,
+            [JobIDs.WAR] = 94081,
+            [JobIDs.DRK] = 94123,
+            [JobIDs.GNB] = 94130,
+
+            // melee dps
+            [JobIDs.PGL] = 92523,
+            [JobIDs.LNC] = 92525,
+            [JobIDs.ROG] = 92621,
+            [JobIDs.MNK] = 92580,
+            [JobIDs.DRG] = 92582,
+            [JobIDs.NIN] = 92622,
+            [JobIDs.SAM] = 92627,
+            [JobIDs.RPR] = 92632,
+            [JobIDs.VPR] = 92685,
+
+            // ranged phys dps
+            [JobIDs.ARC] = 92526,
+            [JobIDs.BRD] = 92583,
+            [JobIDs.MCH] = 92625,
+            [JobIDs.DNC] = 92631,
+
+            // ranged magic dps
+            [JobIDs.THM] = 92529,
+            [JobIDs.ACN] = 92530,
+            [JobIDs.BLM] = 92585,
+            [JobIDs.SMN] = 92586,
+            [JobIDs.RDM] = 92628,
+            [JobIDs.BLU] = 92629,
+            [JobIDs.PCT] = 92686,
+
+            // healers
+            [JobIDs.CNJ] = 94528,
+            [JobIDs.WHM] = 94584,
+            [JobIDs.SCH] = 94587,
+            [JobIDs.SGE] = 94633,
+            [JobIDs.AST] = 94624,
+
+            // crafters
+            [JobIDs.CRP] = 91031,
+            [JobIDs.BSM] = 91032,
+            [JobIDs.ARM] = 91033,
+            [JobIDs.GSM] = 91034,
+            [JobIDs.LTW] = 91034,
+            [JobIDs.WVR] = 91036,
+            [JobIDs.ALC] = 91037,
+            [JobIDs.CUL] = 91038,
+
+            // gatherers
+            [JobIDs.MIN] = 91039,
+            [JobIDs.BOT] = 91039,
+            [JobIDs.FSH] = 91041,
         };
 
         public static Dictionary<JobRoles, PrimaryResourceTypes> PrimaryResourceTypesByRole = new Dictionary<JobRoles, PrimaryResourceTypes>()
@@ -411,7 +658,7 @@ namespace DelvUI.Helpers
 
     public static class JobIDs
     {
-        public const uint GLD = 1;
+        public const uint GLA = 1;
         public const uint MRD = 3;
         public const uint PLD = 19;
         public const uint WAR = 21;
@@ -422,6 +669,7 @@ namespace DelvUI.Helpers
         public const uint WHM = 24;
         public const uint SCH = 28;
         public const uint AST = 33;
+        public const uint SGE = 40;
 
         public const uint PGL = 2;
         public const uint LNC = 4;
@@ -430,6 +678,8 @@ namespace DelvUI.Helpers
         public const uint DRG = 22;
         public const uint NIN = 30;
         public const uint SAM = 34;
+        public const uint RPR = 39;
+        public const uint VPR = 41;
 
         public const uint ARC = 5;
         public const uint BRD = 23;
@@ -442,6 +692,7 @@ namespace DelvUI.Helpers
         public const uint SMN = 27;
         public const uint RDM = 35;
         public const uint BLU = 36;
+        public const uint PCT = 42;
 
         public const uint CRP = 8;
         public const uint BSM = 9;

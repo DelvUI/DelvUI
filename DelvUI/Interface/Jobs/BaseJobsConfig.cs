@@ -13,14 +13,9 @@ namespace DelvUI.Interface.Jobs
         }
     }
 
-    public class BlueMageConfig : BaseJobsConfig
-    {
-        [JsonIgnore] public override uint JobId => JobIDs.BLU;
-    }
-
     public class GladiatorConfig : BaseJobsConfig
     {
-        [JsonIgnore] public override uint JobId => JobIDs.GLD;
+        [JsonIgnore] public override uint JobId => JobIDs.GLA;
     }
 
     public class MarauderConfig : BaseJobsConfig

@@ -34,42 +34,41 @@ namespace DelvUI.Helpers
 
         private readonly unsafe ActionManager* _actionManager;
 
-        public unsafe SpellHelper() 
-        { 
-            _actionManager = ActionManager.Instance(); 
+        public unsafe SpellHelper()
+        {
+            _actionManager = ActionManager.Instance();
         }
 
         public unsafe uint GetSpellActionId(uint actionId) => _actionManager->GetAdjustedActionId(actionId);
 
-        public unsafe float GetRecastTimeElapsed(uint actionId) => _actionManager->GetRecastTimeElapsed(ActionType.Spell, GetSpellActionId(actionId));
+        public unsafe float GetRecastTimeElapsed(uint actionId) => _actionManager->GetRecastTimeElapsed(ActionType.Action, GetSpellActionId(actionId));
+        public unsafe float GetRealRecastTimeElapsed(uint actionId) => _actionManager->GetRecastTimeElapsed(ActionType.Action, actionId);
 
-        public unsafe float GetRecastTime(uint actionId) => _actionManager->GetRecastTime(ActionType.Spell, GetSpellActionId(actionId));
+        public unsafe float GetRecastTime(uint actionId) => _actionManager->GetRecastTime(ActionType.Action, GetSpellActionId(actionId));
+        public unsafe float GetRealRecastTime(uint actionId) => _actionManager->GetRecastTime(ActionType.Action, actionId);
+        
+        public unsafe uint GetLastUsedActionId() => _actionManager->Combo.Action;
 
         public float GetSpellCooldown(uint actionId) => Math.Abs(GetRecastTime(GetSpellActionId(actionId)) - GetRecastTimeElapsed(GetSpellActionId(actionId)));
+        public float GetRealSpellCooldown(uint actionId) => Math.Abs(GetRealRecastTime(actionId) - GetRealRecastTimeElapsed(actionId));
 
         public int GetSpellCooldownInt(uint actionId)
         {
-            if ((int)Math.Ceiling(GetSpellCooldown(actionId) % GetRecastTime(actionId)) <= 0)
-            {
-                return 0;
-            }
-
-            return (int)Math.Ceiling(GetSpellCooldown(actionId) % GetRecastTime(actionId));
+            int cooldown = (int)Math.Ceiling(GetSpellCooldown(actionId) % GetRecastTime(actionId));
+            return Math.Max(0, cooldown);
         }
 
         public int GetStackCount(int maxStacks, uint actionId)
         {
-            if (GetSpellCooldownInt(actionId) == 0 || GetSpellCooldownInt(actionId) < 0)
+            int cooldown = GetSpellCooldownInt(actionId);
+            float recastTime = GetRecastTime(actionId);
+
+            if (cooldown <= 0 || recastTime == 0)
             {
                 return maxStacks;
             }
 
-            return maxStacks - (int)Math.Ceiling(GetSpellCooldownInt(actionId) / (GetRecastTime(actionId) / maxStacks));
+            return maxStacks - (int)Math.Ceiling(cooldown / (recastTime / maxStacks));
         }
-
-        /*public unsafe uint CheckActionResources(uint ActionID)
-        {
-            return _actionManager->CheckActionResources(ActionType.Spell, ActionID);
-        }*/
     }
 }

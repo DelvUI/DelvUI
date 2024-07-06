@@ -1,5 +1,6 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -18,8 +19,20 @@ namespace DelvUI.Interface.GeneralElements
         [Order(6, collapseWith = nameof(UseGlobalHudShift))]
         public Vector2 HudOffset = new(0, 0);
 
-        [Checkbox("Mouseover", separator = true)]
+        [Checkbox("Dim DelvUI's settings window when not focused")]
         [Order(10)]
+        public bool DimConfigWindow = false;
+
+        [Checkbox("Automatically disable HUD elements preview", help = "If enabled, all HUD elements preview modes are disabled when DelvUI's setting window is closed.")]
+        [Order(11)]
+        public bool AutomaticPreviewDisabling = true;
+
+        [Checkbox("Use DelvUI style", help = "If enabled, DelvUI will use its own style for the setting window instead of the general Dalamud style.")]
+        [Order(12)]
+        public bool OverrideDalamudStyle = true;
+
+        [Checkbox("Mouseover", separator = true)]
+        [Order(15)]
         public bool MouseoverEnabled = true;
 
         [Checkbox("Automatic Mode", help =
@@ -27,49 +40,78 @@ namespace DelvUI.Interface.GeneralElements
             "Mouseover macros or other mouseover plugins are not necessary and WON'T WORK in this mode!\n\n" +
             "When disabled: DelvUI unit frames will behave like the game's ones.\n" +
             "You'll need to use mouseover macros or other mouseover related plugins in this mode.")]
-        [Order(11, collapseWith = nameof(MouseoverEnabled))]
+        [Order(16, collapseWith = nameof(MouseoverEnabled))]
         public bool MouseoverAutomaticMode = true;
 
-        [Checkbox("Hide DelvUI outside of combat", separator = true, help = "Show in Duty-option available once enabed.")]
-        [Order(20)]
-        public bool HideOutsideOfCombat = false;
-
-        [Checkbox("Show in duty")]
-        [Order(21, collapseWith = nameof(HideOutsideOfCombat))]
-        public bool ShowInDuty = false;
-
-        [Checkbox("Hide DelvUI in Gold Saucer")]
-        [Order(25)]
-        public bool HideInGoldSaucer = false;
-
-        [Checkbox("Hide only JobPack HUD outside of combat")]
-        [Order(30)]
-        public bool HideOnlyJobPackHudOutsideOfCombat = false;
-
-        [Checkbox("Hide Default Job Gauges", isMonitored = true, spacing = true)]
-        [Order(35)]
+        [Checkbox("Hide Default Job Gauges", isMonitored = true, separator = true)]
+        [Order(40)]
         public bool HideDefaultJobGauges = false;
 
         [Checkbox("Hide Default Castbar", isMonitored = true)]
-        [Order(40)]
+        [Order(45)]
         public bool HideDefaultCastbar = false;
 
         [Checkbox("Hide Default Pulltimer", isMonitored = true)]
-        [Order(45)]
+        [Order(50)]
         public bool HideDefaultPulltimer = false;
 
-        [Checkbox("Enable Combat Hotbars", isMonitored = true, separator = true)]
-        [Order(50)]
-        public bool EnableCombatActionBars = false;
+        [Checkbox("Use Regional Number Format", help = "When enabled, DelvUI will use your system's regional format settings when showing numbers.\nWhen disabled, DelvUI will use English number formatting instead.", separator = true)]
+        [Order(60)]
+        public bool UseRegionalNumberFormats = true;
 
-        [DynamicList("Hotbars Shown Only In Combat", "Hotbar 1", "Hotbar 2", "Hotbar 3", "Hotbar 4", "Hotbar 5", "Hotbar 6", "Hotbar 7", "Hotbar 8", "Hotbar 9", "Hotbar 10", isMonitored = true)]
-        [Order(81, collapseWith = nameof(EnableCombatActionBars))]
-        public List<string> CombatActionBars = new List<string>();
+        public new static HUDOptionsConfig DefaultConfig() => new();
+    }
 
-        public Vector2 CastBarOriginalPosition;
-        public Vector2 PulltimerOriginalPosition;
-        public Dictionary<string, Vector2> JobGaugeOriginalPosition = new Dictionary<string, Vector2>();
+    public class HUDOptionsConfigConverter : PluginConfigObjectConverter
+    {
+        public HUDOptionsConfigConverter()
+        {
+            Func<Vector2, Vector2[]> func = (value) =>
+            {
+                Vector2[] array = new Vector2[4];
+                for (int i = 0; i < 4; i++)
+                {
+                    array[i] = value;
+                }
 
-        public new static HUDOptionsConfig DefaultConfig() { return new HUDOptionsConfig(); }
+                return array;
+            };
+
+            TypeToClassFieldConverter<Vector2, Vector2[]> castBar = new TypeToClassFieldConverter<Vector2, Vector2[]>(
+                "CastBarOriginalPositions",
+                new Vector2[] { Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero },
+                func
+            );
+
+            TypeToClassFieldConverter<Vector2, Vector2[]> pullTimer = new TypeToClassFieldConverter<Vector2, Vector2[]>(
+                "PulltimerOriginalPositions",
+                new Vector2[] { Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero },
+                func
+            );
+
+            NewClassFieldConverter<Dictionary<string, Vector2>, Dictionary<string, Vector2>[]> jobGauge =
+                new NewClassFieldConverter<Dictionary<string, Vector2>, Dictionary<string, Vector2>[]>(
+                    "JobGaugeOriginalPositions",
+                    new Dictionary<string, Vector2>[] { new(), new(), new(), new() },
+                    (oldValue) =>
+                    {
+                        Dictionary<string, Vector2>[] array = new Dictionary<string, Vector2>[4];
+                        for (int i = 0; i < 4; i++)
+                        {
+                            array[i] = oldValue;
+                        }
+
+                        return array;
+                    });
+
+            FieldConvertersMap.Add("CastBarOriginalPosition", castBar);
+            FieldConvertersMap.Add("PulltimerOriginalPosition", pullTimer);
+            FieldConvertersMap.Add("JobGaugeOriginalPosition", jobGauge);
+        }
+
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(HUDOptionsConfig);
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Interface;
+using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Interface.Bars;
@@ -7,10 +8,14 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [Section("Misc")]
+    [Section("Other Elements")]
     [SubSection("Experience Bar", 0)]
     public class ExperienceBarConfig : BarConfig
     {
+        [Checkbox("Hide When Downsynced")]
+        [Order(44, collapseWith = nameof(HideWhenInactive))]
+        public bool HideWhenDownsynced = false;
+
         [Checkbox("Use Job Color")]
         [Order(45)]
         public bool UseJobColor = false;
@@ -26,8 +31,14 @@ namespace DelvUI.Interface.GeneralElements
         [NestedConfig("Left Text", 60)]
         public EditableLabelConfig LeftLabel;
 
-        [NestedConfig("Right Text", 65)]
+        [NestedConfig("Right Text", 61)]
         public EditableLabelConfig RightLabel;
+
+        [NestedConfig("Sanctuary Icon", 62)]
+        public IconLabelConfig SanctuaryLabel = new IconLabelConfig(new Vector2(5, 0), FontAwesomeIcon.Moon, DrawAnchor.Right, DrawAnchor.Left);
+
+        [NestedConfig("Visibility", 70)]
+        public VisibilityConfig VisibilityConfig = new VisibilityConfig();
 
         public ExperienceBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
         {

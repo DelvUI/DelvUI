@@ -46,10 +46,16 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.BioBar.Size);
             }
 
+            if (Config.SacredSoilBar.Enabled)
+            {
+                positions.Add(Config.Position + Config.SacredSoilBar.Position);
+                sizes.Add(Config.SacredSoilBar.Size);
+            }
+
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             Vector2 pos = origin + Config.Position;
 
@@ -60,27 +66,36 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.FairyGaugeBar.Enabled)
             {
-                DrawFairyGaugeBar(pos);
+                DrawFairyGaugeBar(pos, player);
             }
 
             if (Config.AetherflowBar.Enabled)
             {
                 DrawAetherBar(pos, player);
             }
+
+            if (Config.SacredSoilBar.Enabled)
+            {
+                DrawSacredSoilBar(pos, player);
+            }
         }
 
-        private void DrawBioBar(Vector2 origin, PlayerCharacter player)
+        private void DrawBioBar(Vector2 origin, IPlayerCharacter player)
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            BarUtilities.GetDoTBar(Config.BioBar, player, target, BioDoTIDs, BioDoTDurations)?.
-                Draw(origin);
+            BarHud? bar = BarUtilities.GetDoTBar(Config.BioBar, player, target, BioDoTIDs, BioDoTDurations);
+            if (bar != null)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.BioBar.StrataLevel));
+            }
         }
 
-        private void DrawFairyGaugeBar(Vector2 origin)
+        private unsafe void DrawFairyGaugeBar(Vector2 origin, IPlayerCharacter player)
         {
-            byte fairyGauge = Plugin.JobGauges.Get<SCHGauge>().FairyGauge;
-            short seraphDuration = Math.Abs(Plugin.JobGauges.Get<SCHGauge>().SeraphTimer);
+            SCHGauge gauge = Plugin.JobGauges.Get<SCHGauge>();
+            byte fairyGauge = gauge.FairyGauge;
+            float seraphDuration = gauge.SeraphTimer;
 
             if (Config.FairyGaugeBar.HideWhenInactive && fairyGauge == 0 && (seraphDuration == 0 || !Config.FairyGaugeBar.ShowSeraph))
             {
@@ -89,29 +104,47 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.FairyGaugeBar.ShowSeraph && seraphDuration > 0)
             {
-                Config.FairyGaugeBar.Label.SetText($"{seraphDuration / 1000}");
-                BarUtilities.GetProgressBar(Config.FairyGaugeBar, seraphDuration, 22000, fillColor: Config.FairyGaugeBar.SeraphColor).
-                    Draw(origin);
+                Config.FairyGaugeBar.Label.SetValue(seraphDuration / 1000);
+
+                BarHud bar = BarUtilities.GetProgressBar(Config.FairyGaugeBar, seraphDuration / 1000, 22, 0, player, Config.FairyGaugeBar.SeraphColor);
+                AddDrawActions(bar.GetDrawActions(origin, Config.FairyGaugeBar.StrataLevel));
             }
             else
             {
-                Config.FairyGaugeBar.Label.SetText($"{fairyGauge}");
-                BarUtilities.GetProgressBar(Config.FairyGaugeBar, fairyGauge, 100).
-                    Draw(origin);
+                Config.FairyGaugeBar.Label.SetValue(fairyGauge);
+
+                BarHud bar = BarUtilities.GetProgressBar(Config.FairyGaugeBar, fairyGauge, 100, 0, player);
+                AddDrawActions(bar.GetDrawActions(origin, Config.FairyGaugeBar.StrataLevel));
             }
         }
 
-        private void DrawAetherBar(Vector2 origin, PlayerCharacter player)
+        private void DrawAetherBar(Vector2 origin, IPlayerCharacter player)
         {
-            byte stackCount = player.StatusList.FirstOrDefault(o => o.StatusId is 304)?.StackCount ?? 0;
+            byte stackCount = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 304)?.StackCount ?? 0;
 
             if (Config.AetherflowBar.HideWhenInactive && stackCount == 0)
             {
                 return;
             };
 
-            BarUtilities.GetChunkedBars(Config.AetherflowBar, 3, stackCount, 3)
-                .Draw(origin);
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.AetherflowBar, 3, stackCount, 3, 0, player);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.AetherflowBar.StrataLevel));
+            }
+        }
+
+        private void DrawSacredSoilBar(Vector2 origin, IPlayerCharacter player)
+        {
+            float sacredSoilDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 298 or 1944 && o.SourceId == player.GameObjectId)?.RemainingTime ?? 0f;
+
+            if (!Config.SacredSoilBar.HideWhenInactive || sacredSoilDuration > 0)
+            {
+                Config.SacredSoilBar.Label.SetValue(sacredSoilDuration);
+
+                BarHud bar = BarUtilities.GetProgressBar(Config.SacredSoilBar, sacredSoilDuration, 15f, 0f, player);
+                AddDrawActions(bar.GetDrawActions(origin, Config.SacredSoilBar.StrataLevel));
+            }
         }
     }
 
@@ -147,6 +180,13 @@ namespace DelvUI.Interface.Jobs
             new(0, -54),
             new(254, 20),
             new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f))
+        );
+
+        [NestedConfig("Sacred Soil Bar", 45)]
+        public ProgressBarConfig SacredSoilBar = new ProgressBarConfig(
+            new(-0, -76),
+            new(254, 20),
+            new PluginConfigColor(new(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f))
         );
     }
 

@@ -2,9 +2,9 @@ using Dalamud.Logging;
 using DelvUI.Config.Attributes;
 using DelvUI.Config.Profiles;
 using DelvUI.Helpers;
+using DelvUI.Interface;
 using ImGuiNET;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,6 +17,9 @@ namespace DelvUI.Config.Tree
     public class ConfigPageNode : SubSectionNode
     {
         private PluginConfigObject _configObject = null!;
+        private List<ConfigNode>? _drawList = null;
+        private Dictionary<string, ConfigPageNode> _nestedConfigPageNodes = null!;
+
         public PluginConfigObject ConfigObject
         {
             get => _configObject;
@@ -28,16 +31,10 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        private bool _hasSeparator = true;
-        private bool _hasSpacing = false;
-
-        private int _nodeDepth = 0;
-        private FieldInfo? _parentCollapseField = null;
-        private PluginConfigObject? _parentConfigObject = null;
-
-        private List<KeyValuePair<int, object>>? _drawList = null;
-
-        private Dictionary<string, ConfigPageNode> _nestedConfigPageNodes = null!;
+        public override List<T> GetObjects<T>()
+        {
+            return _configObject.GetObjects<T>();
+        }
 
         private void GenerateNestedConfigPageNodes()
         {
@@ -60,6 +57,7 @@ namespace DelvUI.Config.Tree
                     {
                         continue;
                     }
+
                     ConfigPageNode configPageNode = new();
                     configPageNode.ConfigObject = nestedConfig;
                     configPageNode.Name = nestedConfigAttribute.friendlyName;
@@ -108,153 +106,93 @@ namespace DelvUI.Config.Tree
             // Only do this stuff the first time the config page is loaded
             if (_drawList is null)
             {
-                GenerateDrawList(ID);
+                _drawList = GenerateDrawList();
             }
 
-            foreach (KeyValuePair<int, object> pair in _drawList!)
+            if (_drawList is not null)
             {
-                if (pair.Value is FieldNode fieldNode)
+                foreach (var fieldNode in _drawList)
                 {
-                    fieldNode.Draw(ref changed);
+                    didReset |= fieldNode.Draw(ref changed);
                 }
-                else if (pair.Value is ConfigPageNode node)
-                {
-                    // If the parent checkbox of this nested config is disabled, don't draw this nestedconfig
-                    if (node._parentCollapseField is not null && node._parentConfigObject is not null)
-                    {
-                        if (!(Attribute.IsDefined(node._parentCollapseField, typeof(CheckboxAttribute)) &&
-                            (node._parentCollapseField.GetValue(node._parentConfigObject) as bool? ?? false)))
-                        {
-                            continue;
-                        }
-                    }
-
-                    ImGui.BeginGroup();
-                    if (node._hasSeparator)
-                    {
-                        ImGuiHelper.DrawSeparator(1, 1);
-                    }
-                    if (node._hasSpacing)
-                    {
-                        ImGuiHelper.DrawSpacing(1);
-                    }
-
-                    node.DrawWithID(ref changed, node.Name);
-                    ImGui.EndGroup();
-                }
-            }
-
-            // if the ConfigPageNode requires any manual drawing (i.e. not dictated by attributes), draw it now
-            foreach (MethodInfo method in ConfigObject.GetType().GetMethods())
-            {
-                if (!method.GetCustomAttributes(typeof(ManualDrawAttribute), false).Any())
-                {
-                    continue;
-                }
-
-                object[] args = new object[] { false };
-                bool? result = (bool?)method.Invoke(ConfigObject, args);
-
-                bool arg = (bool)args[0];
-                changed |= arg;
-                didReset |= (result.HasValue && result.Value);
             }
 
             didReset |= DrawPortableSection();
 
+            ImGui.NewLine(); // fixes some long pages getting cut off
+
             return didReset;
         }
 
-        private void GenerateDrawList(string? ID = null)
+        private List<ConfigNode> GenerateDrawList(string? ID = null)
         {
-            _drawList = new List<KeyValuePair<int, object>>();
-            FieldInfo[] fields = ConfigObject.GetType().GetFields();
-            List<FieldNode> collapseWithList = new();
+            Dictionary<string, ConfigNode> fieldMap = new Dictionary<string, ConfigNode>();
 
-            foreach (FieldInfo field in fields)
+            FieldInfo[] fields = ConfigObject.GetType().GetFields();
+            foreach (var field in fields)
             {
-                bool wasAdded = false;
+                if (ConfigObject.DisableParentSettings != null && ConfigObject.DisableParentSettings.Contains(field.Name))
+                {
+                    continue;
+                }
 
                 foreach (object attribute in field.GetCustomAttributes(true))
                 {
-                    if (ConfigObject.DisableParentSettings != null && ConfigObject.DisableParentSettings.Contains(field.Name))
+                    if (attribute is NestedConfigAttribute nestedConfigAttribute && _nestedConfigPageNodes.TryGetValue(field.Name, out ConfigPageNode? node))
                     {
-                        continue;
-                    }
-                    if (attribute is OrderAttribute orderAttribute)
-                    {
-                        FieldNode fieldNode = new FieldNode(field, ConfigObject, ID);
-
-                        // By default the 'Enabled' checkbox (inherited from PluginConfigObject) is considered the parent of all config items,
-                        // so if the ConfigObject is marked as undisableable, we bypass adding items as children *only* if their parent was the 'Enabled' field.
-                        if (orderAttribute.collapseWith is null || (!ConfigObject.Disableable && orderAttribute.collapseWith.Equals("Enabled")))
+                        var newNodes = node.GenerateDrawList(node.Name);
+                        foreach (var newNode in newNodes)
                         {
-                            fieldNode.Depth = _nodeDepth;
-                            _drawList.Add(new KeyValuePair<int, object>(orderAttribute.pos, fieldNode));
+                            newNode.Position = nestedConfigAttribute.pos;
+                            newNode.Separator = nestedConfigAttribute.separator;
+                            newNode.Spacing = nestedConfigAttribute.spacing;
+                            newNode.ParentName = nestedConfigAttribute.collapseWith;
+                            newNode.Nest = nestedConfigAttribute.nest;
+                            newNode.CollapsingHeader = nestedConfigAttribute.collapsingHeader;
+                            fieldMap.Add($"{node.Name}_{newNode.Name}", newNode);
                         }
-                        else
-                        {
-                            collapseWithList.Add(fieldNode);
-                        }
-
-                        wasAdded = true;
                     }
-                    else if (attribute is NestedConfigAttribute nestedConfigAttribute && _nestedConfigPageNodes.TryGetValue(field.Name, out ConfigPageNode? node))
+                    else if (attribute is OrderAttribute orderAttribute)
                     {
-                        node._hasSeparator = nestedConfigAttribute.separator;
-                        node._hasSpacing = nestedConfigAttribute.spacing;
-                        if (nestedConfigAttribute.collapseWith is not null)
-                        {
-                            if (nestedConfigAttribute.nest)
-                            {
-                                node._nodeDepth = _nodeDepth + 1;
-                            }
-
-                            node._parentCollapseField = fields.Where(f => f.Name.Equals(nestedConfigAttribute.collapseWith)).FirstOrDefault();
-                            node._parentConfigObject = ConfigObject;
-                        }
-
-                        _drawList.Add(new KeyValuePair<int, object>(nestedConfigAttribute.pos, node));
-                        wasAdded = true;
+                        var fieldNode = new FieldNode(field, ConfigObject, ID);
+                        fieldNode.Position = orderAttribute.pos;
+                        fieldNode.ParentName = orderAttribute.collapseWith;
+                        fieldMap.Add(field.Name, fieldNode);
                     }
-                }
-
-                if (!wasAdded && Attribute.IsDefined(field, typeof(ConfigAttribute), true))
-                {
-                    if (ConfigObject.DisableParentSettings != null && ConfigObject.DisableParentSettings.Contains(field.Name))
-                    {
-                        continue;
-                    }
-                    _drawList.Add(new KeyValuePair<int, object>(int.MaxValue, new FieldNode(field, ConfigObject, ID)));
                 }
             }
 
-            // Loop through nodes that should have a parent and build those relationships
-            foreach (FieldNode fieldNode in collapseWithList)
+            var manualDrawMethods = ConfigObject.GetType().GetMethods().Where(m => Attribute.IsDefined(m, typeof(ManualDrawAttribute), false));
+            foreach (var method in manualDrawMethods)
             {
-                OrderAttribute? orderAttribute = fieldNode.MainField.GetCustomAttributes(false).Where(a => a is OrderAttribute).FirstOrDefault() as OrderAttribute;
-                if (orderAttribute is not null && orderAttribute.collapseWith is not null)
-                {
-                    // The CategoryField for the parent could either be in the drawList (if it is the root) or the collapseWithList (if there is multi-layered nesting)
-                    // Create a union of the CategoryFields that already exist in the drawList and the collapseWithList, then search for the parent field.
-                    // This looks incredibly gross but it's probably the cleanest way to do it without an extremely heavy refactor of the code above.
-                    FieldNode? parentFieldNode = _drawList
-                        .Where(kvp => kvp.Value is FieldNode)
-                        .Select(kvp => kvp.Value as FieldNode)
-                        .Union(collapseWithList)
-                        .Where(categoryField => categoryField is not null && orderAttribute.collapseWith.Equals(categoryField.MainField.Name))
-                        .FirstOrDefault();
+                string id = $"ManualDraw##{method.GetHashCode()}";
+                fieldMap.Add(id, new ManualDrawNode(method, ConfigObject, id));
+            }
 
-                    if (parentFieldNode is not null)
+            foreach (var configNode in fieldMap.Values)
+            {
+                if (configNode.ParentName is not null &&
+                    fieldMap.TryGetValue(configNode.ParentName, out ConfigNode? parentNode))
+                {
+                    if (!ConfigObject.Disableable &&
+                        parentNode.Name.Equals("Enabled") &&
+                        parentNode.ID is null)
+                    {
+                        continue;
+                    }
+
+                    if (parentNode is FieldNode parentFieldNode)
                     {
                         parentFieldNode.CollapseControl = true;
-                        fieldNode.Depth = parentFieldNode.Depth + 1;
-                        parentFieldNode.AddChild(orderAttribute.pos, fieldNode);
+                        parentFieldNode.AddChild(configNode.Position, configNode);
                     }
                 }
             }
 
-            _drawList.Sort((x, y) => x.Key - y.Key);
+            var fieldNodes = fieldMap.Values.ToList();
+            fieldNodes.RemoveAll(f => f.IsChild);
+            fieldNodes.Sort((x, y) => x.Position - y.Position);
+            return fieldNodes;
         }
 
         private bool DrawPortableSection()
@@ -270,7 +208,8 @@ namespace DelvUI.Config.Tree
 
             ImGui.BeginGroup();
 
-            ImGui.SetCursorPos(new Vector2(ImGui.GetWindowContentRegionWidth() / 2f - buttonWidth - 5, ImGui.GetCursorPosY()));
+            float width = ImGui.GetWindowContentRegionMax().X - ImGui.GetWindowContentRegionMin().X;
+            ImGui.SetCursorPos(new Vector2(width / 2f - buttonWidth - 5, ImGui.GetCursorPosY()));
 
             if (ImGui.Button("Export", new Vector2(120, 24)))
             {
@@ -300,48 +239,61 @@ namespace DelvUI.Config.Tree
 
             string finalPath = path + ".json";
 
-            File.WriteAllText(
-                finalPath,
-                JsonConvert.SerializeObject(
-                    ConfigObject,
-                    Formatting.Indented,
-                    new JsonSerializerSettings { TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple, TypeNameHandling = TypeNameHandling.Objects }
-                )
-            );
+            try
+            {
+                File.WriteAllText(
+                    finalPath,
+                    JsonConvert.SerializeObject(
+                        ConfigObject,
+                        Formatting.Indented,
+                        new JsonSerializerSettings { TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple, TypeNameHandling = TypeNameHandling.Objects }
+                    )
+                );
+            }
+            catch (Exception e)
+            {
+                Plugin.Logger.Error("Error when saving config object: " + e.Message);
+            }
         }
 
         public override void Load(string path)
         {
+            if (ConfigObject is not PluginConfigObject) { return; }
 
             FileInfo finalPath = new(path + ".json");
-
-            if (!finalPath.Exists)
-            {
-                return;
-            }
 
             // Use reflection to call the LoadForType method, this allows us to specify a type at runtime.
             // While in general use this is important as the conversion from the superclass 'PluginConfigObject' to a specific subclass (e.g. 'BlackMageHudConfig') would
             // be handled by Json.NET, when the plugin is reloaded with a different assembly (as is the case when using LivePluginLoader, or updating the plugin in-game)
             // it fails. In order to fix this we need to specify the specific subclass, in order to do this during runtime we must use reflection to set the generic.
-            if (ConfigObject is PluginConfigObject)
-            {
-                MethodInfo? methodInfo = GetType().GetMethod("LoadForType");
-                MethodInfo? function = methodInfo?.MakeGenericMethod(ConfigObject.GetType());
-                ConfigObject = (PluginConfigObject)function?.Invoke(this, new object[] { finalPath.FullName })!;
-            }
-        }
+            MethodInfo? methodInfo = ConfigObject.GetType().GetMethod("Load");
+            MethodInfo? function = methodInfo?.MakeGenericMethod(ConfigObject.GetType());
 
-        public T? LoadForType<T>(string path) where T : PluginConfigObject
-        {
-            FileInfo file = new(path);
+            object?[] args = new object?[] { finalPath };
+            PluginConfigObject? config = (PluginConfigObject?)function?.Invoke(ConfigObject, args);
 
-            return JsonConvert.DeserializeObject<T>(File.ReadAllText(file.FullName));
+            ConfigObject = config ?? ConfigObject;
         }
 
         public override void Reset()
         {
-            ConfigObject = ConfigurationManager.GetDefaultConfigObjectForType(ConfigObject.GetType());
+            Type type = ConfigObject.GetType();
+            ImportData? importData = ProfilesManager.Instance?.DefaultImportData(type);
+
+            if (importData == null)
+            {
+                Plugin.Logger.Error("Error finding default import data for type " + type.ToString());
+                return;
+            }
+
+            PluginConfigObject? config = importData.GetObject();
+            if (config == null)
+            {
+                Plugin.Logger.Error("Error importing default import data for type " + type.ToString());
+                return;
+            }
+
+            ConfigObject = config;
         }
 
         public override ConfigPageNode? GetOrAddConfig<T>() => this;

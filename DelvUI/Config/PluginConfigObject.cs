@@ -3,6 +3,8 @@ using DelvUI.Enums;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Numerics;
 using System.Reflection;
 
@@ -56,13 +58,13 @@ namespace DelvUI.Config
                 return attribute == null || attribute.disableable;
             }
         }
-        
+
         [JsonIgnore]
         public string[]? DisableParentSettings
         {
             get
             {
-                DisableParentSettingsAttribute? attribute = (DisableParentSettingsAttribute?)GetType().GetCustomAttribute(typeof(DisableParentSettingsAttribute), false);
+                DisableParentSettingsAttribute? attribute = (DisableParentSettingsAttribute?)GetType().GetCustomAttribute(typeof(DisableParentSettingsAttribute), true);
                 return attribute?.DisabledFields;
             }
         }
@@ -87,6 +89,71 @@ namespace DelvUI.Config
             return null!;
         }
 
+        public List<T> GetObjects<T>()
+        {
+            List<T> list = new List<T>();
+
+            Type type = typeof(T);
+            if (this is T obj)
+            {
+                list.Add(obj);
+            }
+
+            // iterate properties
+            PropertyInfo[] properties = GetType().GetProperties();
+            foreach (PropertyInfo property in properties)
+            {
+                object? value = property.GetValue(this);
+
+                if (value is T o)
+                {
+                    list.Add(o);
+                }
+                else if (value is PluginConfigObject p)
+                {
+                    list.AddRange(p.GetObjects<T>());
+                }
+            }
+
+            // iterate fields
+            FieldInfo[] fields = GetType().GetFields();
+            foreach (FieldInfo field in fields)
+            {
+                object? value = field.GetValue(this);
+
+                if (value is T o)
+                {
+                    list.Add(o);
+                }
+                else if (value is PluginConfigObject p)
+                {
+                    list.AddRange(p.GetObjects<T>());
+                }
+            }
+
+            return list;
+        }
+
+        public T? Load<T>(FileInfo fileInfo) where T : PluginConfigObject
+        {
+            return LoadFromJson<T>(fileInfo.FullName);
+        }
+
+        public static T? LoadFromJson<T>(string path) where T : PluginConfigObject
+        {
+            if (!File.Exists(path)) { return null; }
+
+            return LoadFromJsonString<T>(File.ReadAllText(path));
+        }
+
+        public static T? LoadFromJsonString<T>(string jsonString) where T : PluginConfigObject
+        {
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.ContractResolver = new PluginConfigObjectsContractResolver();
+
+            return JsonConvert.DeserializeObject<T>(jsonString, settings);
+        }
+
         #region IOnChangeEventArgs
 
         // sending event outside of the config
@@ -104,7 +171,13 @@ namespace DelvUI.Config
     public abstract class MovablePluginConfigObject : PluginConfigObject
     {
         [JsonIgnore]
-        public readonly string ID;
+        public string ID;
+
+        [StrataLevel("Strata Level")]
+        [Order(2)]
+        public StrataLevel? Strata;
+
+        public StrataLevel StrataLevel => Strata ?? StrataLevel.LOWEST;
 
         [DragInt2("Position", min = -4000, max = 4000)]
         [Order(5)]
@@ -118,7 +191,7 @@ namespace DelvUI.Config
 
     public abstract class AnchorablePluginConfigObject : MovablePluginConfigObject
     {
-        [DragInt2("Size", min = 1, max = 4000)]
+        [DragInt2("Size", min = 1, max = 4000, isMonitored = true)]
         [Order(10)]
         public Vector2 Size;
 
@@ -144,6 +217,25 @@ namespace DelvUI.Config
 
             Update();
         }
+
+        public static PluginConfigColor FromHex(uint hexColor)
+        {
+            // ARGB to ABGR
+            uint r = (hexColor >> 16) & 0xFF;
+            uint b = hexColor & 0xFF;
+            hexColor = (hexColor & 0xFF00FF00) | (b << 16) | r;
+
+            return new PluginConfigColor(ImGui.ColorConvertU32ToFloat4(hexColor));
+        }
+
+        public PluginConfigColor WithAlpha(float alpha)
+        {
+            if (alpha == Vector.W) { return this; }
+
+            return new PluginConfigColor(Vector.WithNewAlpha(alpha));
+        }
+
+        public static PluginConfigColor Empty => new(Vector4.Zero);
 
         public Vector4 Vector
         {

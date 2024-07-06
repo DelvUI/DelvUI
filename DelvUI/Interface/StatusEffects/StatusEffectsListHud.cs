@@ -1,38 +1,42 @@
-﻿using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Utility;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
-using Dalamud.Utility;
 using LuminaStatus = Lumina.Excel.GeneratedSheets.Status;
 using StatusStruct = FFXIVClientStructs.FFXIV.Client.Game.Status;
 
 namespace DelvUI.Interface.StatusEffects
 {
-    public class StatusEffectsListHud : ParentAnchoredDraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent
+    public class StatusEffectsListHud : ParentAnchoredDraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent, IHudElementWithPreview, IHudElementWithMouseOver, IHudElementWithVisibilityConfig
     {
         protected StatusEffectsListConfig Config => (StatusEffectsListConfig)_config;
+        public VisibilityConfig? VisibilityConfig => Config is UnitFrameStatusEffectsListConfig config ? config.VisibilityConfig : null;
 
         private LayoutInfo _layoutInfo;
 
-        internal static int StatusEffectListsSize = 30;
+        internal static int StatusEffectListsSize = 60;
         private StatusStruct[]? _fakeEffects = null;
 
         private LabelHud _durationLabel;
         private LabelHud _stacksLabel;
+        public IGameObject? Actor { get; set; } = null;
 
-        public GameObject? Actor { get; set; } = null;
+        private bool _wasHovering = false;
+        private bool NeedsSpecialInput => !ClipRectsHelper.Instance.Enabled || ClipRectsHelper.Instance.Mode == WindowClippingMode.Performance;
 
         protected override bool AnchorToParent => Config is UnitFrameStatusEffectsListConfig config ? config.AnchorToUnitFrame : false;
         protected override DrawAnchor ParentAnchor => Config is UnitFrameStatusEffectsListConfig config ? config.UnitFrameAnchor : DrawAnchor.Center;
 
-        public StatusEffectsListHud(StatusEffectsListConfig config, string displayName) : base(config, displayName)
+        public StatusEffectsListHud(StatusEffectsListConfig config, string? displayName = null) : base(config, displayName)
         {
             _config.ValueChangeEvent += OnConfigPropertyChanged;
 
@@ -47,10 +51,25 @@ namespace DelvUI.Interface.StatusEffects
             _config.ValueChangeEvent -= OnConfigPropertyChanged;
         }
 
+        public void StopPreview()
+        {
+            Config.Preview = false;
+            UpdatePreview();
+        }
+
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
-            var pos = CalculateStartPosition(Config.Position, Config.Size, Config.GetGrowthDirections());
+            Vector2 pos = LayoutHelper.CalculateStartPosition(Config.Position, Config.Size, LayoutHelper.GrowthDirectionsFromIndex(Config.Directions));
             return (new List<Vector2>() { pos + Config.Size / 2f }, new List<Vector2>() { Config.Size });
+        }
+
+        public void StopMouseover()
+        {
+            if (_wasHovering && NeedsSpecialInput)
+            {
+                InputsHelper.Instance.StopHandlingInputs();
+                _wasHovering = false;
+            }
         }
 
         private uint CalculateLayout(List<StatusEffectData> list)
@@ -68,44 +87,72 @@ namespace DelvUI.Interface.StatusEffects
                 Config.IconConfig.Size,
                 count,
                 Config.IconPadding,
-                Config.FillRowsFirst
+                LayoutHelper.GetFillsRowsFirst(Config.FillRowsFirst, LayoutHelper.GrowthDirectionsFromIndex(Config.Directions))
             );
 
             return count;
+        }
+
+        protected string GetStatusActorName(StatusStruct status)
+        {
+            var character = Plugin.ObjectTable.SearchById(status.SourceId);
+            return character == null ? "" : character.Name.ToString();
         }
 
         protected virtual List<StatusEffectData> StatusEffectsData()
         {
             var list = StatusEffectDataList(Actor);
 
-            // show mine first
-            if (Config.ShowMineFirst)
+            // sort by duration
+            if (Config.SortByDuration)
             {
-                OrderByMineFirst(list);
+                list.Sort((a, b) =>
+                {
+                    float aTime = a.Data.IsPermanent || a.Data.IsFcBuff ? float.MaxValue : a.Status.RemainingTime;
+                    float bTime = b.Data.IsPermanent || b.Data.IsFcBuff ? float.MaxValue : b.Status.RemainingTime;
+
+                    if (Config.DurationSortType == StatusEffectDurationSortType.Ascending)
+                    {
+                        return aTime.CompareTo(bTime);
+                    }
+                    else
+                    {
+                        return bTime.CompareTo(aTime);
+                    }
+                });
+            } 
+            // show mine or permanent first
+            else if (Config.ShowMineFirst || Config.ShowPermanentFirst)
+            {
+                return OrderByMineOrPermanentFirst(list);
             }
 
             return list;
         }
 
-        protected unsafe List<StatusEffectData> StatusEffectDataList(GameObject? actor)
+        protected unsafe List<StatusEffectData> StatusEffectDataList(IGameObject? actor)
         {
-            var list = new List<StatusEffectData>();
-
-            BattleChara? character = null;
+            List<StatusEffectData> list = new List<StatusEffectData>();
+            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IBattleChara? character = null;
+            int count = StatusEffectListsSize;
 
             if (_fakeEffects == null)
             {
-                if (actor == null || actor is not BattleChara)
+                if (actor == null || actor is not IBattleChara battleChara || battleChara.IsDead || battleChara.CurrentHp <= 0)
                 {
                     return list;
                 }
 
-                character = (BattleChara)actor;
-            }
+                character = (IBattleChara)actor;
 
-            var player = Plugin.ClientState.LocalPlayer;
-            var count = StatusEffectListsSize;
-            if (_fakeEffects != null)
+                try
+                {
+                    count = Math.Min(count, character.StatusList.Length);
+                }
+                catch { }
+            }
+            else
             {
                 count = Config.Limit == -1 ? _fakeEffects.Length : Math.Min(Config.Limit, _fakeEffects.Length);
             }
@@ -122,10 +169,14 @@ namespace DelvUI.Interface.StatusEffects
                 }
                 else
                 {
-                    status = (StatusStruct*)character!.StatusList[i]?.Address;
+                    try
+                    {
+                        status = character?.StatusList[i] == null ? null : (StatusStruct*)character.StatusList[i]!.Address;
+                    }
+                    catch { }
                 }
 
-                if (status == null || status->StatusID == 0)
+                if (status == null || status->StatusId == 0)
                 {
                     continue;
                 }
@@ -135,13 +186,23 @@ namespace DelvUI.Interface.StatusEffects
 
                 if (_fakeEffects != null)
                 {
-                    data = Plugin.DataManager.GetExcelSheet<LuminaStatus>()?.GetRow(status->StatusID);
+                    data = Plugin.DataManager.GetExcelSheet<LuminaStatus>()?.GetRow(status->StatusId);
                 }
                 else
                 {
-                    data = character!.StatusList[i]?.GameData;
+                    try
+                    {
+                        data = character?.StatusList[i]?.GameData;
+                    } catch { }
                 }
+
                 if (data == null)
+                {
+                    continue;
+                }
+
+                // filter "invisible" status effects
+                if (data.Icon == 0 || data.Name.ToString().Length == 0)
                 {
                     continue;
                 }
@@ -154,13 +215,13 @@ namespace DelvUI.Interface.StatusEffects
                 }
 
                 // buffs
-                if (!Config.ShowBuffs && data.Category == 1)
+                if (!Config.ShowBuffs && data.StatusCategory == 1)
                 {
                     continue;
                 }
 
                 // debuffs
-                if (!Config.ShowDebuffs && data.Category != 1)
+                if (!Config.ShowDebuffs && data.StatusCategory != 1)
                 {
                     continue;
                 }
@@ -172,7 +233,14 @@ namespace DelvUI.Interface.StatusEffects
                 }
 
                 // only mine
-                if (Config.ShowOnlyMine && player?.ObjectId != status->SourceID)
+                var mine = player?.GameObjectId == status->SourceId;
+
+                if (Config.IncludePetAsOwn)
+                {
+                    mine = player?.GameObjectId == status->SourceId || IsStatusFromPlayerPet(*status);
+                }
+
+                if (Config.ShowOnlyMine && !mine)
                 {
                     continue;
                 }
@@ -189,31 +257,47 @@ namespace DelvUI.Interface.StatusEffects
             return list;
         }
 
-        protected void OrderByMineFirst(List<StatusEffectData> list)
+        protected bool IsStatusFromPlayerPet(StatusStruct status)
+        {
+            var buddy = Plugin.BuddyList.PetBuddy;
+
+            if (buddy == null)
+            {
+                return false;
+            }
+
+            return buddy.ObjectId == status.SourceId;
+        }
+
+        protected List<StatusEffectData> OrderByMineOrPermanentFirst(List<StatusEffectData> list)
         {
             var player = Plugin.ClientState.LocalPlayer;
             if (player == null)
             {
-                return;
+                return list;
             }
 
-            list.Sort((a, b) =>
+            if (Config.ShowMineFirst && Config.ShowPermanentFirst)
             {
-                bool isAFromPlayer = a.Status.SourceID == player.ObjectId;
-                bool isBFromPlayer = b.Status.SourceID == player.ObjectId;
+                return list.OrderByDescending(x => x.Status.SourceId == player.GameObjectId && x.Data.IsPermanent || x.Data.IsFcBuff)
+                    .ThenByDescending(x => x.Status.SourceId == player.GameObjectId)
+                    .ThenByDescending(x => x.Data.IsPermanent)
+                    .ThenByDescending(x => x.Data.IsFcBuff)
+                    .ToList();
+            }
+            else if (Config.ShowMineFirst && !Config.ShowPermanentFirst)
+            {
+                return list.OrderByDescending(x => x.Status.SourceId == player.GameObjectId)
+                    .ToList();
+            }
+            else if (!Config.ShowMineFirst && Config.ShowPermanentFirst)
+            {
+                return list.OrderByDescending(x => x.Data.IsPermanent)
+                    .ThenByDescending(x => x.Data.IsFcBuff)
+                    .ToList();
+            }
 
-                if (isAFromPlayer && !isBFromPlayer)
-                {
-                    return -1;
-                }
-
-                if (!isAFromPlayer && isBFromPlayer)
-                {
-                    return 1;
-                }
-
-                return 0;
-            });
+            return list;
         }
 
         public override void DrawChildren(Vector2 origin)
@@ -229,128 +313,120 @@ namespace DelvUI.Interface.StatusEffects
             }
 
             // calculate layout
-            var list = StatusEffectsData();
+            List<StatusEffectData> list = StatusEffectsData();
 
             // area
-            GrowthDirections growthDirections = Config.GetGrowthDirections();
+            GrowthDirections growthDirections = LayoutHelper.GrowthDirectionsFromIndex(Config.Directions);
             Vector2 position = origin + GetAnchoredPosition(Config.Position, Config.Size, DrawAnchor.TopLeft);
-            Vector2 areaPos = CalculateStartPosition(position, Config.Size, growthDirections);
+            Vector2 areaPos = LayoutHelper.CalculateStartPosition(position, Config.Size, growthDirections);
+            Vector2 margin = new Vector2(14, 10);
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
             // no need to do anything else if there are no effects
             if (list.Count == 0)
             {
+                if (_wasHovering && NeedsSpecialInput)
+                {
+                    _wasHovering = false;
+                    InputsHelper.Instance.StopHandlingInputs();
+                }
+
                 return;
             }
 
             // calculate icon positions
-            var count = CalculateLayout(list);
-            var iconPositions = new List<Vector2>();
-            var minPos = new Vector2(float.MaxValue, float.MaxValue);
-            var maxPos = Vector2.Zero;
-
-            var row = 0;
-            var col = 0;
-
-            for (var i = 0; i < count; i++)
-            {
-                CalculateAxisDirections(growthDirections, row, count, out var direction, out var offset);
-
-                var pos = new Vector2(
-                    position.X + offset.X + Config.IconConfig.Size.X * col * direction.X + Config.IconPadding.X * col * direction.X,
-                    position.Y + offset.Y + Config.IconConfig.Size.Y * row * direction.Y + Config.IconPadding.Y * row * direction.Y
-                );
-
-                minPos.X = Math.Min(pos.X, minPos.X);
-                minPos.Y = Math.Min(pos.Y, minPos.Y);
-                maxPos.X = Math.Max(pos.X + Config.IconConfig.Size.X, maxPos.X);
-                maxPos.Y = Math.Max(pos.Y + Config.IconConfig.Size.Y, maxPos.Y);
-
-                iconPositions.Add(pos);
-
-                // rows / columns
-                if (Config.FillRowsFirst || (growthDirections & GrowthDirections.Centered) != 0)
-                {
-                    col += 1;
-                    if (col >= _layoutInfo.TotalColCount)
-                    {
-                        col = 0;
-                        row += 1;
-                    }
-                }
-                else
-                {
-                    row += 1;
-                    if (row >= _layoutInfo.TotalRowCount)
-                    {
-                        row = 0;
-                        col += 1;
-                    }
-                }
-            }
-
+            uint count = CalculateLayout(list);
+            var (iconPositions, minPos, maxPos) = LayoutHelper.CalculateIconPositions(
+                growthDirections,
+                count,
+                position,
+                Config.Size,
+                Config.IconConfig.Size,
+                Config.IconPadding,
+                LayoutHelper.GetFillsRowsFirst(Config.FillRowsFirst, growthDirections),
+                _layoutInfo
+            );
+     
             // window
             // imgui clips the left and right borders inside windows for some reason
             // we make the window bigger so the actual drawable size is the expected one
-            var margin = new Vector2(14, 10);
-            var windowPos = minPos - margin;
-            var windowSize = maxPos - minPos;
+            Vector2 windowPos = minPos - margin;
+            Vector2 windowSize = maxPos - minPos;
 
-            DrawHelper.DrawInWindow(ID, windowPos, windowSize + margin * 2, Config.ShowBuffs, false, (drawList) =>
+            AddDrawAction(Config.StrataLevel, () =>
             {
-                // area
-                if (Config.Preview)
+                DrawHelper.DrawInWindow(ID, windowPos, windowSize + margin * 2, !Config.DisableInteraction, (drawList) =>
                 {
-                    drawList.AddRectFilled(areaPos, areaPos + Config.Size, 0x88000000);
-                }
-
-                for (var i = 0; i < count; i++)
-                {
-                    var iconPos = iconPositions[i];
-                    var statusEffectData = list[i];
-
-                    // icon
-                    var cropIcon = Config.IconConfig.CropIcon;
-                    DrawHelper.DrawIcon<LuminaStatus>(drawList, statusEffectData.Data, iconPos, Config.IconConfig.Size, false, cropIcon, statusEffectData.Status.StackCount);
-
-                    // border
-                    var borderConfig = GetBorderConfig(statusEffectData);
-                    if (borderConfig != null && cropIcon)
+                    // area
+                    if (Config.Preview)
                     {
-                        drawList.AddRect(iconPos, iconPos + Config.IconConfig.Size, borderConfig.Color.Base, 0, ImDrawFlags.None, borderConfig.Thickness);
+                        drawList.AddRectFilled(areaPos, areaPos + Config.Size, 0x88000000);
                     }
 
-                    // Draw dispell indicator above dispellable status effect on uncropped icons
-                    if (borderConfig != null && !cropIcon && statusEffectData.Data.CanDispel)
+                    for (var i = 0; i < count; i++)
                     {
-                        var dispellIndicatorColor = new Vector4(141f / 255f, 206f / 255f, 229f / 255f, 100f / 100f);
-                        // 24x32
-                        drawList.AddRectFilled(
-                            iconPos + new Vector2(Config.IconConfig.Size.X * .07f, Config.IconConfig.Size.Y * .07f),
-                            iconPos + new Vector2(Config.IconConfig.Size.X * .93f, Config.IconConfig.Size.Y * .14f),
-                            ImGui.ColorConvertFloat4ToU32(dispellIndicatorColor),
-                            8f
-                        );
+                        Vector2 iconPos = iconPositions[i];
+                        var statusEffectData = list[i];
+
+                        // shadow
+                        if (Config.IconConfig.ShadowConfig! != null && Config.IconConfig.ShadowConfig.Enabled)
+                        {
+                            // Right Side
+                            drawList.AddRectFilled(iconPos + new Vector2(Config.IconConfig.Size.X, Config.IconConfig.ShadowConfig.Offset), iconPos + Config.IconConfig.Size + new Vector2(Config.IconConfig.ShadowConfig.Offset, Config.IconConfig.ShadowConfig.Offset) + new Vector2(Config.IconConfig.ShadowConfig.Thickness - 1, Config.IconConfig.ShadowConfig.Thickness - 1), Config.IconConfig.ShadowConfig.Color.Base);
+
+                            // Bottom Size
+                            drawList.AddRectFilled(iconPos + new Vector2(Config.IconConfig.ShadowConfig.Offset, Config.IconConfig.Size.Y), iconPos + Config.IconConfig.Size + new Vector2(Config.IconConfig.ShadowConfig.Offset, Config.IconConfig.ShadowConfig.Offset) + new Vector2(Config.IconConfig.ShadowConfig.Thickness - 1, Config.IconConfig.ShadowConfig.Thickness - 1), Config.IconConfig.ShadowConfig.Color.Base);
+                        }
+
+                        // icon
+                        var cropIcon = Config.IconConfig.CropIcon;
+                        int stackCount = cropIcon ? 1 : statusEffectData.Data.MaxStacks > 0 ? statusEffectData.Status.StackCount : 0;
+                        DrawHelper.DrawIcon<LuminaStatus>(drawList, statusEffectData.Data, iconPos, Config.IconConfig.Size, false, cropIcon, stackCount);
+
+                        // border
+                        var borderConfig = GetBorderConfig(statusEffectData);
+                        if (borderConfig != null && cropIcon)
+                        {
+                            drawList.AddRect(iconPos, iconPos + Config.IconConfig.Size, borderConfig.Color.Base, 0, ImDrawFlags.None, borderConfig.Thickness);
+                        }
+
+                        // Draw dispell indicator above dispellable status effect on uncropped icons
+                        if (borderConfig != null && !cropIcon && statusEffectData.Data.CanDispel)
+                        {
+                            var dispellIndicatorColor = new Vector4(141f / 255f, 206f / 255f, 229f / 255f, 100f / 100f);
+                            // 24x32
+                            drawList.AddRectFilled(
+                                           iconPos + new Vector2(Config.IconConfig.Size.X * .07f, Config.IconConfig.Size.Y * .07f),
+                                           iconPos + new Vector2(Config.IconConfig.Size.X * .93f, Config.IconConfig.Size.Y * .14f),
+                                           ImGui.ColorConvertFloat4ToU32(dispellIndicatorColor),
+                                           8f
+                                       );
+                        }
                     }
-                }
+                });
             });
+
+            StatusEffectData? hoveringData = null;
+            IGameObject? character = Actor;
 
             // labels need to be drawn separated since they have their own window for clipping
             for (var i = 0; i < count; i++)
             {
-                var iconPos = iconPositions[i];
-                var statusEffectData = list[i];
+                Vector2 iconPos = iconPositions[i];
+                StatusEffectData statusEffectData = list[i];
 
                 // duration
                 if (Config.IconConfig.DurationLabelConfig.Enabled &&
                     !statusEffectData.Data.IsPermanent &&
                     !statusEffectData.Data.IsFcBuff)
                 {
-                    var duration = Math.Round(Math.Abs(statusEffectData.Status.RemainingTime));
-                    Config.IconConfig.DurationLabelConfig.SetText(Utils.DurationToString(duration));
-
-                    _durationLabel.Draw(iconPos, Config.IconConfig.Size);
+                    AddDrawAction(Config.IconConfig.DurationLabelConfig.StrataLevel, () =>
+                    {
+                        double duration = Math.Round(Math.Abs(statusEffectData.Status.RemainingTime));
+                        Config.IconConfig.DurationLabelConfig.SetText(Utils.DurationToString(duration));
+                        _durationLabel.Draw(iconPos, Config.IconConfig.Size, character);
+                    });
                 }
 
                 // stacks
@@ -359,106 +435,91 @@ namespace DelvUI.Interface.StatusEffects
                     statusEffectData.Status.StackCount > 0 &&
                     !statusEffectData.Data.IsFcBuff)
                 {
-                    var text = $"{statusEffectData.Status.StackCount}";
-                    Config.IconConfig.StacksLabelConfig.SetText(text);
-
-                    _stacksLabel.Draw(iconPos, Config.IconConfig.Size);
+                    AddDrawAction(Config.IconConfig.StacksLabelConfig.StrataLevel, () =>
+                    {
+                        Config.IconConfig.StacksLabelConfig.SetText($"{statusEffectData.Status.StackCount}");
+                        _stacksLabel.Draw(iconPos, Config.IconConfig.Size, character);
+                    });
                 }
 
                 // tooltips / interaction
                 if (ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
                 {
-                    // tooltip
-                    if (Config.ShowTooltips)
+                    hoveringData = statusEffectData;
+                }
+            }
+
+            if (hoveringData.HasValue)
+            {
+                StatusEffectData data = hoveringData.Value;
+
+                if (NeedsSpecialInput)
+                {
+                    _wasHovering = true;
+                    InputsHelper.Instance.StartHandlingInputs();
+                }
+
+                // tooltip
+                if (Config.ShowTooltips)
+                {
+                    TooltipsHelper.Instance.ShowTooltipOnCursor(
+                        EncryptedStringsHelper.GetString(data.Data.Description.ToDalamudString().ToString()),
+                        EncryptedStringsHelper.GetString(data.Data.Name),
+                        data.Status.StatusId,
+                        GetStatusActorName(data.Status)
+                    );
+                }
+
+                bool leftClick = InputsHelper.Instance.HandlingMouseInputs ? InputsHelper.Instance.LeftButtonClicked : ImGui.GetIO().MouseClicked[0];
+                bool rightClick = InputsHelper.Instance.HandlingMouseInputs ? InputsHelper.Instance.RightButtonClicked : ImGui.GetIO().MouseClicked[1];
+
+                // remove buff on right click
+                bool isFromPlayer = data.Status.SourceId == Plugin.ClientState.LocalPlayer?.GameObjectId;
+                bool isTheEcho = data.Status.SourceId is 42 or 239;
+
+                if (data.Data.StatusCategory == 1 && (isFromPlayer || isTheEcho) && rightClick)
+                {
+                    ChatHelper.SendChatMessage("/statusoff \"" + data.Data.Name + "\"");
+
+                    if (NeedsSpecialInput)
                     {
-                        TooltipsHelper.Instance.ShowTooltipOnCursor(
-                            statusEffectData.Data.Description.ToDalamudString().ToString(),
-                            statusEffectData.Data.Name,
-                            statusEffectData.Status.StatusID
-                        );
+                        _wasHovering = false;
+                        InputsHelper.Instance.StopHandlingInputs();
                     }
+                }
 
-                    bool leftClick = MouseOverHelper.Instance.HandlingInputs ? MouseOverHelper.Instance.LeftButtonClicked : ImGui.GetIO().MouseClicked[0];
-                    bool rightClick = MouseOverHelper.Instance.HandlingInputs ? MouseOverHelper.Instance.RightButtonClicked : ImGui.GetIO().MouseClicked[1];
+                // automatic add to black list with ctrl+alt+shift click
+                if (Config.BlacklistConfig.Enabled &&
+                    ImGui.GetIO().KeyCtrl && ImGui.GetIO().KeyAlt && ImGui.GetIO().KeyShift && leftClick)
+                {
+                    Config.BlacklistConfig.AddNewEntry(data.Data);
+                    ConfigurationManager.Instance.ForceNeedsSave();
 
-                    // remove buff on right click
-                    bool isFromPlayer = statusEffectData.Status.SourceID == Plugin.ClientState.LocalPlayer?.ObjectId;
-
-                    if (statusEffectData.Data.Category == 1 && isFromPlayer && rightClick)
+                    if (NeedsSpecialInput)
                     {
-                        ChatHelper.SendChatMessage("/statusoff \"" + statusEffectData.Data.Name + "\"");
-                    }
-
-                    // automatic add to black list with ctrl+alt+shift click
-                    if (Config.BlacklistConfig.Enabled &&
-                        ImGui.GetIO().KeyCtrl && ImGui.GetIO().KeyAlt && ImGui.GetIO().KeyShift && leftClick)
-                    {
-                        Config.BlacklistConfig.AddNewEntry(statusEffectData.Data);
+                        _wasHovering = false;
+                        InputsHelper.Instance.StopHandlingInputs();
                     }
                 }
             }
-        }
-
-        private void CalculateAxisDirections(GrowthDirections growthDirections, int row, uint elementCount, out Vector2 direction, out Vector2 offset)
-        {
-            if ((growthDirections & GrowthDirections.Centered) != 0)
+            else if (_wasHovering && NeedsSpecialInput)
             {
-                var elementsPerRow = (int)(Config.Size.X / (Config.IconConfig.Size.X + Config.IconPadding.X));
-                var elementsInRow = Math.Min(elementsPerRow, elementCount - (elementsPerRow * row));
-
-                direction.X = 1;
-                direction.Y = (growthDirections & GrowthDirections.Down) != 0 ? 1 : -1;
-                offset.X = -(Config.IconConfig.Size.X + Config.IconPadding.X) * elementsInRow / 2f;
-                offset.Y = direction.Y == 1 ? 0 : -Config.IconConfig.Size.Y;
+                _wasHovering = false;
+                InputsHelper.Instance.StopHandlingInputs();
             }
-            else
-            {
-                direction.X = (growthDirections & GrowthDirections.Right) != 0 ? 1 : -1;
-                direction.Y = (growthDirections & GrowthDirections.Down) != 0 ? 1 : -1;
-                offset.X = direction.X == 1 ? 0 : -Config.IconConfig.Size.X;
-                offset.Y = direction.Y == 1 ? 0 : -Config.IconConfig.Size.Y;
-            }
-        }
-
-        private Vector2 CalculateStartPosition(Vector2 position, Vector2 size, GrowthDirections growthDirections)
-        {
-            var area = size;
-            if ((growthDirections & GrowthDirections.Left) != 0)
-            {
-                area.X = -area.X;
-            }
-
-            if ((growthDirections & GrowthDirections.Up) != 0)
-            {
-                area.Y = -area.Y;
-            }
-
-            var startPos = position;
-            if ((growthDirections & GrowthDirections.Centered) != 0)
-            {
-                startPos.X = position.X - size.X / 2f;
-            }
-
-            var endPos = position + area;
-
-            if (endPos.X < position.X)
-            {
-                startPos.X = endPos.X;
-            }
-
-            if (endPos.Y < position.Y)
-            {
-                startPos.Y = endPos.Y;
-            }
-
-            return startPos;
         }
 
         public StatusEffectIconBorderConfig? GetBorderConfig(StatusEffectData statusEffectData)
         {
             StatusEffectIconBorderConfig? borderConfig = null;
 
-            if (Config.IconConfig.OwnedBorderConfig.Enabled && statusEffectData.Status.SourceID == Plugin.ClientState.LocalPlayer?.ObjectId)
+            bool isFromPlayerPet = false;
+            if (Config.IncludePetAsOwn)
+            {
+                isFromPlayerPet = IsStatusFromPlayerPet(statusEffectData.Status);
+            }
+
+            if (Config.IconConfig.OwnedBorderConfig.Enabled && (statusEffectData.Status.SourceId == Plugin.ClientState.LocalPlayer?.GameObjectId || isFromPlayerPet))
             {
                 borderConfig = Config.IconConfig.OwnedBorderConfig;
             }
@@ -498,10 +559,10 @@ namespace DelvUI.Interface.StatusEffects
                 var fakeStruct = new StatusStruct();
 
                 // forcing "triplecast" buff first to always be able to test stacks
-                fakeStruct.StatusID = i == 0 ? (ushort)1211 : (ushort)RNG.Next(1, 200);
+                fakeStruct.StatusId = i == 0 ? (ushort)1211 : (ushort)RNG.Next(1, 200);
                 fakeStruct.RemainingTime = RNG.Next(1, 30);
                 fakeStruct.StackCount = (byte)RNG.Next(1, 3);
-                fakeStruct.SourceID = 0;
+                fakeStruct.SourceId = 0;
 
                 _fakeEffects[i] = fakeStruct;
             }
@@ -518,15 +579,5 @@ namespace DelvUI.Interface.StatusEffects
             Status = status;
             Data = data;
         }
-    }
-
-    [Flags]
-    public enum GrowthDirections : short
-    {
-        Up = 1,
-        Down = 2,
-        Left = 4,
-        Right = 8,
-        Centered = 16,
     }
 }

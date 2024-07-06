@@ -81,16 +81,16 @@ namespace DelvUI.Helpers
             // Diadem Compatibility
             if (CAWidget != null && CAWidget->UldManager.NodeListCount == 10)
             {
-                if ((CAWidget->UldManager.SearchNodeById(3)->Alpha_2 > 0 && CAWidget->UldManager.SearchNodeById(3)->IsVisible))
+                if ((CAWidget->UldManager.SearchNodeById(3)->Alpha_2 > 0 && CAWidget->UldManager.SearchNodeById(3)->IsVisible()))
                 {
-                    bool usedAuger = CAWidget->UldManager.SearchNodeById(10)->IsVisible;
+                    bool usedAuger = CAWidget->UldManager.SearchNodeById(10)->IsVisible();
                     for (uint i = 0; i < 5; i++)
                     {
                         AtkResNode* node = CAWidget->UldManager.SearchNodeById(5 + i + (usedAuger ? 1u : 0))->GetComponent()->UldManager.SearchNodeById(3);
 
                         if (LimitBreakBarWidth != null)
                         {
-                            LimitBreakBarWidth[i] = node->IsVisible ? node->Width - 14 : 0;
+                            LimitBreakBarWidth[i] = node->IsVisible() ? node->Width - 14 : 0;
                         }
                     }
 
@@ -103,29 +103,33 @@ namespace DelvUI.Helpers
             if (!foundCaGauge)
             {
                 // Get LB Width
-                if (LBWidget != null && LBWidget->UldManager.NodeListCount == 6)
-                {
-                    if (LBWidget->UldManager.SearchNodeById(3)->Alpha_2 == 0 || !LBWidget->UldManager.SearchNodeById(3)->IsVisible)
-                    {
-                        return;
-                    }
-
-                    for (uint i = 0; i < 3; i++)
-                    {
-                        if (LimitBreakBarWidth != null)
-                        {
-                            LimitBreakBarWidth[i] = LBWidget->UldManager.SearchNodeById(6 - i)->GetComponent()->UldManager.SearchNodeById(3)->Width - 18;
-                        }
-
-                        if (LBWidget->UldManager.SearchNodeById(6 - i)->IsVisible && i > 0)
-                        {
-                            LimitBreakMaxLevel++;
-                        }
-                    }
-                }
-                else
+                if (LBWidget == null || LBWidget->UldManager.NodeListCount != 6)
                 {
                     return;
+                }
+
+                AtkResNode* node = LBWidget->UldManager.SearchNodeById(3);
+                if (node == null)
+                {
+                    return;
+                }
+
+                if (node->Alpha_2 == 0 || !node->IsVisible())
+                {
+                    return;
+                }
+
+                for (uint i = 0; i < 3; i++)
+                {
+                    if (LimitBreakBarWidth != null)
+                    {
+                        LimitBreakBarWidth[i] = LBWidget->UldManager.SearchNodeById(6 - i)->GetComponent()->UldManager.SearchNodeById(3)->Width - 18;
+                    }
+
+                    if (LBWidget->UldManager.SearchNodeById(6 - i)->IsVisible() && i > 0)
+                    {
+                        LimitBreakMaxLevel++;
+                    }
                 }
             }
 

@@ -1,47 +1,49 @@
-﻿using Dalamud.Data;
-using Dalamud.Game;
-using Dalamud.Game.ClientState;
+﻿using Dalamud.Game;
 using Dalamud.Game.ClientState.Conditions;
-using Dalamud.Game.ClientState.JobGauge;
 using Dalamud.Game.ClientState.Objects;
-using Dalamud.Game.ClientState.Party;
 using Dalamud.Game.Command;
-using Dalamud.Game.Gui;
 using Dalamud.Interface;
-using Dalamud.Logging;
+using Dalamud.Interface.Internal;
+using Dalamud.Interface.Textures;
+using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
 using DelvUI.Config;
 using DelvUI.Config.Profiles;
 using DelvUI.Helpers;
 using DelvUI.Interface;
 using DelvUI.Interface.GeneralElements;
+using DelvUI.Interface.Nameplates;
 using DelvUI.Interface.Party;
-using ImGuiNET;
-using ImGuiScene;
+using DelvUI.Interface.PartyCooldowns;
 using System;
 using System.IO;
 using System.Reflection;
-using SigScanner = Dalamud.Game.SigScanner;
 
 namespace DelvUI
 {
     public class Plugin : IDalamudPlugin
     {
-        public static ClientState ClientState { get; private set; } = null!;
-        public static CommandManager CommandManager { get; private set; } = null!;
-        public static Condition Condition { get; private set; } = null!;
-        public static DalamudPluginInterface PluginInterface { get; private set; } = null!;
-        public static DataManager DataManager { get; private set; } = null!;
-        public static Framework Framework { get; private set; } = null!;
-        public static GameGui GameGui { get; private set; } = null!;
-        public static JobGauges JobGauges { get; private set; } = null!;
-        public static ObjectTable ObjectTable { get; private set; } = null!;
-        public static SigScanner SigScanner { get; private set; } = null!;
-        public static TargetManager TargetManager { get; private set; } = null!;
-        public static UiBuilder UiBuilder { get; private set; } = null!;
-        public static PartyList PartyList { get; private set; } = null!;
+        public static IBuddyList BuddyList { get; private set; } = null!;
+        public static IClientState ClientState { get; private set; } = null!;
+        public static ICommandManager CommandManager { get; private set; } = null!;
+        public static ICondition Condition { get; private set; } = null!;
+        public static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
+        public static IDataManager DataManager { get; private set; } = null!;
+        public static IFramework Framework { get; private set; } = null!;
+        public static IGameGui GameGui { get; private set; } = null!;
+        public static IJobGauges JobGauges { get; private set; } = null!;
+        public static IObjectTable ObjectTable { get; private set; } = null!;
+        public static ISigScanner SigScanner { get; private set; } = null!;
+        public static IGameInteropProvider GameInteropProvider { get; private set; } = null!;
+        public static ITargetManager TargetManager { get; private set; } = null!;
+        public static IUiBuilder UiBuilder { get; private set; } = null!;
+        public static IPartyList PartyList { get; private set; } = null!;
+        public static IPluginLog Logger { get; private set; } = null!;
+        public static ITextureProvider TextureProvider { get; private set; } = null!;
+        public static IAddonLifecycle AddonLifecycle { get; private set; } = null!;
 
-        public static TextureWrap? BannerTexture;
+        public static ISharedImmediateTexture? BannerTexture;
 
         public static string AssemblyLocation { get; private set; } = "";
         public string Name => "DelvUI";
@@ -49,23 +51,32 @@ namespace DelvUI
         public static string Version { get; private set; } = "";
 
         private HudManager _hudManager = null!;
-        private SystemMenuHook _menuHook = null!;
+
+        public delegate void JobChangedEventHandler(uint jobId);
+        public static event JobChangedEventHandler? JobChangedEvent;
+        private uint _jobId = 0;
 
         public Plugin(
-            ClientState clientState,
-            CommandManager commandManager,
-            Condition condition,
-            DalamudPluginInterface pluginInterface,
-            DataManager dataManager,
-            Framework framework,
-            GameGui gameGui,
-            JobGauges jobGauges,
-            ObjectTable objectTable,
-            PartyList partyList,
-            SigScanner sigScanner,
-            TargetManager targetManager
+            IBuddyList buddyList,
+            IClientState clientState,
+            ICommandManager commandManager,
+            ICondition condition,
+            IDalamudPluginInterface pluginInterface,
+            IDataManager dataManager,
+            IFramework framework,
+            IGameGui gameGui,
+            IJobGauges jobGauges,
+            IObjectTable objectTable,
+            IPartyList partyList,
+            ISigScanner sigScanner,
+            IGameInteropProvider gameInteropProvider,
+            ITargetManager targetManager,
+            IPluginLog logger,
+            ITextureProvider textureProvider,
+            IAddonLifecycle addonLifecycle
         )
         {
+            BuddyList = buddyList;
             ClientState = clientState;
             CommandManager = commandManager;
             Condition = condition;
@@ -77,8 +88,12 @@ namespace DelvUI
             ObjectTable = objectTable;
             PartyList = partyList;
             SigScanner = sigScanner;
+            GameInteropProvider = gameInteropProvider;
             TargetManager = targetManager;
             UiBuilder = PluginInterface.UiBuilder;
+            Logger = logger;
+            TextureProvider = textureProvider;
+            AddonLifecycle = addonLifecycle;
 
             if (pluginInterface.AssemblyLocation.DirectoryName != null)
             {
@@ -89,33 +104,42 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.3.1.1";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.2.0.0";
 
             FontsManager.Initialize(AssemblyLocation);
+            BarTexturesManager.Initialize(AssemblyLocation);
             LoadBanner();
 
             // initialize a not-necessarily-defaults configuration
             ConfigurationManager.Initialize();
-            FontsManager.Instance.LoadConfig();
+            ProfilesManager.Initialize();
+            ConfigurationManager.Instance.LoadOrInitializeFiles();
 
-            _menuHook = new SystemMenuHook(PluginInterface);
+            FontsManager.Instance.LoadConfig();
+            BarTexturesManager.Instance.LoadConfig();
 
             ChatHelper.Initialize();
             ClipRectsHelper.Initialize();
             GlobalColors.Initialize();
             LimitBreakHelper.Initialize();
-            MouseOverHelper.Initialize();
+            InputsHelper.Initialize();
+            NameplatesManager.Initialize();
             PartyManager.Initialize();
-            ProfilesManager.Initialize();
+            PartyCooldownsManager.Initialize();
             PullTimerHelper.Initialize();
-            TexturesCache.Initialize();
+            TextTagsHelper.Initialize();
             TooltipsHelper.Initialize();
+            PetRenamerHelper.Initialize();
+            HonorificHelper.Initialize();
+            WotsitHelper.Initialize();
+            WhosTalkingHelper.Initialize();
 
             _hudManager = new HudManager();
 
             UiBuilder.Draw += Draw;
-            UiBuilder.BuildFonts += BuildFont;
             UiBuilder.OpenConfigUi += OpenConfigUi;
+
+            FontsManager.Instance.BuildFonts();
 
             CommandManager.AddHandler(
                 "/delvui",
@@ -124,22 +148,38 @@ namespace DelvUI
                     HelpMessage = "Opens the DelvUI configuration window.\n"
                                 + "/delvui toggle → Toggles HUD visibility.\n"
                                 + "/delvui show → Shows HUD.\n"
-                                + "/delvui hide → Hides HUD.",
+                                + "/delvui hide → Hides HUD.\n"
+                                + "/delvui toggledefaulthud → Toggles the game's Job Gauges visibility.\n"
+                                + "/delvui forcejob <JOB> → Forces DelvUI to show the hud for the given Job short name.\n"
+                                + "/delvui profile <PROFILE> → Switch to the given profile",
 
                     ShowInHelp = true
                 }
             );
+
+            CommandManager.AddHandler(
+                "/dui",
+                new CommandInfo(PluginCommand)
+                {
+                    HelpMessage = "Opens the DelvUI configuration window.\n"
+                                + "/dui toggle → Toggles HUD visibility.\n"
+                                + "/dui show → Shows HUD.\n"
+                                + "/dui hide → Hides HUD."
+                                + "/dui toggledefaulthud → Toggles the game's Job Gauges visibility.\n"
+                                + "/dui forcejob <JOB> → Forces DelvUI to show the hud for the given Job short name.\n"
+                                + "/dui profile <PROFILE> → Switch to the given profile",
+
+                    ShowInHelp = true
+                }
+            );
+
+            WotsitHelper.Instance?.Update();
         }
 
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-        }
-
-        private void BuildFont()
-        {
-            FontsManager.Instance.BuildFonts();
         }
 
         private void LoadBanner()
@@ -150,17 +190,16 @@ namespace DelvUI
             {
                 try
                 {
-                    BannerTexture = UiBuilder.LoadImage(bannerImage);
+                    BannerTexture = TextureProvider.GetFromFile(bannerImage);
                 }
                 catch (Exception ex)
                 {
-                    PluginLog.Log($"Image failed to load. {bannerImage}");
-                    PluginLog.Log(ex.ToString());
+                    Logger.Error($"Image failed to load. {bannerImage}\n\n{ex}");
                 }
             }
             else
             {
-                PluginLog.Log($"Image doesn't exist. {bannerImage}");
+                Logger.Debug($"Image doesn't exist. {bannerImage}");
             }
         }
 
@@ -168,7 +207,7 @@ namespace DelvUI
         {
             var configManager = ConfigurationManager.Instance;
 
-            if (configManager.DrawConfigWindow && !configManager.LockHUD)
+            if (configManager.IsConfigWindowOpened && !configManager.LockHUD)
             {
                 configManager.LockHUD = true;
             }
@@ -178,6 +217,11 @@ namespace DelvUI
                 {
                     case "toggle":
                         ConfigurationManager.Instance.ShowHUD = !ConfigurationManager.Instance.ShowHUD;
+                        break;
+
+                    case "toggledefaulthud":
+                        ConfigurationManager.Instance.GetConfigObject<HUDOptionsConfig>().HideDefaultJobGauges =
+                            !ConfigurationManager.Instance.GetConfigObject<HUDOptionsConfig>().HideDefaultJobGauges;
                         break;
 
                     case "show":
@@ -211,16 +255,47 @@ namespace DelvUI
                         }
                         break;
 
+                    case { } argument when argument.StartsWith("profile"):
+                        // TODO: Turn this into a helper function?
+                        var profile = argument.Split(" ", 2);
+
+                        if (profile.Length > 0)
+                        {
+                            ProfilesManager.Instance?.CheckUpdateSwitchCurrentProfile(profile[1]);
+                        }
+
+                        break;
+
                     default:
-                        configManager.DrawConfigWindow = !configManager.DrawConfigWindow;
+                        configManager.ToggleConfigWindow();
 
                         break;
                 }
             }
         }
 
+        private void UpdateJob()
+        {
+            var player = ClientState.LocalPlayer;
+            if (player is null) { return; }
+
+            var newJobId = player.ClassJob.Id;
+            if (ForcedJob.Enabled)
+            {
+                newJobId = ForcedJob.ForcedJobId;
+            }
+
+            if (_jobId != newJobId)
+            {
+                _jobId = newJobId;
+                JobChangedEvent?.Invoke(_jobId);
+            }
+        }
+
         private void Draw()
         {
+            UpdateJob();
+
             bool hudState =
                 Condition[ConditionFlag.WatchingCutscene] ||
                 Condition[ConditionFlag.WatchingCutscene78] ||
@@ -233,25 +308,30 @@ namespace DelvUI
             UiBuilder.OverrideGameCursor = false;
 
             ConfigurationManager.Instance.Draw();
+            PartyManager.Instance?.Update();
+            WhosTalkingHelper.Instance?.Update();
 
-            var fontPushed = FontsManager.Instance.PushDefaultFont();
-
-            if (!hudState)
+            try
             {
-                _hudManager?.Draw();
+                using (FontsManager.Instance.PushDefaultFont())
+                {
+                    if (!hudState)
+                    {
+                        _hudManager?.Draw(_jobId);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error("Something went wrong!:\n" + e.Message);
             }
 
-            if (fontPushed)
-            {
-                ImGui.PopFont();
-            }
-
-            MouseOverHelper.Instance.Update();
+            InputsHelper.Instance.Update();
         }
 
         private void OpenConfigUi()
         {
-            ConfigurationManager.Instance.DrawConfigWindow = !ConfigurationManager.Instance.DrawConfigWindow;
+            ConfigurationManager.Instance.ToggleConfigWindow();
         }
 
         protected virtual void Dispose(bool disposing)
@@ -261,34 +341,40 @@ namespace DelvUI
                 return;
             }
 
-            _menuHook.Dispose();
-            _hudManager.Dispose();
+            _hudManager?.Dispose();
 
-            ConfigurationManager.Instance.DrawConfigWindow = false;
+            ConfigurationManager.Instance?.SaveConfigurations(true);
+            ConfigurationManager.Instance?.CloseConfigWindow();
 
             CommandManager.RemoveHandler("/delvui");
+            CommandManager.RemoveHandler("/dui");
 
             UiBuilder.Draw -= Draw;
-            UiBuilder.BuildFonts -= BuildFont;
             UiBuilder.OpenConfigUi -= OpenConfigUi;
-            UiBuilder.RebuildFonts();
+            UiBuilder.FontAtlas.BuildFontsAsync();
 
-            ChatHelper.Instance.Dispose();
-            ClipRectsHelper.Instance.Dispose();
-            ExperienceHelper.Instance.Dispose();
-            FontsManager.Instance.Dispose();
-            GlobalColors.Instance.Dispose();
-            LimitBreakHelper.Instance.Dispose();
-            MouseOverHelper.Instance.Dispose();
-            PartyManager.Instance.Dispose();
-            PullTimerHelper.Instance.Dispose();
-            ProfilesManager.Instance.Dispose();
-            SpellHelper.Instance.Dispose();
-            TexturesCache.Instance.Dispose();
-            TooltipsHelper.Instance.Dispose();
+            BarTexturesManager.Instance?.Dispose();
+            ChatHelper.Instance?.Dispose();
+            ClipRectsHelper.Instance?.Dispose();
+            ExperienceHelper.Instance?.Dispose();
+            FontsManager.Instance?.Dispose();
+            GlobalColors.Instance?.Dispose();
+            LimitBreakHelper.Instance?.Dispose();
+            InputsHelper.Instance?.Dispose();
+            NameplatesManager.Instance?.Dispose();
+            PartyCooldownsManager.Instance?.Dispose();
+            PartyManager.Instance?.Dispose();
+            PullTimerHelper.Instance?.Dispose();
+            ProfilesManager.Instance?.Dispose();
+            SpellHelper.Instance?.Dispose();
+            TooltipsHelper.Instance?.Dispose();
+            HonorificHelper.Instance?.Dispose();
+            PetRenamerHelper.Instance?.Dispose();
+            WotsitHelper.Instance?.Dispose();
+            WhosTalkingHelper.Instance?.Dispose();
 
             // This needs to remain last to avoid race conditions
-            ConfigurationManager.Instance.Dispose();
+            ConfigurationManager.Instance?.Dispose();
         }
     }
 }

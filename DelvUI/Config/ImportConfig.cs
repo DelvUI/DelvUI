@@ -37,10 +37,19 @@ namespace DelvUI.Interface
 
             ImGui.InputText("", ref _importString, 999999);
 
-            ImGui.NewLine();
+            ImGui.Text("Here you can import specific parts of a profile.\nIf the string contains more than one part you will be able to select which parts you wish to import.");
+
             if (ImGui.Button("Import", new Vector2(560, 24)))
             {
                 _importing = _importString.Length > 0;
+            }
+
+            ImGuiHelper.DrawSeparator(1, 1);
+            ImGui.Text("To browse presets made by users of the DelvUI community, click the button below.");
+
+            if (ImGui.Button("DelvUI on wago.io", new Vector2(560, 24)))
+            {
+                Utils.OpenUrl("https://wago.io/delvui");
             }
 
             // error modal
@@ -167,14 +176,14 @@ namespace DelvUI.Interface
             bool didConfirm = false;
             bool didClose = false;
 
-            ImGui.OpenPopup("Import");
+            ImGui.OpenPopup("Import ##DelvUI");
 
             Vector2 center = ImGui.GetMainViewport().GetCenter();
             ImGui.SetNextWindowPos(center, ImGuiCond.Appearing, new Vector2(0.5f, 0.5f));
 
             bool p_open = true; // i've no idea what this is used for
 
-            if (ImGui.BeginPopupModal("Import", ref p_open, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove))
+            if (ImGui.BeginPopupModal("Import ##DelvUI", ref p_open, ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove))
             {
                 float width = 300;
 
@@ -247,7 +256,7 @@ namespace DelvUI.Interface
         }
     }
 
-    public struct ImportData
+    public class ImportData
     {
         public readonly Type ConfigType;
         public readonly string Name;
@@ -260,7 +269,7 @@ namespace DelvUI.Interface
             ImportString = base64String;
             JsonString = ImportExportHelper.Base64DecodeAndDecompress(base64String);
 
-            var typeString = (string?)JObject.Parse(JsonString)["$type"];
+            string? typeString = (string?)JObject.Parse(JsonString)["$type"];
             if (typeString == null)
             {
                 throw new ArgumentException("Invalid type");
@@ -278,14 +287,9 @@ namespace DelvUI.Interface
 
         public PluginConfigObject? GetObject()
         {
-            MethodInfo? methodInfo = GetType().GetMethod("DeserializeObject", BindingFlags.Public | BindingFlags.Static);
+            MethodInfo? methodInfo = typeof(PluginConfigObject).GetMethod("LoadFromJsonString", BindingFlags.Public | BindingFlags.Static);
             MethodInfo? function = methodInfo?.MakeGenericMethod(ConfigType);
             return (PluginConfigObject?)function?.Invoke(this, new object[] { JsonString })!;
-        }
-
-        public static T? DeserializeObject<T>(string jsonString)
-        {
-            return JsonConvert.DeserializeObject<T>(jsonString);
         }
     }
 }

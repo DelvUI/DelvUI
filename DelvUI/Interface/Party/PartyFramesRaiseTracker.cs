@@ -1,23 +1,46 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
+using DelvUI.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace DelvUI.Interface.Party
 {
-    public class PartyFramesRaiseTracker
+    public class PartyFramesRaiseTracker : IDisposable
     {
-        private PartyFramesRaiseTrackerConfig _config;
+        private PartyFramesRaiseTrackerConfig _config = null!;
+
         public PartyFramesRaiseTracker()
         {
-            _config = ConfigurationManager.Instance.GetConfigObject<PartyFramesRaiseTrackerConfig>();
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
+            OnConfigReset(ConfigurationManager.Instance);
+        }
+
+        ~PartyFramesRaiseTracker()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
         }
 
         public void OnConfigReset(ConfigurationManager sender)
         {
-            _config = sender.GetConfigObject<PartyFramesRaiseTrackerConfig>();
+            _config = sender.GetConfigObject<PartyFramesTrackersConfig>().Raise;
         }
 
         public void Update(List<IPartyFramesMember> partyMembers)
@@ -44,13 +67,13 @@ namespace DelvUI.Interface.Party
                     member.RaiseTime = null;
                 }
 
-                if (member.Character is not BattleChara battleChara)
+                if (member.Character is not IBattleChara battleChara)
                 {
                     continue;
                 }
 
                 // check raise casts
-                if (battleChara.IsCasting)
+                if (Utils.IsActorCasting(battleChara))
                 {
                     var remaining = Math.Max(0, battleChara.TotalCastTime - battleChara.CurrentCastTime);
 
@@ -63,16 +86,16 @@ namespace DelvUI.Interface.Party
                     // check regular raise
                     else if (IsRaiseAction(battleChara.CastActionId))
                     {
-                        if (raiseTimeMap.TryGetValue(battleChara.CastTargetObjectId, out float raiseTime))
+                        if (raiseTimeMap.TryGetValue((uint)battleChara.CastTargetObjectId, out float raiseTime))
                         {
                             if (raiseTime > remaining)
                             {
-                                raiseTimeMap[battleChara.CastTargetObjectId] = remaining;
+                                raiseTimeMap[(uint)battleChara.CastTargetObjectId] = remaining;
                             }
                         }
                         else
                         {
-                            raiseTimeMap.Add(battleChara.CastTargetObjectId, remaining);
+                            raiseTimeMap.Add((uint)battleChara.CastTargetObjectId, remaining);
                         }
                     }
                 }
@@ -82,7 +105,8 @@ namespace DelvUI.Interface.Party
                 {
                     bool hasBuff = false;
 
-                    foreach (var status in battleChara.StatusList)
+                    var statusList = Utils.StatusListForBattleChara(battleChara);
+                    foreach (var status in statusList)
                     {
                         if (status == null || (status.StatusId != 148 && status.StatusId != 1140))
                         {
@@ -145,7 +169,8 @@ namespace DelvUI.Interface.Party
             18317, // BLU
             22345, // Lost Sacrifice, Bozja
             20730, // Lost Arise, Bozja
-            12996 // Raise L, Eureka
+            12996, // Raise L, Eureka
+            24287 // SGE
         };
 
         private static List<uint> LimitBreakIds = new List<uint>()
@@ -153,6 +178,7 @@ namespace DelvUI.Interface.Party
             208, // WHM
             4247, // SCH
             4248, // AST
+            24859 // SGE
         };
         #endregion
     }

@@ -1,11 +1,13 @@
 ﻿using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
+using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +19,8 @@ namespace DelvUI.Interface.Jobs
     {
         private new BlackMageConfig Config => (BlackMageConfig)_config;
 
-        private static readonly List<uint> ThunderDoTIDs = new() { 161, 162, 163, 1210 };
-        private static readonly List<float> ThunderDoTDurations = new() { 18, 12, 24, 18 };
+        private static readonly List<uint> ThunderDoTIDs = new() { 161, 162, 163, 1210, 3871, 3872 };
+        private static readonly List<float> ThunderDoTDurations = new() { 24, 18, 27, 21, 30, 24 };
 
         public BlackMageHud(BlackMageConfig config, string? displayName = null) : base(config, displayName)
         {
@@ -34,6 +36,12 @@ namespace DelvUI.Interface.Jobs
             {
                 positions.Add(Config.Position + Config.ManaBar.Position);
                 sizes.Add(Config.ManaBar.Size);
+            }
+
+            if (Config.StacksBar.Enabled)
+            {
+                positions.Add(Config.Position + Config.StacksBar.Position);
+                sizes.Add(Config.StacksBar.Size);
             }
 
             if (Config.UmbralHeartBar.Enabled)
@@ -60,6 +68,12 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.PolyglotBar.Size);
             }
 
+            if (Config.ParadoxBar.Enabled)
+            {
+                positions.Add(Config.Position + Config.ParadoxBar.Position);
+                sizes.Add(Config.ParadoxBar.Size);
+            }
+
             if (Config.ThundercloudBar.Enabled && !Config.ThundercloudBar.HideWhenInactive)
             {
                 positions.Add(Config.Position + Config.ThundercloudBar.Position);
@@ -81,13 +95,28 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             Vector2 pos = origin + Config.Position;
+
+            if (Config.ManaBar.Enabled)
+            {
+                DrawManaBar(pos, player);
+            }
+
+            if (Config.StacksBar.Enabled)
+            {
+                DrawStacksBar(pos);
+            }
 
             if (Config.UmbralHeartBar.Enabled)
             {
                 DrawUmbralHeartBar(pos);
+            }
+
+            if (Config.AstralSoulBar.Enabled)
+            {
+                DrawAstralSoulBar(pos);
             }
 
             if (Config.TriplecastBar.Enabled)
@@ -100,14 +129,14 @@ namespace DelvUI.Interface.Jobs
                 DrawPolyglotBar(pos, player);
             }
 
-            if (Config.ManaBar.Enabled)
+            if (Config.ParadoxBar.Enabled)
             {
-                DrawManaBar(pos, player);
+                DrawParadoxBar(pos, player);
             }
 
             if (Config.EnochianBar.Enabled)
             {
-                DrawEnochianBar(pos);
+                DrawEnochianBar(pos, player);
             }
 
             if (Config.ThundercloudBar.Enabled)
@@ -126,10 +155,10 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        protected void DrawManaBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawManaBar(Vector2 origin, IPlayerCharacter player)
         {
             BlackMageManaBarConfig config = Config.ManaBar;
-            var gauge = Plugin.JobGauges.Get<BLMGauge>();
+            BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
 
             if (config.HideWhenInactive && !gauge.InAstralFire && !gauge.InUmbralIce && player.CurrentMp == player.MaxMp)
             {
@@ -137,13 +166,13 @@ namespace DelvUI.Interface.Jobs
             }
 
             // value
-            config.ValueLabelConfig.SetText($"{player.CurrentMp}");
+            config.ValueLabelConfig.SetValue(player.CurrentMp);
 
             // element timer
             if (gauge.InAstralFire || gauge.InUmbralIce)
             {
-                var time = gauge.ElementTimeRemaining > 10 ? gauge.ElementTimeRemaining / 1000 + 1 : 0;
-                config.ElementTimerLabelConfig.SetText($"{time}");
+                float time = gauge.ElementTimeRemaining > 10 ? gauge.ElementTimeRemaining / 1000f : 0;
+                config.ElementTimerLabelConfig.SetValue(time);
             }
             else
             {
@@ -151,6 +180,14 @@ namespace DelvUI.Interface.Jobs
             }
 
             bool drawTreshold = gauge.InAstralFire || !config.ThresholdConfig.ShowOnlyDuringAstralFire;
+
+            PluginConfigColor fillColor = config.FillColor;
+            PluginConfigColor bgColor = config.BackgroundColor;
+            if (config.UseElementColor)
+            {
+                fillColor = gauge.InAstralFire ? config.FireColor : gauge.InUmbralIce ? config.IceColor : config.FillColor;
+                bgColor = gauge.InAstralFire ? config.FireBackgroundColor : gauge.InUmbralIce ? config.IceBackgroundColor : config.BackgroundColor;
+            }
 
             BarHud bar = BarUtilities.GetProgressBar(
                 config,
@@ -160,56 +197,115 @@ namespace DelvUI.Interface.Jobs
                 player.MaxMp,
                 0,
                 player,
-                gauge.InAstralFire ? config.FireColor : gauge.InUmbralIce ? config.IceColor : config.FillColor,
-                gauge.IsEnochianActive && config.GlowConfig.Enabled ? config.GlowConfig : null
+                fillColor: fillColor,
+                backgroundColor: bgColor
             );
 
-            bar.Draw(origin);
+            AddDrawActions(bar.GetDrawActions(origin, config.StrataLevel));
+        }
+
+        protected void DrawStacksBar(Vector2 origin)
+        {
+            BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
+            if (Config.StacksBar.HideWhenInactive && gauge.UmbralIceStacks == 0 && gauge.AstralFireStacks == 0)
+            {
+                return;
+            };
+
+            PluginConfigColor color = gauge.UmbralIceStacks > 0 ? Config.StacksBar.IceColor : Config.StacksBar.FireColor;
+            byte stacks = gauge.UmbralIceStacks > 0 ? gauge.UmbralIceStacks : gauge.AstralFireStacks;
+
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.StacksBar, 3, stacks, 3f, fillColor: color);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.StacksBar.StrataLevel));
+            }
         }
 
         protected void DrawUmbralHeartBar(Vector2 origin)
         {
-            var gauge = Plugin.JobGauges.Get<BLMGauge>();
+            BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
             if (Config.UmbralHeartBar.HideWhenInactive && gauge.UmbralHearts == 0)
             {
                 return;
             };
 
-            BarUtilities.GetChunkedBars(Config.UmbralHeartBar, 3, gauge.UmbralHearts, 3f)
-                .Draw(origin);
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.UmbralHeartBar, 3, gauge.UmbralHearts, 3f);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.UmbralHeartBar.StrataLevel));
+            }
         }
 
-        protected void DrawTripleCastBar(Vector2 origin, PlayerCharacter player)
+        protected unsafe void DrawAstralSoulBar(Vector2 origin)
         {
-            byte stackCount = player.StatusList.FirstOrDefault(o => o.StatusId is 1211)?.StackCount ?? 0;
+            BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
+            BlackMageGauge* internalGauge = (BlackMageGauge*)gauge.Address;
+            int stacks = (int)internalGauge->EnochianFlags >> 2;
+            const int maxStacks = 6;
+
+            if (Config.AstralSoulBar.HideWhenInactive && stacks == 0)
+            {
+                return;
+            };
+
+            bool isFull = stacks == maxStacks;
+            BarGlowConfig? glow = isFull && Config.AstralSoulBar.GlowConfig.Enabled ? Config.AstralSoulBar.GlowConfig : null;
+            PluginConfigColor color = isFull ? Config.AstralSoulBar.FullStacksColor : Config.AstralSoulBar.FillColor;
+            
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.AstralSoulBar, maxStacks, stacks, maxStacks, fillColor: color, glowConfig: glow);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.AstralSoulBar.StrataLevel));
+            }
+        }
+
+        protected void DrawTripleCastBar(Vector2 origin, IPlayerCharacter player)
+        {
+            byte stackCount = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1211)?.StackCount ?? 0;
+            int maxCount = 3;
+
+            if (Config.TriplecastBar.CountSwiftcast)
+            {
+                bool hasSwiftcast = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 167) != null;
+                if (hasSwiftcast)
+                {
+                    stackCount++;
+                    maxCount = stackCount == 4 ? 4 : 3;
+                }
+            }
 
             if (Config.TriplecastBar.HideWhenInactive && stackCount == 0)
             {
                 return;
             };
 
-            BarUtilities.GetChunkedBars(Config.TriplecastBar, 3, stackCount, 3f)
-                .Draw(origin);
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.TriplecastBar, maxCount, stackCount, maxCount);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.TriplecastBar.StrataLevel));
+            }
         }
 
-        protected void DrawEnochianBar(Vector2 origin)
+        protected void DrawEnochianBar(Vector2 origin, IPlayerCharacter player)
         {
-            var gauge = Plugin.JobGauges.Get<BLMGauge>();
+            BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
 
             if (Config.EnochianBar.HideWhenInactive && !gauge.IsEnochianActive)
             {
                 return;
             }
 
-            int timer = gauge.IsEnochianActive ? (30000 - gauge.EnochianTimer) : 0;
-            Config.EnochianBar.Label.SetText($"{timer / 1000}");
-            BarUtilities.GetProgressBar(Config.EnochianBar, timer, 30000, 0f)
-                .Draw(origin);
+            float timer = gauge.IsEnochianActive ? (30000f - gauge.EnochianTimer) : 0f;
+            Config.EnochianBar.Label.SetValue(timer / 1000);
+
+            BarHud bar = BarUtilities.GetProgressBar(Config.EnochianBar, timer / 1000, 30, 0f, player);
+            AddDrawActions(bar.GetDrawActions(origin, Config.EnochianBar.StrataLevel));
         }
 
-        protected void DrawPolyglotBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawPolyglotBar(Vector2 origin, IPlayerCharacter player)
         {
-            var gauge = Plugin.JobGauges.Get<BLMGauge>();
+            BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
 
             if (Config.PolyglotBar.HideWhenInactive && gauge.PolyglotStacks == 0)
             {
@@ -219,37 +315,70 @@ namespace DelvUI.Interface.Jobs
             // only 1 stack before level 80
             if (player.Level < 80)
             {
-                var glow = gauge.PolyglotStacks == 1 && Config.PolyglotBar.GlowConfig.Enabled ? Config.PolyglotBar.GlowConfig : null;
-                BarUtilities.GetBar(Config.PolyglotBar, gauge.PolyglotStacks, 1, 0, glowConfig: glow)
-                    .Draw(origin);
+                BarGlowConfig? glow = gauge.PolyglotStacks == 1 && Config.PolyglotBar.GlowConfig.Enabled ? Config.PolyglotBar.GlowConfig : null;
+                BarHud bar = BarUtilities.GetBar(Config.PolyglotBar, gauge.PolyglotStacks, 1, 0, glowConfig: glow);
+                AddDrawActions(bar.GetDrawActions(origin, Config.PolyglotBar.StrataLevel));
             }
-            // 2 stacks for level 80+
+            // 2-3 stacks after
             else
             {
-                var glow = Config.PolyglotBar.GlowConfig.Enabled ? Config.PolyglotBar.GlowConfig : null;
-                BarUtilities.GetChunkedBars(Config.PolyglotBar, 2, gauge.PolyglotStacks, 2f, 0, glowConfig: glow)
-                    .Draw(origin);
+                int stacks = player.Level < 98 ? 2 : 3;
+                BarGlowConfig? glow = Config.PolyglotBar.GlowConfig.Enabled ? Config.PolyglotBar.GlowConfig : null;
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.PolyglotBar, stacks, gauge.PolyglotStacks, stacks, 0, glowConfig: glow);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.PolyglotBar.StrataLevel));
+                }
             }
         }
 
-        protected void DrawThundercloudBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawParadoxBar(Vector2 origin, IPlayerCharacter player)
         {
-            BarUtilities.GetProcBar(Config.ThundercloudBar, player, 164, 18f)?
-                .Draw(origin);
+            BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
+
+            if (Config.ParadoxBar.HideWhenInactive && !gauge.IsParadoxActive)
+            {
+                return;
+            };
+
+            PluginConfigColor color = Config.ParadoxBar.FillColor;
+            if (Config.ParadoxBar.UseElementColor)
+            {
+                color = gauge.InUmbralIce ? Config.ParadoxBar.IceColor : (gauge.InAstralFire ? Config.ParadoxBar.FireColor : color);
+            }
+
+            BarGlowConfig? glow = gauge.IsParadoxActive && Config.ParadoxBar.GlowConfig.Enabled ? Config.ParadoxBar.GlowConfig : null;
+            BarHud bar = BarUtilities.GetBar(Config.ParadoxBar, gauge.IsParadoxActive ? 1 : 0, 1, 0, fillColor: color, glowConfig: glow);
+            AddDrawActions(bar.GetDrawActions(origin, Config.ParadoxBar.StrataLevel));
         }
 
-        protected void DrawFirestarterBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawThundercloudBar(Vector2 origin, IPlayerCharacter player)
         {
-            BarUtilities.GetProcBar(Config.FirestarterBar, player, 165, 18f)?
-                .Draw(origin);
+            BarHud? bar = BarUtilities.GetProcBar(Config.ThundercloudBar, player, 3870, 30f);
+            if (bar != null)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.ThundercloudBar.StrataLevel));
+            }
         }
 
-        protected void DrawThunderDoTBar(Vector2 origin, PlayerCharacter player)
+        protected void DrawFirestarterBar(Vector2 origin, IPlayerCharacter player)
         {
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            BarHud? bar = BarUtilities.GetProcBar(Config.FirestarterBar, player, 165, 30f);
+            if (bar != null)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.FirestarterBar.StrataLevel));
+            }
+        }
 
-            BarUtilities.GetDoTBar(Config.ThunderDoTBar, player, target, ThunderDoTIDs, ThunderDoTDurations)?.
-                Draw(origin);
+        protected void DrawThunderDoTBar(Vector2 origin, IPlayerCharacter player)
+        {
+            IGameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+
+            BarHud? bar = BarUtilities.GetDoTBar(Config.ThunderDoTBar, player, target, ThunderDoTIDs, ThunderDoTDurations);
+            if (bar != null)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.ThunderDoTBar.StrataLevel));
+            }
         }
     }
 
@@ -290,39 +419,59 @@ namespace DelvUI.Interface.Jobs
         [NestedConfig("Mana Bar", 30)]
         public BlackMageManaBarConfig ManaBar = new BlackMageManaBarConfig(
             new Vector2(0, -10),
-            new Vector2(254, 20),
+            new Vector2(254, 18),
             new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Umbreal Heart Bar", 35)]
+        [NestedConfig("Umbral Ice / Astral Fire Bar", 31)]
+        public BlackMageStacksBarConfig StacksBar = new BlackMageStacksBarConfig(
+            new(-67, -27),
+            new(120, 10)
+        );
+
+        [NestedConfig("Umbral Heart Bar", 32)]
         public ChunkedBarConfig UmbralHeartBar = new ChunkedBarConfig(
-            new(0, -27),
-            new(254, 10),
+            new(67, -27),
+            new(120, 10),
             new PluginConfigColor(new Vector4(125f / 255f, 195f / 255f, 205f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Triplecast Bar", 40)]
-        public ChunkedBarConfig TriplecastBar = new ChunkedBarConfig(
-            new(0, -39),
-            new(254, 10),
-            new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f))
+        [NestedConfig("Paradox Bar", 33)]
+        public BlackMageParadoxBarConfig ParadoxBar = new BlackMageParadoxBarConfig(
+            new(0, -27),
+            new(10, 10),
+            new PluginConfigColor(new Vector4(123f / 255f, 66f / 255f, 177f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Enochian Bar", 45)]
+        [NestedConfig("Enochian Bar", 40)]
         public ProgressBarConfig EnochianBar = new ProgressBarConfig(
-            new(-16, -53),
+            new(-16, -41),
             new(222, 14),
             new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Polyglot Bar", 50)]
+        [NestedConfig("Polyglot Bar", 45)]
         public BlackMagePolyglotBarConfig PolyglotBar = new BlackMagePolyglotBarConfig(
-            new(112, -53),
+            new(112, -41),
             new(30, 14),
             new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Thundercloud Bar", 55)]
+        [NestedConfig("Astral Soul Bar", 45)]
+        public BlackMageAstralSoulBarConfig AstralSoulBar = new BlackMageAstralSoulBarConfig(
+            new(112, -41),
+            new(30, 14),
+            new PluginConfigColor(new Vector4(220f / 255f, 180f / 255f, 180f / 255f, 100f / 100f))
+        );
+        
+        [NestedConfig("Triplecast Bar", 50)]
+        public BlackMageTriplecastBarConfig TriplecastBar = new BlackMageTriplecastBarConfig(
+            new(0, -55),
+            new(254, 10),
+            new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f))
+        );
+
+        [NestedConfig("Thunderhead Bar", 55)]
         public ProgressBarConfig ThundercloudBar = new ProgressBarConfig(
             new(-64, -69),
             new(126, 14),
@@ -348,24 +497,33 @@ namespace DelvUI.Interface.Jobs
     [Exportable(false)]
     public class BlackMageManaBarConfig : BarConfig
     {
+        [Checkbox("Use Element Color" + "##MP", spacing = true)]
+        [Order(50)]
+        public bool UseElementColor = true;
+
         [ColorEdit4("Ice Color" + "##MP")]
-        [Order(26)]
+        [Order(51, collapseWith = nameof(UseElementColor))]
         public PluginConfigColor IceColor = new PluginConfigColor(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 100f / 100f));
 
+        [ColorEdit4("Ice Background Color" + "##MP")]
+        [Order(52, collapseWith = nameof(UseElementColor))]
+        public PluginConfigColor IceBackgroundColor = new PluginConfigColor(new Vector4(50f / 255f, 80f / 255f, 130f / 255f, 50f / 100f));
+
         [ColorEdit4("Fire Color" + "##MP")]
-        [Order(27)]
+        [Order(53, collapseWith = nameof(UseElementColor))]
         public PluginConfigColor FireColor = new PluginConfigColor(new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
 
-        [NestedConfig("Value Label", 45, separator = false, spacing = true)]
-        public LabelConfig ValueLabelConfig = new LabelConfig(new Vector2(2, 0), "", DrawAnchor.Left, DrawAnchor.Left);
+        [ColorEdit4("Fire Background Color" + "##MP")]
+        [Order(54, collapseWith = nameof(UseElementColor))]
+        public PluginConfigColor FireBackgroundColor = new PluginConfigColor(new Vector4(120f / 255f, 30f / 255f, 30f / 255f, 50f / 100f));
 
-        [NestedConfig("Element Timer Label", 50, separator = false, spacing = true)]
-        public LabelConfig ElementTimerLabelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+        [NestedConfig("Value Label", 60, separator = false, spacing = true)]
+        public NumericLabelConfig ValueLabelConfig = new NumericLabelConfig(new Vector2(2, 0), "", DrawAnchor.Left, DrawAnchor.Left);
 
-        [NestedConfig("Glow When Enochian Is Active", 55, separator = false, spacing = true)]
-        public BarGlowConfig GlowConfig = new BarGlowConfig();
+        [NestedConfig("Element Timer Label", 65, separator = false, spacing = true)]
+        public NumericLabelConfig ElementTimerLabelConfig = new NumericLabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
 
-        [NestedConfig("Threshold", 65, separator = false, spacing = true)]
+        [NestedConfig("Threshold", 70, separator = false, spacing = true)]
         public BlackMakeManaBarThresholdConfig ThresholdConfig = new BlackMakeManaBarThresholdConfig();
 
         public BlackMageManaBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
@@ -391,6 +549,24 @@ namespace DelvUI.Interface.Jobs
         }
     }
 
+    [DisableParentSettings("FillColor", "FillDirection")]
+    [Exportable(false)]
+    public class BlackMageStacksBarConfig : ChunkedBarConfig
+    {
+        [ColorEdit4("Ice Color" + "##MP")]
+        [Order(26)]
+        public PluginConfigColor IceColor = new PluginConfigColor(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 100f / 100f));
+
+        [ColorEdit4("Fire Color" + "##MP")]
+        [Order(27)]
+        public PluginConfigColor FireColor = new PluginConfigColor(new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
+
+        public BlackMageStacksBarConfig(Vector2 position, Vector2 size)
+             : base(position, size, PluginConfigColor.Empty)
+        {
+        }
+    }
+
     [Exportable(false)]
     public class BlackMagePolyglotBarConfig : ChunkedBarConfig
     {
@@ -398,6 +574,60 @@ namespace DelvUI.Interface.Jobs
         public BarGlowConfig GlowConfig = new BarGlowConfig();
 
         public BlackMagePolyglotBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+             : base(position, size, fillColor)
+        {
+        }
+    }
+
+    [Exportable(false)]
+    public class BlackMageParadoxBarConfig : BarConfig
+    {
+        [Checkbox("Use Element Color" + "##Paradox", spacing = true)]
+        [Order(50)]
+        public bool UseElementColor = true;
+
+        [ColorEdit4("Ice Color" + "##Paradox")]
+        [Order(51, collapseWith = nameof(UseElementColor))]
+        public PluginConfigColor IceColor = new PluginConfigColor(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 100f / 100f));
+
+        [ColorEdit4("Fire Color" + "##Paradox")]
+        [Order(52, collapseWith = nameof(UseElementColor))]
+        public PluginConfigColor FireColor = new PluginConfigColor(new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
+
+        [NestedConfig("Show Glow" + "##Paradox", 60, separator = false, spacing = true)]
+        public BarGlowConfig GlowConfig = new BarGlowConfig();
+
+        public BlackMageParadoxBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+             : base(position, size, fillColor)
+        {
+        }
+    }
+
+    [Exportable(false)]
+    public class BlackMageTriplecastBarConfig : ChunkedBarConfig
+    {
+        [Checkbox("Count Swiftcast" + "##Triplecast", spacing = true)]
+        [Order(50)]
+        public bool CountSwiftcast = false;
+
+        public BlackMageTriplecastBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+             : base(position, size, fillColor)
+        {
+        }
+    }
+
+    [DisableParentSettings("FillDirection")]
+    [Exportable(false)]
+    public class BlackMageAstralSoulBarConfig : ChunkedBarConfig
+    {
+        [ColorEdit4("Full Stacks Color")]
+        [Order(26)]
+        public PluginConfigColor FullStacksColor = new PluginConfigColor(new Vector4(255f / 255f, 200f / 255f, 160f / 255f, 100f / 100f));
+
+        [NestedConfig("Show Glow" + "##AstralSoul", 60, separator = false, spacing = true)]
+        public BarGlowConfig GlowConfig = new BarGlowConfig();
+
+        public BlackMageAstralSoulBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
              : base(position, size, fillColor)
         {
         }

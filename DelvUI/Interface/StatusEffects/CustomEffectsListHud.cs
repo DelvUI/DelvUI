@@ -10,7 +10,7 @@ namespace DelvUI.Interface.StatusEffects
         {
         }
 
-        public GameObject? TargetActor { get; set; } = null!;
+        public IGameObject? TargetActor { get; set; } = null!;
 
         protected override List<StatusEffectData> StatusEffectsData()
         {
@@ -18,14 +18,14 @@ namespace DelvUI.Interface.StatusEffects
             list.AddRange(StatusEffectDataList(Actor));
 
             // cull duplicate statuses from the same source
-            list = list.GroupBy(s => new { s.Status.StatusID, s.Status.SourceID })
+            list = list.GroupBy(s => new { s.Status.StatusId, s.Status.SourceId })
                 .Select(status => status.First())
                 .ToList();
 
-            // show mine first
-            if (Config.ShowMineFirst)
+            // show mine or permanent first
+            if (Config.ShowMineFirst || Config.ShowPermanentFirst)
             {
-                OrderByMineFirst(list);
+                return OrderByMineOrPermanentFirst(list);
             }
 
             return list;

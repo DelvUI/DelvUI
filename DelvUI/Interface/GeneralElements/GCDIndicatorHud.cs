@@ -11,10 +11,12 @@ using Dalamud.Logging;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class GCDIndicatorHud : DraggableHudElement, IHudElementWithActor
+    public class GCDIndicatorHud : DraggableHudElement, IHudElementWithActor, IHudElementWithVisibilityConfig
     {
         private GCDIndicatorConfig Config => (GCDIndicatorConfig)_config;
-        public GameObject? Actor { get; set; } = null;
+        public VisibilityConfig VisibilityConfig => Config.VisibilityConfig;
+
+        public IGameObject? Actor { get; set; } = null;
 
         private bool _wasBarEnabled = true;
         private bool _wasCircularModeEnabled = false;
@@ -62,21 +64,22 @@ namespace DelvUI.Interface.GeneralElements
         {
             CheckToggles();
 
-            if (!Config.Enabled || Actor == null || Actor is not PlayerCharacter)
+            if (!Config.Enabled || Actor == null || Actor is not IPlayerCharacter)
             {
                 return;
             }
 
-            GCDHelper.GetGCDInfo((PlayerCharacter)Actor, out var elapsed, out var total);
+            GCDHelper.GetGCDInfo((IPlayerCharacter)Actor, out var elapsed, out var total);
 
             if (!Config.AlwaysShow && total == 0)
             {
+                _lastTotalCastTime = 0;
                 return;
             }
 
-            if (_lastTotalCastTime == 0 && ((BattleChara)Actor).IsCasting)
+            if (_lastTotalCastTime == 0 && Utils.IsActorCasting(Actor))
             {
-                _lastTotalCastTime = ((BattleChara)Actor).TotalCastTime;
+                _lastTotalCastTime = ((IBattleChara)Actor).TotalCastTime;
             }
 
             var scale = elapsed / total;
@@ -86,7 +89,10 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            if (Config.InstantGCDsOnly && _lastTotalCastTime != 0)
+            bool instantGCDsOnly = Config.InstantGCDsOnly && _lastTotalCastTime != 0;
+            bool thresholdGCDs = Config.LimitGCDThreshold && _lastTotalCastTime > Config.GCDThreshold;
+
+            if (instantGCDsOnly || thresholdGCDs)
             {
                 if (Config.AlwaysShow)
                 {
@@ -113,9 +119,12 @@ namespace DelvUI.Interface.GeneralElements
             {
                 var (pos, size) = GetPositionAndSize(origin);
                 pos = Utils.GetAnchoredPosition(pos, size, Config.Anchor);
-                DrawCircularIndicator(pos, Config.CircleRadius, elapsed, total);
-            }
 
+                AddDrawAction(_config.StrataLevel, () =>
+                {
+                    DrawCircularIndicator(pos, Config.CircleRadius, elapsed, total);
+                });
+            }
         }
 
         private void CheckToggles()
@@ -144,49 +153,57 @@ namespace DelvUI.Interface.GeneralElements
             current = Config.AlwaysShow && current == 0 ? total : current;
 
             var size = new Vector2(radius * 2);
-            DrawHelper.DrawInWindow(ID, position - size / 2, size, false, false, (drawList) =>
+            DrawHelper.DrawInWindow(ID, position - size / 2, size, false, (drawList) =>
             {
                 current = Math.Min(current, total);
 
                 // controls how smooth the arc looks
                 const int segments = 100;
                 const float queueTime = 0.5f;
-                const float startAngle = 0f;
+                float startAngle = 0f;
+                float endAngle = 2f * (float)Math.PI;
+                float offset = (float)(-Math.PI / 2f + (Config.CircleStartAngle * (Math.PI / 180f)));
+
+                if (Config.RotateCCW)
+                {
+                    startAngle *= -1;
+                    endAngle *= -1;
+                }
 
                 if (Config.AlwaysShow && current == total)
                 {
-                    drawList.PathArcTo(position, radius, startAngle, 2f * (float)Math.PI, segments);
+                    drawList.PathArcTo(position, radius, startAngle + offset, endAngle + offset, segments);
                     drawList.PathStroke(Config.FillColor.Base, ImDrawFlags.None, Config.CircleThickness);
                 }
                 else
                 {
                     // always draw until the queue threshold
-                    float progressAngle = Math.Min(current, total - (Config.ShowGCDQueueIndicator ? queueTime : 0f)) / total * 2f * (float)Math.PI;
+                    float progressAngle = Math.Min(current, total - (Config.ShowGCDQueueIndicator ? queueTime : 0f)) / total * endAngle;
 
                     // drawing an arc with thickness to make it look like an annular sector
-                    drawList.PathArcTo(position, radius, startAngle, progressAngle, segments);
+                    drawList.PathArcTo(position, radius, startAngle + offset, progressAngle + offset, segments);
                     drawList.PathStroke(Config.FillColor.Base, ImDrawFlags.None, Config.CircleThickness);
 
                     // draw the queue indicator
                     if (Config.ShowGCDQueueIndicator && current > total - queueTime)
                     {
-                        float oldAngle = progressAngle - 0.0003f * total * 2f * (float)Math.PI;
-                        progressAngle = current / total * 2f * (float)Math.PI;
-                        drawList.PathArcTo(position, radius, oldAngle, progressAngle, segments);
+                        float oldAngle = progressAngle - 0.0003f * total * endAngle;
+                        progressAngle = current / total * endAngle;
+                        drawList.PathArcTo(position, radius, oldAngle + offset, progressAngle + offset, segments);
                         drawList.PathStroke(Config.QueueColor.Base, ImDrawFlags.None, Config.CircleThickness);
                     }
 
                     // anything that remains is background
-                    drawList.PathArcTo(position, radius, progressAngle, 2f * (float)Math.PI, segments);
+                    drawList.PathArcTo(position, radius, progressAngle + offset, endAngle + offset, segments);
                     drawList.PathStroke(Config.BackgroundColor.Base, ImDrawFlags.None, Config.CircleThickness);
                 }
 
                 if (Config.ShowBorder)
                 {
-                    drawList.PathArcTo(position, radius - Config.CircleThickness / 2f, 0f, 2f * (float)Math.PI, segments);
+                    drawList.PathArcTo(position, radius - Config.CircleThickness / 2f, 0, endAngle, segments);
                     drawList.PathStroke(0xFF000000, ImDrawFlags.None, 1);
 
-                    drawList.PathArcTo(position, radius + Config.CircleThickness / 2f, 0f, 2f * (float)Math.PI, segments);
+                    drawList.PathArcTo(position, radius + Config.CircleThickness / 2f, 0, endAngle, segments);
                     drawList.PathStroke(0xFF000000, ImDrawFlags.None, 1);
                 }
             });
@@ -202,8 +219,6 @@ namespace DelvUI.Interface.GeneralElements
 
             float currentPercent = current / total;
             float percentNonQueue = total != 0 ? 1F - (500f / 1000f) / total : 0;
-
-            PluginLog.Log(current + " - " + percentNonQueue + " - " + total);
 
             if (percentNonQueue > 0 && currentPercent >= percentNonQueue && Config.ShowGCDQueueIndicator)
             {
@@ -226,7 +241,7 @@ namespace DelvUI.Interface.GeneralElements
                 bar.AddForegrounds(foreground);
             }
 
-            bar.Draw(origin);
+            AddDrawActions(bar.GetDrawActions(origin, _config.StrataLevel));
         }
     }
 }

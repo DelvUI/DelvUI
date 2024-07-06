@@ -1,6 +1,4 @@
-﻿using Dalamud.Interface;
-using DelvUI.Config.Attributes;
-using DelvUI.Helpers;
+﻿using DelvUI.Config.Attributes;
 using ImGuiNET;
 using System;
 using System.IO;
@@ -12,10 +10,19 @@ namespace DelvUI.Config.Tree
     {
         public bool Selected;
         public string Name = null!;
+        public bool ForceAllowExport = false;
+        public string? ForceSelectedTabName = null;
 
         public SectionNode() { }
 
-        public bool Draw(ref bool changed)
+        protected override bool AllowExport()
+        {
+            if (ForceAllowExport) { return true; }
+
+            return base.AllowExport();
+        }
+
+        public bool Draw(ref bool changed, float alpha)
         {
             if (!Selected)
             {
@@ -27,20 +34,39 @@ namespace DelvUI.Config.Tree
             ImGui.NewLine();
 
             ImGui.BeginChild(
-                "item view",
-                new Vector2(0, -ImGui.GetFrameHeightWithSpacing() - 15),
+                "DelvU_Settings_Tab",
+                new Vector2(0, -10),
                 false,
                 ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse
             ); // Leave room for 1 line below us
 
             {
+                if (ConfigurationManager.Instance.OverrideDalamudStyle)
+                {
+                    ImGui.PushStyleColor(ImGuiCol.Tab, new Vector4(45f / 255f, 45f / 255f, 45f / 255f, alpha));
+                    ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(45f / 255f, 45f / 255f, 45f / 255f, alpha));
+                }
+
                 if (ImGui.BeginTabBar("##Tabs", ImGuiTabBarFlags.None))
                 {
                     foreach (SubSectionNode subSectionNode in _children)
                     {
-                        if (!ImGui.BeginTabItem(subSectionNode.Name))
+                        if (ForceSelectedTabName != null)
                         {
-                            continue;
+                            bool a = subSectionNode.Name == ForceSelectedTabName; // no idea how this works
+                            ImGuiTabItemFlags flag = subSectionNode.Name == ForceSelectedTabName ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None;
+
+                            if (!ImGui.BeginTabItem(subSectionNode.Name, ref a, flag))
+                            {
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            if (!ImGui.BeginTabItem(subSectionNode.Name))
+                            {
+                                continue;
+                            }
                         }
 
                         DrawExportResetContextMenu(subSectionNode, subSectionNode.Name);
@@ -53,6 +79,12 @@ namespace DelvUI.Config.Tree
                     }
 
                     ImGui.EndTabBar();
+                    ForceSelectedTabName = null;
+                }
+
+                if (ConfigurationManager.Instance.OverrideDalamudStyle)
+                {
+                    ImGui.PopStyleColor(2);
                 }
 
                 didReset |= DrawResetModal();
@@ -107,7 +139,8 @@ namespace DelvUI.Config.Tree
                 }
             }
 
-            throw new ArgumentException("The provided configuration object does not specify a sub-section");
+            Type type = typeof(T);
+            throw new ArgumentException("The provided configuration object does not specify a sub-section: " + type.Name);
         }
     }
 }

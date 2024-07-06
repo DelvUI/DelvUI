@@ -6,17 +6,13 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [Section("Misc")]
+    [Section("Other Elements")]
     [SubSection("Pull Timer", 0)]
     public class PullTimerConfig : ProgressBarConfig
     {
         [Checkbox("Use Job Color")]
         [Order(45)]
         public bool UseJobColor = false;
-
-        [Checkbox("Show Decimals")]
-        [Order(50)]
-        public bool ShowDecimals = true;
 
         public PullTimerConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
         {

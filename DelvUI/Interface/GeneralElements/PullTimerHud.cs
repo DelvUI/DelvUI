@@ -12,7 +12,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         private PullTimerConfig Config => (PullTimerConfig)_config;
 
-        public GameObject? Actor { get; set; } = null;
+        public IGameObject? Actor { get; set; } = null;
 
         public PullTimerHud(PullTimerConfig config, string displayName) : base(config, displayName) { }
 
@@ -24,14 +24,14 @@ namespace DelvUI.Interface.GeneralElements
         public override void DrawChildren(Vector2 origin)
         {
             PullTimerState helper = PullTimerHelper.Instance.PullTimerState;
-            
-            Config.Label.SetText($"{helper.CountDownValue.ToString(Config.ShowDecimals ? "N2" : "N0", CultureInfo.InvariantCulture),0}");
+
+            Config.Label.SetValue(helper.CountDownValue);
 
             if (!helper.CountingDown)
             {
                 Config.Label.SetText("");
             }
-            
+
             if (!Config.Enabled || Actor is null)
             {
                 return;
@@ -42,11 +42,13 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            var fillColor = Config.UseJobColor ? Utils.ColorForActor(Actor) : null;
-            
-            BarUtilities.GetProgressBar(Config, 
+            PluginConfigColor? fillColor = Config.UseJobColor ? ColorUtils.ColorForActor(Actor) : null;
+             
+            BarHud bar = BarUtilities.GetProgressBar(Config,
                 helper.CountDownValue,
-                helper.CountDownMax, 0F, Actor, fillColor).Draw(origin);
+                helper.CountDownMax, 0F, Actor, fillColor);
+
+            AddDrawActions(bar.GetDrawActions(origin, Config.StrataLevel));
         }
     }
 }

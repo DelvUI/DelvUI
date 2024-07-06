@@ -10,6 +10,7 @@ namespace DelvUI.Config.Tree
     {
         public string Name = null!;
         public int Depth;
+        public string? ForceSelectedTabName = null;
 
         public abstract bool Draw(ref bool changed);
 
@@ -27,10 +28,10 @@ namespace DelvUI.Config.Tree
             if (_children.Count > 1)
             {
                 ImGui.BeginChild(
-                    "item" + Depth + " view",
+                    "DelvUI_Tabs_" + Depth,
                     new Vector2(0, ImGui.GetWindowHeight() - 22),
                     false,
-                    ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse
+                    ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse
                 ); // Leave room for 1 line below us
 
                 if (ImGui.BeginTabBar("##tabs" + Depth, ImGuiTabBarFlags.None))
@@ -62,9 +63,22 @@ namespace DelvUI.Config.Tree
             {
                 if (subSectionNode is NestedSubSectionNode)
                 {
-                    if (!ImGui.BeginTabItem(subSectionNode.Name))
+                    if (ForceSelectedTabName != null)
                     {
-                        continue;
+                        bool a = subSectionNode.Name == ForceSelectedTabName; // no idea how this works
+                        ImGuiTabItemFlags flag = subSectionNode.Name == ForceSelectedTabName ? ImGuiTabItemFlags.SetSelected : ImGuiTabItemFlags.None;
+
+                        if (!ImGui.BeginTabItem(subSectionNode.Name, ref a, flag))
+                        {
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        if (!ImGui.BeginTabItem(subSectionNode.Name))
+                        {
+                            continue;
+                        }
                     }
 
                     DrawExportResetContextMenu(subSectionNode, subSectionNode.Name);
@@ -80,6 +94,8 @@ namespace DelvUI.Config.Tree
                     didReset |= subSectionNode.Draw(ref changed);
                 }
             }
+
+            ForceSelectedTabName = null;
 
             didReset |= DrawResetModal();
 

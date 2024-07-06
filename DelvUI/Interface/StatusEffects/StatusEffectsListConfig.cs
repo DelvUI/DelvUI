@@ -1,8 +1,9 @@
-﻿using Dalamud.Interface;
+using Dalamud.Interface;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Helpers;
+using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Lumina.Excel;
@@ -10,6 +11,7 @@ using Lumina.Excel.GeneratedSheets;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 
 namespace DelvUI.Interface.StatusEffects
@@ -161,6 +163,9 @@ namespace DelvUI.Interface.StatusEffects
         [Order(17, collapseWith = nameof(AnchorToUnitFrame))]
         public DrawAnchor UnitFrameAnchor = DrawAnchor.TopLeft;
 
+        [NestedConfig("Visibility", 200)]
+        public VisibilityConfig VisibilityConfig = new VisibilityConfig();
+
         public UnitFrameStatusEffectsListConfig(Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
             GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
             : base(position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)
@@ -177,7 +182,7 @@ namespace DelvUI.Interface.StatusEffects
         [Order(15)]
         public Vector2 Size;
 
-        [DragInt2("Icon Padding", min = 0, max = 100)]
+        [DragInt2("Icon Padding", min = 0, max = 500)]
         [Order(19)]
         public Vector2 IconPadding = new(2, 2);
 
@@ -185,7 +190,7 @@ namespace DelvUI.Interface.StatusEffects
         [Order(20)]
         public bool Preview;
 
-        [Checkbox("Fill Rows First", separator = true)]
+        [Checkbox("Fill Rows First", spacing = true)]
         [Order(25)]
         public bool FillRowsFirst = true;
 
@@ -195,7 +200,9 @@ namespace DelvUI.Interface.StatusEffects
             "Left and Down",
             "Left and Up",
             "Centered and Up",
-            "Centered and Down"
+            "Centered and Down",
+            "Centered and Left",
+            "Centered and Right"
         )]
         [Order(30)]
         public int Directions;
@@ -208,22 +215,42 @@ namespace DelvUI.Interface.StatusEffects
         [Order(40)]
         public bool ShowPermanentEffects;
 
-        [Checkbox("Only My Effects")]
-        [Order(45)]
+        [Checkbox("Permanent Effects First")]
+        [Order(41)]
+        public bool ShowPermanentFirst;
+
+        [Checkbox("Only My Effects", spacing = true)]
+        [Order(42)]
         public bool ShowOnlyMine = false;
 
         [Checkbox("My Effects First")]
-        [Order(50)]
+        [Order(43)]
         public bool ShowMineFirst = false;
 
-        [Checkbox("Tooltips")]
-        [Order(55)]
+        [Checkbox("Pet As Own Effect")]
+        [Order(44)]
+        public bool IncludePetAsOwn = false;
+
+        [Checkbox("Sort by Duration", spacing = true, help = "If enabled, \"Permanent Effects First\" and \"My Effects First\" will be ignored!")]
+        [Order(45)]
+        public bool SortByDuration = false;
+
+        [RadioSelector("Ascending", "Descending")]
+        [Order(46, collapseWith = nameof(SortByDuration))]
+        public StatusEffectDurationSortType DurationSortType = StatusEffectDurationSortType.Ascending;
+
+        [Checkbox("Tooltips", spacing = true)]
+        [Order(47)]
         public bool ShowTooltips = true;
 
-        [NestedConfig("Icons", 60)]
+        [Checkbox("Disable Interaction", help = "Enabling this will disable right clicking buffs off, or the shortcut to blacklist/whitelist a status effect.")]
+        [Order(48)]
+        public bool DisableInteraction = false;
+
+        [NestedConfig("Icons", 65)]
         public StatusEffectIconConfig IconConfig;
 
-        [NestedConfig("Filter Status Effects", 65)]
+        [NestedConfig("Filter Status Effects", 70, separator = true, spacing = false, collapsingHeader = false)]
         public StatusEffectsBlacklistConfig BlacklistConfig = new StatusEffectsBlacklistConfig();
 
 
@@ -239,37 +266,14 @@ namespace DelvUI.Interface.StatusEffects
             SetGrowthDirections(growthDirections);
 
             IconConfig = iconConfig;
+
+            Strata = StrataLevel.HIGH;
         }
 
         private void SetGrowthDirections(GrowthDirections growthDirections)
         {
-            var index = DirectionOptionsValues.FindIndex(d => d == growthDirections);
-            if (index > 0)
-            {
-                Directions = index;
-            }
+            Directions = LayoutHelper.IndexFromGrowthDirections(growthDirections);
         }
-
-        public GrowthDirections GetGrowthDirections()
-        {
-            if (Directions > 0 && Directions < DirectionOptionsValues.Count)
-            {
-                return DirectionOptionsValues[Directions];
-            }
-
-            return DirectionOptionsValues[0];
-        }
-
-        [JsonIgnore]
-        internal List<GrowthDirections> DirectionOptionsValues = new List<GrowthDirections>()
-        {
-            GrowthDirections.Right | GrowthDirections.Down,
-            GrowthDirections.Right | GrowthDirections.Up,
-            GrowthDirections.Left | GrowthDirections.Down,
-            GrowthDirections.Left | GrowthDirections.Up,
-            GrowthDirections.Centered | GrowthDirections.Up,
-            GrowthDirections.Centered | GrowthDirections.Down
-        };
     }
 
     [Exportable(false)]
@@ -280,24 +284,27 @@ namespace DelvUI.Interface.StatusEffects
         [Order(5)]
         public Vector2 Size = new(40, 40);
 
-        [NestedConfig("Duration", 10, separator = false, spacing = true)]
-        public LabelConfig DurationLabelConfig;
-
-        [NestedConfig("Stacks", 15, separator = false, spacing = true)]
-        public LabelConfig StacksLabelConfig;
-
         [Checkbox("Crop Icon", spacing = true)]
         [Order(20)]
         public bool CropIcon = true;
 
-        [NestedConfig("Border", 25, collapseWith = nameof(CropIcon), separator = false, spacing = true)]
+        [NestedConfig("Border", 25, collapseWith = nameof(CropIcon), collapsingHeader = false)]
         public StatusEffectIconBorderConfig BorderConfig = new();
 
-        [NestedConfig("Dispellable Effects Border", 30, collapseWith = nameof(CropIcon), separator = false, spacing = true)]
+        [NestedConfig("Shadow", 26, collapseWith = nameof(CropIcon), collapsingHeader = false)]
+        public ShadowConfig ShadowConfig = new ShadowConfig() { Enabled = false };
+
+        [NestedConfig("Dispellable Effects Border", 30, collapseWith = nameof(CropIcon), collapsingHeader = false)]
         public StatusEffectIconBorderConfig DispellableBorderConfig = new(new PluginConfigColor(new Vector4(141f / 255f, 206f / 255f, 229f / 255f, 100f / 100f)), 2);
 
-        [NestedConfig("My Effects Border", 35, collapseWith = nameof(CropIcon), separator = false, spacing = true)]
+        [NestedConfig("My Effects Border", 35, collapseWith = nameof(CropIcon), collapsingHeader = false)]
         public StatusEffectIconBorderConfig OwnedBorderConfig = new(new PluginConfigColor(new Vector4(35f / 255f, 179f / 255f, 69f / 255f, 100f / 100f)), 1);
+
+        [NestedConfig("Duration", 50)]
+        public LabelConfig DurationLabelConfig;
+
+        [NestedConfig("Stacks", 60)]
+        public LabelConfig StacksLabelConfig;
 
         public StatusEffectIconConfig(LabelConfig? durationLabelConfig = null, LabelConfig? stacksLabelConfig = null)
         {
@@ -340,16 +347,25 @@ namespace DelvUI.Interface.StatusEffects
             var config = new LabelConfig(new Vector2(16, -11), "", DrawAnchor.Center, DrawAnchor.Center);
             config.Color = new(Vector4.UnitW);
             config.OutlineColor = new(Vector4.One);
-            config.ShadowColor = new(Vector4.One);
+            config.ShadowConfig.Color = new(Vector4.One);
 
             return config;
         }
     }
 
+    public enum FilterType
+    {
+        Blacklist,
+        Whitelist
+    }
+
     [Exportable(false)]
     public class StatusEffectsBlacklistConfig : PluginConfigObject
     {
-        public bool UseAsWhitelist = false;
+        [RadioSelector(typeof(FilterType))]
+        [Order(5)]
+        public FilterType FilterType;
+
         public SortedList<string, uint> List = new SortedList<string, uint>();
 
         [JsonIgnore] private string? _errorMessage = null;
@@ -363,8 +379,8 @@ namespace DelvUI.Interface.StatusEffects
 
         public bool StatusAllowed(Status status)
         {
-            var inList = List.ContainsKey(KeyName(status));
-            if ((inList && !UseAsWhitelist) || (!inList && UseAsWhitelist))
+            bool inList = List.Any(pair => pair.Value == status.RowId);
+            if ((inList && FilterType == FilterType.Blacklist) || (!inList && FilterType == FilterType.Whitelist))
             {
                 return false;
             }
@@ -389,19 +405,23 @@ namespace DelvUI.Interface.StatusEffects
         {
             if (input.Length > 0 && sheet != null)
             {
-                Status? status = null;
+                List<Status> statusToAdd = new List<Status>();
 
                 // try id
                 if (uint.TryParse(input, out uint uintValue))
                 {
                     if (uintValue > 0)
                     {
-                        status = sheet.GetRow(uintValue);
+                        Status? status = sheet.GetRow(uintValue);
+                        if (status != null)
+                        {
+                            statusToAdd.Add(status);
+                        }
                     }
                 }
 
                 // try name
-                if (status == null)
+                if (statusToAdd.Count == 0)
                 {
                     var enumerator = sheet.GetEnumerator();
 
@@ -410,13 +430,17 @@ namespace DelvUI.Interface.StatusEffects
                         Status item = enumerator.Current;
                         if (item.Name.ToString().ToLower() == input.ToLower())
                         {
-                            status = item;
-                            break;
+                            statusToAdd.Add(item);
                         }
                     }
                 }
 
-                return AddNewEntry(status);
+                bool added = false;
+                foreach (Status status in statusToAdd)
+                {
+                    added |= AddNewEntry(status);
+                }
+                return added;
             }
 
             return false;
@@ -487,18 +511,13 @@ namespace DelvUI.Interface.StatusEffects
             var iconSize = new Vector2(30, 30);
             var indexToRemove = -1;
 
-            if (ImGui.BeginChild("Filter Effects", new Vector2(0, 360), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+            if (ImGui.BeginChild("Filter Effects", new Vector2(0, 360), false, ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
-                ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
-                ImGui.SameLine();
-                changed |= ImGui.Checkbox("Use as Whitelist", ref UseAsWhitelist);
-                ImGui.NewLine();
-
-                ImGui.Text("\u2002 \u2002");
+                ImGui.Text("    ");
                 ImGui.SameLine();
                 ImGui.Text("Type an ID or Name");
 
-                ImGui.Text("\u2002 \u2002");
+                ImGui.Text("    ");
                 ImGui.SameLine();
                 ImGui.PushItemWidth(300);
                 if (ImGui.InputText("", ref _input, 64, ImGuiInputTextFlags.EnterReturnsTrue))
@@ -525,7 +544,7 @@ namespace DelvUI.Interface.StatusEffects
                     ImGui.OpenPopup("export_succes_popup");
                 }
                 ImGui.PopFont();
-                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Export List to Clipboard"); }
+                ImGuiHelper.SetTooltip("Export List to Clipboard");
 
                 // export success popup
                 if (ImGui.BeginPopup("export_succes_popup"))
@@ -542,7 +561,7 @@ namespace DelvUI.Interface.StatusEffects
                     _importString = ImGui.GetClipboardText();
                 }
                 ImGui.PopFont();
-                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Import List from Clipboard"); }
+                ImGuiHelper.SetTooltip("Import List from Clipboard");
 
                 // clear
                 ImGui.SameLine();
@@ -552,9 +571,9 @@ namespace DelvUI.Interface.StatusEffects
                     _clearingList = true;
                 }
                 ImGui.PopFont();
-                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Clear List"); }
+                ImGuiHelper.SetTooltip("Clear List");
 
-                ImGui.Text("\u2002 \u2002");
+                ImGui.Text("    ");
                 ImGui.SameLine();
 
                 if (ImGui.BeginTable("table", 4, flags, new Vector2(583, List.Count > 0 ? 200 : 40)))
@@ -623,7 +642,7 @@ namespace DelvUI.Interface.StatusEffects
 
                     ImGui.EndTable();
                 }
-                ImGui.Text("\u2002 \u2002");
+                ImGui.Text("    ");
                 ImGui.SameLine();
                 ImGui.Text("Tip: You can [Ctrl + Alt + Shift] + Left Click on a status effect to automatically add it to the list.");
 
@@ -689,6 +708,26 @@ namespace DelvUI.Interface.StatusEffects
         }
     }
 
+
+    public class StatusEffectsBlacklistConfigConverter : PluginConfigObjectConverter
+    {
+        public StatusEffectsBlacklistConfigConverter()
+        {
+            NewTypeFieldConverter<bool, FilterType> converter;
+            converter = new NewTypeFieldConverter<bool, FilterType>("FilterType", FilterType.Blacklist, (oldValue) =>
+            {
+                return oldValue ? FilterType.Whitelist : FilterType.Blacklist;
+            });
+
+            FieldConvertersMap.Add("UseAsWhitelist", converter);
+        }
+
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(StatusEffectsBlacklistConfig);
+        }
+    }
+
     [Section("Buffs and Debuffs")]
     [SubSection("Custom Effects", 0)]
     public class CustomEffectsListConfig : StatusEffectsListConfig
@@ -707,7 +746,7 @@ namespace DelvUI.Interface.StatusEffects
             config.Directions = 5;
 
             // pre-populated white list
-            config.BlacklistConfig.UseAsWhitelist = true;
+            config.BlacklistConfig.FilterType = FilterType.Whitelist;
 
             ExcelSheet<Status>? sheet = Plugin.DataManager.GetExcelSheet<Status>();
             if (sheet != null)
@@ -748,6 +787,27 @@ namespace DelvUI.Interface.StatusEffects
                 // Devotion
                 config.BlacklistConfig.AddNewEntry(sheet.GetRow(1213));
 
+                // Divination
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1878));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2034));
+
+                // Chain Stratagem
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1221));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1406));
+
+                // Radiant Finale
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2722));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2964));
+
+                // Arcane Circle
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2599));
+
+                // Searing Light
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2703));
+
+                // Trick Attack
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(638));
+
                 // ------ AST Card Buffs -------
                 // The Balance
                 config.BlacklistConfig.AddNewEntry(sheet.GetRow(829));
@@ -776,22 +836,6 @@ namespace DelvUI.Interface.StatusEffects
                 config.BlacklistConfig.AddNewEntry(sheet.GetRow(834));
                 config.BlacklistConfig.AddNewEntry(sheet.GetRow(1341));
                 config.BlacklistConfig.AddNewEntry(sheet.GetRow(1887));
-
-                // Lord of Crowns
-                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1451));
-                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1876));
-
-                // Lady of Crowns
-                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1452));
-                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1877));
-
-                // Divination
-                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1878));
-                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2034));
-
-                // Chain Stratagem
-                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1221));
-                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1406));
             }
 
             return config;
@@ -802,5 +846,11 @@ namespace DelvUI.Interface.StatusEffects
             : base(position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)
         {
         }
+    }
+
+    public enum StatusEffectDurationSortType
+    {
+        Ascending,
+        Descending
     }
 }

@@ -11,12 +11,13 @@ using Dalamud.Game.ClientState.JobGauge.Types;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class MPTickerHud : DraggableHudElement, IHudElementWithActor
+    public class MPTickerHud : DraggableHudElement, IHudElementWithActor, IHudElementWithVisibilityConfig
     {
         private MPTickerConfig Config => (MPTickerConfig)_config;
+        public VisibilityConfig VisibilityConfig => Config.VisibilityConfig;
 
         private MPTickHelper _mpTickHelper = null!;
-        public GameObject? Actor { get; set; } = null;
+        public IGameObject? Actor { get; set; } = null;
 
         public MPTickerHud(MPTickerConfig config, string displayName) : base(config, displayName) { }
 
@@ -33,7 +34,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public override void DrawChildren(Vector2 origin)
         {
-            if (!Config.Enabled || Actor == null || Actor is not PlayerCharacter player)
+            if (!Config.Enabled || Actor == null || Actor is not IPlayerCharacter player)
             {
                 return;
             }
@@ -78,13 +79,14 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             MPTickerFire3ThresholdConfig? thresholdConfig = GetFire3ThresholdConfig();
-            BarUtilities.GetProgressBar(Config.Bar, thresholdConfig, null, scale, 1, 0, fillColor: Config.Bar.FillColor)
-                .Draw(origin + Config.Position);
+            BarHud bar = BarUtilities.GetProgressBar(Config.Bar, thresholdConfig, null, scale, 1, 0, fillColor: Config.Bar.FillColor);
+
+            AddDrawActions(bar.GetDrawActions(origin + Config.Position, _config.StrataLevel));
         }
 
         private MPTickerFire3ThresholdConfig? GetFire3ThresholdConfig()
         {
-            if (Actor is not PlayerCharacter player || player.ClassJob.Id != JobIDs.BLM)
+            if (Actor is not IPlayerCharacter player || player.ClassJob.Id != JobIDs.BLM)
             {
                 return null;
             }
@@ -95,7 +97,7 @@ namespace DelvUI.Interface.GeneralElements
                 return null;
             }
 
-            bool leyLinesActive = player.StatusList.Any(e => e.StatusId == 738);
+            bool leyLinesActive = Utils.StatusListForBattleChara(player).Any(e => e.StatusId == 738);
             float castTime = config.Fire3CastTime * (leyLinesActive ? 0.85f : 1f);
 
             // tick rate is 3s

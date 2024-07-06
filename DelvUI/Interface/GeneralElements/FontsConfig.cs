@@ -1,4 +1,5 @@
 ﻿using Dalamud.Interface;
+using Dalamud.Interface.ImGuiFileDialog;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -7,7 +8,12 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Numerics;
+using Dalamud.Interface.GameFonts;
+using Dalamud.Logging;
+using DelvUI.Enums;
+using DelvUI.Interface.Bars;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -24,7 +30,7 @@ namespace DelvUI.Interface.GeneralElements
     }
 
     [Disableable(false)]
-    [Section("Misc")]
+    [Section("Customization")]
     [SubSection("Fonts", 0)]
     public class FontsConfig : PluginConfigObject
     {
@@ -36,8 +42,20 @@ namespace DelvUI.Interface.GeneralElements
         public SortedList<string, FontData> Fonts = new SortedList<string, FontData>();
         public bool SupportChineseCharacters = false;
         public bool SupportKoreanCharacters = false;
+        public bool SupportCyrillicCharacters = false;
+        [JsonIgnore] public readonly Dictionary<string, string> GameFontMap = new Dictionary<string, string>()
+        {
+            {"Axis", "axis-ffxiv"},
+            {"Jupiter", "jupiter-ffxiv"},
+            {"JupiterNumeric", "jupiter-numeric-ffxiv"},
+            {"MiedingerMid", "meidinger-ffxiv"},
+            {"Meidinger", "meidinger-numberic-ffxiv"},
+            {"TrumpGothic", "trumpgothic-ffxiv"},
+            
+        };
 
-        [JsonIgnore] public static readonly List<string> DefaultFontsKeys = new List<string>() { "big-noodle-too_24", "big-noodle-too_20", "big-noodle-too_16" };
+        [JsonIgnore] public static readonly List<string> DefaultFontsKeys = new List<string>() { "Expressway_24", "Expressway_20", "Expressway_16" };
+
         [JsonIgnore] public static string DefaultBigFontKey => DefaultFontsKeys[0];
         [JsonIgnore] public static string DefaultMediumFontKey => DefaultFontsKeys[1];
         [JsonIgnore] public static string DefaultSmallFontKey => DefaultFontsKeys[2];
@@ -47,6 +65,11 @@ namespace DelvUI.Interface.GeneralElements
 
         [JsonIgnore] private string[] _fonts = null!;
         [JsonIgnore] private string[] _sizes = null!;
+
+        [JsonIgnore] private int _removingIndex = -1;
+        [JsonIgnore] private int _applyingIndex = -1!;
+
+        [JsonIgnore] private FileDialogManager _fileDialogManager = new FileDialogManager();
 
         public FontsConfig()
         {
@@ -61,11 +84,10 @@ namespace DelvUI.Interface.GeneralElements
                     var defaultFont = new FontData(str[0], int.Parse(str[1]));
                     Fonts.Add(key, defaultFont);
                 }
-
             }
 
             // sizes
-            _sizes = new string[40];
+            _sizes = new string[100];
             for (int i = 0; i < _sizes.Length; i++)
             {
                 _sizes[i] = (i + 1).ToString();
@@ -109,16 +131,31 @@ namespace DelvUI.Interface.GeneralElements
 
             return fonts;
         }
+        
+        private string[] FontsFromGame()
+        {
+            string[] gameFontArray = Enum.GetNames(typeof(GameFontFamily)).Skip(1).ToArray();
+            string[] fonts = new string[gameFontArray.Length];
+
+            for (int i = 0; i < gameFontArray.Length; i++)
+            {
+                fonts[i] = GameFontMap[gameFontArray[i]];
+            }
+
+            return fonts;
+        }
 
         private void ReloadFonts()
         {
-            var defaultFontsPath = ValidatePath(FontsManager.Instance.DefaultFontsPath);
+            string defaultFontsPath = ValidatePath(FontsManager.Instance.DefaultFontsPath);
             string[] defaultFonts = FontsFromPath(defaultFontsPath);
+            string[] gameFonts = FontsFromGame();
             string[] userFonts = FontsFromPath(ValidatedFontsPath);
 
-            _fonts = new string[defaultFonts.Length + userFonts.Length];
+            _fonts = new string[defaultFonts.Length + gameFonts.Length + userFonts.Length];
             defaultFonts.CopyTo(_fonts, 0);
-            userFonts.CopyTo(_fonts, defaultFonts.Length);
+            gameFonts.CopyTo(_fonts, defaultFonts.Length);
+            userFonts.CopyTo(_fonts, defaultFonts.Length + gameFonts.Length);
         }
 
         private bool AddNewEntry(int font, int size)
@@ -133,26 +170,40 @@ namespace DelvUI.Interface.GeneralElements
                 return false;
             }
 
-            var fontName = _fonts[font];
-            var key = fontName + "_" + size.ToString();
+            string fontName = _fonts[font];
+            string key = fontName + "_" + size.ToString();
 
             if (Fonts.ContainsKey(key))
             {
                 return false;
             }
 
-            var fontData = new FontData(fontName, size);
+            FontData fontData = new FontData(fontName, size);
             Fonts.Add(key, fontData);
 
-            Plugin.UiBuilder.RebuildFonts();
+            FontsManager.Instance.BuildFonts();
 
             return true;
+        }
+
+        private void SelectFolder()
+        {
+            Action<bool, string> callback = (finished, path) =>
+            {
+                if (finished && path.Length > 0)
+                {
+                    FontsPath = path;
+                    ReloadFonts();
+                }
+            };
+
+            _fileDialogManager.OpenFolderDialog("Select Fonts Folder", callback);
         }
 
         [ManualDraw]
         public bool Draw(ref bool changed)
         {
-            var flags =
+            ImGuiTableFlags flags =
                 ImGuiTableFlags.RowBg |
                 ImGuiTableFlags.Borders |
                 ImGuiTableFlags.BordersOuter |
@@ -160,23 +211,29 @@ namespace DelvUI.Interface.GeneralElements
                 ImGuiTableFlags.ScrollY |
                 ImGuiTableFlags.SizingFixedSame;
 
-            var indexToRemove = -1;
-
-            if (ImGui.BeginChild("Fonts", new Vector2(400, 400), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+            if (ImGui.BeginChild("Fonts", new Vector2(800, 500), false, ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
                 if (_fonts.Length == 0)
                 {
                     ImGuiHelper.Tab();
-                    ImGui.Text("Default font not found in \"%appdata%/Roaming/XIVLauncher/InstalledPlugins/DelvUI/Media/Fonts/big-noodle-too.ttf\"");
+                    ImGui.Text("Default font not found in \"%appdata%/Roaming/XIVLauncher/InstalledPlugins/DelvUI/Media/Fonts/Expressway.ttf\"");
                     return false;
                 }
 
                 ImGuiHelper.NewLineAndTab();
-                if (ImGui.InputText("Fonts Path", ref FontsPath, 200, ImGuiInputTextFlags.EnterReturnsTrue))
+                if (ImGui.InputText("Path", ref FontsPath, 200, ImGuiInputTextFlags.EnterReturnsTrue))
                 {
                     changed = true;
                     ReloadFonts();
                 }
+
+                ImGui.SameLine();
+                ImGui.PushFont(UiBuilder.IconFont);
+                if (ImGui.Button(FontAwesomeIcon.Folder.ToIconString(), new Vector2(0, 0)))
+                {
+                    SelectFolder();
+                }
+                ImGui.PopFont();
 
                 ImGuiHelper.Tab();
                 ImGui.Combo("Font ##font", ref _inputFont, _fonts, _fonts.Length, 10);
@@ -201,11 +258,11 @@ namespace DelvUI.Interface.GeneralElements
                 ImGui.PopFont();
 
                 ImGuiHelper.NewLineAndTab();
-                if (ImGui.BeginTable("table", 3, flags, new Vector2(326, 150)))
+                if (ImGui.BeginTable("table", 3, flags, new Vector2(326, 300)))
                 {
                     ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch, 0, 0);
                     ImGui.TableSetupColumn("Size", ImGuiTableColumnFlags.WidthFixed, 0, 1);
-                    ImGui.TableSetupColumn("", ImGuiTableColumnFlags.WidthFixed, 0, 2);
+                    ImGui.TableSetupColumn("Actions", ImGuiTableColumnFlags.WidthFixed, 0, 2);
 
                     ImGui.TableSetupScrollFreeze(0, 1);
                     ImGui.TableHeadersRow();
@@ -231,17 +288,25 @@ namespace DelvUI.Interface.GeneralElements
                         }
 
                         // remove
-                        if (!IsDefaultFont(key) && ImGui.TableSetColumnIndex(2))
+                        if (ImGui.TableSetColumnIndex(2))
                         {
                             ImGui.PushFont(UiBuilder.IconFont);
                             ImGui.PushStyleColor(ImGuiCol.Button, Vector4.Zero);
                             ImGui.PushStyleColor(ImGuiCol.ButtonActive, Vector4.Zero);
                             ImGui.PushStyleColor(ImGuiCol.ButtonHovered, Vector4.Zero);
 
-                            if (ImGui.Button(FontAwesomeIcon.Trash.ToIconString()))
+                            if (ImGui.Button(FontAwesomeIcon.ArrowAltCircleUp.ToIconString()))
                             {
-                                changed = true;
-                                indexToRemove = i;
+                                _applyingIndex = i;
+                            }
+
+                            if (!IsDefaultFont(key))
+                            {
+                                ImGui.SameLine();
+                                if (ImGui.Button(FontAwesomeIcon.Trash.ToIconString()))
+                                {
+                                    _removingIndex = i;
+                                }
                             }
 
                             ImGui.PopFont();
@@ -253,29 +318,81 @@ namespace DelvUI.Interface.GeneralElements
                     ImGui.EndTable();
                 }
 
-                ImGui.NewLine();
                 ImGuiHelper.NewLineAndTab();
                 if (ImGui.Checkbox("Support Chinese", ref SupportChineseCharacters))
                 {
                     changed = true;
-                    Plugin.UiBuilder.RebuildFonts();
+                    FontsManager.Instance.BuildFonts();
                 }
 
                 ImGui.SameLine();
                 if (ImGui.Checkbox("Support Korean", ref SupportKoreanCharacters))
                 {
                     changed = true;
-                    Plugin.UiBuilder.RebuildFonts();
+                    FontsManager.Instance.BuildFonts();
+                }
+
+                ImGui.SameLine();
+                if (ImGui.Checkbox("Support Cyrillic", ref SupportCyrillicCharacters))
+                {
+                    changed = true;
+                    FontsManager.Instance.BuildFonts();
                 }
             }
 
-            if (indexToRemove >= 0)
+            // apply confirmation
+            if (_applyingIndex >= 0)
             {
-                Fonts.RemoveAt(indexToRemove);
-                Plugin.UiBuilder.RebuildFonts();
+                string[] lines = new string[] { "Are you sure you want to apply this font", "to all labels using a font with the same size?" };
+                var (didConfirm, didClose) = ImGuiHelper.DrawConfirmationModal("Apply to all labels?", lines);
+
+                if (didConfirm)
+                {
+                    var (key, font) = Fonts.ElementAt(_applyingIndex);
+
+                    List<LabelConfig> labelConfigs = ConfigurationManager.Instance.GetObjects<LabelConfig>();
+                    foreach (LabelConfig label in labelConfigs)
+                    {
+                        if (label.FontID != null && Fonts.TryGetValue(label.FontID, out FontData value))
+                        {
+                            if (font.Size == value.Size)
+                            {
+                                label.FontID = key;
+                            }
+                        }
+                    }
+
+                    changed = true;
+                }
+
+                if (didConfirm || didClose)
+                {
+                    _applyingIndex = -1;
+                }
+            }
+
+            // delete confirmation
+            if (_removingIndex >= 0)
+            {
+                string[] lines = new string[] { "Are you sure you want to remove this font?" };
+                var (didConfirm, didClose) = ImGuiHelper.DrawConfirmationModal("Remove custom font?", lines);
+
+                if (didConfirm)
+                {
+                    Fonts.RemoveAt(_removingIndex);
+                    FontsManager.Instance.BuildFonts();
+                    changed = true;
+                }
+
+                if (didConfirm || didClose)
+                {
+                    _removingIndex = -1;
+                }
             }
 
             ImGui.EndChild();
+
+            _fileDialogManager.Draw();
 
             return false;
         }

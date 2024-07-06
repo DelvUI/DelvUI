@@ -1,6 +1,8 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using System.Numerics;
+using DelvUI.Interface.GeneralElements;
+using DelvUI.Enums;
 
 namespace DelvUI.Interface.Bars
 {
@@ -8,8 +10,8 @@ namespace DelvUI.Interface.Bars
     public class BarConfig : AnchorablePluginConfigObject
     {
         [ColorEdit4("Background Color")]
-        [Order(20)]
-        public PluginConfigColor BackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 50f / 100f));        
+        [Order(16)]
+        public PluginConfigColor BackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 50f / 100f));
 
         [ColorEdit4("Fill Color")]
         [Order(25)]
@@ -19,12 +21,31 @@ namespace DelvUI.Interface.Bars
         [Order(30)]
         public BarDirection FillDirection;
 
-        [Checkbox("Show Border")]
+        [BarTexture("Bar Texture", spacing = true, help = "Default means the bar will be drawn using the global gradient configuration for bars found in Colors > Misc.")]
+        [Order(31)]
+        public string BarTextureName = "";
+
+        [BarTextureDrawMode("Draw Mode")]
+        [Order(32)]
+        public BarTextureDrawMode BarTextureDrawMode = BarTextureDrawMode.Stretch;
+
+        [Checkbox("Show Border", spacing = true)]
         [Order(35)]
         public bool DrawBorder = true;
 
-        [Checkbox("Hide When Inactive")]
-        [Order(40)]
+        [ColorEdit4("Border Color")]
+        [Order(36, collapseWith = nameof(DrawBorder))]
+        public PluginConfigColor BorderColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+
+        [DragInt("Border Thickness", min = 1, max = 10)]
+        [Order(37, collapseWith = nameof(DrawBorder))]
+        public int BorderThickness = 1;
+
+        [NestedConfig("Shadow", 40, spacing = true)]
+        public ShadowConfig ShadowConfig = new ShadowConfig() { Enabled = false };
+
+        [Checkbox("Hide When Inactive", spacing = true)]
+        [Order(41)]
         public bool HideWhenInactive = false;
 
         public BarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor, BarDirection fillDirection = BarDirection.Right)

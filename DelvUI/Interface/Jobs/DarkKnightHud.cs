@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -65,7 +66,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
+        public override void DrawJobHud(Vector2 origin, IPlayerCharacter player)
         {
             Vector2 pos = origin + Config.Position;
 
@@ -81,7 +82,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.DarksideBar.Enabled)
             {
-                DrawDarkside(pos);
+                DrawDarkside(pos, player);
             }
 
             if (Config.BloodWeaponBar.Enabled)
@@ -96,88 +97,141 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.LivingShadowBar.Enabled)
             {
-                DrawLivingShadowBar(pos);
+                DrawLivingShadowBar(pos, player);
             }
         }
 
-        private void DrawManaBar(Vector2 origin, PlayerCharacter player)
+        private unsafe void DrawManaBar(Vector2 origin, IPlayerCharacter player)
         {
+            // TODO: Clean up with CS commit
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
+            byte darkArtsState = *((byte *)(new IntPtr(gauge.Address) + 0x9));
+            bool hasDarkArts = darkArtsState > 0;
 
-            if (Config.ManaBar.HideWhenInactive && !gauge.HasDarkArts && player.CurrentMp == player.MaxMp) { return; }
+            if (Config.ManaBar.HideWhenInactive && !hasDarkArts && player.CurrentMp == player.MaxMp) { return; }
 
-            if (gauge.HasDarkArts)
-            {
-                Config.ManaBar.UsePartialFillColor = false;
-            }
-            else { Config.ManaBar.UsePartialFillColor = true; }
+            Config.ManaBar.UsePartialFillColor = !hasDarkArts;
 
-            Config.ManaBar.Label.SetText($"{player.CurrentMp,0}");
+            Config.ManaBar.Label.SetValue(player.CurrentMp);
+
             // hardcoded 9k as maxMP so the chunks are each 3k since that's what a DRK wants to see
-            BarUtilities.GetChunkedProgressBars(
+            BarHud[] bars = BarUtilities.GetChunkedProgressBars(
                 Config.ManaBar,
-                gauge.HasDarkArts ? 1 : 3,
+                hasDarkArts ? 1 : 3,
                 player.CurrentMp,
-                Config.ManaBar.UseChunks ? 9000 : player.MaxMp,
+                Config.ManaBar.ShowFullMana ? player.MaxMp : 9000,
                 0f,
                 player,
-                glowConfig: null,
-                gauge.HasDarkArts ? Config.ManaBar.DarkArtsColor : Config.ManaBar.FillColor
-                ).Draw(origin);
+                null,
+                hasDarkArts ? Config.ManaBar.DarkArtsColor : Config.ManaBar.FillColor
+            );
+
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.ManaBar.StrataLevel));
+            }
         }
 
-        private void DrawDarkside(Vector2 origin)
+        private void DrawDarkside(Vector2 origin, IPlayerCharacter player)
         {
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
             if (Config.DarksideBar.HideWhenInactive && gauge.DarksideTimeRemaining == 0) { return; };
 
-            int timer = Math.Abs(gauge.DarksideTimeRemaining);
-            Config.DarksideBar.Label.SetText($"{timer / 1000}");
-            BarUtilities.GetProgressBar(Config.DarksideBar, timer, 60000f)
-                .Draw(origin);
+            float timer = Math.Abs(gauge.DarksideTimeRemaining) / 1000;
+
+            Config.DarksideBar.Label.SetValue(timer);
+
+            BarHud bar = BarUtilities.GetProgressBar(Config.DarksideBar, timer, 60, 0, player);
+            AddDrawActions(bar.GetDrawActions(origin, Config.DarksideBar.StrataLevel));
         }
 
-        private void DrawBloodGauge(Vector2 origin, PlayerCharacter player)
+        private void DrawBloodGauge(Vector2 origin, IPlayerCharacter player)
         {
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
             if (!Config.BloodGauge.HideWhenInactive || gauge.Blood > 0)
             {
-                Config.BloodGauge.Label.SetText(gauge.Blood.ToString("N0"));
-                BarUtilities.GetChunkedProgressBars(Config.BloodGauge, 2, gauge.Blood, 100).Draw(origin);
+                Config.BloodGauge.Label.SetValue(gauge.Blood);
+
+                BarHud[] bars = BarUtilities.GetChunkedProgressBars(Config.BloodGauge, 2, gauge.Blood, 100, 0, player);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.BloodGauge.StrataLevel));
+                }
             }
         }
 
-        private void DrawBloodWeaponBar(Vector2 origin, PlayerCharacter player)
+        private void DrawBloodWeaponBar(Vector2 origin, IPlayerCharacter player)
         {
-            float bloodWeaponDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 742)?.RemainingTime ?? 0f;
+            Status? bloodWeaponBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 742);
+            float duration = bloodWeaponBuff?.RemainingTime ?? 0f;
+            int stacks = bloodWeaponBuff?.StackCount ?? 0;
 
-            if (Config.BloodWeaponBar.HideWhenInactive && bloodWeaponDuration is 0) { return; }
+            if (Config.BloodWeaponBar.HideWhenInactive && duration is 0) { return; }
 
-            Config.BloodWeaponBar.Label.SetText(Math.Truncate(bloodWeaponDuration).ToString());
-            BarUtilities.GetProgressBar(Config.BloodWeaponBar, bloodWeaponDuration, 10, 0f)
-                .Draw(origin);
+            var chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[5];
+
+            for (int i = 0; i < 5; i++)
+            {
+                chunks[i] = new(Config.BloodWeaponBar.FillColor, i < stacks ? 1 : 0, i == 2 ? Config.BloodWeaponBar.Label : null);
+            }
+
+            if(Config.BloodWeaponBar.FillDirection is BarDirection.Left or BarDirection.Up)
+            {
+                chunks = chunks.Reverse().ToArray();
+            }
+
+            Config.BloodWeaponBar.Label.SetValue(duration);
+
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.BloodWeaponBar, chunks, player);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.BloodWeaponBar.StrataLevel));
+            }
         }
 
-        private void DrawDeliriumBar(Vector2 origin, PlayerCharacter player)
+        private void DrawDeliriumBar(Vector2 origin, IPlayerCharacter player)
         {
-            float deliriumDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1972 && o.RemainingTime > 0f)?.RemainingTime ?? 0f;
+            Status? deliriumBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1972);
+            float deliriumDuration = Math.Max(0f, deliriumBuff?.RemainingTime ?? 0f);
+            byte stacks = deliriumBuff?.StackCount ?? 0;
 
-            if (Config.DeliriumBar.HideWhenInactive && deliriumDuration is 0) { return; }
+            if (!Config.DeliriumBar.HideWhenInactive || deliriumDuration > 0)
+            {
+                var chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[3];
 
-            Config.DeliriumBar.Label.SetText(Math.Truncate(deliriumDuration).ToString());
-            BarUtilities.GetProgressBar(Config.DeliriumBar, deliriumDuration, 10, 0f)
-                .Draw(origin);
+                for (int i = 0; i < 3; i++)
+                {
+                    chunks[i] = new(Config.DeliriumBar.FillColor, i < stacks ? 1 : 0, i == 1 ? Config.DeliriumBar.Label : null);
+                }
+            
+                if(Config.DeliriumBar.FillDirection is BarDirection.Left or BarDirection.Up)
+                {
+                    chunks = chunks.Reverse().ToArray();
+                }
+
+                Config.DeliriumBar.Label.SetValue(deliriumDuration);
+
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.DeliriumBar, chunks, player);
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.DeliriumBar.StrataLevel));
+                }
+            }
         }
 
-        private void DrawLivingShadowBar(Vector2 origin)
+        private unsafe void DrawLivingShadowBar(Vector2 origin, IPlayerCharacter player)
         {
+            // TODO: Clean up with CS commit
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
-            if (Config.LivingShadowBar.HideWhenInactive && gauge.ShadowTimeRemaining == 0) { return; }
+            ushort shadowTime = *((ushort *)(new IntPtr(gauge.Address) + 0xC));
+            
+            if (Config.LivingShadowBar.HideWhenInactive && shadowTime == 0) { return; }
 
-            int timer = Math.Abs(gauge.ShadowTimeRemaining);
-            Config.LivingShadowBar.Label.SetText($"{timer / 1000}");
-            BarUtilities.GetProgressBar(Config.LivingShadowBar, timer, 24000f)
-                .Draw(origin);
+            float timer = Math.Abs(shadowTime) / 1000;
+            Config.LivingShadowBar.Label.SetValue(timer);
+
+            BarHud bar = BarUtilities.GetProgressBar(Config.LivingShadowBar, timer, 20, 0, player);
+            AddDrawActions(bar.GetDrawActions(origin, Config.LivingShadowBar.StrataLevel));
         }
     }
 
@@ -230,14 +284,14 @@ namespace DelvUI.Interface.Jobs
         );
 
         [NestedConfig("Blood Weapon Bar", 45)]
-        public ProgressBarConfig BloodWeaponBar = new ProgressBarConfig(
+        public DarkKnightChunkedBarConfig BloodWeaponBar = new DarkKnightChunkedBarConfig(
             new Vector2(-64, -32),
             new Vector2(126, 20),
             new PluginConfigColor(new Vector4(160f / 255f, 0f / 255f, 0f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Delirium Bar", 50)]
-        public ProgressBarConfig DeliriumBar = new ProgressBarConfig(
+        public DarkKnightChunkedBarConfig DeliriumBar = new DarkKnightChunkedBarConfig(
             new Vector2(64, -32),
             new Vector2(126, 20),
             new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f))
@@ -258,7 +312,21 @@ namespace DelvUI.Interface.Jobs
         [Order(26)]
         public PluginConfigColor DarkArtsColor = new PluginConfigColor(new Vector4(210f / 255f, 33f / 255f, 33f / 255f, 100f / 100f));
 
+        [Checkbox("Show mana values up to 10k (will break thresholds)", spacing = true)]
+        [Order(27)]
+        public bool ShowFullMana = false;
+
         public DarkKnightManaBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+             : base(position, size, fillColor)
+        {
+        }
+    }
+
+    [Exportable(false)]
+    [DisableParentSettings("UseChunks", "LabelMode")]
+    public class DarkKnightChunkedBarConfig : ChunkedProgressBarConfig
+    {
+        public DarkKnightChunkedBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
              : base(position, size, fillColor)
         {
         }

@@ -22,6 +22,7 @@ using ImGuiNET;
 using System;
 using System.Linq;
 using Dalamud.Game;
+using Dalamud.Plugin.Services;
 
 namespace DelvUI.Helpers
 {
@@ -40,7 +41,7 @@ namespace DelvUI.Helpers
 
         public double LastTick => LastTickTime;
 
-        private void FrameworkOnOnUpdateEvent(Framework framework)
+        private void FrameworkOnOnUpdateEvent(IFramework framework)
         {
             var player = Plugin.ClientState.LocalPlayer;
             if (player is null)
@@ -59,7 +60,7 @@ namespace DelvUI.Helpers
             var mp = player.CurrentMp;
 
             // account for lucid dreaming screwing up mp calculations
-            var lucidDreamingActive = player.StatusList.Any(e => e.StatusId == 1204);
+            var lucidDreamingActive = Utils.StatusListForBattleChara(player).Any(e => e.StatusId == 1204);
 
             if (!lucidDreamingActive && _lastMpValue < mp)
             {
