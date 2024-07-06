@@ -241,7 +241,7 @@ namespace DelvUI.Interface.Jobs
         {
             BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
             BlackMageGauge* internalGauge = (BlackMageGauge*)gauge.Address;
-            int stacks = (int)internalGauge->EnochianFlags >> 2;
+            int stacks = ((int)internalGauge->EnochianFlags >> 2) & 7;
             const int maxStacks = 6;
 
             if (Config.AstralSoulBar.HideWhenInactive && stacks == 0)

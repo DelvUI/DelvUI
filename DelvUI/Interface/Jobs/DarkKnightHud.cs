@@ -103,27 +103,27 @@ namespace DelvUI.Interface.Jobs
 
         private unsafe void DrawManaBar(Vector2 origin, IPlayerCharacter player)
         {
-            // TODO: Clean up with CS commit
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
-            byte darkArtsState = *((byte *)(new IntPtr(gauge.Address) + 0x9));
-            bool hasDarkArts = darkArtsState > 0;
 
-            if (Config.ManaBar.HideWhenInactive && !hasDarkArts && player.CurrentMp == player.MaxMp) { return; }
+            if (Config.ManaBar.HideWhenInactive && !gauge.HasDarkArts && player.CurrentMp == player.MaxMp)
+            {
+                return; 
+            }
 
-            Config.ManaBar.UsePartialFillColor = !hasDarkArts;
+            Config.ManaBar.UsePartialFillColor = !gauge.HasDarkArts;
 
             Config.ManaBar.Label.SetValue(player.CurrentMp);
 
             // hardcoded 9k as maxMP so the chunks are each 3k since that's what a DRK wants to see
             BarHud[] bars = BarUtilities.GetChunkedProgressBars(
                 Config.ManaBar,
-                hasDarkArts ? 1 : 3,
+                gauge.HasDarkArts ? 1 : 3,
                 player.CurrentMp,
                 Config.ManaBar.ShowFullMana ? player.MaxMp : 9000,
                 0f,
                 player,
                 null,
-                hasDarkArts ? Config.ManaBar.DarkArtsColor : Config.ManaBar.FillColor
+                gauge.HasDarkArts ? Config.ManaBar.DarkArtsColor : Config.ManaBar.FillColor
             );
 
             foreach (BarHud bar in bars)
@@ -135,7 +135,10 @@ namespace DelvUI.Interface.Jobs
         private void DrawDarkside(Vector2 origin, IPlayerCharacter player)
         {
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
-            if (Config.DarksideBar.HideWhenInactive && gauge.DarksideTimeRemaining == 0) { return; };
+            if (Config.DarksideBar.HideWhenInactive && gauge.DarksideTimeRemaining == 0) 
+            {
+                return; 
+            };
 
             float timer = Math.Abs(gauge.DarksideTimeRemaining) / 1000;
 
@@ -148,15 +151,17 @@ namespace DelvUI.Interface.Jobs
         private void DrawBloodGauge(Vector2 origin, IPlayerCharacter player)
         {
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
-            if (!Config.BloodGauge.HideWhenInactive || gauge.Blood > 0)
+            if (Config.BloodGauge.HideWhenInactive && gauge.Blood <= 0)
             {
-                Config.BloodGauge.Label.SetValue(gauge.Blood);
+                return;
+            }
 
-                BarHud[] bars = BarUtilities.GetChunkedProgressBars(Config.BloodGauge, 2, gauge.Blood, 100, 0, player);
-                foreach (BarHud bar in bars)
-                {
-                    AddDrawActions(bar.GetDrawActions(origin, Config.BloodGauge.StrataLevel));
-                }
+            Config.BloodGauge.Label.SetValue(gauge.Blood);
+
+            BarHud[] bars = BarUtilities.GetChunkedProgressBars(Config.BloodGauge, 2, gauge.Blood, 100, 0, player);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.BloodGauge.StrataLevel));
             }
         }
 
@@ -166,7 +171,10 @@ namespace DelvUI.Interface.Jobs
             float duration = bloodWeaponBuff?.RemainingTime ?? 0f;
             int stacks = bloodWeaponBuff?.StackCount ?? 0;
 
-            if (Config.BloodWeaponBar.HideWhenInactive && duration is 0) { return; }
+            if (Config.BloodWeaponBar.HideWhenInactive && duration <= 0)
+            {
+                return; 
+            }
 
             var chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[5];
 
@@ -195,39 +203,41 @@ namespace DelvUI.Interface.Jobs
             float deliriumDuration = Math.Max(0f, deliriumBuff?.RemainingTime ?? 0f);
             byte stacks = deliriumBuff?.StackCount ?? 0;
 
-            if (!Config.DeliriumBar.HideWhenInactive || deliriumDuration > 0)
+            if (Config.DeliriumBar.HideWhenInactive && deliriumDuration <= 0)
             {
-                var chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[3];
+                return;
+            }
 
-                for (int i = 0; i < 3; i++)
-                {
-                    chunks[i] = new(Config.DeliriumBar.FillColor, i < stacks ? 1 : 0, i == 1 ? Config.DeliriumBar.Label : null);
-                }
+            var chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[3];
+            for (int i = 0; i < 3; i++)
+            {
+                chunks[i] = new(Config.DeliriumBar.FillColor, i < stacks ? 1 : 0, i == 1 ? Config.DeliriumBar.Label : null);
+            }
             
-                if(Config.DeliriumBar.FillDirection is BarDirection.Left or BarDirection.Up)
-                {
-                    chunks = chunks.Reverse().ToArray();
-                }
+            if(Config.DeliriumBar.FillDirection is BarDirection.Left or BarDirection.Up)
+            {
+                chunks = chunks.Reverse().ToArray();
+            }
 
-                Config.DeliriumBar.Label.SetValue(deliriumDuration);
+            Config.DeliriumBar.Label.SetValue(deliriumDuration);
 
-                BarHud[] bars = BarUtilities.GetChunkedBars(Config.DeliriumBar, chunks, player);
-                foreach (BarHud bar in bars)
-                {
-                    AddDrawActions(bar.GetDrawActions(origin, Config.DeliriumBar.StrataLevel));
-                }
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.DeliriumBar, chunks, player);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.DeliriumBar.StrataLevel));
             }
         }
 
         private unsafe void DrawLivingShadowBar(Vector2 origin, IPlayerCharacter player)
         {
-            // TODO: Clean up with CS commit
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
-            ushort shadowTime = *((ushort *)(new IntPtr(gauge.Address) + 0xC));
             
-            if (Config.LivingShadowBar.HideWhenInactive && shadowTime == 0) { return; }
+            if (Config.LivingShadowBar.HideWhenInactive && gauge.ShadowTimeRemaining <= 0)
+            {
+                return; 
+            }
 
-            float timer = Math.Abs(shadowTime) / 1000;
+            float timer = Math.Abs(gauge.ShadowTimeRemaining) / 1000;
             Config.LivingShadowBar.Label.SetValue(timer);
 
             BarHud bar = BarUtilities.GetProgressBar(Config.LivingShadowBar, timer, 20, 0, player);
