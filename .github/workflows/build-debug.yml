@@ -24,17 +24,18 @@ jobs:
       # Get Dalamud version from project file
       - name: Extract Project Dalamud Version
         id: project-dalamud-version
-        uses: mavrosxristoforos/get-xml-info@v1.1.0
-        with:
-          xml-file: "./DelvUI/DelvUI.csproj"
-          xpath: "//DalamudCIDist"
+        shell: pwsh
+        run: |
+          [xml]$xml = Get-Content "./DelvUI/DelvUI.csproj"
+          $dalamudVersion = $xml.Project.PropertyGroup.DalamudCIDist
+          echo "dalamud-version=$dalamudVersion" >> $GITHUB_ENV
 
       # Set Dalamud Version Normalised URL Env
       - name: Set Dalamud Version Normalised URL Env
         id: dalamud-norm-url
         shell: pwsh
         run: |
-          $url = if ('${{ steps.project-dalamud-version.outputs.info }}' -eq 'release') { '' } else { '${{ steps.project-dalamud-version.outputs.info }}' }
+          $url = if ('${{ env.dalamud-version }}' -eq 'release') { '' } else { '${{ env.dalamud-version }}' }
           echo "url=$url" >> $GITHUB_ENV
 
       # Request the version information from Dalamud
