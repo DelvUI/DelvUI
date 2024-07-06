@@ -159,6 +159,8 @@ namespace DelvUI.Interface.PartyCooldowns
 
         private unsafe void OnActionUsed(int characterId, IntPtr characterAddress, IntPtr position, IntPtr effect, IntPtr unk1, IntPtr unk2)
         {
+            _onActionUsedHook?.Original(characterId, characterAddress, position, effect, unk1, unk2);
+
             uint actorId = (uint)characterId;
             bool isAction = *((byte*)effect.ToPointer() + 0x1F) == 1;
 
@@ -223,8 +225,6 @@ namespace DelvUI.Interface.PartyCooldowns
                     }
                 }
             }
-
-            _onActionUsedHook?.Original(characterId, characterAddress, position, effect, unk1, unk2);
         }
 
         public void ForcedUpdate()

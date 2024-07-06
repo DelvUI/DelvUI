@@ -30,14 +30,14 @@ using Lumina.Excel;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using static FFXIVClientStructs.FFXIV.Client.Game.ActionManager;
 using Action = Lumina.Excel.GeneratedSheets.Action;
 
 namespace DelvUI.Helpers
 {
     public unsafe class InputsHelper : IDisposable
     {
-        public delegate void OnSetUIMouseoverActor(long arg1, long arg2);
-        private delegate bool UseActionDelegate(IntPtr manager, ActionType actionType, uint actionId, uint targetId, uint a4, uint a5, uint a6, IntPtr a7);
+        private delegate bool UseActionDelegate(ActionManager* manager, ActionType actionType, uint actionId, ulong targetId, uint extraParam, UseActionMode mode, uint comboRouteId, bool* outOptAreaTargeted);
 
         #region Singleton
         private InputsHelper()
@@ -188,8 +188,16 @@ namespace DelvUI.Helpers
         //_uiMouseOverActorHook?.Original(arg1, arg2);
         //}
 
-        private bool HandleRequestAction(IntPtr manager, ActionType actionType, uint actionId, uint targetId, uint a4, uint a5,
-                                          uint a6, IntPtr a7)
+        private bool HandleRequestAction(
+            ActionManager* manager,
+            ActionType actionType,
+            uint actionId,
+            ulong targetId,
+            uint extraParam,
+            UseActionMode mode,
+            uint comboRouteId,
+            bool* outOptAreaTargeted
+        )
         {
             if (_requestActionHook == null) { return false; }
 
@@ -199,10 +207,10 @@ namespace DelvUI.Helpers
                 IsActionValid(actionId, _target) &&
                 !_ignoringMouseover)
             {
-                return _requestActionHook.Original(manager, actionType, actionId, (uint)_target.GameObjectId, a4, a5, a6, a7);
+                return _requestActionHook.Original(manager, actionType, actionId, _target.GameObjectId, extraParam, mode, comboRouteId, outOptAreaTargeted);
             }
 
-            return _requestActionHook.Original(manager, actionType, actionId, targetId, a4, a5, a6, a7);
+            return _requestActionHook.Original(manager, actionType, actionId, targetId, extraParam, mode, comboRouteId, outOptAreaTargeted);
         }
 
         private bool IsActionValid(ulong actionID, IGameObject? target)
