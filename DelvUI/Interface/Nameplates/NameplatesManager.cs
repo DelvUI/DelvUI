@@ -138,8 +138,8 @@ namespace DelvUI.Interface.Nameplates
 
                     // position
                     Vector2 screenPos = new Vector2(
-                        nameplateObject.RootNode->AtkResNode.X + nameplateObject.RootNode->AtkResNode.Width / 2f,
-                        nameplateObject.RootNode->AtkResNode.Y + nameplateObject.RootNode->AtkResNode.Height
+                        nameplateObject.RootComponentNode->AtkResNode.X + nameplateObject.RootComponentNode->AtkResNode.Width / 2f,
+                        nameplateObject.RootComponentNode->AtkResNode.Y + nameplateObject.RootComponentNode->AtkResNode.Height
                     );
                     screenPos = ClampScreenPosition(screenPos);
 
@@ -166,7 +166,7 @@ namespace DelvUI.Interface.Nameplates
 
                     // state icon
                     int iconId = 0;
-                    AtkUldAsset* textureInfo = nameplateObject.IconImageNode->PartsList->Parts[nameplateObject.IconImageNode->PartId].UldAsset;
+                    AtkUldAsset* textureInfo = nameplateObject.NameIcon->PartsList->Parts[nameplateObject.NameIcon->PartId].UldAsset;
                     if (textureInfo != null && textureInfo->AtkTexture.Resource != null)
                     {
                         iconId = (int)textureInfo->AtkTexture.Resource->IconId;

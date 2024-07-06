@@ -7,6 +7,7 @@ using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
+using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
@@ -172,10 +173,8 @@ namespace DelvUI.Interface.Jobs
 
         private unsafe void DrawKazematoiBar(Vector2 origin, IPlayerCharacter player)
         {
-            NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
-
-            // TODO: clean after dalamud updates
-            int stacks = gauge.Ninki;
+            NinjaGauge* gauge = (NinjaGauge*)Plugin.JobGauges.Get<NINGauge>().Address;
+            int stacks = gauge->Kazematoi;
 
             if (Config.KazematoiBar.HideWhenInactive && stacks == 0)
             {
@@ -191,10 +190,8 @@ namespace DelvUI.Interface.Jobs
 
         private unsafe void DrawNinkiGauge(Vector2 origin, IPlayerCharacter player)
         {
-            NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
-
-            // TODO: clean after dalamud updates
-            int ninki = gauge.HutonTimer;
+            NinjaGauge* gauge = (NinjaGauge*)Plugin.JobGauges.Get<NINGauge>().Address;
+            int ninki = gauge->Ninki;
 
             if (Config.NinkiBar.HideWhenInactive && ninki == 0)
             {
