@@ -5,7 +5,9 @@ using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
+using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -99,7 +101,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawIfritBar(Vector2 origin, IPlayerCharacter player)
+        private unsafe void DrawIfritBar(Vector2 origin, IPlayerCharacter player)
         {
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
             int stackCount = gauge.IsIfritReady ? 1 : 0;
@@ -144,20 +146,33 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void HandleAttunementStacks(Vector2 origin, IPlayerCharacter player)
+        private unsafe void HandleAttunementStacks(Vector2 origin, IPlayerCharacter player)
         {
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
-            byte attunementStacks = gauge.Attunement;
 
-            if (gauge.IsIfritAttuned && Config.StacksBar.ShowIfritStacks)
+            byte summonedPrimal = *((byte*)(new IntPtr(gauge.Address) + 0xE));                      // Formally Attunement, now...?
+            bool isIfritAttuned = summonedPrimal is 9 or 5;                                         // 9 max, Hardcoded cuz I'm bad at c#
+            bool isTitanAttuned = summonedPrimal is 18 or 14 or 10 or 6;                            // 18 max
+            bool isGarudaAttuned = summonedPrimal is 19 or 15 or 11 or 7;                           // 19 max
+
+            int primalId = 0;                                                                       // Attunement is wierd, adds 4 per stack to this number
+            if (isIfritAttuned) { primalId = 1; }
+            else if (isTitanAttuned) { primalId = 2; }
+            else if (isGarudaAttuned) { primalId = 3; }
+            int attunementStacks = ((summonedPrimal - primalId) / 4);                               // Offsets by PrimalId and gets Attunement Stacks
+
+            // It seems like Attunement Stacks are now measured by a base amount per primal (1/2/3) + 4 for each stack?
+            // This feels wrong, but it works. Please correct when/if ClientStructs fixes gauge data.
+
+            if (isIfritAttuned && Config.StacksBar.ShowIfritStacks)
             {
                 DrawStacksBar(origin, player, attunementStacks, 2, Config.StacksBar.IfritStackColor);
             }
-            else if (gauge.IsTitanAttuned && Config.StacksBar.ShowTitanStacks)
+            else if (isTitanAttuned && Config.StacksBar.ShowTitanStacks)
             {
                 DrawStacksBar(origin, player, attunementStacks, 4, Config.StacksBar.TitanStackColor);
             }
-            else if (gauge.IsGarudaAttuned && Config.StacksBar.ShowGarudaStacks)
+            else if (isGarudaAttuned && Config.StacksBar.ShowGarudaStacks)
             {
                 DrawStacksBar(origin, player, attunementStacks, 4, Config.StacksBar.GarudaStackColor);
             }
@@ -183,7 +198,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawTranceBar(Vector2 origin, IPlayerCharacter player)
+        private unsafe void DrawTranceBar(Vector2 origin, IPlayerCharacter player)
         {
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
             PluginConfigColor tranceColor;
@@ -193,26 +208,44 @@ namespace DelvUI.Interface.Jobs
             float tranceDuration = 0f;
             tranceColor = Config.TranceBar.FillColor;
 
-            if (gauge.IsIfritAttuned || gauge.IsTitanAttuned || gauge.IsGarudaAttuned)
+            // Dawntrail Fixes
+            bool isSolarBahamutReady = gauge.AetherFlags.HasFlag(AetherFlags.None + 0x8) ||         // 0x8    Formerly Titan Attuned
+                                       gauge.AetherFlags.HasFlag(AetherFlags.None + 0xC);           // 0xC    Formerly Garuda Attuned
+            bool isPhoenixReady = gauge.AetherFlags.HasFlag(AetherFlags.None + 0x4);                // 0x4    Formerly Ifrit Attuned
+            bool isNormalBahamutReady = !isSolarBahamutReady && !isPhoenixReady;                    // You'd think it would be 0x10, but thats unused now
+
+            byte summonedPrimal = *((byte*)(new IntPtr(gauge.Address) + 0xE));                      // Formally Attunement, now...?
+            bool isIfritAttuned = summonedPrimal is 9 or 5;                                         // 9 max, Hardcoded cuz I'm bad at c#
+            bool isTitanAttuned = summonedPrimal is 18 or 14 or 10 or 6;                            // 18 max
+            bool isGarudaAttuned = summonedPrimal is 19 or 15 or 11 or 7;                           // 19 max
+
+            if (isIfritAttuned || isTitanAttuned || isGarudaAttuned)
             {
-                tranceColor = gauge.IsIfritAttuned ? Config.TranceBar.IfritColor : gauge.IsTitanAttuned ? Config.TranceBar.TitanColor : gauge.IsGarudaAttuned ? Config.TranceBar.GarudaColor : Config.TranceBar.FillColor;
+                tranceColor = isIfritAttuned ? Config.TranceBar.IfritColor : isTitanAttuned ? Config.TranceBar.TitanColor : isGarudaAttuned ? Config.TranceBar.GarudaColor : Config.TranceBar.FillColor;
                 tranceDuration = gauge.AttunmentTimerRemaining;
                 maxDuration = 30f;
             }
             else
             {
-                if (gauge.IsBahamutReady)
+                if (isNormalBahamutReady)
                 {
                     tranceColor = Config.TranceBar.BahamutColor;
                     tranceDuration = gauge.SummonTimerRemaining;
                     spellID = 7427;
                     maxDuration = 15f;
                 }
-                else if (gauge.IsPhoenixReady)
+                else if (isPhoenixReady)
                 {
                     tranceColor = Config.TranceBar.PhoenixColor;
                     tranceDuration = gauge.SummonTimerRemaining;
                     spellID = 25831;
+                    maxDuration = 15f;
+                }
+                else if (isSolarBahamutReady)
+                {
+                    tranceColor = Config.TranceBar.SolarBahamutColor;
+                    tranceDuration = gauge.SummonTimerRemaining;
+                    spellID = 36992;
                     maxDuration = 15f;
                 }
             }
@@ -338,16 +371,20 @@ namespace DelvUI.Interface.Jobs
         [Order(27)]
         public PluginConfigColor PhoenixColor = new(new Vector4(240f / 255f, 100f / 255f, 10f / 255f, 100f / 100f));
 
-        [ColorEdit4("Ifrit Color")]
+        [ColorEdit4("Solar Bahamut Color")]
         [Order(28)]
+        public PluginConfigColor SolarBahamutColor = new(new Vector4(235f / 255f, 241f / 255f, 252f / 255f, 100f / 100f));
+
+        [ColorEdit4("Ifrit Color")]
+        [Order(29)]
         public PluginConfigColor IfritColor = new(new Vector4(200f / 255f, 40f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Titan Color")]
-        [Order(29)]
+        [Order(30)]
         public PluginConfigColor TitanColor = new(new Vector4(210f / 255f, 150f / 255f, 26f / 255f, 100f / 100f));
 
         [ColorEdit4("Garuda Color")]
-        [Order(30)]
+        [Order(31)]
         public PluginConfigColor GarudaColor = new(new Vector4(60f / 255f, 160f / 255f, 100f / 255f, 100f / 100f));
 
         [Checkbox("Hide Primals")]
