@@ -241,7 +241,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(25)]
         public PluginConfigColor RPRColor = new PluginConfigColor(new(150f / 255f, 90f / 255f, 144f / 255f, 100f / 100f));
         
-        [ColorEdit4("Viper")]   // TODO: Update when colors are finalized, prob needs to be a green?
+        [ColorEdit4("Viper")]
         [Order(25)]
         public PluginConfigColor VPRColor = new PluginConfigColor(new(16f / 255f, 130f / 255f, 16f / 255f, 100f / 100f));
 
@@ -301,9 +301,9 @@ namespace DelvUI.Interface.GeneralElements
         [Order(15)]
         public PluginConfigColor RDMColor = new PluginConfigColor(new(232f / 255f, 123f / 255f, 123f / 255f, 100f / 100f));
 
-        [ColorEdit4("Pictomancer")]    // TODO: Update when colors are finalized, no idea what color
+        [ColorEdit4("Pictomancer")]
         [Order(15)]
-        public PluginConfigColor PCTColor = new PluginConfigColor(new(232f / 255f, 123f / 255f, 123f / 255f, 100f / 100f));
+        public PluginConfigColor PCTColor = new PluginConfigColor(new(252f / 255f, 146f / 255f, 225f / 255f, 100f / 100f));
         
         [ColorEdit4("Blue Mage", spacing = true)]
         [Order(20)]
