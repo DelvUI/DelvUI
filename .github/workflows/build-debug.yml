@@ -24,7 +24,7 @@ jobs:
       # Get Dalamud version from project file
       - name: Extract Project Dalamud Version
         id: project-dalamud-version
-        uses: mavrosxristoforos/get-xml-info@v1.1.1
+        uses: mavrosxristoforos/get-xml-info@v1.1.0
         with:
           xml-file: "./DelvUI/DelvUI.csproj"
           xpath: "//DalamudCIDist"
