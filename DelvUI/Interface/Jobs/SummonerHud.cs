@@ -6,6 +6,7 @@ using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
+using FFXIVClientStructs.FFXIV.Common.Lua;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -146,35 +147,33 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
+        private enum Primal
+        {
+            None = 0,
+            Ifrit = 1,
+            Titan = 2,
+            Garuda = 3
+        }
+
         private unsafe void HandleAttunementStacks(Vector2 origin, IPlayerCharacter player)
         {
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
 
-            byte summonedPrimal = *((byte*)(new IntPtr(gauge.Address) + 0xE));                      // Formally Attunement, now...?
-            bool isIfritAttuned = summonedPrimal is 9 or 5;                                         // 9 max, Hardcoded cuz I'm bad at c#
-            bool isTitanAttuned = summonedPrimal is 18 or 14 or 10 or 6;                            // 18 max
-            bool isGarudaAttuned = summonedPrimal is 19 or 15 or 11 or 7;                           // 19 max
+            byte value = *((byte*)(new IntPtr(gauge.Address) + 0xE));
+            Primal primal = (Primal)(value & 2);
+            int stacks = ((value >> 2) & 2);
 
-            int primalId = 0;                                                                       // Attunement is wierd, adds 4 per stack to this number
-            if (isIfritAttuned) { primalId = 1; }
-            else if (isTitanAttuned) { primalId = 2; }
-            else if (isGarudaAttuned) { primalId = 3; }
-            int attunementStacks = ((summonedPrimal - primalId) / 4);                               // Offsets by PrimalId and gets Attunement Stacks
-
-            // It seems like Attunement Stacks are now measured by a base amount per primal (1/2/3) + 4 for each stack?
-            // This feels wrong, but it works. Please correct when/if ClientStructs fixes gauge data.
-
-            if (isIfritAttuned && Config.StacksBar.ShowIfritStacks)
+            if (primal == Primal.Ifrit && Config.StacksBar.ShowIfritStacks)
             {
-                DrawStacksBar(origin, player, attunementStacks, 2, Config.StacksBar.IfritStackColor);
+                DrawStacksBar(origin, player, stacks, 2, Config.StacksBar.IfritStackColor);
             }
-            else if (isTitanAttuned && Config.StacksBar.ShowTitanStacks)
+            else if (primal == Primal.Titan && Config.StacksBar.ShowTitanStacks)
             {
-                DrawStacksBar(origin, player, attunementStacks, 4, Config.StacksBar.TitanStackColor);
+                DrawStacksBar(origin, player, stacks, 4, Config.StacksBar.TitanStackColor);
             }
-            else if (isGarudaAttuned && Config.StacksBar.ShowGarudaStacks)
+            else if (primal == Primal.Garuda && Config.StacksBar.ShowGarudaStacks)
             {
-                DrawStacksBar(origin, player, attunementStacks, 4, Config.StacksBar.GarudaStackColor);
+                DrawStacksBar(origin, player, stacks, 4, Config.StacksBar.GarudaStackColor);
             }
             else if (!Config.StacksBar.HideWhenInactive)
             {
@@ -215,13 +214,11 @@ namespace DelvUI.Interface.Jobs
             bool isNormalBahamutReady = !isSolarBahamutReady && !isPhoenixReady;                    // You'd think it would be 0x10, but thats unused now
 
             byte summonedPrimal = *((byte*)(new IntPtr(gauge.Address) + 0xE));                      // Formally Attunement, now...?
-            bool isIfritAttuned = summonedPrimal is 9 or 5;                                         // 9 max, Hardcoded cuz I'm bad at c#
-            bool isTitanAttuned = summonedPrimal is 18 or 14 or 10 or 6;                            // 18 max
-            bool isGarudaAttuned = summonedPrimal is 19 or 15 or 11 or 7;                           // 19 max
+            Primal primal = (Primal)(summonedPrimal & 2);
 
-            if (isIfritAttuned || isTitanAttuned || isGarudaAttuned)
+            if (primal != Primal.None)
             {
-                tranceColor = isIfritAttuned ? Config.TranceBar.IfritColor : isTitanAttuned ? Config.TranceBar.TitanColor : isGarudaAttuned ? Config.TranceBar.GarudaColor : Config.TranceBar.FillColor;
+                tranceColor = primal == Primal.Ifrit ? Config.TranceBar.IfritColor : primal == Primal.Titan ? Config.TranceBar.TitanColor : primal == Primal.Garuda ? Config.TranceBar.GarudaColor : Config.TranceBar.FillColor;
                 tranceDuration = gauge.AttunmentTimerRemaining;
                 maxDuration = 30f;
             }
