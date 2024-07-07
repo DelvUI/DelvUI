@@ -124,7 +124,7 @@ namespace DelvUI.Interface.Nameplates
             switch (data.Kind)
             {
                 case ObjectKind.Player:
-                    if (data.GameObject == Plugin.ClientState.LocalPlayer)
+                    if (data.GameObject?.EntityId == Plugin.ClientState.LocalPlayer?.EntityId)
                     {
                         return _playerHud;
                     }
