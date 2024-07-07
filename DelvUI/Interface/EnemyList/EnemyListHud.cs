@@ -346,7 +346,7 @@ namespace DelvUI.Interface.EnemyList
         private PluginConfigColor GetBorderColor(ICharacter? character, int enmityLevel)
         {
             IGameObject? target = Plugin.TargetManager.Target;
-            if (character != null && character == target)
+            if (character != null && target != null && character.EntityId == target.EntityId)
             {
                 return Configs.HealthBar.Colors.TargetBordercolor;
             }
