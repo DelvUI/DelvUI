@@ -215,7 +215,7 @@ namespace DelvUI.Interface.Jobs
                 null
             );
 
-            var chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[3];
+            var chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[2];
             chunks[0] = canvas;
             chunks[1] = portrait;
 
