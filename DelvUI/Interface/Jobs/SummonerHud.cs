@@ -162,7 +162,6 @@ namespace DelvUI.Interface.Jobs
             byte value = *((byte*)(new IntPtr(gauge.Address) + 0xE));
             Primal primal = (Primal)(value & 3);
             int stacks = ((value >> 2) & 7);
-            Plugin.Logger.Debug($"{value}   {primal}    {stacks}");
 
             if (primal == Primal.Ifrit && Config.StacksBar.ShowIfritStacks)
             {
