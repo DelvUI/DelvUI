@@ -160,8 +160,9 @@ namespace DelvUI.Interface.Jobs
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
 
             byte value = *((byte*)(new IntPtr(gauge.Address) + 0xE));
-            Primal primal = (Primal)(value & 2);
-            int stacks = ((value >> 2) & 2);
+            Primal primal = (Primal)(value & 3);
+            int stacks = ((value >> 2) & 7);
+            Plugin.Logger.Debug($"{value}   {primal}    {stacks}");
 
             if (primal == Primal.Ifrit && Config.StacksBar.ShowIfritStacks)
             {
@@ -214,7 +215,7 @@ namespace DelvUI.Interface.Jobs
             bool isNormalBahamutReady = !isSolarBahamutReady && !isPhoenixReady;                    // You'd think it would be 0x10, but thats unused now
 
             byte summonedPrimal = *((byte*)(new IntPtr(gauge.Address) + 0xE));                      // Formally Attunement, now...?
-            Primal primal = (Primal)(summonedPrimal & 2);
+            Primal primal = (Primal)(summonedPrimal & 3);
 
             if (primal != Primal.None)
             {
