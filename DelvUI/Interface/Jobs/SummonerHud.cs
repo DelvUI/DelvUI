@@ -224,7 +224,14 @@ namespace DelvUI.Interface.Jobs
             }
             else
             {
-                if (isNormalBahamutReady)
+                if (isSolarBahamutReady)
+                {
+                    tranceColor = Config.TranceBar.SolarBahamutColor;
+                    tranceDuration = gauge.SummonTimerRemaining;
+                    spellID = 36992;
+                    maxDuration = 15f;
+                }
+                else if (isNormalBahamutReady)
                 {
                     tranceColor = Config.TranceBar.BahamutColor;
                     tranceDuration = gauge.SummonTimerRemaining;
@@ -236,13 +243,6 @@ namespace DelvUI.Interface.Jobs
                     tranceColor = Config.TranceBar.PhoenixColor;
                     tranceDuration = gauge.SummonTimerRemaining;
                     spellID = 25831;
-                    maxDuration = 15f;
-                }
-                else if (isSolarBahamutReady)
-                {
-                    tranceColor = Config.TranceBar.SolarBahamutColor;
-                    tranceDuration = gauge.SummonTimerRemaining;
-                    spellID = 36992;
                     maxDuration = 15f;
                 }
             }
