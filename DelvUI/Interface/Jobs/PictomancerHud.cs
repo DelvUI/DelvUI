@@ -199,26 +199,6 @@ namespace DelvUI.Interface.Jobs
                 null
             );
 
-            // part drawing
-            PluginConfigColor? drawingColor = null;
-            if (gauge.CreatureFlags.HasFlag(CreatureFlags.Pom))
-            {
-                drawingColor = config.PomColor;
-            }
-            else if (gauge.CreatureFlags.HasFlag(CreatureFlags.Wings))
-            {
-                drawingColor = config.WingsColor;
-            }
-            else if (gauge.CreatureFlags.HasFlag(CreatureFlags.Claw))
-            {
-                drawingColor = config.ClawColor;
-            }
-            Tuple<PluginConfigColor, float, LabelConfig?> drawing = new(
-                drawingColor ?? PluginConfigColor.Empty,
-                drawingColor != null ? 1 : 0,
-                null
-            );
-
             // portrait
             PluginConfigColor? portraitColor = null;
             if (gauge.CreatureFlags.HasFlag(CreatureFlags.MooglePortait))
