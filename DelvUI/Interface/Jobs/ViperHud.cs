@@ -20,8 +20,6 @@ namespace DelvUI.Interface.Jobs
         private new ViperConfig Config => (ViperConfig)_config;
         private static readonly List<uint> NoxiousGnashIDs = new() { 3667, 4099 };
         private static readonly List<float> NoxiousGnashDurations = new() { 40f, 40f };
-        
-        private static PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         public ViperHud(ViperConfig config, string? displayName = null) : base(config, displayName) { }
 
@@ -128,7 +126,7 @@ namespace DelvUI.Interface.Jobs
                     break;
             }
             
-            var empty = new Tuple<PluginConfigColor, float, LabelConfig?>(EmptyColor, 1, null);
+            var empty = new Tuple<PluginConfigColor, float, LabelConfig?>(PluginConfigColor.Empty, 1, null);
             
             var start = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboStartColor, 1, null);
             var end = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboEndColor, 1, null);
