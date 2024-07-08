@@ -177,22 +177,22 @@ namespace DelvUI.Interface.Jobs
 
             // canvas
             PluginConfigColor? canvasColor = null;
-            if (gauge.CanvasFlags.HasFlag(CanvasFlags.Pom))
+            if (gauge.CanvasFlags.HasFlag(CanvasFlags.Maw))
             {
-                canvasColor = config.PomColor;
-            }
-            else if (gauge.CanvasFlags.HasFlag(CanvasFlags.Wing))
-            {
-                canvasColor = config.WingsColor;
+                canvasColor = config.FangsColor;
             }
             else if (gauge.CanvasFlags.HasFlag(CanvasFlags.Claw))
             {
                 canvasColor = config.ClawColor;
             }
-            else if (gauge.CanvasFlags.HasFlag(CanvasFlags.Maw))
+            else if (gauge.CanvasFlags.HasFlag(CanvasFlags.Wing))
             {
-                canvasColor = config.FangsColor;
+                canvasColor = config.WingsColor;
             }
+            else if(gauge.CanvasFlags.HasFlag(CanvasFlags.Pom))
+            {
+                canvasColor = config.PomColor;
+            }  
             Tuple<PluginConfigColor, float, LabelConfig?> canvas = new(
                 canvasColor ?? PluginConfigColor.Empty,
                 canvasColor != null ? 1 : 0,
@@ -201,17 +201,17 @@ namespace DelvUI.Interface.Jobs
 
             // part drawing
             PluginConfigColor? drawingColor = null;
-            if (gauge.CreatureFlags.HasFlag(CreatureFlags.Pom))
+            if (gauge.CreatureFlags.HasFlag(CreatureFlags.Claw))
             {
-                drawingColor = config.PomColor;
+                drawingColor = config.ClawColor;
             }
             else if (gauge.CreatureFlags.HasFlag(CreatureFlags.Wings))
             {
                 drawingColor = config.WingsColor;
             }
-            else if (gauge.CreatureFlags.HasFlag(CreatureFlags.Claw))
+            else if(gauge.CreatureFlags.HasFlag(CreatureFlags.Pom))
             {
-                drawingColor = config.ClawColor;
+                drawingColor = config.PomColor;
             }
             Tuple<PluginConfigColor, float, LabelConfig?> drawing = new(
                 drawingColor ?? PluginConfigColor.Empty,
@@ -235,12 +235,15 @@ namespace DelvUI.Interface.Jobs
                 null
             );
 
-            var chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[3];
-            chunks[0] = canvas;
-            chunks[1] = drawing;
-            chunks[2] = portrait;
+            var chunks = new List<Tuple<PluginConfigColor, float, LabelConfig?>>();
+            chunks.Add(canvas);
+            if (!config.DontShowDrawing)
+            {
+                chunks.Add(drawing);
+            }
+            chunks.Add(portrait);
 
-            BarHud[] bars = BarUtilities.GetChunkedBars(config, chunks, player);
+            BarHud[] bars = BarUtilities.GetChunkedBars(config, chunks.ToArray(), player);
             foreach (BarHud bar in bars)
             {
                 AddDrawActions(bar.GetDrawActions(origin, config.StrataLevel));
@@ -418,6 +421,10 @@ namespace DelvUI.Interface.Jobs
         [ColorEdit4("Madeen Color")]
         [Order(22)]
         public PluginConfigColor MadeenColor = PluginConfigColor.FromHex(0xFF93Cf7D);
+
+        [Checkbox("Don't Show Drawing", spacing = true, help = "When enabled, this hides the middle chunk that shows which creature parts were already drawn.")]
+        [Order(50)]
+        public bool DontShowDrawing = false;
 
         public PictomancerCreatureCanvasBarConfig(Vector2 position, Vector2 size)
              : base(position, size, PluginConfigColor.Empty)
