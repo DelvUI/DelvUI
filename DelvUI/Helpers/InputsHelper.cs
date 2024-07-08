@@ -174,6 +174,7 @@ namespace DelvUI.Helpers
             if (_config.MouseoverEnabled && !_config.MouseoverAutomaticMode && !_ignoringMouseover)
             {
                 Plugin.TargetManager.MouseOverTarget = _target;
+                Plugin.TargetManager.MouseOverNameplateTarget = _target;
             }
         }
 
