@@ -102,7 +102,7 @@ namespace DelvUI.Interface.Party
         private const int PartyCrossWorldDisplayNameOffset = 0x14EA;
         private const int PartyCrossWorldEntrySize = 0xD8;
 
-        private const int PartyTrustNameOffset = 0x0CF0;
+        private const int PartyTrustNameOffset = 0x0D78;
         private const int PartyTrustEntrySize = 0x20;
 
         private const int PartyMembersInfoIndex = 11;

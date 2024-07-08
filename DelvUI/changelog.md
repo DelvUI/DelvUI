@@ -1,3 +1,8 @@
+# 2.2.0.1
+- Fixed `[health:current-percent]` and `[mana:current-percent]` not working properly.
+- Fixed mouseover not working when using other plugins like MOAction or ReAction.
+- Fixed Party Frames not working when using the Trust party system.
+
 # 2.2.0.0
 - Added support for Dawntrail and Dalamud API 10.
 
