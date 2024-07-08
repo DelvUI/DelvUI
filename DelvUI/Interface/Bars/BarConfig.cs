@@ -48,6 +48,10 @@ namespace DelvUI.Interface.Bars
         [Order(41)]
         public bool HideWhenInactive = false;
 
+        [Checkbox("Invert", spacing = true)]
+        [Order(44)]
+        public bool Invert = false;
+
         public BarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor, BarDirection fillDirection = BarDirection.Right)
         {
             Position = position;

@@ -181,7 +181,13 @@ namespace DelvUI.Interface.Jobs
                     break;
                 }
             }
-            
+
+            if (Config.Vipersight.Invert)
+            {
+                chunks.Reverse();
+                glows.Reverse();
+            }
+                
             if (!Config.Vipersight.HideWhenInactive)
             {
                 BarHud[] bars = BarUtilities.GetChunkedBars(Config.Vipersight, chunks.ToArray(), player, Config.Vipersight.GlowConfig, glows.ToArray());
