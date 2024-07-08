@@ -25,6 +25,10 @@ using Dalamud.Hooking;
 using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using FFXIVClientStructs.FFXIV.Client.System.Framework;
+using FFXIVClientStructs.FFXIV.Client.UI;
+using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using ImGuiNET;
 using Lumina.Excel;
 using System;
@@ -170,12 +174,18 @@ namespace DelvUI.Helpers
 
         private unsafe void SetGameMouseoverTarget(long address)
         {
-            // set mouseover target in-game
-            if (_config.MouseoverEnabled && !_config.MouseoverAutomaticMode && !_ignoringMouseover)
+            if (!_config.MouseoverEnabled || _config.MouseoverAutomaticMode || _ignoringMouseover)
             {
-                Plugin.TargetManager.MouseOverTarget = _target;
-                Plugin.TargetManager.MouseOverNameplateTarget = _target;
+                return;
             }
+
+            UIModule* uiModule = Framework.Instance()->GetUIModule();
+            if (uiModule == null) { return; }
+
+            PronounModule* pronounModule = uiModule->GetPronounModule();
+            if (pronounModule == null) { return; }
+
+            pronounModule->UiMouseOverTarget = (GameObject*)address;
         }
 
         private void OnConfigReset(ConfigurationManager sender)
