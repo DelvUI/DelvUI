@@ -49,6 +49,18 @@ namespace DelvUI.Helpers
                 Initials().
                 Truncated(length).
                 CheckForUpperCase(),
+
+            ["[name:initial-first]"] = (actor, name, length, isPlayerName) =>
+                ValidateName(actor, name).
+                FirstInitial().
+                Truncated(length).
+                CheckForUpperCase(),
+
+            ["[name:initial-last]"] = (actor, name, length, isPlayerName) =>
+                ValidateName(actor, name).
+                LastInitial().
+                Truncated(length).
+                CheckForUpperCase(),
             #endregion
 
             #region player names
@@ -74,6 +86,18 @@ namespace DelvUI.Helpers
                 Initials().
                 Truncated(length).
                 CheckForUpperCase(),
+            
+            ["[player_name:initial-first]"] = (actor, name, length, isPlayerName) =>
+                ValidatePlayerName(actor, name, isPlayerName).
+                FirstInitial().
+                Truncated(length).
+                CheckForUpperCase(),
+
+            ["[player_name:initial-last]"] = (actor, name, length, isPlayerName) =>
+                ValidatePlayerName(actor, name, isPlayerName).
+                LastInitial().
+                Truncated(length).
+                CheckForUpperCase(),
             #endregion
 
             #region npc names
@@ -94,6 +118,16 @@ namespace DelvUI.Helpers
             ["[npc_name:initials]"] = (actor, name, length, isPlayerName) =>
                 ValidateNPCName(actor, name, isPlayerName).
                 Initials().
+                CheckForUpperCase(),
+
+            ["[npc_name:initial-first]"] = (actor, name, length, isPlayerName) =>
+                ValidateNPCName(actor, name, isPlayerName).
+                FirstInitial().
+                CheckForUpperCase(),
+
+            ["[npc_name:initial-last]"] = (actor, name, length, isPlayerName) =>
+                ValidateNPCName(actor, name, isPlayerName).
+                LastInitial().
                 CheckForUpperCase(),
             #endregion
         };

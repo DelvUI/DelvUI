@@ -1,3 +1,6 @@
+# 2.2.0.1
+- Added Individual initials in text tags.
+
 # 2.2.0.0
 - Added support for Dawntrail and Dalamud API 10.
 

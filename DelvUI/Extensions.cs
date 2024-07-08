@@ -36,22 +36,36 @@ namespace DelvUI
             return splits.Length > 1 ? splits[^1] : "";
         }
 
-        public static string Initials(this string str)
+        public static string FirstInitial(this string str)
         {
-            var initials = "";
+            var firstInitial = "";
             var firstName = FirstName(str);
-            var lastName = LastName(str);
 
             if (firstName.Length > 0)
             {
-                initials = firstName[0] + ".";
+                firstInitial = firstName[0] + ".";
             }
+
+            return firstInitial;
+        }
+
+        public static string LastInitial(this string str)
+        {
+            var lastInitial = "";
+            var lastName = LastName(str);
 
             if (lastName.Length > 0)
             {
-                initials += " " + lastName[0] + ".";
+                lastInitial = lastName[0] + ".";
             }
 
+            return lastInitial;
+        }
+
+        public static string Initials(this string str)
+        {
+            var initials = "";
+            initials = FirstInitial(str) + " " + LastInitial(str);
             return initials;
         }
 
