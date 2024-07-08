@@ -103,7 +103,7 @@ namespace DelvUI.Helpers
         private IntPtr CountdownTimerFunc(ulong value)
         {
             _agentData = value;
-            return _countdownTimerHook!.Original(value);
+            return _countdownTimerHook?.Original(value) ?? IntPtr.Zero;
         }
 
         private void UpdateEncounterTimer()
@@ -142,6 +142,7 @@ namespace DelvUI.Helpers
             byte countdownActive = Marshal.PtrToStructure<byte>((IntPtr)_agentData + 0x38);
             if (countdownActive == 0)
             {
+                _lastMaxValueSet = false;
                 return;
             } 
 
@@ -174,8 +175,7 @@ namespace DelvUI.Helpers
                 PullTimerState.CountDownMax = countDownPointerValue;
                 _lastMaxValueSet = true;
             }
-
-            if (_lastMaxValueSet && !CountDownRunning)
+            else if (_lastMaxValueSet && countDownPointerValue <= 0)
             {
                 _lastMaxValueSet = false;
             }
@@ -185,7 +185,6 @@ namespace DelvUI.Helpers
 
         [UnmanagedFunctionPointer(CallingConvention.ThisCall, CharSet = CharSet.Ansi)]
         private delegate IntPtr CountdownTimer(ulong param1);
-
     }
 
     public class PullTimerState

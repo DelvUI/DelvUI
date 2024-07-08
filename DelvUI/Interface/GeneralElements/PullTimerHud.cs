@@ -3,7 +3,6 @@ using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
@@ -43,7 +42,7 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             PluginConfigColor? fillColor = Config.UseJobColor ? ColorUtils.ColorForActor(Actor) : null;
-             
+
             BarHud bar = BarUtilities.GetProgressBar(Config,
                 helper.CountDownValue,
                 helper.CountDownMax, 0F, Actor, fillColor);
