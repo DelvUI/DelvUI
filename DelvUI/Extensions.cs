@@ -15,13 +15,17 @@ namespace DelvUI
     {
         public static string Abbreviate(this string str)
         {
-            string[] splits = str.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            for (int i = 0; i < splits.Length - 1; i++)
-            {
-                splits[i] = splits[i][0].ToString();
+            if (str.Length > 20) {
+                string[] splits = str.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                for (int i = 0; i < splits.Length - 1; i++)
+                {
+                    splits[i] = splits[i][0].ToString();
+                }
+                
+                return string.Join(". ", splits).ToString();
             }
 
-            return string.Join(". ", splits).ToUpper();
+            return str;
         }
 
         public static string FirstName(this string str)
