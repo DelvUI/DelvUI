@@ -210,7 +210,8 @@ namespace DelvUI.Interface.Bars
                     glowColor: glow?.Color,
                     glowSize: glow?.Size,
                     barTextureName: config.BarTextureName,
-                    barTextureDrawMode: config.BarTextureDrawMode
+                    barTextureDrawMode: config.BarTextureDrawMode,
+                    shadowConfig: config.ShadowConfig
                 );
                 bars[i].SetBackground(background);
                 bars[i].AddForegrounds(foreground);
