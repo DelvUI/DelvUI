@@ -3,6 +3,7 @@ using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
@@ -66,6 +67,12 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.HammerTimeBar.Size);
             }
 
+            if (Config.HyperphantasiaBar.Enabled)
+            {
+                positions.Add(Config.Position + Config.HyperphantasiaBar.Position);
+                sizes.Add(Config.HyperphantasiaBar.Size);
+            }
+
             return (positions, sizes);
         }
 
@@ -102,6 +109,11 @@ namespace DelvUI.Interface.Jobs
             {
                 DrawHammerTimeBar(pos, player);
             }
+
+            if (Config.HyperphantasiaBar.Enabled)
+            {
+                DrawHyperphantasiaBar(pos, player);
+            }
         }
 
         protected unsafe void DrawPaletteBar(Vector2 origin, IPlayerCharacter player)
@@ -114,9 +126,12 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
+            bool isSubstractive = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3674) != null;
+
+            config.Label = config.PaletteLabel;
+            config.PaletteLabel.SubtractiveMode = isSubstractive;
             config.Label.SetValue(gauge.PalleteGauge);
 
-            bool isSubstractive = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3674) != null;
             PluginConfigColor fillColor = isSubstractive ? config.SubtractiveColor : config.FillColor;
 
             BarHud[] bars = BarUtilities.GetChunkedProgressBars(
@@ -310,6 +325,23 @@ namespace DelvUI.Interface.Jobs
                 AddDrawActions(bar.GetDrawActions(origin, config.StrataLevel));
             }
         }
+
+        private unsafe void DrawHyperphantasiaBar(Vector2 origin, IPlayerCharacter player)
+        {
+            ChunkedBarConfig config = Config.HyperphantasiaBar;
+            int stacks = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3688)?.StackCount ?? 0;
+
+            if (config.HideWhenInactive && stacks == 0)
+            {
+                return;
+            }
+
+            BarHud[] bars = BarUtilities.GetChunkedBars(config, 5, stacks, 5, 0, player);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, config.StrataLevel));
+            }
+        }
     }
 
     [Section("Job Specific Bars")]
@@ -367,8 +399,16 @@ namespace DelvUI.Interface.Jobs
             new(254, 10),
             PluginConfigColor.FromHex(0xFFFFFFFF)
         );
+
+        [NestedConfig("Hyperphantasia Bar", 45)]
+        public ChunkedBarConfig HyperphantasiaBar = new ChunkedBarConfig(
+            new(0, -50),
+            new(254, 10),
+            PluginConfigColor.FromHex(0xFFFFFFFF)
+        );
     }
 
+    [DisableParentSettings("Label")]
     [Exportable(false)]
     public class PictomancerPaletteBarConfig : ChunkedProgressBarConfig
     {
@@ -376,10 +416,53 @@ namespace DelvUI.Interface.Jobs
         [Order(27)]
         public PluginConfigColor SubtractiveColor = PluginConfigColor.FromHex(0xFFAF6BAE);
 
+        [NestedConfig("Bar Text", 1001, separator = false, spacing = true)]
+        public PictomancerPaletteLabelConfig PaletteLabel = new PictomancerPaletteLabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+
         public PictomancerPaletteBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
              : base(position, size, fillColor)
         {
+            Label = PaletteLabel;
         }
+    }
+
+    [Exportable(false)]
+    public class PictomancerPaletteLabelConfig : NumericLabelConfig
+    {
+        [ColorEdit4("Subtractive Color")]
+        [Order(31)]
+        public PluginConfigColor SubtractiveColor = new PluginConfigColor(Vector4.UnitW);
+
+        [ColorEdit4("Subtractive Color ##Outline")]
+        [Order(41, collapseWith = nameof(ShowOutline))]
+        public PluginConfigColor SubtractiveOutlineColor = new PluginConfigColor(Vector4.One);
+
+        public PictomancerPaletteLabelConfig(Vector2 position, string text, DrawAnchor frameAnchor, DrawAnchor textAnchor)
+            : base(position, text, frameAnchor, textAnchor)
+        {
+        }
+
+        [JsonIgnore] public bool SubtractiveMode = false;
+
+        public override PluginConfigColor GetColor() => SubtractiveMode ? SubtractiveColor : Color;
+
+        public override PluginConfigColor GetOutlineColor() => SubtractiveMode ? SubtractiveOutlineColor : OutlineColor;
+
+        public override PictomancerPaletteLabelConfig Clone(int index) =>
+            new PictomancerPaletteLabelConfig(Position, _text, FrameAnchor, TextAnchor)
+            {
+                Color = Color,
+                SubtractiveColor = SubtractiveColor,
+                OutlineColor = OutlineColor,
+                SubtractiveOutlineColor = SubtractiveOutlineColor,
+                ShadowConfig = ShadowConfig,
+                ShowOutline = ShowOutline,
+                FontID = FontID,
+                UseJobColor = UseJobColor,
+                Enabled = Enabled,
+                HideIfZero = HideIfZero,
+                ID = ID + "_{index}"
+            };
     }
 
     [DisableParentSettings("FillColor")]

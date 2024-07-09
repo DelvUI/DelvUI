@@ -79,7 +79,7 @@ namespace DelvUI.Interface.GeneralElements
 
             PluginConfigColor fillColor = color;
             PluginConfigColor shadowColor = Config.ShadowConfig.Color;
-            PluginConfigColor outlineColor = Config.OutlineColor;
+            PluginConfigColor outlineColor = Config.GetOutlineColor();
 
             if (alpha.HasValue)
             {
@@ -148,7 +148,7 @@ namespace DelvUI.Interface.GeneralElements
                 case true when actor is not ICharacter:
                     return GlobalColors.Instance.NPCFriendlyColor;
                 default:
-                    return Config.Color;
+                    return Config.GetColor();
             }
         }
 

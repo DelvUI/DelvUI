@@ -204,6 +204,10 @@ namespace DelvUI.Interface.GeneralElements
             _text = text;
         }
 
+        public virtual PluginConfigColor GetColor() => Color;
+
+        public virtual PluginConfigColor GetOutlineColor() => OutlineColor;
+
         public virtual bool UseSystemFont() => false;
         public virtual float GetFontScale() => 1;
 

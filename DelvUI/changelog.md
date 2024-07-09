@@ -1,3 +1,8 @@
+# 2.2.0.2
+- Added subtractive color options to the Pictomancer's Pallete Bar.
+- Added setting to the Pictomancer's Creature Canvas bar to show an empty drawing section when it contains Pom + Wings.
+- Fixed shadows not working on chunked bars.
+
 # 2.2.0.1
 - Fixed `[health:current-percent]` and `[mana:current-percent]` not working properly.
 - Fixed mouseover not working when using other plugins like MOAction or ReAction.
