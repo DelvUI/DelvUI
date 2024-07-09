@@ -2,6 +2,7 @@
 - Added subtractive color options to the Pictomancer's Pallete Bar.
 - Added setting to the Pictomancer's Creature Canvas bar to show an empty drawing section when it contains Pom + Wings.
 - Fixed shadows not working on chunked bars.
+- Fixer Monk's Masterful Blitz Bar colors.
 
 # 2.2.0.1
 - Fixed `[health:current-percent]` and `[mana:current-percent]` not working properly.

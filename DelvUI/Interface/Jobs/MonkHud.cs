@@ -285,9 +285,10 @@ namespace DelvUI.Interface.Jobs
 
         private PluginConfigColor GetChakraColor(BeastChakra chakra) => chakra switch
         {
-            BeastChakra.RAPTOR => Config.MastersGauge.RaptorChakraColor,
-            BeastChakra.COEURL => Config.MastersGauge.CoeurlChakraColor,
-            BeastChakra.OPOOPO => Config.MastersGauge.OpoopoChakraColor,
+            // weird indices
+            BeastChakra.COEURL => Config.MastersGauge.OpoopoChakraColor,
+            BeastChakra.OPOOPO => Config.MastersGauge.RaptorChakraColor,
+            BeastChakra.RAPTOR => Config.MastersGauge.CoeurlChakraColor,
             _ => new PluginConfigColor(new(0, 0, 0, 0))
         };
     }
