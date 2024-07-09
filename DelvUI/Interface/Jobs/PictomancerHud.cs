@@ -205,6 +205,12 @@ namespace DelvUI.Interface.Jobs
             {
                 drawingColor = config.ClawColor;
             }
+            else if (config.ShowEmptyPomWings &&
+                gauge.CreatureFlags.HasFlag(CreatureFlags.Pom) &&
+                gauge.CreatureFlags.HasFlag(CreatureFlags.Wings))
+            {
+                drawingColor = PluginConfigColor.Empty;
+            }
             else if (gauge.CreatureFlags.HasFlag(CreatureFlags.Wings))
             {
                 drawingColor = config.WingsColor;
@@ -425,6 +431,11 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Don't Show Drawing", spacing = true, help = "When enabled, this hides the middle chunk that shows which creature parts were already drawn.")]
         [Order(50)]
         public bool DontShowDrawing = false;
+
+        [Checkbox("Show Empty Drawing for Pom + Wings")]
+        [Order(51)]
+        public bool ShowEmptyPomWings = false;
+
 
         public PictomancerCreatureCanvasBarConfig(Vector2 position, Vector2 size)
              : base(position, size, PluginConfigColor.Empty)
