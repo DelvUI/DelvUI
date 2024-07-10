@@ -130,8 +130,8 @@ namespace DelvUI.Interface.Jobs
             
             var start = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboStartColor, 1, null);
             var endFlank = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboEndFlankColor, 1, null);
-            var endHind = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboEndRearColor, 1, null);
-            var endAOE = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboAOEEndColor, 1, null);
+            var endHind = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboEndHindColor, 1, null);
+            var endAOE = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboEndAOEColor, 1, null);
 
             switch (comboState)
             {
@@ -168,7 +168,7 @@ namespace DelvUI.Interface.Jobs
                 case 2: // Combo Finisher, bar fully filled
                 {
                     var isFlankEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3645 or 3646);
-                    var isHindEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3647 or 3647);
+                    var isHindEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3647 or 3648);
 
                     Tuple<PluginConfigColor, float, LabelConfig?> end;
                     
@@ -354,11 +354,11 @@ namespace DelvUI.Interface.Jobs
             
             [ColorEdit4("Hind ender")]
             [Order(43)]
-            public PluginConfigColor ComboEndRearColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 1f));
+            public PluginConfigColor ComboEndHindColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 1f));
 
             [ColorEdit4("Grim/Default Ender")]
             [Order(44)]
-            public PluginConfigColor ComboAOEEndColor = new(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 1f));
+            public PluginConfigColor ComboEndAOEColor = new(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 1f));
 
             public VipersightBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
                 : base(position, size, fillColor)
