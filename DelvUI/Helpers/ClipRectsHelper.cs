@@ -117,6 +117,11 @@ namespace DelvUI.Helpers
                         size.X += size.X + (16 * addon->Scale);
                         size.Y += (30 * addon->Scale);
                     }
+                    
+                    if (name == "Journal")
+                    {
+                        size.X += size.X + (16 * addon->Scale);
+                    }
 
                     // just in case this causes weird issues / crashes (doubt it though...)
                     ClipRect clipRect = new ClipRect(pos, pos + size);
