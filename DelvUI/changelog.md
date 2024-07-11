@@ -1,3 +1,17 @@
+# 2.2.0.3
+- Added `[name:abbreviate]`, `health:percent-hidden` and `level:hidden` text tags.
+  * For more info check https://github.com/DelvUI/DelvUI/wiki/Text-Formatting
+
+- Added several improvements to the Viper Hud:
+  * Added hind/rear skill colors.
+  * Serpent Offering can now be shown in chunks.
+  * Added reawakened timer toggle.
+  * Added color option to show when Reawakened is ready to be used.
+
+- Attempt to fix inputs from not working when the plugin is updated.
+- Fixed Ninja's Kunai's Bane not being tracked properly in the Trick Attack Bar.
+- Fixed right click context menu not working on the Party Frames.
+
 # 2.2.0.2
 - Added subtractive color options to the Pictomancer's Pallete Bar.
 - Added setting to the Pictomancer's Creature Canvas bar to show an empty drawing section when it contains Pom + Wings.

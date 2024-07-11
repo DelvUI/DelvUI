@@ -98,9 +98,6 @@ namespace DelvUI.Helpers
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-
-            _requestActionHook?.Disable();
-            _requestActionHook?.Dispose();
         }
 
         protected void Dispose(bool disposing)
@@ -117,7 +114,7 @@ namespace DelvUI.Helpers
 
             _requestActionHook?.Disable();
             _requestActionHook?.Dispose();
-
+            
             // give imgui the control of inputs again
             if (_wndHandle != IntPtr.Zero && _imguiWndProcPtr != IntPtr.Zero)
             {

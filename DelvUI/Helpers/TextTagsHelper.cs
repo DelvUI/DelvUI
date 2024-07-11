@@ -155,9 +155,9 @@ namespace DelvUI.Helpers
 
             ["[health:max-short]"] = (currentHp, maxHp) => maxHp.KiloFormat(),
 
-            ["[health:percent]"] = (currentHp, maxHp) => (100f * currentHp / Math.Max(1, maxHp)).ToString("N0"),
+            ["[health:percent]"] = (currentHp, maxHp) => (100f * currentHp / Math.Max(1, maxHp)).ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
 
-            ["[health:percent-hidden]"] = (currentHp, maxHp) => currentHp == (0 | maxHp) ? "" : $"{Math.Round(100f / maxHp * currentHp)}",
+            ["[health:percent-hidden]"] = (currentHp, maxHp) => currentHp == (0 | maxHp) ? "" : (100f * currentHp / Math.Max(1, maxHp)).ToString("N0", ConfigurationManager.Instance.ActiveCultreInfo),
 
             ["[health:percent-decimal]"] = (currentHp, maxHp) => (100f * currentHp / Math.Max(1f, maxHp)).ToString("N1", ConfigurationManager.Instance.ActiveCultreInfo),
 
@@ -213,7 +213,7 @@ namespace DelvUI.Helpers
 
             ["[level]"] = (chara) => chara.Level > 0 ? chara.Level.ToString() : "-",
 
-            ["[level:hidden]"] = (chara) => (chara.Level > 1 && chara.Level < 100) ? chara.Level.ToString() + " " : "",
+            ["[level:hidden]"] = (chara) => (chara.Level > 1 && chara.Level < 100) ? chara.Level.ToString() : "",
 
             ["[job]"] = (chara) => JobsHelper.JobNames.TryGetValue(chara.ClassJob.Id, out var jobName) ? jobName : "",
 
