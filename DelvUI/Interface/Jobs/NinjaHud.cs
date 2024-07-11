@@ -212,7 +212,7 @@ namespace DelvUI.Interface.Jobs
             IGameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
             float trickDuration = Utils.StatusListForActor(actor).FirstOrDefault(
-                o => o.StatusId is 3254 && o.SourceId == player.GameObjectId && o.RemainingTime > 0
+                o => o.StatusId is 3254 or 3906 && o.SourceId == player.GameObjectId && o.RemainingTime > 0
             )?.RemainingTime ?? 0f;
 
             if (Config.TrickAttackBar.HideWhenInactive && trickDuration == 0)
