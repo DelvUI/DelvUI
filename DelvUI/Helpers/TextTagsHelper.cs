@@ -49,6 +49,11 @@ namespace DelvUI.Helpers
                 Initials().
                 Truncated(length).
                 CheckForUpperCase(),
+
+            ["[name:abbreviate]"] = (actor, name, length, isPlayerName) => 
+                ValidateName(actor, name).
+                Abbreviate().
+                CheckForUpperCase(),
             #endregion
 
             #region player names
@@ -152,6 +157,8 @@ namespace DelvUI.Helpers
 
             ["[health:percent]"] = (currentHp, maxHp) => (100f * currentHp / Math.Max(1, maxHp)).ToString("N0"),
 
+            ["[health:percent-hidden]"] = (currentHp, maxHp) => currentHp == (0 | maxHp) ? "" : $"{Math.Round(100f / maxHp * currentHp)}",
+
             ["[health:percent-decimal]"] = (currentHp, maxHp) => (100f * currentHp / Math.Max(1f, maxHp)).ToString("N1", ConfigurationManager.Instance.ActiveCultreInfo),
 
             ["[health:percent-decimal-uniform]"] = (currentHp, maxHp) => ConsistentDigitPercentage(currentHp, maxHp),
@@ -205,6 +212,8 @@ namespace DelvUI.Helpers
             ["[company]"] = (chara) => chara.CompanyTag.ToString(),
 
             ["[level]"] = (chara) => chara.Level > 0 ? chara.Level.ToString() : "-",
+
+            ["[level:hidden]"] = (chara) => (chara.Level > 1 && chara.Level < 100) ? chara.Level.ToString() + " " : "",
 
             ["[job]"] = (chara) => JobsHelper.JobNames.TryGetValue(chara.ClassJob.Id, out var jobName) ? jobName : "",
 
