@@ -81,7 +81,7 @@ namespace DelvUI.Interface.Party
                 .text:00007FF6485197AE 0F 85 DF 00 00 00 jnz     loc_7FF648519893
                 */
                 _openContextMenu =
-                    Marshal.GetDelegateForFunctionPointer<OpenContextMenu>(Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? EB 50 83 FB 01"));
+                    Marshal.GetDelegateForFunctionPointer<OpenContextMenu>(Plugin.SigScanner.ScanText("48 89 5C 24 ?? 48 89 6C 24 ?? 57 48 83 EC 20 49 63 D8"));
             }
             catch { }
         }
