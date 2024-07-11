@@ -129,7 +129,9 @@ namespace DelvUI.Interface.Jobs
             var empty = new Tuple<PluginConfigColor, float, LabelConfig?>(PluginConfigColor.Empty, 1, null);
             
             var start = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboStartColor, 1, null);
-            var end = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboEndColor, 1, null);
+            var endFlank = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboEndFlankColor, 1, null);
+            var endHind = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboEndHindColor, 1, null);
+            var endAOE = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboEndAOEColor, 1, null);
 
             switch (comboState)
             {
@@ -165,6 +167,24 @@ namespace DelvUI.Interface.Jobs
                 }
                 case 2: // Combo Finisher, bar fully filled
                 {
+                    var isFlankEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3645 or 3646);
+                    var isHindEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3647 or 3648);
+
+                    Tuple<PluginConfigColor, float, LabelConfig?> end;
+                    
+                    if (isFlankEnder)
+                    {
+                        end = endFlank;
+                    }
+                    else if (isHindEnder)
+                    {
+                        end = endHind;
+                    }
+                    else
+                    {
+                        end = endAOE;
+                    }
+
                     chunks = [end, start, start, end];
                     if (isSteelFangsEnder)
                     {   // Glow left
@@ -328,9 +348,17 @@ namespace DelvUI.Interface.Jobs
             [Order(41)]
             public PluginConfigColor ComboStartColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 100f / 100f));
 
-            [ColorEdit4("Combo End")]
+            [ColorEdit4("Flank ender")]
             [Order(42)]
-            public PluginConfigColor ComboEndColor = new(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 1f));
+            public PluginConfigColor ComboEndFlankColor = new(new Vector4(46f / 255f, 228f / 255f, 42f / 255f, 1f));
+            
+            [ColorEdit4("Hind ender")]
+            [Order(43)]
+            public PluginConfigColor ComboEndHindColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 1f));
+
+            [ColorEdit4("Grim/Default Ender")]
+            [Order(44)]
+            public PluginConfigColor ComboEndAOEColor = new(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 1f));
 
             public VipersightBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
                 : base(position, size, fillColor)
