@@ -264,6 +264,7 @@ namespace DelvUI.Interface.Jobs
         
         private unsafe void DrawSerpentOfferingsBar(Vector2 origin, IPlayerCharacter player)
         {
+            ViperConfig.SerpentOfferingsBarConfig config = Config.SerpentOfferings;
             var instance = JobGaugeManager.Instance();
             var gauge = (ViperGauge*)instance->CurrentGauge;
             
@@ -276,8 +277,24 @@ namespace DelvUI.Interface.Jobs
             {
                 Config.SerpentOfferings.Label.SetValue(serpentOffering);
 
-                BarHud bar = BarUtilities.GetProgressBar(Config.SerpentOfferings, serpentOffering, isReawakened ? 30f : 100f, 0f, player);
-                AddDrawActions(bar.GetDrawActions(origin, Config.SerpentOfferings.StrataLevel));
+                bool showReawakened = isReawakened && config.EnableAwakenedTimer;
+
+                if (serpentOffering >= 50)
+                {
+                    config.FillColor = config.AwakenedColor;
+                }
+
+                BarHud[] bars = BarUtilities.GetChunkedProgressBars(
+                    config,
+                    showReawakened ? 1 : 2,
+                    showReawakened ? reawakenedDuration : serpentOffering,
+                    showReawakened ? 30f : 100f
+                );
+                
+                foreach (BarHud bar in bars)
+                {
+                    AddDrawActions(bar.GetDrawActions(origin, Config.SerpentOfferings.StrataLevel));
+                }
             }
         }
     }
@@ -300,7 +317,14 @@ namespace DelvUI.Interface.Jobs
     public class ViperConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.VPR;
-        public new static ViperConfig DefaultConfig() { return new ViperConfig(); }
+
+        public new static ViperConfig DefaultConfig()
+        {
+            var config = new ViperConfig();
+            config.SerpentOfferings.UseChunks = false;
+            
+            return config;
+        }
 
         [NestedConfig("Vipersight Bar", 30)]
         public VipersightBarConfig Vipersight = new VipersightBarConfig(
@@ -324,7 +348,7 @@ namespace DelvUI.Interface.Jobs
         );
         
         [NestedConfig("Serpent Offerings Bar", 45)]
-        public ProgressBarConfig SerpentOfferings = new ProgressBarConfig(
+        public SerpentOfferingsBarConfig SerpentOfferings = new SerpentOfferingsBarConfig(
             new(0, -46),
             new(254, 10),
             new(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 1f))
@@ -348,11 +372,11 @@ namespace DelvUI.Interface.Jobs
             [Order(41)]
             public PluginConfigColor ComboStartColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 100f / 100f));
 
-            [ColorEdit4("Flank ender")]
+            [ColorEdit4("Flank Ender")]
             [Order(42)]
             public PluginConfigColor ComboEndFlankColor = new(new Vector4(46f / 255f, 228f / 255f, 42f / 255f, 1f));
             
-            [ColorEdit4("Hind ender")]
+            [ColorEdit4("Hind Ender")]
             [Order(43)]
             public PluginConfigColor ComboEndHindColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 1f));
 
@@ -361,6 +385,23 @@ namespace DelvUI.Interface.Jobs
             public PluginConfigColor ComboEndAOEColor = new(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 1f));
 
             public VipersightBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+                : base(position, size, fillColor)
+            {
+            }
+        }
+
+        [Exportable(false)]
+        public class SerpentOfferingsBarConfig : ChunkedProgressBarConfig
+        {
+            [Checkbox("Enable Awakened Timer", spacing = true)]
+            [Order(46)]
+            public bool EnableAwakenedTimer = true;
+            
+            [ColorEdit4("Ready to Reawaken Color")]
+            [Order(47)]
+            public PluginConfigColor AwakenedColor = new(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 1f));
+            
+            public SerpentOfferingsBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
                 : base(position, size, fillColor)
             {
             }
