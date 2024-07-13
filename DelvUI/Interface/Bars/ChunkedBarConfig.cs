@@ -59,6 +59,22 @@ namespace DelvUI.Interface.Bars
         }
     }
 
+    [DisableParentSettings("LabelMode", "UsePartialFillColor", "PartialFillColor")]
+    [Exportable(false)]
+    public class StacksWithDurationBarConfig : ChunkedProgressBarConfig
+    {
+        public StacksWithDurationBarConfig(
+            Vector2 position,
+            Vector2 size,
+            PluginConfigColor fillColor,
+            int padding = 2,
+            PluginConfigColor? partialFillColor = null) : base(position, size, fillColor, padding)
+        {
+            UseChunks = true;
+            UsePartialFillColor = false;
+        }
+    }
+
     public enum LabelMode
     {
         AllChunks,

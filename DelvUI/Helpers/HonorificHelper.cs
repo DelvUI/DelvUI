@@ -53,23 +53,26 @@ namespace DelvUI.Helpers
 
         public TitleData? GetTitle(IGameObject? actor)
         {
-            if (_getCharacterTitle == null || 
-                actor == null || 
-                actor.ObjectKind != ObjectKind.Player || 
-                actor is not ICharacter character)
-            {
-                return null;
-            }
-
-            try
-            {
-                string jsonData = _getCharacterTitle.InvokeFunc(character);
-                TitleData? titleData = JsonConvert.DeserializeObject<TitleData>(jsonData ?? string.Empty);
-                return titleData;
-            }
-            catch { }
-
+            // IPC not working /shrug
             return null;
+
+            //if (_getCharacterTitle == null || 
+            //    actor == null || 
+            //    actor.ObjectKind != ObjectKind.Player || 
+            //    actor is not ICharacter character)
+            //{
+            //    return null;
+            //}
+
+            //try
+            //{
+            //    string jsonData = _getCharacterTitle.InvokeFunc(character);
+            //    TitleData? titleData = JsonConvert.DeserializeObject<TitleData>(jsonData ?? string.Empty);
+            //    return titleData;
+            //}
+            //catch { }
+
+            //return null;
         }
     }
 }

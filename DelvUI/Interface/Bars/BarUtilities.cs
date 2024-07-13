@@ -271,7 +271,8 @@ namespace DelvUI.Interface.Bars
             BarGlowConfig? glowConfig = null,
             PluginConfigColor? fillColor = null,
             int thresholdChunk = 1,
-            bool[]? chunksToGlow = null)
+            bool[]? chunksToGlow = null,
+            int forceLabelIndex = -1)
         {
             var color = fillColor ?? config.FillColor;
 
@@ -286,16 +287,23 @@ namespace DelvUI.Interface.Bars
                     float chunkPercent = Math.Clamp((current - chunkMin) / (chunkMax - chunkMin), 0f, 1f);
 
                     NumericLabelConfig? label = config.Label;
-                    switch (config.LabelMode)
+                    if (forceLabelIndex == -1)
                     {
-                        case LabelMode.AllChunks:
-                            label = config.Label.Clone(i);
-                            label.SetValue(Math.Clamp(current - chunkMin, 0, chunkRange));
-                            break;
-                        case LabelMode.ActiveChunk:
-                            label = chunkPercent < 1f && chunkPercent > 0f ? config.Label.Clone(i) : null;
-                            break;
-                    };
+                        switch (config.LabelMode)
+                        {
+                            case LabelMode.AllChunks:
+                                label = config.Label.Clone(i);
+                                label.SetValue(Math.Clamp(current - chunkMin, 0, chunkRange));
+                                break;
+                            case LabelMode.ActiveChunk:
+                                label = chunkPercent < 1f && chunkPercent > 0f ? config.Label.Clone(i) : null;
+                                break;
+                        };
+                    } 
+                    else
+                    {
+                        label = forceLabelIndex == i ? config.Label : null;
+                    }
 
                     labels[i] = label;
                 }

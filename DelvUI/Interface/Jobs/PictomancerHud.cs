@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game.ClientState.JobGauge.Enums;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
@@ -311,15 +312,19 @@ namespace DelvUI.Interface.Jobs
 
         private unsafe void DrawHammerTimeBar(Vector2 origin, IPlayerCharacter player)
         {
-            ChunkedBarConfig config = Config.HammerTimeBar;
-            int stacks = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3680)?.StackCount ?? 0;
+            StacksWithDurationBarConfig config = Config.HammerTimeBar;
+            Status? status = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3680);
+            int stacks = status?.StackCount ?? 0;
+            float time = Math.Abs(status?.RemainingTime ?? 0f);
 
             if (config.HideWhenInactive && stacks == 0)
             {
                 return;
             }
 
-            BarHud[] bars = BarUtilities.GetChunkedBars(config, 3, stacks, 3, 0, player);
+            config.Label.SetValue(time);
+
+            BarHud[] bars = BarUtilities.GetChunkedProgressBars(config, 3, stacks, 3, 0, player, forceLabelIndex: 1);
             foreach (BarHud bar in bars)
             {
                 AddDrawActions(bar.GetDrawActions(origin, config.StrataLevel));
@@ -328,15 +333,19 @@ namespace DelvUI.Interface.Jobs
 
         private unsafe void DrawHyperphantasiaBar(Vector2 origin, IPlayerCharacter player)
         {
-            ChunkedBarConfig config = Config.HyperphantasiaBar;
-            int stacks = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3688)?.StackCount ?? 0;
+            StacksWithDurationBarConfig config = Config.HyperphantasiaBar;
+            Status? status = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3688);
+            int stacks = status?.StackCount ?? 0;
+            float time = Math.Abs(status?.RemainingTime ?? 0f);
 
             if (config.HideWhenInactive && stacks == 0)
             {
                 return;
             }
 
-            BarHud[] bars = BarUtilities.GetChunkedBars(config, 5, stacks, 5, 0, player);
+            config.Label.SetValue(time);
+
+            BarHud[] bars = BarUtilities.GetChunkedProgressBars(config, 5, stacks, 5, 0, player, forceLabelIndex: 2);
             foreach (BarHud bar in bars)
             {
                 AddDrawActions(bar.GetDrawActions(origin, config.StrataLevel));
@@ -394,14 +403,14 @@ namespace DelvUI.Interface.Jobs
         );
 
         [NestedConfig("Hammer Time Bar", 40)]
-        public ChunkedBarConfig HammerTimeBar = new ChunkedBarConfig(
+        public StacksWithDurationBarConfig HammerTimeBar = new StacksWithDurationBarConfig(
             new(0, -50),
             new(254, 10),
             PluginConfigColor.FromHex(0xFFFFFFFF)
         );
 
         [NestedConfig("Hyperphantasia Bar", 45)]
-        public ChunkedBarConfig HyperphantasiaBar = new ChunkedBarConfig(
+        public StacksWithDurationBarConfig HyperphantasiaBar = new StacksWithDurationBarConfig(
             new(0, -50),
             new(254, 10),
             PluginConfigColor.FromHex(0xFFFFFFFF)

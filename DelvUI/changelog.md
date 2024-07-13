@@ -1,5 +1,7 @@
 # 2.2.0.4
-- Added Eukrasian Dyskrasia (AoE DoT) to Sage Hud.
+- Added duration labels for Pictomancer's Hammer Time and Hyperphantasia Bars.
+- Fixed Sage's Eukrasian Dyskrasia not being tracked in the Eukrasian Dosis Bar.
+- Fixed Monk's Masterful Blitz colors.
 
 # 2.2.0.3
 - Added `[name:abbreviate]`, `health:percent-hidden` and `level:hidden` text tags.
