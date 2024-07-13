@@ -18,8 +18,8 @@ namespace DelvUI.Interface.Jobs
     {
         private new SageConfig Config => (SageConfig)_config;
 
-        private static readonly List<uint> DotIDs = new() { 2614, 2615, 2616 };
-        private static readonly List<float> DotDurations = new() { 30, 30, 30 };
+        private static readonly List<uint> DotIDs = new() { 2614, 2615, 2616, 3897 };
+        private static readonly List<float> DotDurations = new() { 30, 30, 30, 30 };
 
         public SageHud(JobConfig config, string? displayName = null) : base(config, displayName)
         {
