@@ -1,5 +1,6 @@
 # 2.2.0.5
 - Fix Bard's Radiant Finale duration in Party Cooldowns
+- Fixed Who's Talking Indicator in Party Frames.
 
 # 2.2.0.4
 - Added duration labels for Pictomancer's Hammer Time and Hyperphantasia Bars.

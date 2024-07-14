@@ -1,4 +1,4 @@
-﻿using Dalamud.Game.ClientState.Party;
+using Dalamud.Game.ClientState.Party;
 using Dalamud.Interface;
 using Dalamud.Interface.Internal;
 using Dalamud.Interface.Textures.TextureWraps;
@@ -27,10 +27,10 @@ namespace DelvUI.Helpers
     {
         private readonly ICallGateSubscriber<string, int> _getUserState;
         private Dictionary<string, WhosTalkingState> _cachedStates = new Dictionary<string, WhosTalkingState>();
-
-        private IDalamudTextureWrap? _speakingTexture = null;
-        private IDalamudTextureWrap? _mutedTexture = null;
-        private IDalamudTextureWrap? _deafenedTexture = null;
+        
+        private string speakingPath = "";
+        private string mutedPath = "";
+        private string deafenedPath = "";
 
         #region Singleton
         private WhosTalkingHelper()
@@ -42,16 +42,13 @@ namespace DelvUI.Helpers
                 string imagesPath = Path.Combine(Plugin.AssemblyLocation, "Media", "Images");
 
                 // speaking
-                string speakingPath = Path.Combine(imagesPath, "speaking.png");
-                _speakingTexture = Plugin.TextureProvider.GetFromFile(speakingPath).GetWrapOrDefault();
+                speakingPath = Path.Combine(imagesPath, "speaking.png");
 
                 // muted
-                string mutedPath = Path.Combine(imagesPath, "muted.png");
-                _mutedTexture = Plugin.TextureProvider.GetFromFile(mutedPath).GetWrapOrDefault();
+                mutedPath = Path.Combine(imagesPath, "muted.png");
                 
                 // deafened
-                string deafenedPath = Path.Combine(imagesPath, "deafened.png");
-                _deafenedTexture = Plugin.TextureProvider.GetFromFile(deafenedPath).GetWrapOrDefault();
+                deafenedPath = Path.Combine(imagesPath, "deafened.png");
             }
             catch { }
         }
@@ -119,9 +116,9 @@ namespace DelvUI.Helpers
         {
             switch (state)
             {
-                case WhosTalkingState.Speaking: return _speakingTexture;
-                case WhosTalkingState.Muted: return _mutedTexture;
-                case WhosTalkingState.Deafened: return _deafenedTexture;
+                case WhosTalkingState.Speaking: return Plugin.TextureProvider.GetFromFile(speakingPath).GetWrapOrDefault();
+                case WhosTalkingState.Muted: return Plugin.TextureProvider.GetFromFile(mutedPath).GetWrapOrDefault();
+                case WhosTalkingState.Deafened: return Plugin.TextureProvider.GetFromFile(deafenedPath).GetWrapOrDefault();
             }
 
             return null;
