@@ -137,6 +137,10 @@ namespace DelvUI.Interface.Jobs
             var endFlank = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboEndFlankColor, 1, null);
             var endHind = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboEndHindColor, 1, null);
             var endAoE = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboEndAOEColor, 1, null);
+            
+            var isFlankEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3645 or 3646);
+            var isHindEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3647 or 3648);
+            var noEnder = !isFlankEnder && !isHindEnder;
 
             switch (comboState)
             {
@@ -153,44 +157,56 @@ namespace DelvUI.Interface.Jobs
                     var glowLeft = !useLowerDuration && (isLeftGlowing || isAoE);
                     var glowRight = !useLowerDuration && (isRightGlowing || isAoE);
                     
-                    if (useLowerDuration && swiftScaledDuration > huntersInstinctDuration)
-                    {
-                        glowLeft = true;
-                    }
-                    if (useLowerDuration && huntersInstinctDuration > swiftScaledDuration)
-                    {
-                        glowRight = true;
+                    if (useLowerDuration) {
+                        if (isFlankEnder) {
+                            glowLeft = true;
+                            glowRight = false;
+                        } else if (isHindEnder) {
+                            glowLeft = false;
+                            glowRight = true;
+                        } else if (noEnder) {
+                            if (huntersInstinctDuration < swiftScaledDuration) {
+                                glowLeft = true;
+                                glowRight = false;
+                            } else if (swiftScaledDuration < huntersInstinctDuration) {
+                                glowLeft = false;
+                                glowRight = true;
+                            } else {
+                                glowLeft = true;
+                                glowRight = true;
+                            }
+                        }
                     }
                     
                     glows = [false, glowLeft, glowRight, false];
-
                     break;
                 }
                 case ViperComboState.Finisher:
                 {
-                    var isFlankEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3645 or 3646);
-                    var isHindEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3647 or 3648);
+                    var end = isFlankEnder ? endFlank : isHindEnder ? endHind : endAoE;
+                    chunks = [end, start, start, end];
+                    glows = [isLeftGlowing, isLeftGlowing, isRightGlowing, isRightGlowing];
+                    break;
+                    
+                    /*
+                    var isFlankChain = (ViperCombo)lastUsedActionId == ViperCombo.HuntersSting;
+                    var isHindChain = (ViperCombo)lastUsedActionId == ViperCombo.SwiftskinsSting;
 
                     Tuple<PluginConfigColor, float, LabelConfig?> end;
-                    
-                    if (isFlankEnder)
-                    {
-                        end = endFlank;
-                    }
-                    else if (isHindEnder)
-                    {
-                        end = endHind;
-                    }
-                    else
-                    {
-                        end = endAoE;
+
+                    if (isFlankEnder) {
+                        end = isHindChain ? endHind : endFlank;
+                    } else if (isHindEnder) {
+                        end = isFlankChain ? endFlank : endHind;
+                    } else {
+                        end = isFlankChain ? endFlank : isHindChain ? endHind : endAoE;
                     }
 
                     chunks = [end, start, start, end];
-                    
                     glows = [isLeftGlowing, isLeftGlowing, isRightGlowing, isRightGlowing];
-                    
+
                     break;
+                    */
                 }
             }
 
@@ -365,7 +381,7 @@ namespace DelvUI.Interface.Jobs
         {
             [Checkbox("Recommend Lower Duration Buff", 
                 spacing = true, 
-                help = "When enabled, the second step of the combo will recommend refreshing the buff with the shorter duration, but this will make it less accurate to the in-game gauge."
+                help = "When enabled, the second step of the combo will recommend refreshing the buff with the shorter duration if you have no ender buff, but this will make it less accurate to the in-game gauge."
                 )]
             [Order(38)]
             public bool RecommendLowerBuff = true;
