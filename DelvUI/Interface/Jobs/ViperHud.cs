@@ -183,12 +183,6 @@ namespace DelvUI.Interface.Jobs
                 }
                 case ViperComboState.Finisher:
                 {
-                    var end = isFlankEnder ? endFlank : isHindEnder ? endHind : endAoE;
-                    chunks = [end, start, start, end];
-                    glows = [isLeftGlowing, isLeftGlowing, isRightGlowing, isRightGlowing];
-                    break;
-                    
-                    /*
                     var isFlankChain = (ViperCombo)lastUsedActionId == ViperCombo.HuntersSting;
                     var isHindChain = (ViperCombo)lastUsedActionId == ViperCombo.SwiftskinsSting;
 
@@ -206,7 +200,7 @@ namespace DelvUI.Interface.Jobs
                     glows = [isLeftGlowing, isLeftGlowing, isRightGlowing, isRightGlowing];
 
                     break;
-                    */
+                    
                 }
             }
 
@@ -275,8 +269,10 @@ namespace DelvUI.Interface.Jobs
             ViperConfig.SerpentOfferingsBarConfig config = Config.SerpentOfferings;
             var instance = JobGaugeManager.Instance();
             var gauge = (ViperGauge*)instance->CurrentGauge;
+            var fillColor = config.FillColor;
             
             float reawakenedDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3670 or 4094 && o.RemainingTime > 0f)?.RemainingTime ?? 0f;
+            bool reAwakenedReady = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3671) || gauge->SerpentOffering >= 50;
             bool isReawakened = reawakenedDuration > 0;
             
             var serpentOffering = isReawakened ? reawakenedDuration : gauge->SerpentOffering;
@@ -287,16 +283,17 @@ namespace DelvUI.Interface.Jobs
 
                 bool showReawakened = isReawakened && config.EnableAwakenedTimer;
 
-                if (serpentOffering >= 50)
+                if (reAwakenedReady)
                 {
-                    config.FillColor = config.AwakenedColor;
+                    fillColor = config.AwakenedColor;
                 }
 
                 BarHud[] bars = BarUtilities.GetChunkedProgressBars(
                     config,
                     showReawakened ? 1 : 2,
                     showReawakened ? reawakenedDuration : serpentOffering,
-                    showReawakened ? 30f : 100f
+                    showReawakened ? 30f : 100f,
+                    fillColor: fillColor
                 );
                 
                 foreach (BarHud bar in bars)
