@@ -70,5 +70,7 @@ namespace DelvUI.Helpers
 
             return maxStacks - (int)Math.Ceiling(cooldown / (recastTime / maxStacks));
         }
+
+        public unsafe bool IsActionHighlighted(uint actionId, ActionType type = ActionType.Action) => _actionManager->IsActionHighlighted(type, actionId);
     }
 }

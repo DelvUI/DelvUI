@@ -91,114 +91,116 @@ namespace DelvUI.Interface.Jobs
         
         private unsafe void DrawVipersightBar(Vector2 origin, IPlayerCharacter player)
         {
-            var instance = JobGaugeManager.Instance();
-            var gauge = (ViperGauge*)instance->CurrentGauge;
-            
             var huntersInstinctDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3668)?.RemainingTime ?? 0f;
             var swiftScaledDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3669)?.RemainingTime ?? 0f;
-            
-            var isDreadFangsEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3646 or 3648 or 3650);
-            var isSteelFangsEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3645 or 3647 or 3649);
+
+            var useLowerDuration = Config.Vipersight.RecommendLowerBuff;
             
             var lastUsedActionId = SpellHelper.Instance.GetLastUsedActionId();
 
-            int comboState;
+            var isAoE = false;
+            ViperComboState comboState;
             
             List<Tuple<PluginConfigColor, float, LabelConfig?>> chunks = new List<Tuple<PluginConfigColor, float, LabelConfig?>>();
             List<bool> glows = new List<bool>();
             
             switch ((ViperCombo) lastUsedActionId)
             {
-                case ViperCombo.DreadFangs:
-                case ViperCombo.SteelFangs:
                 case ViperCombo.SteelMaw:
                 case ViperCombo.DreadMaw:
-                    comboState = 1;
+                    isAoE = true;
+                    comboState = ViperComboState.Started;
+                    break;
+                case ViperCombo.SteelFangs:
+                case ViperCombo.DreadFangs:
+                    comboState = ViperComboState.Started;
+                    break;
+                case ViperCombo.HuntersBite:
+                case ViperCombo.SwiftskinsBite:
+                    isAoE = true;
+                    comboState = ViperComboState.Finisher;
                     break;
                 case ViperCombo.HuntersSting:
                 case ViperCombo.SwiftskinsSting:
-                case ViperCombo.HuntersBite:
-                case ViperCombo.SwiftskinsBite:
-                    comboState = 2;
+                    comboState = ViperComboState.Finisher;
                     break;
                 default:
-                    comboState = 0;
+                    comboState = ViperComboState.None;
                     break;
             }
             
-            var empty = new Tuple<PluginConfigColor, float, LabelConfig?>(PluginConfigColor.Empty, 1, null);
+            var isLeftGlowing = SpellHelper.Instance.IsActionHighlighted(SpellHelper.Instance.GetSpellActionId(isAoE ? (uint)ViperCombo.SteelMaw : (uint)ViperCombo.SteelFangs));
+            var isRightGlowing = SpellHelper.Instance.IsActionHighlighted(SpellHelper.Instance.GetSpellActionId(isAoE ? (uint)ViperCombo.DreadMaw : (uint)ViperCombo.DreadFangs));
             
+            var empty = new Tuple<PluginConfigColor, float, LabelConfig?>(PluginConfigColor.Empty, 1, null);
             var start = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboStartColor, 1, null);
             var endFlank = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboEndFlankColor, 1, null);
             var endHind = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboEndHindColor, 1, null);
-            var endAOE = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboEndAOEColor, 1, null);
+            var endAoE = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboEndAOEColor, 1, null);
+            
+            var isFlankEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3645 or 3646);
+            var isHindEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3647 or 3648);
+            var noEnder = !isFlankEnder && !isHindEnder;
 
             switch (comboState)
             {
-                case 0: // Empty Bars
+                case ViperComboState.None:
                 {
                     chunks = [empty, empty, empty, empty];
                     glows = [false, false, false, false];
                     break;
                 }
-                case 1: // Combo started
+                case ViperComboState.Started:
                 {
                     chunks = [empty, start, start, empty];
 
-                    if ((ViperCombo)lastUsedActionId == ViperCombo.DreadMaw || (ViperCombo)lastUsedActionId == ViperCombo.DreadMaw)
-                    {   // Glow both, 2nd step AoE always suggests both
-                        glows = [false, true, true, false];
-
-                        break;
+                    var glowLeft = !useLowerDuration && (isLeftGlowing || isAoE);
+                    var glowRight = !useLowerDuration && (isRightGlowing || isAoE);
+                    
+                    if (useLowerDuration) {
+                        if (isFlankEnder) {
+                            glowLeft = true;
+                            glowRight = false;
+                        } else if (isHindEnder) {
+                            glowLeft = false;
+                            glowRight = true;
+                        } else if (noEnder) {
+                            if (huntersInstinctDuration < swiftScaledDuration) {
+                                glowLeft = true;
+                                glowRight = false;
+                            } else if (swiftScaledDuration < huntersInstinctDuration) {
+                                glowLeft = false;
+                                glowRight = true;
+                            } else {
+                                glowLeft = true;
+                                glowRight = true;
+                            }
+                        }
                     }
-                    if (swiftScaledDuration > huntersInstinctDuration)
-                    {   // Glow left
-                        glows = [false, true, false, false];
-                    }
-                    else if (huntersInstinctDuration > swiftScaledDuration)
-                    {   // Glow right
-                        glows = [false, false, true, false];
-                    }
-                    else
-                    {   // Glow both
-                        glows = [false, true, true, false];
-                    }
+                    
+                    glows = [false, glowLeft, glowRight, false];
                     break;
                 }
-                case 2: // Combo Finisher, bar fully filled
+                case ViperComboState.Finisher:
                 {
-                    var isFlankEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3645 or 3646);
-                    var isHindEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3647 or 3648);
+                    var isFlankChain = (ViperCombo)lastUsedActionId == ViperCombo.HuntersSting;
+                    var isHindChain = (ViperCombo)lastUsedActionId == ViperCombo.SwiftskinsSting;
 
                     Tuple<PluginConfigColor, float, LabelConfig?> end;
-                    
-                    if (isFlankEnder)
-                    {
-                        end = endFlank;
-                    }
-                    else if (isHindEnder)
-                    {
-                        end = endHind;
-                    }
-                    else
-                    {
-                        end = endAOE;
+
+                    if (isFlankEnder) {
+                        end = isHindChain ? endHind : endFlank;
+                    } else if (isHindEnder) {
+                        end = isFlankChain ? endFlank : endHind;
+                    } else {
+                        end = isFlankChain ? endFlank : isHindChain ? endHind : endAoE;
                     }
 
                     chunks = [end, start, start, end];
-                    if (isSteelFangsEnder)
-                    {   // Glow left
-                        glows = [true, true, false, false];
-                    }
-                    else if (isDreadFangsEnder)
-                    {   // Glow right
-                        glows = [false, false, true, true];
-                    }
-                    else
-                    {   // Glow both
-                        glows = [true, true, true, true];
-                    }
+                    glows = [isLeftGlowing, isLeftGlowing, isRightGlowing, isRightGlowing];
+
                     break;
+                    
                 }
             }
 
@@ -267,8 +269,10 @@ namespace DelvUI.Interface.Jobs
             ViperConfig.SerpentOfferingsBarConfig config = Config.SerpentOfferings;
             var instance = JobGaugeManager.Instance();
             var gauge = (ViperGauge*)instance->CurrentGauge;
+            var fillColor = config.FillColor;
             
             float reawakenedDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3670 or 4094 && o.RemainingTime > 0f)?.RemainingTime ?? 0f;
+            bool reAwakenedReady = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3671) || gauge->SerpentOffering >= 50;
             bool isReawakened = reawakenedDuration > 0;
             
             var serpentOffering = isReawakened ? reawakenedDuration : gauge->SerpentOffering;
@@ -279,16 +283,17 @@ namespace DelvUI.Interface.Jobs
 
                 bool showReawakened = isReawakened && config.EnableAwakenedTimer;
 
-                if (serpentOffering >= 50)
+                if (reAwakenedReady)
                 {
-                    config.FillColor = config.AwakenedColor;
+                    fillColor = config.AwakenedColor;
                 }
 
                 BarHud[] bars = BarUtilities.GetChunkedProgressBars(
                     config,
                     showReawakened ? 1 : 2,
                     showReawakened ? reawakenedDuration : serpentOffering,
-                    showReawakened ? 30f : 100f
+                    showReawakened ? 30f : 100f,
+                    fillColor: fillColor
                 );
                 
                 foreach (BarHud bar in bars)
@@ -309,6 +314,13 @@ namespace DelvUI.Interface.Jobs
         DreadMaw = 34615,
         HuntersBite = 34616,
         SwiftskinsBite = 34617
+    }
+
+    public enum ViperComboState
+    {
+        None,
+        Started,
+        Finisher
     }
 
     [Section("Job Specific Bars")]
@@ -364,6 +376,12 @@ namespace DelvUI.Interface.Jobs
         [Exportable(false)]
         public class VipersightBarConfig : ChunkedBarConfig
         {
+            [Checkbox("Recommend Lower Duration Buff", 
+                spacing = true, 
+                help = "When enabled, the second step of the combo will recommend refreshing the buff with the shorter duration if you have no ender buff, but this will make it less accurate to the in-game gauge."
+                )]
+            [Order(38)]
+            public bool RecommendLowerBuff = true;
             
             [NestedConfig("Show Glow", 39, separator = false, spacing = true)]
             public BarGlowConfig GlowConfig = new BarGlowConfig();
