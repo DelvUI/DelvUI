@@ -102,7 +102,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.2.0.4";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.2.0.5";
 
             FontsManager.Initialize(AssemblyLocation);
             BarTexturesManager.Initialize(AssemblyLocation);
@@ -321,7 +321,7 @@ namespace DelvUI
             }
             catch (Exception e)
             {
-                Logger.Error("Something went wrong!:\n" + e.Message);
+                Logger.Error("Something went wrong!:\n" + e.StackTrace);
             }
 
             InputsHelper.Instance.Update();

@@ -1,8 +1,8 @@
 # 2.2.0.5
-- Fix Bard's Radiant Finale duration in Party Cooldowns
+- Updated Monk's Fury Stacks Bar for 7.01 patch changes.
+- Fix Bard's Radiant Finale duration in Party Cooldowns.
 - Fixed Who's Talking Indicator in Party Frames.
-- Slightly reworked Viper's Vipersight Bar
-  * Added a toggle named "Recommend Lower Buff Duration". This toggle behaves similarly to the current implementation, but now includes recommendations for lower duration buffs when using Steel Maw or Dread Maw. Turning off this toggle makes the bar behave identically to the game's default handling.
+- Fixed default job gauges sometimes getting stuck after disabling `Misc > HUD Options > Hide Default Job Gauge`.
 
 # 2.2.0.4
 - Added duration labels for Pictomancer's Hammer Time and Hyperphantasia Bars.

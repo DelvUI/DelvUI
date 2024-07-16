@@ -1,17 +1,16 @@
-﻿using System;
-using Dalamud.Game.ClientState.JobGauge.Types;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
+using DelvUI.Interface.GeneralElements;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using DelvUI.Config;
-using DelvUI.Interface.GeneralElements;
-using FFXIVClientStructs.FFXIV.Client.Game;
-using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -33,7 +32,7 @@ namespace DelvUI.Interface.Jobs
                 positions.Add(Config.Position + Config.RattlingCoilGauge.Position);
                 sizes.Add(Config.RattlingCoilGauge.Size);
             }
-            
+
             if (Config.Vipersight.Enabled)
             {
                 positions.Add(Config.Position + Config.Vipersight.Position);
@@ -67,7 +66,7 @@ namespace DelvUI.Interface.Jobs
             {
                 DrawRattlingCoilGauge(origin + Config.Position, player);
             }
-            
+
             if (Config.Vipersight.Enabled)
             {
                 DrawVipersightBar(origin + Config.Position, player);
@@ -77,7 +76,7 @@ namespace DelvUI.Interface.Jobs
             {
                 DrawNoxiousGnashBar(origin + Config.Position, player);
             }
-            
+
             if (Config.SerpentOfferings.Enabled)
             {
                 DrawSerpentOfferingsBar(origin + Config.Position, player);
@@ -88,23 +87,14 @@ namespace DelvUI.Interface.Jobs
                 DrawAnguineTributeGauge(origin + Config.Position, player);
             }
         }
-        
+
         private unsafe void DrawVipersightBar(Vector2 origin, IPlayerCharacter player)
         {
-            var huntersInstinctDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3668)?.RemainingTime ?? 0f;
-            var swiftScaledDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3669)?.RemainingTime ?? 0f;
-
-            var useLowerDuration = Config.Vipersight.RecommendLowerBuff;
-            
-            var lastUsedActionId = SpellHelper.Instance.GetLastUsedActionId();
-
-            var isAoE = false;
+            ViperCombo lastUsedActionId = (ViperCombo)SpellHelper.Instance.GetLastUsedActionId();
             ViperComboState comboState;
-            
-            List<Tuple<PluginConfigColor, float, LabelConfig?>> chunks = new List<Tuple<PluginConfigColor, float, LabelConfig?>>();
-            List<bool> glows = new List<bool>();
-            
-            switch ((ViperCombo) lastUsedActionId)
+            bool isAoE = false;
+
+            switch (lastUsedActionId)
             {
                 case ViperCombo.SteelMaw:
                 case ViperCombo.DreadMaw:
@@ -128,80 +118,70 @@ namespace DelvUI.Interface.Jobs
                     comboState = ViperComboState.None;
                     break;
             }
-            
-            var isLeftGlowing = SpellHelper.Instance.IsActionHighlighted(SpellHelper.Instance.GetSpellActionId(isAoE ? (uint)ViperCombo.SteelMaw : (uint)ViperCombo.SteelFangs));
-            var isRightGlowing = SpellHelper.Instance.IsActionHighlighted(SpellHelper.Instance.GetSpellActionId(isAoE ? (uint)ViperCombo.DreadMaw : (uint)ViperCombo.DreadFangs));
-            
-            var empty = new Tuple<PluginConfigColor, float, LabelConfig?>(PluginConfigColor.Empty, 1, null);
-            var start = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboStartColor, 1, null);
-            var endFlank = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboEndFlankColor, 1, null);
-            var endHind = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboEndHindColor, 1, null);
-            var endAoE = new Tuple<PluginConfigColor, float, LabelConfig?>(Config.Vipersight.ComboEndAOEColor, 1, null);
-            
-            var isFlankEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3645 or 3646);
-            var isHindEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3647 or 3648);
-            var noEnder = !isFlankEnder && !isHindEnder;
+
+            if (Config.Vipersight.HideWhenInactive && comboState == ViperComboState.None)
+            {
+                return;
+            }
+
+            uint leftId = SpellHelper.Instance.GetSpellActionId(isAoE ? (uint)ViperCombo.SteelMaw : (uint)ViperCombo.SteelFangs);
+            bool isLeftGlowing = SpellHelper.Instance.IsActionHighlighted(leftId);
+
+            uint rightId = SpellHelper.Instance.GetSpellActionId(isAoE ? (uint)ViperCombo.DreadMaw : (uint)ViperCombo.DreadFangs);
+            bool isRightGlowing = SpellHelper.Instance.IsActionHighlighted(rightId);
+
+            List<Tuple<PluginConfigColor, float, LabelConfig?>> chunks = new();
+            List<bool> glows = new();
+
+            Tuple<PluginConfigColor, float, LabelConfig?> empty = new(PluginConfigColor.Empty, 1, null);
+            Tuple<PluginConfigColor, float, LabelConfig?> start = new(Config.Vipersight.ComboStartColor, 1, null);
+            Tuple<PluginConfigColor, float, LabelConfig?> endFlank = new(Config.Vipersight.ComboEndFlankColor, 1, null);
+            Tuple<PluginConfigColor, float, LabelConfig?> endHind = new(Config.Vipersight.ComboEndHindColor, 1, null);
+            Tuple<PluginConfigColor, float, LabelConfig?> endAoE = new(Config.Vipersight.ComboEndAOEColor, 1, null);
+
+            bool isFlankEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3645 or 3646);
+            bool isHindEnder = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3647 or 3648);
+            bool noEnder = !isFlankEnder && !isHindEnder;
 
             switch (comboState)
             {
                 case ViperComboState.None:
-                {
-                    chunks = [empty, empty, empty, empty];
-                    glows = [false, false, false, false];
-                    break;
-                }
+                    {
+                        chunks = [empty, empty, empty, empty];
+                        glows = [false, false, false, false];
+                        break;
+                    }
                 case ViperComboState.Started:
-                {
-                    chunks = [empty, start, start, empty];
-
-                    var glowLeft = !useLowerDuration && (isLeftGlowing || isAoE);
-                    var glowRight = !useLowerDuration && (isRightGlowing || isAoE);
-                    
-                    if (useLowerDuration) {
-                        if (isFlankEnder) {
-                            glowLeft = true;
-                            glowRight = false;
-                        } else if (isHindEnder) {
-                            glowLeft = false;
-                            glowRight = true;
-                        } else if (noEnder) {
-                            if (huntersInstinctDuration < swiftScaledDuration) {
-                                glowLeft = true;
-                                glowRight = false;
-                            } else if (swiftScaledDuration < huntersInstinctDuration) {
-                                glowLeft = false;
-                                glowRight = true;
-                            } else {
-                                glowLeft = true;
-                                glowRight = true;
-                            }
-                        }
+                    {
+                        chunks = [empty, start, start, empty];
+                        glows = [false, isLeftGlowing || isAoE, isRightGlowing || isAoE, false];
+                        break;
                     }
-                    
-                    glows = [false, glowLeft, glowRight, false];
-                    break;
-                }
                 case ViperComboState.Finisher:
-                {
-                    var isFlankChain = (ViperCombo)lastUsedActionId == ViperCombo.HuntersSting;
-                    var isHindChain = (ViperCombo)lastUsedActionId == ViperCombo.SwiftskinsSting;
+                    {
+                        bool isFlankChain = lastUsedActionId == ViperCombo.HuntersSting;
+                        bool isHindChain = lastUsedActionId == ViperCombo.SwiftskinsSting;
 
-                    Tuple<PluginConfigColor, float, LabelConfig?> end;
+                        Tuple<PluginConfigColor, float, LabelConfig?> end;
 
-                    if (isFlankEnder) {
-                        end = isHindChain ? endHind : endFlank;
-                    } else if (isHindEnder) {
-                        end = isFlankChain ? endFlank : endHind;
-                    } else {
-                        end = isFlankChain ? endFlank : isHindChain ? endHind : endAoE;
+                        if (isFlankEnder)
+                        {
+                            end = isHindChain ? endHind : endFlank;
+                        }
+                        else if (isHindEnder)
+                        {
+                            end = isFlankChain ? endFlank : endHind;
+                        }
+                        else
+                        {
+                            end = isFlankChain ? endFlank : isHindChain ? endHind : endAoE;
+                        }
+
+                        chunks = [end, start, start, end];
+                        glows = [isLeftGlowing, isLeftGlowing, isRightGlowing, isRightGlowing];
+
+                        break;
                     }
-
-                    chunks = [end, start, start, end];
-                    glows = [isLeftGlowing, isLeftGlowing, isRightGlowing, isRightGlowing];
-
-                    break;
-                    
-                }
             }
 
             if (Config.Vipersight.Invert)
@@ -209,97 +189,95 @@ namespace DelvUI.Interface.Jobs
                 chunks.Reverse();
                 glows.Reverse();
             }
-                
-            if (!Config.Vipersight.HideWhenInactive)
+
+            BarHud[] bars = BarUtilities.GetChunkedBars(
+                Config.Vipersight,
+                chunks.ToArray(),
+                player,
+                Config.Vipersight.GlowConfig,
+                glows.ToArray()
+            );
+
+            foreach (BarHud bar in bars)
             {
-                BarHud[] bars = BarUtilities.GetChunkedBars(Config.Vipersight, chunks.ToArray(), player, Config.Vipersight.GlowConfig, glows.ToArray());
-                foreach (BarHud bar in bars)
-                {
-                    AddDrawActions(bar.GetDrawActions(origin, Config.Vipersight.StrataLevel));
-                }
+                AddDrawActions(bar.GetDrawActions(origin, Config.Vipersight.StrataLevel));
             }
         }
 
         private unsafe void DrawRattlingCoilGauge(Vector2 origin, IPlayerCharacter player)
         {
-            var instance = JobGaugeManager.Instance();
-            var gauge = (ViperGauge*)instance->CurrentGauge;
-            
-            
-            if (!Config.RattlingCoilGauge.HideWhenInactive || gauge->RattlingCoilStacks > 0)
+            VPRGauge gauge = Plugin.JobGauges.Get<VPRGauge>();
+
+            if (Config.RattlingCoilGauge.HideWhenInactive || gauge.RattlingCoilStacks <= 0)
             {
-                var maxStacks = player.Level >= 88 ? 3 : 2;
-                BarHud[] bars = BarUtilities.GetChunkedBars(Config.RattlingCoilGauge, maxStacks, gauge->RattlingCoilStacks, maxStacks, 0, player);
-                foreach (BarHud bar in bars)
-                {
-                    AddDrawActions(bar.GetDrawActions(origin, Config.RattlingCoilGauge.StrataLevel));
-                }
+                return;
+            }
+
+            int maxStacks = player.Level >= 88 ? 3 : 2;
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.RattlingCoilGauge, maxStacks, gauge.RattlingCoilStacks, maxStacks, 0, player);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.RattlingCoilGauge.StrataLevel));
             }
         }
-        
+
         private unsafe void DrawAnguineTributeGauge(Vector2 origin, IPlayerCharacter player)
         {
-            var instance = JobGaugeManager.Instance();
-            var gauge = (ViperGauge*)instance->CurrentGauge;
-            
-            if (!Config.AnguineTribute.HideWhenInactive || gauge->AnguineTribute > 0)
+            VPRGauge gauge = Plugin.JobGauges.Get<VPRGauge>();
+
+            if (Config.AnguineTribute.HideWhenInactive || gauge.AnguineTribute <= 0)
             {
-                var maxStacks = player.Level >= 96 ? 5 : 4;
-                BarHud[] bars = BarUtilities.GetChunkedBars(Config.AnguineTribute, maxStacks, gauge->AnguineTribute, maxStacks, 0, player);
-                foreach (BarHud bar in bars)
-                {
-                    AddDrawActions(bar.GetDrawActions(origin, Config.AnguineTribute.StrataLevel));
-                }
+                return;
+            }
+
+            int maxStacks = player.Level >= 96 ? 5 : 4;
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.AnguineTribute, maxStacks, gauge.AnguineTribute, maxStacks, 0, player);
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.AnguineTribute.StrataLevel));
             }
         }
 
         private void DrawNoxiousGnashBar(Vector2 origin, IPlayerCharacter player)
         {
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            
+            IGameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+
             BarHud? bar = BarUtilities.GetDoTBar(Config.NoxiousGnash, player, target, NoxiousGnashIDs, NoxiousGnashDurations);
             if (bar != null)
             {
                 AddDrawActions(bar.GetDrawActions(origin, Config.NoxiousGnash.StrataLevel));
             }
         }
-        
+
         private unsafe void DrawSerpentOfferingsBar(Vector2 origin, IPlayerCharacter player)
         {
             ViperConfig.SerpentOfferingsBarConfig config = Config.SerpentOfferings;
-            var instance = JobGaugeManager.Instance();
-            var gauge = (ViperGauge*)instance->CurrentGauge;
-            var fillColor = config.FillColor;
-            
+            VPRGauge gauge = Plugin.JobGauges.Get<VPRGauge>();
+
             float reawakenedDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3670 or 4094 && o.RemainingTime > 0f)?.RemainingTime ?? 0f;
-            bool reAwakenedReady = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3671) || gauge->SerpentOffering >= 50;
+            bool reAwakenedReady = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3671) || gauge.SerpentOffering >= 50;
             bool isReawakened = reawakenedDuration > 0;
-            
-            var serpentOffering = isReawakened ? reawakenedDuration : gauge->SerpentOffering;
-            
-            if (!Config.SerpentOfferings.HideWhenInactive)
+            float serpentOffering = isReawakened ? reawakenedDuration : gauge.SerpentOffering;
+
+            if (Config.SerpentOfferings.HideWhenInactive && gauge.SerpentOffering <= 0)
             {
-                Config.SerpentOfferings.Label.SetValue(serpentOffering);
+                return;
+            }
 
-                bool showReawakened = isReawakened && config.EnableAwakenedTimer;
+            Config.SerpentOfferings.Label.SetValue(serpentOffering);
+            bool showReawakened = isReawakened && config.EnableAwakenedTimer;
 
-                if (reAwakenedReady)
-                {
-                    fillColor = config.AwakenedColor;
-                }
+            BarHud[] bars = BarUtilities.GetChunkedProgressBars(
+                config,
+                showReawakened ? 1 : 2,
+                showReawakened ? reawakenedDuration : serpentOffering,
+                showReawakened ? 30f : 100f,
+                fillColor: reAwakenedReady ? config.AwakenedColor : config.FillColor
+            ); ;
 
-                BarHud[] bars = BarUtilities.GetChunkedProgressBars(
-                    config,
-                    showReawakened ? 1 : 2,
-                    showReawakened ? reawakenedDuration : serpentOffering,
-                    showReawakened ? 30f : 100f,
-                    fillColor: fillColor
-                );
-                
-                foreach (BarHud bar in bars)
-                {
-                    AddDrawActions(bar.GetDrawActions(origin, Config.SerpentOfferings.StrataLevel));
-                }
+            foreach (BarHud bar in bars)
+            {
+                AddDrawActions(bar.GetDrawActions(origin, Config.SerpentOfferings.StrataLevel));
             }
         }
     }
@@ -334,7 +312,7 @@ namespace DelvUI.Interface.Jobs
         {
             var config = new ViperConfig();
             config.SerpentOfferings.UseChunks = false;
-            
+
             return config;
         }
 
@@ -358,7 +336,7 @@ namespace DelvUI.Interface.Jobs
             new(254, 10),
             new(new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 1f))
         );
-        
+
         [NestedConfig("Serpent Offerings Bar", 45)]
         public SerpentOfferingsBarConfig SerpentOfferings = new SerpentOfferingsBarConfig(
             new(0, -46),
@@ -372,20 +350,13 @@ namespace DelvUI.Interface.Jobs
             new(254, 10),
             new(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 1f))
         );
-        
+
         [Exportable(false)]
         public class VipersightBarConfig : ChunkedBarConfig
         {
-            [Checkbox("Recommend Lower Duration Buff", 
-                spacing = true, 
-                help = "When enabled, the second step of the combo will recommend refreshing the buff with the shorter duration if you have no ender buff, but this will make it less accurate to the in-game gauge."
-                )]
-            [Order(38)]
-            public bool RecommendLowerBuff = true;
-            
             [NestedConfig("Show Glow", 39, separator = false, spacing = true)]
             public BarGlowConfig GlowConfig = new BarGlowConfig();
-            
+
             [ColorEdit4("Combo Start", spacing = true)]
             [Order(41)]
             public PluginConfigColor ComboStartColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 100f / 100f));
@@ -393,7 +364,7 @@ namespace DelvUI.Interface.Jobs
             [ColorEdit4("Flank Ender")]
             [Order(42)]
             public PluginConfigColor ComboEndFlankColor = new(new Vector4(46f / 255f, 228f / 255f, 42f / 255f, 1f));
-            
+
             [ColorEdit4("Hind Ender")]
             [Order(43)]
             public PluginConfigColor ComboEndHindColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 1f));
@@ -414,11 +385,11 @@ namespace DelvUI.Interface.Jobs
             [Checkbox("Enable Awakened Timer", spacing = true)]
             [Order(46)]
             public bool EnableAwakenedTimer = true;
-            
+
             [ColorEdit4("Ready to Reawaken Color")]
             [Order(47)]
             public PluginConfigColor AwakenedColor = new(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 1f));
-            
+
             public SerpentOfferingsBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
                 : base(position, size, fillColor)
             {

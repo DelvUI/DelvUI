@@ -23,14 +23,8 @@ namespace DelvUI.Interface
 
         private Vector2 _castBarPos = Vector2.Zero;
         private bool _hidingCastBar = false;
-        private Dictionary<string, Vector2> _jobGaugePos = new();
-        private bool _hidingJobGauge = false;
         private Vector2 _pullTimerPos = Vector2.Zero;
         private bool _hidingPullTimer = false;
-
-        private uint _previousJob = 0;
-        private double _jobChangeTime = 0;
-        private bool _jobChangeUpdated = false;
 
         public HudHelper()
         {
@@ -72,32 +66,9 @@ namespace DelvUI.Interface
                 _firstUpdate = false;
                 UpdateDefaultCastBar();
                 UpdateDefaultPulltimer();
-                UpdateJobGauges();
             }
-            else
-            {
-                // detect job change
-                IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
-                if (player != null)
-                {
-                    uint job = player.ClassJob.Id;
-                    double now = ImGui.GetTime();
 
-                    if (job != _previousJob)
-                    {
-                        _previousJob = job;
-                        _jobChangeUpdated = false;
-                        _jobChangeTime = now;
-                        ResetJobGauges();
-                    }
-                    else if (!_jobChangeUpdated && now - _jobChangeTime > 0.1f)
-                    { 
-                        _hidingJobGauge = false;
-                        ResetJobGauges();
-                        UpdateJobGauges();
-                    }
-                }
-            }
+            UpdateJobGauges();
         }
 
         public bool IsElementHidden(HudElement element)
@@ -117,9 +88,6 @@ namespace DelvUI.Interface
                     break;
                 case "HideDefaultPulltimer":
                     UpdateDefaultPulltimer();
-                    break;
-                case "HideDefaultJobGauges":
-                    UpdateJobGauges();
                     break;
             }
         }
@@ -275,61 +243,29 @@ namespace DelvUI.Interface
             if (player == null) { return; }
 
             string jobName = JobsHelper.JobNames[player.ClassJob.Id];
+            int i = 0;
+            bool stop = false;
 
-            if (Config.HideDefaultJobGauges && !_hidingJobGauge)
+            do
             {
-                int i = 0;
-                bool stop = false;
-
-                do
+                string addonName = $"JobHud{jobName}{i}";
+                if (_specialCases.TryGetValue(addonName, out string? name) && name != null)
                 {
-                    string addonName = $"JobHud{jobName}{i}";
-                    if (_specialCases.TryGetValue(addonName, out string? name) && name != null)
-                    {
-                        addonName = name;
-                    }
-
-                    AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName(addonName, 1);
-                    if (addon == null)
-                    {
-                        stop = true;
-                    }
-                    else
-                    {
-                        _jobGaugePos[addonName] = new Vector2(addon->RootNode->GetXFloat(), addon->RootNode->GetYFloat());
-                        addon->RootNode->SetPositionFloat(-9999, -9999);
-
-                        Plugin.AddonLifecycle.RegisterListener(AddonEvent.PreDraw, addonName, (addonEvent, args) =>
-                        {
-                            AtkUnitBase* addon = (AtkUnitBase*)args.Addon;
-                            addon->RootNode->SetPositionFloat(-9999.0f, -9999.0f);
-                        });
-                    }
-
-                    i++;
-                } while (!stop);
-
-                _hidingJobGauge = true;
-            }
-            else if ((forceVisible || !Config.HideDefaultJobGauges) && _hidingJobGauge)
-            {
-                ResetJobGauges();
-                _hidingJobGauge = false;
-            }
-        }
-
-        private unsafe void ResetJobGauges()
-        {
-            foreach (KeyValuePair<string, Vector2> entry in _jobGaugePos)
-            {
-                Plugin.AddonLifecycle.UnregisterListener(AddonEvent.PreDraw, entry.Key);
-
-                AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName(entry.Key, 1);
-                if (addon != null)
-                {
-                    addon->RootNode->SetPositionFloat(entry.Value.X, entry.Value.Y);
+                    addonName = name;
                 }
-            }
+
+                AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName(addonName, 1);
+                if (addon == null)
+                {
+                    stop = true;
+                }
+                else
+                {
+                    addon->IsVisible = forceVisible || !Config.HideDefaultJobGauges;
+                }
+
+                i++;
+            } while (!stop);
         }
     }
 

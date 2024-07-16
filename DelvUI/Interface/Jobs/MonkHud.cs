@@ -113,25 +113,21 @@ namespace DelvUI.Interface.Jobs
         {
             MonkBeastChakraStacksBar config = Config.BeastChakraStacksBar;
             MNKGauge gauge = Plugin.JobGauges.Get<MNKGauge>();
-            ushort stacks = *((ushort*)(new IntPtr(gauge.Address) + 0xC));
+            int stacks = gauge.OpoOpoFury + gauge.RaptorFury + gauge.CoeurlFury;
 
             if (config.HideWhenInactive && stacks == 0)
             {
                 return;
             }
 
-            int opoOpoStacks = stacks & 1;
-            int raptorStacks = ((stacks >> 2) & 3);
-            int coeurlStacks = ((stacks >> 4) & 3);
-
             PluginConfigColor empty = PluginConfigColor.Empty;
-            Tuple<PluginConfigColor, float, LabelConfig?>[] chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[6];
-            chunks[0] = new(opoOpoStacks > 0 ? config.OpoopoColor : empty, 1, null);
-            chunks[1] = new(raptorStacks > 0 ? config.RaptorColor : empty, 1, null);
-            chunks[2] = new(raptorStacks > 1 ? config.RaptorColor : empty, 1, null);
-            chunks[3] = new(coeurlStacks > 0 ? config.CoeurlColor : empty, 1, null);
-            chunks[4] = new(coeurlStacks > 1 ? config.CoeurlColor : empty, 1, null);
-            chunks[5] = new(coeurlStacks > 2 ? config.CoeurlColor : empty, 1, null);
+            Tuple<PluginConfigColor, float, LabelConfig?>[] chunks =
+            [
+                new(gauge.OpoOpoFury > 0 ? config.OpoopoColor : empty, 1, null),
+                new(gauge.RaptorFury > 0 ? config.RaptorColor : empty, 1, null),
+                new(gauge.CoeurlFury > 0 ? config.CoeurlColor : empty, 1, null),
+                new(gauge.CoeurlFury > 1 ? config.CoeurlColor : empty, 1, null),
+            ];
 
             BarHud[] bars = BarUtilities.GetChunkedBars(config, chunks, player);
             foreach (BarHud bar in bars)
@@ -143,12 +139,9 @@ namespace DelvUI.Interface.Jobs
         private unsafe void DrawMastersGauge(Vector2 origin, IPlayerCharacter player)
         {
             MNKGauge gauge = Plugin.JobGauges.Get<MNKGauge>();
-            ushort nadi = *((ushort*)(new IntPtr(gauge.Address) + 0xD));
-            const int kLunar = 1;
-            const int kSolar = 2;
 
             if (Config.MastersGauge.HideWhenInactive &&
-                nadi == 0 &&
+                gauge.Nadi == Nadi.NONE &&
                 gauge.BeastChakra[0] == BeastChakra.NONE &&
                 gauge.BeastChakra[1] == BeastChakra.NONE &&
                 gauge.BeastChakra[2] == BeastChakra.NONE)
@@ -157,14 +150,14 @@ namespace DelvUI.Interface.Jobs
             }
 
             int[] order = Config.MastersGauge.ChakraOrder;
-            int[] hasChakra = new[]
-            {
-                (nadi & kLunar) != 0 ? 1 : 0,
+            int[] hasChakra =
+            [
+                gauge.Nadi.HasFlag(Nadi.LUNAR) ? 1 : 0,
                 gauge.BeastChakra[0] != BeastChakra.NONE ? 1 : 0,
                 gauge.BeastChakra[0] != BeastChakra.NONE ? 1 : 0,
                 gauge.BeastChakra[0] != BeastChakra.NONE ? 1 : 0,
-                (nadi & kSolar) != 0 ? 1 : 0,
-            };
+                gauge.Nadi.HasFlag(Nadi.SOLAR) ? 1 : 0,
+            ];
 
             PluginConfigColor[] colors = new[]
             {
@@ -317,7 +310,7 @@ namespace DelvUI.Interface.Jobs
             new(new Vector4(204f / 255f, 115f / 255f, 0f, 100f / 100f))
         );
 
-        [NestedConfig("Beast Chakra Stacks Bar", 40)]
+        [NestedConfig("Fury Stacks Bar", 40)]
         public MonkBeastChakraStacksBar BeastChakraStacksBar = new MonkBeastChakraStacksBar(
             new(0, -32),
             new(254, 20)
