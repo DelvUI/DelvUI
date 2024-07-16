@@ -339,6 +339,15 @@ namespace DelvUI
                 return;
             }
 
+            try
+            {
+                InputsHelper.Instance?.Dispose();
+            } 
+            catch (Exception e)
+            {
+                Logger.Error("Error disposing InputsHelper:\n" + e.StackTrace);
+            }
+
             _hudManager?.Dispose();
 
             ConfigurationManager.Instance?.SaveConfigurations(true);
@@ -358,7 +367,6 @@ namespace DelvUI
             FontsManager.Instance?.Dispose();
             GlobalColors.Instance?.Dispose();
             LimitBreakHelper.Instance?.Dispose();
-            InputsHelper.Instance?.Dispose();
             NameplatesManager.Instance?.Dispose();
             PartyCooldownsManager.Instance?.Dispose();
             PartyManager.Instance?.Dispose();
