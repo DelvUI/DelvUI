@@ -208,7 +208,7 @@ namespace DelvUI.Interface.Jobs
         {
             VPRGauge gauge = Plugin.JobGauges.Get<VPRGauge>();
 
-            if (Config.RattlingCoilGauge.HideWhenInactive || gauge.RattlingCoilStacks <= 0)
+            if (Config.RattlingCoilGauge.HideWhenInactive && gauge.RattlingCoilStacks <= 0)
             {
                 return;
             }
@@ -225,7 +225,7 @@ namespace DelvUI.Interface.Jobs
         {
             VPRGauge gauge = Plugin.JobGauges.Get<VPRGauge>();
 
-            if (Config.AnguineTribute.HideWhenInactive || gauge.AnguineTribute <= 0)
+            if (Config.AnguineTribute.HideWhenInactive && gauge.AnguineTribute <= 0)
             {
                 return;
             }
