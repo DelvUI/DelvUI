@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using DelvUI.Enums;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -229,9 +230,14 @@ namespace DelvUI.Interface.Jobs
             {
                 return;
             }
+            
+            float reawakenedDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3670 or 4094 && o.RemainingTime > 0f)?.RemainingTime ?? 0f;
+            
+            Config.AnguineTribute.ReawakenedTimerLabel.SetValue(reawakenedDuration);
 
             int maxStacks = player.Level >= 96 ? 5 : 4;
-            BarHud[] bars = BarUtilities.GetChunkedBars(Config.AnguineTribute, maxStacks, gauge.AnguineTribute, maxStacks, 0, player);
+            var labels = new[] { Config.AnguineTribute.ReawakenedTimerLabel, null, null, null, null };
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.AnguineTribute, maxStacks, gauge.AnguineTribute, maxStacks, 0, player, labels);
             foreach (BarHud bar in bars)
             {
                 AddDrawActions(bar.GetDrawActions(origin, Config.AnguineTribute.StrataLevel));
@@ -254,25 +260,22 @@ namespace DelvUI.Interface.Jobs
             ViperConfig.SerpentOfferingsBarConfig config = Config.SerpentOfferings;
             VPRGauge gauge = Plugin.JobGauges.Get<VPRGauge>();
 
-            float reawakenedDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3670 or 4094 && o.RemainingTime > 0f)?.RemainingTime ?? 0f;
-            bool reAwakenedReady = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3671) || gauge.SerpentOffering >= 50;
-            bool isReawakened = reawakenedDuration > 0;
-            float serpentOffering = isReawakened ? reawakenedDuration : gauge.SerpentOffering;
+            bool reAwakenedReady = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3671);
 
             if (Config.SerpentOfferings.HideWhenInactive && gauge.SerpentOffering <= 0)
             {
                 return;
             }
 
-            Config.SerpentOfferings.Label.SetValue(serpentOffering);
-            bool showReawakened = isReawakened && config.EnableAwakenedTimer;
+            Config.SerpentOfferings.Label.SetValue(gauge.SerpentOffering);
 
             BarHud[] bars = BarUtilities.GetChunkedProgressBars(
                 config,
-                showReawakened ? 1 : 2,
-                showReawakened ? reawakenedDuration : serpentOffering,
-                showReawakened ? 30f : 100f,
-                fillColor: reAwakenedReady ? config.AwakenedColor : config.FillColor
+                2,
+                gauge.SerpentOffering,
+                100f,
+                glowConfig: reAwakenedReady && config.GlowConfig.Enabled ? config.GlowConfig : null,
+                chunksToGlow: [reAwakenedReady, reAwakenedReady]
             ); ;
 
             foreach (BarHud bar in bars)
@@ -312,6 +315,7 @@ namespace DelvUI.Interface.Jobs
         {
             var config = new ViperConfig();
             config.SerpentOfferings.UseChunks = false;
+            config.AnguineTribute.ReawakenedTimerLabel.HideIfZero = true;
 
             return config;
         }
@@ -345,7 +349,7 @@ namespace DelvUI.Interface.Jobs
         );
 
         [NestedConfig("Anguine Tribute Bar", 50)]
-        public ChunkedBarConfig AnguineTribute = new ChunkedBarConfig(
+        public AnguineTributeBarConfig AnguineTribute = new AnguineTributeBarConfig(
             new(0, -58),
             new(254, 10),
             new(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 1f))
@@ -382,17 +386,26 @@ namespace DelvUI.Interface.Jobs
         [Exportable(false)]
         public class SerpentOfferingsBarConfig : ChunkedProgressBarConfig
         {
-            [Checkbox("Enable Awakened Timer", spacing = true)]
-            [Order(46)]
-            public bool EnableAwakenedTimer = true;
-
-            [ColorEdit4("Ready to Reawaken Color")]
-            [Order(47)]
-            public PluginConfigColor AwakenedColor = new(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 1f));
+            [NestedConfig("Glow on Ready to Reawaken", 50, separator = false, spacing = true)]
+            public BarGlowConfig GlowConfig = new BarGlowConfig();
 
             public SerpentOfferingsBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
                 : base(position, size, fillColor)
             {
+                GlowConfig.Color = new PluginConfigColor(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 1f));
+            }
+        }
+        
+        [Exportable(false)]
+        public class AnguineTributeBarConfig : ChunkedProgressBarConfig
+        {
+            [NestedConfig("Reawakened Duration Text", 50, spacing = true)]
+            public NumericLabelConfig ReawakenedTimerLabel;
+
+            public AnguineTributeBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+                : base(position, size, fillColor)
+            {
+                ReawakenedTimerLabel = new NumericLabelConfig(new Vector2(-8, 0), "", DrawAnchor.Left, DrawAnchor.Right);
             }
         }
     }
