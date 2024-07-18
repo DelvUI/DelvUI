@@ -405,6 +405,7 @@ namespace DelvUI.Interface
             catch { }
 
             TooltipsHelper.Instance.RemoveTooltip(); // remove tooltip from previous frame
+            _hudHelper.Update();
 
             if (!ShouldBeVisible())
             {
@@ -439,8 +440,6 @@ namespace DelvUI.Interface
                 ImGui.End();
                 return;
             }
-
-            _hudHelper.Update();
 
             UpdateJob(jobId);
             AssignActors();
@@ -497,11 +496,25 @@ namespace DelvUI.Interface
                 return false;
             }
 
-            var parameterWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_ParameterWidget", 1);
-            var fadeMiddleWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("FadeMiddle", 1);
+            bool hudHidden =
+                Plugin.Condition[ConditionFlag.WatchingCutscene] ||
+                Plugin.Condition[ConditionFlag.WatchingCutscene78] ||
+                Plugin.Condition[ConditionFlag.OccupiedInCutSceneEvent] ||
+                Plugin.Condition[ConditionFlag.CreatingCharacter] ||
+                Plugin.Condition[ConditionFlag.BetweenAreas] ||
+                Plugin.Condition[ConditionFlag.BetweenAreas51] ||
+                Plugin.Condition[ConditionFlag.OccupiedSummoningBell];
+            
+            if (hudHidden)
+            {
+                return false;
+            }
 
-            var paramenterVisible = parameterWidget != null && parameterWidget->IsVisible;
-            var fadeMiddleVisible = fadeMiddleWidget != null && fadeMiddleWidget->IsVisible;
+            AtkUnitBase* parameterWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_ParameterWidget", 1);
+            AtkUnitBase* fadeMiddleWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("FadeMiddle", 1);
+
+            bool paramenterVisible = parameterWidget != null && parameterWidget->IsVisible;
+            bool fadeMiddleVisible = fadeMiddleWidget != null && fadeMiddleWidget->IsVisible;
 
             return paramenterVisible && !fadeMiddleVisible;
         }

@@ -1,3 +1,7 @@
+# 2.2.0.6
+- Fixed default job gauge flickering when "Hide Default Job Gauge" is enabled.
+- Fixed Viper's Rattling Coil and Anguine Tribute bars not working properly with "Hide when Inactive".
+
 # 2.2.0.5
 - Updated Monk's Fury Stacks Bar for 7.01 patch changes.
 - Fix Bard's Radiant Finale duration in Party Cooldowns.

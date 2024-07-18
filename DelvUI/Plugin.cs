@@ -102,7 +102,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.2.0.5";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.2.0.6";
 
             FontsManager.Initialize(AssemblyLocation);
             BarTexturesManager.Initialize(AssemblyLocation);
@@ -294,15 +294,6 @@ namespace DelvUI
         {
             UpdateJob();
 
-            bool hudState =
-                Condition[ConditionFlag.WatchingCutscene] ||
-                Condition[ConditionFlag.WatchingCutscene78] ||
-                Condition[ConditionFlag.OccupiedInCutSceneEvent] ||
-                Condition[ConditionFlag.CreatingCharacter] ||
-                Condition[ConditionFlag.BetweenAreas] ||
-                Condition[ConditionFlag.BetweenAreas51] ||
-                Condition[ConditionFlag.OccupiedSummoningBell];
-
             UiBuilder.OverrideGameCursor = false;
 
             ConfigurationManager.Instance.Draw();
@@ -313,10 +304,7 @@ namespace DelvUI
             {
                 using (FontsManager.Instance.PushDefaultFont())
                 {
-                    if (!hudState)
-                    {
-                        _hudManager?.Draw(_jobId);
-                    }
+                    _hudManager?.Draw(_jobId);
                 }
             }
             catch (Exception e)
