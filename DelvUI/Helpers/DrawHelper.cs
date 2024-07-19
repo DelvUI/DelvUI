@@ -216,15 +216,38 @@ namespace DelvUI.Helpers
         public static void DrawIconCooldown(Vector2 position, Vector2 size, float elapsed, float total, ImDrawListPtr drawList)
         {
             float completion = elapsed / total;
-            float endAngle = (float)Math.PI * 2f * -completion;
-            float offset = (float)Math.PI / 2;
+            int segments = (int)Math.Ceiling(completion * 4);
 
+            Vector2 center = position + size / 2;
+            Vector2[] vertices =
+            [
+                center with {Y = center.Y - size.Y}, // Top
+                center with {X = center.X - size.X}, // Left
+                center with {Y = center.Y + size.Y}, // Bottom
+                center with {X = center.X + size.X}  // Right
+
+
+            ];
+            
             ImGui.PushClipRect(position, position + size, false);
-            drawList.PathArcTo(position + size / 2, size.X / 2, endAngle - offset, -offset, 50);
-            drawList.PathStroke(0xCC000000, ImDrawFlags.None, size.X);
+            for (int i = 0; i < segments; i++)
+            {
+                Vector2 v2 = vertices[i % 4];
+                Vector2 v3 = vertices[(i + 1) % 4];
+
+                if (i == segments - 1)
+                {
+                    float angle = (float)(Math.PI * 2 * (1-completion));
+                    float cos = (float)Math.Cos(angle);
+                    float sin = (float)Math.Sin(angle);
+
+                    v3 = center + Vector2.Multiply(new Vector2(sin,-cos), size);
+                }
+
+                drawList.AddTriangleFilled(center, v2, v3, 0xcc000000);
+            }
             ImGui.PopClipRect();
         }
-
         public static void DrawOvershield(float shield, Vector2 cursorPos, Vector2 barSize, float height, bool useRatioForHeight, PluginConfigColor color, ImDrawListPtr drawList)
         {
             if (shield == 0) { return; }
