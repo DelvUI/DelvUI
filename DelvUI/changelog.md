@@ -1,9 +1,8 @@
-# 2.2.0.7
-- Fixed Viper's Serpent's Offering gauge showing Awakened Timer even when "Enable Awakened Timer" is disabled.
-
 # 2.2.0.6
 - Fixed default job gauge flickering when "Hide Default Job Gauge" is enabled.
 - Fixed Viper's Rattling Coil and Anguine Tribute bars not working properly with "Hide when Inactive".
+- Fixed Viper's Serpent's Offering gauge showing Awakened Timer even when "Enable Awakened Timer" is disabled.
+- Fixed Party Frames Ready Check icons not working.
 
 # 2.2.0.5
 - Updated Monk's Fury Stacks Bar for 7.01 patch changes.

@@ -83,12 +83,12 @@ namespace DelvUI.Interface.Party
         {
             _onReadyCheckStartHook?.Original(ptr);
             _readyCheckOngoing = true;
+            _lastReadyCheckEndTime = -1;
         }
 
         private unsafe void OnReadycheckEnd(AgentReadyCheck *ptr)
         {
             _onReadyCheckEndHook?.Original(ptr);
-            _readyCheckOngoing = false;
             _lastReadyCheckEndTime = ImGui.GetTime();
         }
 
@@ -106,7 +106,9 @@ namespace DelvUI.Interface.Party
 
         public void Update(double maxDuration)
         {
-            if (ImGui.GetTime() - _lastReadyCheckEndTime >= maxDuration)
+            if (_readyCheckOngoing &&
+                _lastReadyCheckEndTime != -1 &&
+                ImGui.GetTime() - _lastReadyCheckEndTime >= maxDuration)
             {
                 _readyCheckOngoing = false;
             }
