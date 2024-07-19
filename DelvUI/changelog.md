@@ -1,3 +1,6 @@
+# 2.2.0.7
+- Fixed Viper's Serpent's Offering gauge showing Awakened Timer even when "Enable Awakened Timer" is disabled.
+
 # 2.2.0.6
 - Fixed default job gauge flickering when "Hide Default Job Gauge" is enabled.
 - Fixed Viper's Rattling Coil and Anguine Tribute bars not working properly with "Hide when Inactive".

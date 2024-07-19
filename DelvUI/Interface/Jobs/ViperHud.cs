@@ -257,7 +257,9 @@ namespace DelvUI.Interface.Jobs
             float reawakenedDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3670 or 4094 && o.RemainingTime > 0f)?.RemainingTime ?? 0f;
             bool reAwakenedReady = Utils.StatusListForBattleChara(player).Any(o => o.StatusId is 3671) || gauge.SerpentOffering >= 50;
             bool isReawakened = reawakenedDuration > 0;
-            float serpentOffering = isReawakened ? reawakenedDuration : gauge.SerpentOffering;
+            bool showReawakened = isReawakened && config.EnableAwakenedTimer;
+            
+            float serpentOffering = showReawakened && isReawakened ? reawakenedDuration : gauge.SerpentOffering;
 
             if (Config.SerpentOfferings.HideWhenInactive && gauge.SerpentOffering <= 0)
             {
@@ -265,7 +267,6 @@ namespace DelvUI.Interface.Jobs
             }
 
             Config.SerpentOfferings.Label.SetValue(serpentOffering);
-            bool showReawakened = isReawakened && config.EnableAwakenedTimer;
 
             BarHud[] bars = BarUtilities.GetChunkedProgressBars(
                 config,
