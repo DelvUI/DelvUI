@@ -374,6 +374,10 @@ namespace DelvUI.Interface.Jobs
             [Order(44)]
             public PluginConfigColor ComboEndAOEColor = new(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 1f));
 
+            [Checkbox("Invert", spacing = true)]
+            [Order(45)]
+            public bool Invert = false;
+
             public VipersightBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
                 : base(position, size, fillColor)
             {
