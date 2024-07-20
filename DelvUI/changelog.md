@@ -1,3 +1,6 @@
+# 2.2.0.7
+- Fixed Honorific Title integration
+
 # 2.2.0.6
 - Fixed default job gauge flickering when "Hide Default Job Gauge" is enabled.
 - Fixed Viper's Rattling Coil and Anguine Tribute bars not working properly with "Hide when Inactive".
