@@ -235,18 +235,16 @@ namespace DelvUI.Helpers
 
                 if (i == segments - 1)
                 {
-                    double angle = Math.PI * 2 * (1-completion);
-                    float cos = (float)Math.Cos(angle);
-                    float sin = (float)Math.Sin(angle);
+                    float angle = MathF.PI * 2 * (1-completion);
+                    float cos = MathF.Cos(angle);
+                    float sin = MathF.Sin(angle);
 
                     v3 = center + Vector2.Multiply(new Vector2(sin,-cos), size);
                 }
 
-                drawList.AddTriangleFilled(center, v2, v3, 0xCC000000);
+                drawList.AddTriangleFilled(center, v3, v2, 0xCC000000);
             }
             ImGui.PopClipRect();
-            
-            
         }
         
         public static void DrawOvershield(float shield, Vector2 cursorPos, Vector2 barSize, float height, bool useRatioForHeight, PluginConfigColor color, ImDrawListPtr drawList)
