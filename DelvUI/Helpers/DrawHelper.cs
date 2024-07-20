@@ -219,6 +219,8 @@ namespace DelvUI.Helpers
             int segments = (int)Math.Ceiling(completion * 4);
 
             Vector2 center = position + size / 2;
+            
+            //Define vertices for top, left, bottom, and right points relative to the center.
             Vector2[] vertices =
             [
                 center with {Y = center.Y - size.Y}, // Top
@@ -232,10 +234,11 @@ namespace DelvUI.Helpers
             {
                 Vector2 v2 = vertices[i % 4];
                 Vector2 v3 = vertices[(i + 1) % 4];
-
+                
+                
                 if (i == segments - 1)
-                {
-                    float angle = MathF.PI * 2 * (1-completion);
+                {   // If drawing the last segment, adjust the second vertex based on the cooldown.
+                    float angle = 2 * MathF.PI * (1 - completion);
                     float cos = MathF.Cos(angle);
                     float sin = MathF.Sin(angle);
 
