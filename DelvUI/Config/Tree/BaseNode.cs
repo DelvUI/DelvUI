@@ -238,23 +238,11 @@ namespace DelvUI.Config.Tree
                     ImGui.PopFont();
                     ImGuiHelper.SetTooltip("Changelog");
 
-                    // browse button
-                    ImGui.PushFont(UiBuilder.IconFont);
-                    ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(255f / 255f, 255f / 255f, 255f / 255f, alpha));
-                    ImGui.SetCursorPos(new Vector2(48 * _scale, y));
-                    if (ImGui.Button(FontAwesomeIcon.Search.ToIconString(), new Vector2(24 * _scale, 24 * _scale)))
-                    {
-                        Utils.OpenUrl("https://wago.io/delvui");
-                    }
-                    ImGui.PopStyleColor();
-                    ImGui.PopFont();
-                    ImGuiHelper.SetTooltip("Browse presets on wago.io");
-
                     // discord button
                     ImGui.PushFont(UiBuilder.IconFont);
                     ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(114f / 255f, 137f / 255f, 218f / 255f, alpha));
                     ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(114f / 255f, 137f / 255f, 218f / 255f, alpha * .85f));
-                    ImGui.SetCursorPos(new Vector2(77 * _scale, y));
+                    ImGui.SetCursorPos(new Vector2(48 * _scale, y));
                     if (ImGui.Button(FontAwesomeIcon.Link.ToIconString(), new Vector2(24 * _scale, 24 * _scale)))
                     {
                         Utils.OpenUrl("https://discord.gg/xzde5qQayh");
@@ -267,7 +255,7 @@ namespace DelvUI.Config.Tree
                     ImGui.PushFont(UiBuilder.IconFont);
                     ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(255f / 255f, 94f / 255f, 91f / 255f, alpha));
                     ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(255f / 255f, 94f / 255f, 91f / 255f, alpha * .85f));
-                    ImGui.SetCursorPos(new Vector2(106 * _scale, y));
+                    ImGui.SetCursorPos(new Vector2(77 * _scale, y));
                     if (ImGui.Button(FontAwesomeIcon.MugHot.ToIconString(), new Vector2(24 * _scale, 24 * _scale)))
                     {
                         Utils.OpenUrl("https://ko-fi.com/Tischel");

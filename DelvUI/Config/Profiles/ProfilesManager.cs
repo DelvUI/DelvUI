@@ -827,12 +827,6 @@ namespace DelvUI.Config.Profiles
                     }
                 }
 
-                ImGui.SameLine();
-                if (ImGui.Button("Browse Presets", new Vector2(200, 0)))
-                {
-                    Utils.OpenUrl("https://wago.io/delvui");
-                }
-
                 // no name popup
                 if (ImGui.BeginPopup("import_error_popup"))
                 {

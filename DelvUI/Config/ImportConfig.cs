@@ -45,11 +45,11 @@ namespace DelvUI.Interface
             }
 
             ImGuiHelper.DrawSeparator(1, 1);
-            ImGui.Text("To browse presets made by users of the DelvUI community, click the button below.");
+            ImGui.Text("To browse presets made by users of the DelvUI community join our Discord and find the #profiles channel.");
 
-            if (ImGui.Button("DelvUI on wago.io", new Vector2(560, 24)))
+            if (ImGui.Button("DelvUI Discord", new Vector2(560, 24)))
             {
-                Utils.OpenUrl("https://wago.io/delvui");
+                Utils.OpenUrl("https://discord.gg/xzde5qQayh");
             }
 
             // error modal
