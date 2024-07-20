@@ -225,8 +225,6 @@ namespace DelvUI.Helpers
                 center with {X = center.X - size.X}, // Left
                 center with {Y = center.Y + size.Y}, // Bottom
                 center with {X = center.X + size.X}  // Right
-
-
             ];
             
             ImGui.PushClipRect(position, position + size, false);
@@ -237,17 +235,20 @@ namespace DelvUI.Helpers
 
                 if (i == segments - 1)
                 {
-                    float angle = (float)(Math.PI * 2 * (1-completion));
+                    double angle = Math.PI * 2 * (1-completion);
                     float cos = (float)Math.Cos(angle);
                     float sin = (float)Math.Sin(angle);
 
                     v3 = center + Vector2.Multiply(new Vector2(sin,-cos), size);
                 }
 
-                drawList.AddTriangleFilled(center, v2, v3, 0xcc000000);
+                drawList.AddTriangleFilled(center, v2, v3, 0xCC000000);
             }
             ImGui.PopClipRect();
+            
+            
         }
+        
         public static void DrawOvershield(float shield, Vector2 cursorPos, Vector2 barSize, float height, bool useRatioForHeight, PluginConfigColor color, ImDrawListPtr drawList)
         {
             if (shield == 0) { return; }
