@@ -96,17 +96,19 @@ namespace DelvUI.Interface
         {
             if (Plugin.Condition[ConditionFlag.OccupiedInEvent] ||
                 Plugin.Condition[ConditionFlag.OccupiedInQuestEvent] ||
-                Plugin.Condition[ConditionFlag.ChocoboRacing] ||
+                Plugin.Condition[ConditionFlag.OccupiedInCutSceneEvent] ||
+                Plugin.Condition[ConditionFlag.OccupiedSummoningBell] ||
                 Plugin.Condition[ConditionFlag.Occupied] ||
                 Plugin.Condition[ConditionFlag.Occupied30] ||
                 Plugin.Condition[ConditionFlag.Occupied33] ||
                 Plugin.Condition[ConditionFlag.Occupied38] ||
                 Plugin.Condition[ConditionFlag.Occupied39] ||
-                Plugin.Condition[ConditionFlag.OccupiedInCutSceneEvent] ||
-                Plugin.Condition[ConditionFlag.OccupiedInEvent] ||
-                Plugin.Condition[ConditionFlag.OccupiedInQuestEvent] ||
                 Plugin.Condition[ConditionFlag.WatchingCutscene] ||
                 Plugin.Condition[ConditionFlag.WatchingCutscene78] ||
+                Plugin.Condition[ConditionFlag.CreatingCharacter] ||
+                Plugin.Condition[ConditionFlag.BetweenAreas] ||
+                Plugin.Condition[ConditionFlag.BetweenAreas51] ||
+                Plugin.Condition[ConditionFlag.ChocoboRacing] ||
                 Plugin.ClientState.IsPvP)
             {
                 return;
