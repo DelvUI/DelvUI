@@ -5,6 +5,7 @@ using Dalamud.Plugin.Ipc;
 using Newtonsoft.Json;
 using Lumina.Data.Parsing.Uld;
 using System;
+using System.Linq;
 
 namespace DelvUI.Helpers
 {
@@ -17,12 +18,12 @@ namespace DelvUI.Helpers
 
     internal class HonorificHelper
     {
-        private ICallGateSubscriber<ICharacter, string>? _getCharacterTitle;
+        private ICallGateSubscriber<int, string>? _getCharacterTitle;
 
         #region Singleton
         private HonorificHelper()
         {
-            _getCharacterTitle = Plugin.PluginInterface.GetIpcSubscriber<ICharacter, string>("Honorific.GetCharacterTitle");
+            _getCharacterTitle = Plugin.PluginInterface.GetIpcSubscriber<int, string>("Honorific.GetCharacterTitle");
         }
 
         public static void Initialize() { Instance = new HonorificHelper(); }
@@ -53,26 +54,23 @@ namespace DelvUI.Helpers
 
         public TitleData? GetTitle(IGameObject? actor)
         {
-            // IPC not working /shrug
+            if (_getCharacterTitle == null || 
+                actor == null || 
+                actor.ObjectKind != ObjectKind.Player || 
+                actor is not ICharacter character)
+            {
+                return null;
+            }
+
+            try
+            {
+                string jsonData = _getCharacterTitle.InvokeFunc(character.ObjectIndex);
+                TitleData? titleData = JsonConvert.DeserializeObject<TitleData>(jsonData ?? string.Empty);
+                return titleData;
+            }
+            catch { }
+
             return null;
-
-            //if (_getCharacterTitle == null || 
-            //    actor == null || 
-            //    actor.ObjectKind != ObjectKind.Player || 
-            //    actor is not ICharacter character)
-            //{
-            //    return null;
-            //}
-
-            //try
-            //{
-            //    string jsonData = _getCharacterTitle.InvokeFunc(character);
-            //    TitleData? titleData = JsonConvert.DeserializeObject<TitleData>(jsonData ?? string.Empty);
-            //    return titleData;
-            //}
-            //catch { }
-
-            //return null;
         }
     }
 }
