@@ -96,6 +96,7 @@ namespace DelvUI.Helpers
 
         public void Dispose()
         {
+            Plugin.Logger.Verbose("\tDisposing InputsHelper...");
             Dispose(true);
             GC.SuppressFinalize(this);
         }
@@ -109,16 +110,18 @@ namespace DelvUI.Helpers
 
             ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
 
-            //_uiMouseOverActorHook?.Disable();
-            //_uiMouseOverActorHook?.Dispose();
-
+            Plugin.Logger.Verbose("\t\tDisposing _requestActionHook: " + _requestActionHook?.Address.ToString("X") ?? "null");
             _requestActionHook?.Disable();
             _requestActionHook?.Dispose();
-            
+
             // give imgui the control of inputs again
+            Plugin.Logger.Verbose("\t\tRestoring WndProc");
+            Plugin.Logger.Verbose("\t\t\tOld _wndHandle = " + _wndHandle.ToString("X"));
+            Plugin.Logger.Verbose("\t\t\tOld _imguiWndProcPtr = " + _imguiWndProcPtr.ToString("X"));
             if (_wndHandle != IntPtr.Zero && _imguiWndProcPtr != IntPtr.Zero)
             {
                 SetWindowLongPtr(_wndHandle, GWL_WNDPROC, _imguiWndProcPtr);
+                Plugin.Logger.Verbose("\t\t\tDone!");
             }
 
             Instance = null!;

@@ -176,6 +176,7 @@ namespace DelvUI
 
         public void Dispose()
         {
+            Logger.Verbose("Starting DelvUI Dispose...");
             Dispose(true);
             GC.SuppressFinalize(this);
         }
@@ -336,38 +337,80 @@ namespace DelvUI
                 Logger.Error("Error disposing InputsHelper:\n" + e.StackTrace);
             }
 
-            _hudManager?.Dispose();
-
+            Logger.Verbose("\tSaving configurations...");
             ConfigurationManager.Instance?.SaveConfigurations(true);
             ConfigurationManager.Instance?.CloseConfigWindow();
 
+            Logger.Verbose("\tDisposing HudManager...");
+            _hudManager?.Dispose();
+
+            Logger.Verbose("\tDisposing BarTexturesManager...");
+            BarTexturesManager.Instance?.Dispose();
+
+            Logger.Verbose("\tDisposing ChatHelper...");
+            ChatHelper.Instance?.Dispose();
+            
+            Logger.Verbose("\tDisposing ClipRectsHelper...");
+            ClipRectsHelper.Instance?.Dispose();
+
+            Logger.Verbose("\tDisposing ExperienceHelper...");
+            ExperienceHelper.Instance?.Dispose();
+
+            Logger.Verbose("\tDisposing FontsManager...");
+            FontsManager.Instance?.Dispose();
+
+            Logger.Verbose("\tDisposing GlobalColors...");
+            GlobalColors.Instance?.Dispose();
+
+            Logger.Verbose("\tDisposing LimitBreakHelper...");
+            LimitBreakHelper.Instance?.Dispose();
+
+            Logger.Verbose("\tDisposing NameplatesManager...");
+            NameplatesManager.Instance?.Dispose();
+
+            Logger.Verbose("\tDisposing PartyCooldownsManager...");
+            PartyCooldownsManager.Instance?.Dispose();
+
+            Logger.Verbose("\tDisposing PartyManager...");
+            PartyManager.Instance?.Dispose();
+
+            Logger.Verbose("\tDisposing PullTimerHelper...");
+            PullTimerHelper.Instance?.Dispose();
+
+            Logger.Verbose("\tDisposing ProfilesManager...");
+            ProfilesManager.Instance?.Dispose();
+
+            Logger.Verbose("\tDisposing SpellHelper...");
+            SpellHelper.Instance?.Dispose();
+
+            Logger.Verbose("\tDisposing TooltipsHelper...");
+            TooltipsHelper.Instance?.Dispose();
+
+            Logger.Verbose("\tDisposing HonorificHelper...");
+            HonorificHelper.Instance?.Dispose();
+
+            Logger.Verbose("\tDisposing PetRenamerHelper...");
+            PetRenamerHelper.Instance?.Dispose();
+
+            Logger.Verbose("\tDisposing WotsitHelper...");
+            WotsitHelper.Instance?.Dispose();
+
+            Logger.Verbose("\tDisposing WhosTalkingHelper...");
+            WhosTalkingHelper.Instance?.Dispose();
+
+            Logger.Verbose("\tRemoving commands...");
             CommandManager.RemoveHandler("/delvui");
             CommandManager.RemoveHandler("/dui");
 
+            Logger.Verbose("\tUnsubscribing from UIBuilder events...");
             UiBuilder.Draw -= Draw;
             UiBuilder.OpenConfigUi -= OpenConfigUi;
+
+            Logger.Verbose("\tRebuilding fonts...");
             UiBuilder.FontAtlas.BuildFontsAsync();
 
-            BarTexturesManager.Instance?.Dispose();
-            ChatHelper.Instance?.Dispose();
-            ClipRectsHelper.Instance?.Dispose();
-            ExperienceHelper.Instance?.Dispose();
-            FontsManager.Instance?.Dispose();
-            GlobalColors.Instance?.Dispose();
-            LimitBreakHelper.Instance?.Dispose();
-            NameplatesManager.Instance?.Dispose();
-            PartyCooldownsManager.Instance?.Dispose();
-            PartyManager.Instance?.Dispose();
-            PullTimerHelper.Instance?.Dispose();
-            ProfilesManager.Instance?.Dispose();
-            SpellHelper.Instance?.Dispose();
-            TooltipsHelper.Instance?.Dispose();
-            HonorificHelper.Instance?.Dispose();
-            PetRenamerHelper.Instance?.Dispose();
-            WotsitHelper.Instance?.Dispose();
-            WhosTalkingHelper.Instance?.Dispose();
-
             // This needs to remain last to avoid race conditions
+            Logger.Verbose("\tDisposing ConfigurationManager...");
             ConfigurationManager.Instance?.Dispose();
         }
     }

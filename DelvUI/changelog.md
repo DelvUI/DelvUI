@@ -1,6 +1,7 @@
 # 2.2.0.7
 - Fixed Honorific Title integration.
 - Fixed chat being spammed with hotbar commands.
+- Fixed Viper's Vipersight Bar glow not working.
 
 # 2.2.0.6
 - Fixed default job gauge flickering when "Hide Default Job Gauge" is enabled.
