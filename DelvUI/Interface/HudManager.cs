@@ -405,12 +405,15 @@ namespace DelvUI.Interface
             catch { }
 
             TooltipsHelper.Instance.RemoveTooltip(); // remove tooltip from previous frame
+
             _hudHelper.Update();
 
             if (!ShouldBeVisible())
             {
                 return;
             }
+
+            _hudHelper.UpdateCombatActionBars();
 
             ClipRectsHelper.Instance.Update();
 

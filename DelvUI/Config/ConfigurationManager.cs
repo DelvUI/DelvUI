@@ -223,10 +223,10 @@ namespace DelvUI.Config
         {
             string path = Path.Combine(ConfigDirectory, "version");
 
+            bool needsBackup = false;
             try
             {
                 bool needsWrite = false;
-                bool needsBackup = false;
 
                 if (!File.Exists(path))
                 {
@@ -248,7 +248,14 @@ namespace DelvUI.Config
                 {
                     File.WriteAllText(path, Plugin.Version);
                 }
+            }
+            catch (Exception e)
+            {
+                Plugin.Logger.Error("Error checking version: " + e.Message);
+            }
 
+            try
+            {
                 if (needsBackup && PreviousVersion != null)
                 {
                     BackupFiles(PreviousVersion);
@@ -256,7 +263,7 @@ namespace DelvUI.Config
             }
             catch (Exception e)
             {
-                Plugin.Logger.Error("Error checking version: " + e.Message);
+                Plugin.Logger.Error("Error making backup: " + e.Message);
             }
         }
 

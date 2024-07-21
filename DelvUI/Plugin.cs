@@ -102,7 +102,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.2.0.7";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.2.0.8";
 
             FontsManager.Initialize(AssemblyLocation);
             BarTexturesManager.Initialize(AssemblyLocation);
@@ -176,11 +176,11 @@ namespace DelvUI
 
         public void Dispose()
         {
-            Logger.Verbose("Starting DelvUI Dispose...");
+            Logger.Info("Starting DelvUI Dispose v" + Version);
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-
+        
         private void LoadBanner()
         {
             string bannerImage = Path.Combine(Path.GetDirectoryName(AssemblyLocation) ?? "", "Media", "Images", "banner_short_x150.png");
@@ -337,80 +337,80 @@ namespace DelvUI
                 Logger.Error("Error disposing InputsHelper:\n" + e.StackTrace);
             }
 
-            Logger.Verbose("\tSaving configurations...");
+            Logger.Info("\tSaving configurations...");
             ConfigurationManager.Instance?.SaveConfigurations(true);
             ConfigurationManager.Instance?.CloseConfigWindow();
 
-            Logger.Verbose("\tDisposing HudManager...");
+            Logger.Info("\tDisposing HudManager...");
             _hudManager?.Dispose();
 
-            Logger.Verbose("\tDisposing BarTexturesManager...");
+            Logger.Info("\tDisposing BarTexturesManager...");
             BarTexturesManager.Instance?.Dispose();
 
-            Logger.Verbose("\tDisposing ChatHelper...");
+            Logger.Info("\tDisposing ChatHelper...");
             ChatHelper.Instance?.Dispose();
             
-            Logger.Verbose("\tDisposing ClipRectsHelper...");
+            Logger.Info("\tDisposing ClipRectsHelper...");
             ClipRectsHelper.Instance?.Dispose();
 
-            Logger.Verbose("\tDisposing ExperienceHelper...");
+            Logger.Info("\tDisposing ExperienceHelper...");
             ExperienceHelper.Instance?.Dispose();
 
-            Logger.Verbose("\tDisposing FontsManager...");
+            Logger.Info("\tDisposing FontsManager...");
             FontsManager.Instance?.Dispose();
 
-            Logger.Verbose("\tDisposing GlobalColors...");
+            Logger.Info("\tDisposing GlobalColors...");
             GlobalColors.Instance?.Dispose();
 
-            Logger.Verbose("\tDisposing LimitBreakHelper...");
+            Logger.Info("\tDisposing LimitBreakHelper...");
             LimitBreakHelper.Instance?.Dispose();
 
-            Logger.Verbose("\tDisposing NameplatesManager...");
+            Logger.Info("\tDisposing NameplatesManager...");
             NameplatesManager.Instance?.Dispose();
 
-            Logger.Verbose("\tDisposing PartyCooldownsManager...");
+            Logger.Info("\tDisposing PartyCooldownsManager...");
             PartyCooldownsManager.Instance?.Dispose();
 
-            Logger.Verbose("\tDisposing PartyManager...");
+            Logger.Info("\tDisposing PartyManager...");
             PartyManager.Instance?.Dispose();
 
-            Logger.Verbose("\tDisposing PullTimerHelper...");
+            Logger.Info("\tDisposing PullTimerHelper...");
             PullTimerHelper.Instance?.Dispose();
 
-            Logger.Verbose("\tDisposing ProfilesManager...");
+            Logger.Info("\tDisposing ProfilesManager...");
             ProfilesManager.Instance?.Dispose();
 
-            Logger.Verbose("\tDisposing SpellHelper...");
+            Logger.Info("\tDisposing SpellHelper...");
             SpellHelper.Instance?.Dispose();
 
-            Logger.Verbose("\tDisposing TooltipsHelper...");
+            Logger.Info("\tDisposing TooltipsHelper...");
             TooltipsHelper.Instance?.Dispose();
 
-            Logger.Verbose("\tDisposing HonorificHelper...");
+            Logger.Info("\tDisposing HonorificHelper...");
             HonorificHelper.Instance?.Dispose();
 
-            Logger.Verbose("\tDisposing PetRenamerHelper...");
+            Logger.Info("\tDisposing PetRenamerHelper...");
             PetRenamerHelper.Instance?.Dispose();
 
-            Logger.Verbose("\tDisposing WotsitHelper...");
+            Logger.Info("\tDisposing WotsitHelper...");
             WotsitHelper.Instance?.Dispose();
 
-            Logger.Verbose("\tDisposing WhosTalkingHelper...");
+            Logger.Info("\tDisposing WhosTalkingHelper...");
             WhosTalkingHelper.Instance?.Dispose();
 
-            Logger.Verbose("\tRemoving commands...");
+            Logger.Info("\tRemoving commands...");
             CommandManager.RemoveHandler("/delvui");
             CommandManager.RemoveHandler("/dui");
 
-            Logger.Verbose("\tUnsubscribing from UIBuilder events...");
+            Logger.Info("\tUnsubscribing from UIBuilder events...");
             UiBuilder.Draw -= Draw;
             UiBuilder.OpenConfigUi -= OpenConfigUi;
 
-            Logger.Verbose("\tRebuilding fonts...");
+            Logger.Info("\tRebuilding fonts...");
             UiBuilder.FontAtlas.BuildFontsAsync();
 
             // This needs to remain last to avoid race conditions
-            Logger.Verbose("\tDisposing ConfigurationManager...");
+            Logger.Info("\tDisposing ConfigurationManager...");
             ConfigurationManager.Instance?.Dispose();
         }
     }

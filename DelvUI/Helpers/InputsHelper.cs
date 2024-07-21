@@ -93,10 +93,10 @@ namespace DelvUI.Helpers
         {
             Dispose(false);
         }
-
+        
         public void Dispose()
         {
-            Plugin.Logger.Verbose("\tDisposing InputsHelper...");
+            Plugin.Logger.Info("\tDisposing InputsHelper...");
             Dispose(true);
             GC.SuppressFinalize(this);
         }
@@ -110,18 +110,18 @@ namespace DelvUI.Helpers
 
             ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
 
-            Plugin.Logger.Verbose("\t\tDisposing _requestActionHook: " + _requestActionHook?.Address.ToString("X") ?? "null");
+            Plugin.Logger.Info("\t\tDisposing _requestActionHook: " + _requestActionHook?.Address.ToString("X") ?? "null");
             _requestActionHook?.Disable();
             _requestActionHook?.Dispose();
 
             // give imgui the control of inputs again
-            Plugin.Logger.Verbose("\t\tRestoring WndProc");
-            Plugin.Logger.Verbose("\t\t\tOld _wndHandle = " + _wndHandle.ToString("X"));
-            Plugin.Logger.Verbose("\t\t\tOld _imguiWndProcPtr = " + _imguiWndProcPtr.ToString("X"));
+            Plugin.Logger.Info("\t\tRestoring WndProc");
+            Plugin.Logger.Info("\t\t\tOld _wndHandle = " + _wndHandle.ToString("X"));
+            Plugin.Logger.Info("\t\t\tOld _imguiWndProcPtr = " + _imguiWndProcPtr.ToString("X"));
             if (_wndHandle != IntPtr.Zero && _imguiWndProcPtr != IntPtr.Zero)
             {
                 SetWindowLongPtr(_wndHandle, GWL_WNDPROC, _imguiWndProcPtr);
-                Plugin.Logger.Verbose("\t\t\tDone!");
+                Plugin.Logger.Info("\t\t\tDone!");
             }
 
             Instance = null!;
@@ -380,8 +380,9 @@ namespace DelvUI.Helpers
             _wndProcPtr = Marshal.GetFunctionPointerForDelegate(_wndProcDelegate);
             _imguiWndProcPtr = SetWindowLongPtr(hWnd, GWL_WNDPROC, _wndProcPtr);
 
-            Plugin.Logger.Debug("Hooking WndProc for window: " + hWnd.ToString("X"));
-            Plugin.Logger.Debug("Old WndProc: " + _imguiWndProcPtr.ToString("X"));
+            Plugin.Logger.Info("Initializing DelvUI Inputs v" + Plugin.Version);
+            Plugin.Logger.Info("\tHooking WndProc for window: " + hWnd.ToString("X"));
+            Plugin.Logger.Info("\tOld WndProc: " + _imguiWndProcPtr.ToString("X"));
         }
 
         private IntPtr _wndHandle = IntPtr.Zero;
