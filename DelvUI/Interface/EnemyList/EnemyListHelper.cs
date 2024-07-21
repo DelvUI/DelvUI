@@ -23,7 +23,17 @@ namespace DelvUI.Interface.EnemyList
                 return target != null && target.GameObjectId == objectId;
             }
 
-        public void Update(bool hideCurrentTarget)
+        private List<EnemyListData> GeneratePreviewData()
+        {
+            List<EnemyListData> previewData = new List<EnemyListData>();
+            for (int i = 0; i < 8; i++)
+            {
+                previewData.Add(new EnemyListData((ulong)i, i, Math.Min(4, i + 1)));
+            }
+            return previewData;
+        }
+
+        public void Update(bool hideCurrentTarget, bool preview)
         {
             UIModule* uiModule = StructsFramework.Instance()->GetUIModule();
             if (uiModule != null)
