@@ -122,7 +122,7 @@ namespace DelvUI.Interface.EnemyList
         {
             if (!Config.Enabled) { return; }
 
-            _helper.Update(Config.HideCurrentTarget);
+            _helper.Update(Config.HideCurrentTarget, Config.Preview);
 
             int count = Math.Min(MaxEnemyCount, Config.Preview ? MaxEnemyCount : _helper.EnemyCount);
             uint fakeMaxHp = 100000;
@@ -135,11 +135,11 @@ namespace DelvUI.Interface.EnemyList
                 // hp bar
                 ICharacter? character = Config.Preview ? null : Plugin.ObjectTable.SearchById(_helper.EnemiesData.ElementAt(j).ObjectId) as ICharacter;
 
-                if (character == null) { i--; continue; }
+                if (character == null && !Config.Preview) { i--; continue; }
 
                 uint currentHp = Config.Preview ? (uint)(_previewValues[i] * fakeMaxHp) : character?.CurrentHp ?? fakeMaxHp;
                 uint maxHp = Config.Preview ? fakeMaxHp : character?.MaxHp ?? fakeMaxHp;
-                int enmityLevel = Config.Preview ? Math.Max(4, i + 1) : _helper.EnemiesData.ElementAt(i).EnmityLevel;
+                int enmityLevel = Config.Preview ? Math.Max(4, i + 1) : _helper.EnemiesData.ElementAt(j).EnmityLevel;
 
                 if (Configs.HealthBar.SmoothHealthConfig.Enabled)
                 {
