@@ -35,6 +35,12 @@ namespace DelvUI.Interface.EnemyList
 
         public void Update(bool hideCurrentTarget, bool preview)
         {
+            if (preview)
+            {
+                _enemiesData = GeneratePreviewData();
+                return;
+            }
+
             UIModule* uiModule = StructsFramework.Instance()->GetUIModule();
             if (uiModule != null)
             {
