@@ -1,3 +1,6 @@
+# 2.2.0.8
+- Fixed chat being spammed with hotbar commands.
+
 # 2.2.0.7
 - Fixed Honorific Title integration.
 - Fixed chat being spammed with hotbar commands.

@@ -59,8 +59,6 @@ namespace DelvUI.Interface
 
         public void Update()
         {
-            UpdateCombatActionBars();
-
             if (_firstUpdate)
             {
                 _firstUpdate = false;
@@ -92,7 +90,7 @@ namespace DelvUI.Interface
             }
         }
 
-        private void UpdateCombatActionBars()
+        public void UpdateCombatActionBars()
         {
             if (Plugin.Condition[ConditionFlag.OccupiedInEvent] ||
                 Plugin.Condition[ConditionFlag.OccupiedInQuestEvent] ||
