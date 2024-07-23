@@ -210,6 +210,8 @@ namespace DelvUI.Helpers
             ["[distance]"] = (chara) => (chara.YalmDistanceX + 1).ToString(),
 
             ["[company]"] = (chara) => chara.CompanyTag.ToString(),
+            
+            ["[company:formatted]"] = (chara) => !String.IsNullOrEmpty(chara.CompanyTag.ToString()) ? $"«{chara.CompanyTag}»" : "",
 
             ["[level]"] = (chara) => chara.Level > 0 ? chara.Level.ToString() : "-",
 

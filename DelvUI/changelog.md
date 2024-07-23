@@ -1,5 +1,7 @@
 # 2.2.0.8
 - Fixed chat being spammed with hotbar commands.
+- Added [company:formatted] text tag.
+  * For more info check https://github.com/DelvUI/DelvUI/wiki/Text-Formatting
 
 # 2.2.0.7
 - Fixed Honorific Title integration.
