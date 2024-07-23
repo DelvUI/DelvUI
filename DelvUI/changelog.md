@@ -1,5 +1,6 @@
 # 2.2.0.8
 - Fixed chat being spammed with hotbar commands.
+- Fixed soft targeting support for the EnemyList.
 
 # 2.2.0.7
 - Fixed Honorific Title integration.
