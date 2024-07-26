@@ -176,9 +176,9 @@ namespace DelvUI.Interface.Jobs
                 return; 
             }
 
-            var chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[5];
+            var chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[3];
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 3; i++)
             {
                 chunks[i] = new(Config.BloodWeaponBar.FillColor, i < stacks ? 1 : 0, i == 2 ? Config.BloodWeaponBar.Label : null);
             }
