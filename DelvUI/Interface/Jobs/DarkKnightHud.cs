@@ -180,7 +180,7 @@ namespace DelvUI.Interface.Jobs
 
             for (int i = 0; i < 3; i++)
             {
-                chunks[i] = new(Config.BloodWeaponBar.FillColor, i < stacks ? 1 : 0, i == 2 ? Config.BloodWeaponBar.Label : null);
+                chunks[i] = new(Config.BloodWeaponBar.FillColor, i < stacks ? 1 : 0, i == 1 ? Config.BloodWeaponBar.Label : null);
             }
 
             if(Config.BloodWeaponBar.FillDirection is BarDirection.Left or BarDirection.Up)
