@@ -1,6 +1,7 @@
 # 2.2.0.8
 - Fixed chat being spammed with hotbar commands.
-- Fixed soft targeting support for the EnemyList.
+- Fixed Chocobo showing up as a Viper in the party list.
+- Fixed Dark Knight's Blood Weapon Stacks being 3 instead of the previous 5.
 
 # 2.2.0.7
 - Fixed Honorific Title integration.
