@@ -1,3 +1,6 @@
+# 2.2.0.9
+- Changed Mug to Dokumori in Party Cooldowns.
+
 # 2.2.0.8
 - Fixed chat being spammed with hotbar commands.
 - Fixed Chocobo showing up as a Viper in the party list.
