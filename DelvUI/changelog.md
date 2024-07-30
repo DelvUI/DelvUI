@@ -3,6 +3,7 @@
 - Fixed Chocobo showing up as a Viper in the party list.
 - Fixed Dark Knight's Blood Weapon Stacks being 3 instead of the previous 5.
 - Changed Mug to Dokumori in Party Cooldowns.
+- Changed Suiton to Shadow Walker in Ninja Hud
 
 # 2.2.0.7
 - Fixed Honorific Title integration.
