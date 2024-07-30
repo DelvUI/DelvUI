@@ -1,4 +1,4 @@
-﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Statuses;
@@ -44,10 +44,10 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.TrickAttackBar.Size);
             }
 
-            if (Config.SuitonBar.Enabled)
+            if (Config.ShadowWalkerBar.Enabled)
             {
-                positions.Add(Config.Position + Config.SuitonBar.Position);
-                sizes.Add(Config.SuitonBar.Size);
+                positions.Add(Config.Position + Config.ShadowWalkerBar.Position);
+                sizes.Add(Config.ShadowWalkerBar.Size);
             }
 
             if (Config.MudraBar.Enabled)
@@ -82,9 +82,9 @@ namespace DelvUI.Interface.Jobs
                 DrawTrickAttackBar(pos, player);
             }
 
-            if (Config.SuitonBar.Enabled)
+            if (Config.ShadowWalkerBar.Enabled)
             {
-                DrawSuitonBar(pos, player);
+                DrawShadowWalkerBar(pos, player);
             }
         }
 
@@ -226,21 +226,21 @@ namespace DelvUI.Interface.Jobs
             AddDrawActions(bar.GetDrawActions(origin, Config.TrickAttackBar.StrataLevel));
         }
 
-        private void DrawSuitonBar(Vector2 origin, IPlayerCharacter player)
+        private void DrawShadowWalkerBar(Vector2 origin, IPlayerCharacter player)
         {
-            float suitonDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(
-                o => o.StatusId == 507 && o.RemainingTime > 0
+            float shadowwalkerDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(
+                o => o.StatusId == 3848 && o.RemainingTime > 0
             )?.RemainingTime ?? 0f;
 
-            if (Config.SuitonBar.HideWhenInactive && suitonDuration == 0)
+            if (Config.ShadowWalkerBar.HideWhenInactive && shadowwalkerDuration == 0)
             {
                 return;
             }
 
-            Config.SuitonBar.Label.SetValue(suitonDuration);
+            Config.ShadowWalkerBar.Label.SetValue(shadowwalkerDuration);
 
-            BarHud bar = BarUtilities.GetProgressBar(Config.SuitonBar, suitonDuration, 20f, 0f, player);
-            AddDrawActions(bar.GetDrawActions(origin, Config.SuitonBar.StrataLevel));
+            BarHud bar = BarUtilities.GetProgressBar(Config.ShadowWalkerBar, shadowwalkerDuration, 20f, 0f, player);
+            AddDrawActions(bar.GetDrawActions(origin, Config.ShadowWalkerBar.StrataLevel));
         }
 
         private string GenerateNinjutsuText(byte param, bool haveKassatsuBuff, bool haveTCJBuff)
@@ -276,8 +276,8 @@ namespace DelvUI.Interface.Jobs
             config.TrickAttackBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
             config.TrickAttackBar.Enabled = false;
 
-            config.SuitonBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
-            config.SuitonBar.Enabled = false;
+            config.ShadowWalkerBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.ShadowWalkerBar.Enabled = false;
 
             config.NinkiBar.UsePartialFillColor = true;
 
@@ -313,8 +313,8 @@ namespace DelvUI.Interface.Jobs
             new PluginConfigColor(new Vector4(191f / 255f, 40f / 255f, 0f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Suiton Bar", 50)]
-        public ProgressBarConfig SuitonBar = new ProgressBarConfig(
+        [NestedConfig("Shadow Walker Bar", 50)]
+        public ProgressBarConfig ShadowWalkerBar = new ProgressBarConfig(
             new(0, -75),
             new(254, 10),
             new PluginConfigColor(new Vector4(202f / 255f, 228f / 255f, 246f / 242f, 100f / 100f))
