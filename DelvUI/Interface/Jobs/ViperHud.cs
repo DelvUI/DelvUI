@@ -17,8 +17,6 @@ namespace DelvUI.Interface.Jobs
     public class ViperHud : JobHud
     {
         private new ViperConfig Config => (ViperConfig)_config;
-        private static readonly List<uint> NoxiousGnashIDs = new() { 3667, 4099 };
-        private static readonly List<float> NoxiousGnashDurations = new() { 40f, 40f };
 
         public ViperHud(ViperConfig config, string? displayName = null) : base(config, displayName) { }
 
@@ -37,12 +35,6 @@ namespace DelvUI.Interface.Jobs
             {
                 positions.Add(Config.Position + Config.Vipersight.Position);
                 sizes.Add(Config.Vipersight.Size);
-            }
-
-            if (Config.NoxiousGnash.Enabled)
-            {
-                positions.Add(Config.Position + Config.NoxiousGnash.Position);
-                sizes.Add(Config.NoxiousGnash.Size);
             }
 
             if (Config.AnguineTribute.Enabled)
@@ -70,11 +62,6 @@ namespace DelvUI.Interface.Jobs
             if (Config.Vipersight.Enabled)
             {
                 DrawVipersightBar(origin + Config.Position, player);
-            }
-
-            if (Config.NoxiousGnash.Enabled)
-            {
-                DrawNoxiousGnashBar(origin + Config.Position, player);
             }
 
             if (Config.SerpentOfferings.Enabled)
@@ -148,7 +135,7 @@ namespace DelvUI.Interface.Jobs
                 case ViperComboState.None:
                     {
                         chunks = [empty, empty, empty, empty];
-                        glows = [false, false, false, false];
+                        glows = [false, isLeftGlowing, isRightGlowing, false];
                         break;
                     }
                 case ViperComboState.Started:
@@ -238,17 +225,6 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawNoxiousGnashBar(Vector2 origin, IPlayerCharacter player)
-        {
-            IGameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-
-            BarHud? bar = BarUtilities.GetDoTBar(Config.NoxiousGnash, player, target, NoxiousGnashIDs, NoxiousGnashDurations);
-            if (bar != null)
-            {
-                AddDrawActions(bar.GetDrawActions(origin, Config.NoxiousGnash.StrataLevel));
-            }
-        }
-
         private unsafe void DrawSerpentOfferingsBar(Vector2 origin, IPlayerCharacter player)
         {
             ViperConfig.SerpentOfferingsBarConfig config = Config.SerpentOfferings;
@@ -322,13 +298,6 @@ namespace DelvUI.Interface.Jobs
             new(0, -10),
             new(254, 10),
             new(new Vector4(237f / 255f, 141f / 255f, 7f / 255f, 100f / 100f))
-        );
-
-        [NestedConfig("Noxious Gnash Bar", 35)]
-        public ProgressBarConfig NoxiousGnash = new ProgressBarConfig(
-            new(0, -22),
-            new(254, 10),
-            new(new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 1f))
         );
 
         [NestedConfig("Rattling Coil Bar", 40)]
