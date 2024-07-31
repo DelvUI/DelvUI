@@ -1,18 +1,13 @@
-﻿using Dalamud.Game.ClientState.Objects.Enums;
+﻿using System;
+using System.Collections.Generic;
+using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Plugin.Ipc;
-using System;
 
 namespace DelvUI.Helpers
 {
     internal class PetRenamerHelper
     {
-        private ICallGateSubscriber<nint, string>? GetPetNicknameNint;
-        private ICallGateSubscriber<object>? PetNicknameReady;
-        private ICallGateSubscriber<object>? PetNicknameDispose;
-        private ICallGateSubscriber<bool>? Enabled;
-
-        private bool pluginEnabled = false;
+        private Dictionary<ulong, string>? PetNicknamesDictionary;
 
         #region Singleton
         public static void Initialize() { Instance = new PetRenamerHelper(); }
@@ -21,9 +16,7 @@ namespace DelvUI.Helpers
 
         public PetRenamerHelper()
         {
-            AssignIPCs();
-            AssignFunctions();
-            CheckPluginEnabled();
+            AssignShares();
         }
 
         ~PetRenamerHelper()
@@ -44,70 +37,49 @@ namespace DelvUI.Helpers
                 return;
             }
 
-            PetNicknameReady?.Unsubscribe(OnPetReady);
-            PetNicknameDispose?.Unsubscribe(OnPetDispose);
+            Plugin.PluginInterface.RelinquishData("PetRenamer.GameObjectRenameDict");
 
             Instance = null!;
         }
         #endregion
 
-        private void AssignIPCs()
-        {
-            GetPetNicknameNint = Plugin.PluginInterface.GetIpcSubscriber<nint, string>("PetRenamer.GetPetNicknameNint");
-            PetNicknameReady = Plugin.PluginInterface.GetIpcSubscriber<object>("PetRenamer.Ready");
-            PetNicknameDispose = Plugin.PluginInterface.GetIpcSubscriber<object>("PetRenamer.Disposing");
-            Enabled = Plugin.PluginInterface.GetIpcSubscriber<bool>("PetRenamer.Enabled");
-        }
-
-        private void AssignFunctions()
-        {
-            PetNicknameReady?.Subscribe(OnPetReady);
-            PetNicknameDispose?.Subscribe(OnPetDispose);
-        }
-
-        private void CheckPluginEnabled()
+        private void AssignShares()
         {
             try
             {
-                pluginEnabled = Enabled?.InvokeFunc() ?? false;
+                PetNicknamesDictionary = Plugin.PluginInterface.GetOrCreateData("PetRenamer.GameObjectRenameDict", () => new Dictionary<ulong, string>());
             }
             catch { }
         }
 
-        private void OnPetReady()
+        private string? GetNameForActor(IGameObject actor)
         {
-            pluginEnabled = true;
-        }
-
-        private void OnPetDispose()
-        {
-            pluginEnabled = false;
-        }
-
-        private string GetPetNamesForCharacter(nint character)
-        {
-            try
+            if (PetNicknamesDictionary == null)
             {
-                return GetPetNicknameNint?.InvokeFunc(character) ?? null!;
+                return null;
             }
-            catch { }
 
-            return null!;
+            if (PetNicknamesDictionary.TryGetValue(actor.GameObjectId, out string? nickname))
+            {
+                return nickname;
+            }
+
+            return null;
         }
 
         public string? GetPetName(IGameObject? actor)
         {
-            if (!pluginEnabled)
+            if (actor == null)
             {
                 return null;
             }
 
-            if (actor == null || (actor.ObjectKind != ObjectKind.Companion && actor.ObjectKind != ObjectKind.BattleNpc))
+            if (actor.ObjectKind != ObjectKind.Companion && actor.ObjectKind != ObjectKind.BattleNpc)
             {
                 return null;
             }
 
-            return GetPetNamesForCharacter(actor.Address);
+            return GetNameForActor(actor);
         }
     }
 }
