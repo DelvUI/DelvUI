@@ -211,7 +211,7 @@ namespace DelvUI.Helpers
 
             ["[company]"] = (chara) => chara.CompanyTag.ToString(),
             
-            ["[company:formatted]"] = (chara) => !String.IsNullOrEmpty(chara.CompanyTag.ToString()) ? $"«{chara.CompanyTag}»" : "",
+            ["[company-formatted]"] = (chara) => !String.IsNullOrEmpty(chara.CompanyTag.ToString()) ? $"«{chara.CompanyTag}»" : "",
 
             ["[level]"] = (chara) => chara.Level > 0 ? chara.Level.ToString() : "-",
 
