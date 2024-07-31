@@ -187,7 +187,7 @@ namespace DelvUI.Interface.EnemyList
                 // highlight
                 var (areaStart, areaEnd) = Configs.HealthBar.MouseoverAreaConfig.GetArea(origin + pos, Configs.HealthBar.Size);
                 bool isHovering = character != null && ImGui.IsMouseHoveringRect(areaStart, areaEnd);
-                bool isSoftTarget = character != null && character == Plugin.TargetManager.SoftTarget;
+                bool isSoftTarget = character != null && character.EntityId == Plugin.TargetManager.SoftTarget?.EntityId;
                 if (isHovering || isSoftTarget)
                 {
                     if (Configs.HealthBar.Colors.ShowHighlight)
@@ -345,7 +345,7 @@ namespace DelvUI.Interface.EnemyList
 
         private PluginConfigColor GetBorderColor(ICharacter? character, int enmityLevel)
         {
-            IGameObject? target = Plugin.TargetManager.Target;
+            IGameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             if (character != null && target != null && character.EntityId == target.EntityId)
             {
                 return Configs.HealthBar.Colors.TargetBordercolor;
