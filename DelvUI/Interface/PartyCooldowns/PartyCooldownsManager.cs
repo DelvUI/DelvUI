@@ -193,6 +193,11 @@ namespace DelvUI.Interface.PartyCooldowns
                     {
                         actionID = 35349;
                     }
+                    // special case for mug > set id to dokumori
+                    if (actionID == 2248)
+                    {
+                        actionID = 36957;
+                    }
 
                     // special case for technical step / finish
                     // we detect when technical step is pressed and save the time

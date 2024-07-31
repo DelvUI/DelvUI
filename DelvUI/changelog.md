@@ -1,7 +1,10 @@
 # 2.2.0.8
+- Added the `company:formatted` text tag.
+- Changed Mug to Dokumori in Party Cooldowns.
 - Fixed chat being spammed with hotbar commands.
-- Added [company:formatted] text tag.
-  * For more info check https://github.com/DelvUI/DelvUI/wiki/Text-Formatting
+- Fixed soft targeting support for the Enemy List.
+- Fixed Chocobo showing up as a Viper in the party list.
+- Fixed Dark Knight's Blood Weapon Stacks being 3 instead of the previous 5.
 
 # 2.2.0.7
 - Fixed Honorific Title integration.
