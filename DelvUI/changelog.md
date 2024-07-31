@@ -1,5 +1,5 @@
 # 2.2.0.8
-- Added the `company:formatted` text tag.
+- Added the `company-formatted` text tag.
 - Changed Mug to Dokumori in Party Cooldowns.
 - Fixed chat being spammed with hotbar commands.
 - Fixed soft targeting support for the Enemy List.
