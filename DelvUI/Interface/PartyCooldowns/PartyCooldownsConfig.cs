@@ -173,7 +173,7 @@ namespace DelvUI.Interface.PartyCooldowns
     {
         public List<PartyCooldownData> Cooldowns = new List<PartyCooldownData>();
 
-        private List<uint> _removedIds = new() { 7398 };
+        private List<uint> _removedIds = new() { 7398 , 2248 };
 
         private JobRoles _roleFilter = JobRoles.Unknown;
         private uint _tankFilter = 0;
@@ -677,7 +677,7 @@ namespace DelvUI.Interface.PartyCooldowns
             // lol?
 
             // NIN
-            [2248] = NewData(2248, JobIDs.NIN, 15, 120, 20, 30, 3, PartyCooldownEnabled.PartyCooldowns), // mug
+            [36957] = NewData(36957, JobIDs.NIN, 15, 120, 20, 30, 3, PartyCooldownEnabled.PartyCooldowns), // dokumori
             [2258] = NewData(2258, JobIDs.NIN, 18, 60, 15, 10, 3, PartyCooldownEnabled.PartyFrames), // trick attack
             [2241] = NewData(2241, JobIDs.NIN, 2, 120, 20, 20, 4, PartyCooldownEnabled.PartyFrames), // shade shift
 
