@@ -1,5 +1,6 @@
 # 2.2.0.8
 - Fixed chat being spammed with hotbar commands.
+- Fixed soft targeting support for the Enemy List.
 - Fixed Chocobo showing up as a Viper in the party list.
 - Fixed Dark Knight's Blood Weapon Stacks being 3 instead of the previous 5.
 - Changed Mug to Dokumori in Party Cooldowns.
