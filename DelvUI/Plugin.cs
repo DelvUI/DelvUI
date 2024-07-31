@@ -298,6 +298,7 @@ namespace DelvUI
             UiBuilder.OverrideGameCursor = false;
 
             ConfigurationManager.Instance.Draw();
+            NameplatesManager.Instance?.Update();
             PartyManager.Instance?.Update();
             WhosTalkingHelper.Instance?.Update();
 

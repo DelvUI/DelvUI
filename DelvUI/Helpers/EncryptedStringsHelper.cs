@@ -17,11 +17,18 @@ namespace DelvUI.Helpers
                 return original;
             }
 
-            StdMap<Utf8String, Pointer<byte>> map = LayoutWorld.Instance()->RsvMap[0];
-            Pointer<byte> demangled = map[new Utf8String(original)];
-            if (demangled.Value != null && Marshal.PtrToStringUTF8((IntPtr)demangled.Value) is { } result)
+            try
             {
-                return result;
+                StdMap<Utf8String, Pointer<byte>> map = LayoutWorld.Instance()->RsvMap[0];
+                Pointer<byte> demangled = map[new Utf8String(original)];
+                if (demangled.Value != null && Marshal.PtrToStringUTF8((IntPtr)demangled.Value) is { } result)
+                {
+                    return result;
+                }
+            } 
+            catch (Exception e) 
+            {
+                Plugin.Logger.Error("Error reading rsv map:\n" + e.StackTrace);
             }
 
             return original;
