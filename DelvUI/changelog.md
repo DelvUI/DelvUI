@@ -1,3 +1,6 @@
+# 2.2.0.9
+- Fixed actions and status effects names on ACC Light-Heavyweight M4 Savage.
+
 # 2.2.0.8
 - Updated Viper's Vipersight Bar according to the changes in patch 7.05.
 - Removed Viper's Noxious Gnash bar.
