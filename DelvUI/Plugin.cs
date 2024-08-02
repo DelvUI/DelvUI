@@ -14,6 +14,7 @@ using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Nameplates;
 using DelvUI.Interface.Party;
 using DelvUI.Interface.PartyCooldowns;
+using ImGuiNET;
 using System;
 using System.IO;
 using System.Reflection;
@@ -54,6 +55,8 @@ namespace DelvUI
         public static event JobChangedEventHandler? JobChangedEvent;
         private uint _jobId = 0;
 
+        public static double LoadTime { get; private set; } = -1;
+
         public Plugin(
             IBuddyList buddyList,
             IClientState clientState,
@@ -71,8 +74,7 @@ namespace DelvUI
             ITargetManager targetManager,
             IPluginLog logger,
             ITextureProvider textureProvider,
-            IAddonLifecycle addonLifecycle
-        )
+            IAddonLifecycle addonLifecycle)
         {
             BuddyList = buddyList;
             ClientState = clientState;
@@ -172,6 +174,8 @@ namespace DelvUI
             );
 
             WotsitHelper.Instance?.Update();
+
+            LoadTime = ImGui.GetTime();
         }
 
         public void Dispose()

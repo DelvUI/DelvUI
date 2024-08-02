@@ -1,5 +1,7 @@
 # 2.2.0.9
+- Fixed inputs getting stuck when DelvUI is updated.
 - Fixed actions and status effects names on ACC Light-Heavyweight M4 Savage.
+- Fixed Party Cooldowns resetting when changing targets during combat.
 
 # 2.2.0.8
 - Updated Viper's Vipersight Bar according to the changes in patch 7.05.
