@@ -1,7 +1,19 @@
+# 2.2.0.9
+- Fixed inputs getting stuck when DelvUI is updated.
+- Fixed actions and status effects names on ACC Light-Heavyweight M4 Savage.
+- Fixed Party Cooldowns resetting when changing targets during combat.
+
 # 2.2.0.8
+- Updated Viper's Vipersight Bar according to the changes in patch 7.05.
+- Removed Viper's Noxious Gnash bar.
+- Added the `company-formatted` text tag.
+- Changed Mug to Dokumori in Party Cooldowns.
+- Fixed Ninja's Suiton Bar (now called Shadow Walker Bar).
 - Fixed chat being spammed with hotbar commands.
+- Fixed soft targeting support for the Enemy List.
 - Fixed Chocobo showing up as a Viper in the party list.
 - Fixed Dark Knight's Blood Weapon Stacks being 3 instead of the previous 5.
+- Fixed support for the Pet Nicknames plugin.
 
 # 2.2.0.7
 - Fixed Honorific Title integration.

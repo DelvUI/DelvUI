@@ -229,7 +229,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawSuitonBar(Vector2 origin, IPlayerCharacter player)
         {
             float suitonDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(
-                o => o.StatusId == 507 && o.RemainingTime > 0
+                o => o.StatusId == 3848 && o.RemainingTime > 0
             )?.RemainingTime ?? 0f;
 
             if (Config.SuitonBar.HideWhenInactive && suitonDuration == 0)
@@ -313,7 +313,7 @@ namespace DelvUI.Interface.Jobs
             new PluginConfigColor(new Vector4(191f / 255f, 40f / 255f, 0f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Suiton Bar", 50)]
+        [NestedConfig("Shadow Walker Bar", 50)]
         public ProgressBarConfig SuitonBar = new ProgressBarConfig(
             new(0, -75),
             new(254, 10),

@@ -1,9 +1,6 @@
-﻿using Dalamud.Game;
-using Dalamud.Game.ClientState.Objects.Enums;
+﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Logging;
 using Dalamud.Memory;
-using Dalamud.Plugin.Services;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
@@ -31,7 +28,6 @@ namespace DelvUI.Interface.Nameplates
 
         private NameplatesManager()
         {
-            Plugin.Framework.Update += FrameworkOnOnUpdateEvent;
             Plugin.ClientState.TerritoryChanged -= ClientStateOnTerritoryChangedEvent;
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
 
@@ -61,7 +57,6 @@ namespace DelvUI.Interface.Nameplates
                 return;
             }
 
-            Plugin.Framework.Update -= FrameworkOnOnUpdateEvent;
             Plugin.ClientState.TerritoryChanged -= ClientStateOnTerritoryChangedEvent;
 
             Instance = null!;
@@ -87,7 +82,7 @@ namespace DelvUI.Interface.Nameplates
             _cache.Clear();
         }
 
-        private unsafe void FrameworkOnOnUpdateEvent(IFramework framework)
+        public unsafe void Update()
         {
             if (!_config.Enabled) { return; }
 

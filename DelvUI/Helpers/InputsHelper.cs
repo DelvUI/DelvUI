@@ -355,6 +355,12 @@ namespace DelvUI.Helpers
 
         private void HookWndProc()
         {
+            if (Plugin.LoadTime <= 0 ||
+                ImGui.GetTime() - Plugin.LoadTime < 3)
+            {
+                return;
+            }
+
             ulong processId = (ulong)Process.GetCurrentProcess().Id;
 
             IntPtr hWnd = IntPtr.Zero;

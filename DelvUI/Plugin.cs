@@ -14,6 +14,7 @@ using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Nameplates;
 using DelvUI.Interface.Party;
 using DelvUI.Interface.PartyCooldowns;
+using ImGuiNET;
 using System;
 using System.IO;
 using System.Reflection;
@@ -54,6 +55,8 @@ namespace DelvUI
         public static event JobChangedEventHandler? JobChangedEvent;
         private uint _jobId = 0;
 
+        public static double LoadTime { get; private set; } = -1;
+
         public Plugin(
             IBuddyList buddyList,
             IClientState clientState,
@@ -71,8 +74,7 @@ namespace DelvUI
             ITargetManager targetManager,
             IPluginLog logger,
             ITextureProvider textureProvider,
-            IAddonLifecycle addonLifecycle
-        )
+            IAddonLifecycle addonLifecycle)
         {
             BuddyList = buddyList;
             ClientState = clientState;
@@ -102,7 +104,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.2.0.8";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.2.0.9";
 
             FontsManager.Initialize(AssemblyLocation);
             BarTexturesManager.Initialize(AssemblyLocation);
@@ -172,6 +174,8 @@ namespace DelvUI
             );
 
             WotsitHelper.Instance?.Update();
+
+            LoadTime = ImGui.GetTime();
         }
 
         public void Dispose()
@@ -298,6 +302,7 @@ namespace DelvUI
             UiBuilder.OverrideGameCursor = false;
 
             ConfigurationManager.Instance.Draw();
+            NameplatesManager.Instance?.Update();
             PartyManager.Instance?.Update();
             WhosTalkingHelper.Instance?.Update();
 
