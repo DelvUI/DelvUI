@@ -10,9 +10,9 @@
 	<!-- Assembly Configuration -->
 	<PropertyGroup>
 		<AssemblyName>DelvUI</AssemblyName>
-		<AssemblyVersion>2.2.0.9</AssemblyVersion>
-		<FileVersion>2.2.0.9</FileVersion>
-		<InformationalVersion>2.2.0.9</InformationalVersion>
+		<AssemblyVersion>2.2.0.10</AssemblyVersion>
+		<FileVersion>2.2.0.10</FileVersion>
+		<InformationalVersion>2.2.0.10</InformationalVersion>
 	</PropertyGroup>
 
 	<!-- Build Configuration -->

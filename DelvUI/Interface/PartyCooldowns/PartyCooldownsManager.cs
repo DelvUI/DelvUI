@@ -193,11 +193,6 @@ namespace DelvUI.Interface.PartyCooldowns
                     {
                         actionID = 35349;
                     }
-                    // special case for mug > set id to dokumori
-                    if (actionID == 2248)
-                    {
-                        actionID = 36957;
-                    }
 
                     // special case for technical step / finish
                     // we detect when technical step is pressed and save the time
@@ -224,7 +219,18 @@ namespace DelvUI.Interface.PartyCooldowns
                                 _technicalStepMap.Remove(actorId);
                             }
 
-                            cooldown.LastTimeUsed = ImGui.GetTime();
+                            double now = ImGui.GetTime();
+                            cooldown.LastTimeUsed = now;
+                            cooldown.IgnoreNextUse = false;
+
+                            foreach (uint id in cooldown.Data.SharedActionIds)
+                            {
+                                if (_cooldownsMap[actorId].TryGetValue(id, out PartyCooldown? sharedCooldown) && sharedCooldown != null)
+                                {
+                                    sharedCooldown.LastTimeUsed = now;
+                                    sharedCooldown.IgnoreNextUse = true;
+                                }
+                            }
                         }
                     }
                 }
@@ -285,6 +291,7 @@ namespace DelvUI.Interface.PartyCooldowns
             {
                 if (data.EnabledV2 != PartyCooldownEnabled.Disabled &&
                     level >= data.RequiredLevel &&
+                    (data.DisabledAfterLevel == 0 || level < data.DisabledAfterLevel) &&
                     data.IsUsableBy(jobId) &&
                     !data.ExcludedJobIds.Contains(jobId))
                 {

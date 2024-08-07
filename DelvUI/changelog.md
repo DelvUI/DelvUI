@@ -1,3 +1,10 @@
+# 2.2.0.10
+- Fixed Party Cooldowns not working properly:
+  * Added some cooldowns that were missing.
+  * Cooldowns that have an upgraded version now work for the old and new abilities.
+  * Actions that share the same cooldown should work properly now.
+  * Fixed Starry Muse's icon.
+
 # 2.2.0.9
 - Fixed inputs getting stuck when DelvUI is updated.
 - Fixed actions and status effects names on ACC Light-Heavyweight M4 Savage.

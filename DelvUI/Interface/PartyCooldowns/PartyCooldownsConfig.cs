@@ -4,7 +4,6 @@ using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
-using FFXIVClientStructs.FFXIV.Common.Lua;
 using ImGuiNET;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
@@ -149,7 +148,7 @@ namespace DelvUI.Interface.PartyCooldowns
         }
     }
 
-    public class PartyCooldownTimeLabelConfig: NumericLabelConfig
+    public class PartyCooldownTimeLabelConfig : NumericLabelConfig
     {
         public PartyCooldownTimeLabelConfig(Vector2 position, string text, DrawAnchor frameAnchor, DrawAnchor textAnchor)
             : base(position, text, frameAnchor, textAnchor)
@@ -173,7 +172,7 @@ namespace DelvUI.Interface.PartyCooldowns
     {
         public List<PartyCooldownData> Cooldowns = new List<PartyCooldownData>();
 
-        private List<uint> _removedIds = new() { 7398 , 2248 };
+        private List<uint> _removedIds = new() { 7398 };
 
         private JobRoles _roleFilter = JobRoles.Unknown;
         private uint _tankFilter = 0;
@@ -231,12 +230,14 @@ namespace DelvUI.Interface.PartyCooldowns
                 else if (data != null && !data.Equals(defaultData))
                 {
                     data.RequiredLevel = defaultData.RequiredLevel;
+                    data.DisabledAfterLevel = defaultData.DisabledAfterLevel;
                     data.JobId = defaultData.JobId;
                     data.JobIds = defaultData.JobIds;
                     data.Role = defaultData.Role;
                     data.Roles = defaultData.Roles;
                     data.CooldownDuration = defaultData.CooldownDuration;
                     data.EffectDuration = defaultData.EffectDuration;
+                    data.SharedActionIds = defaultData.SharedActionIds;
 
                     needsSave = true;
                 }
@@ -276,7 +277,16 @@ namespace DelvUI.Interface.PartyCooldowns
                     cooldown.OverriddenCooldownText = "40-60";
                 }
 
-                cooldown.IconId = action.Icon;
+                // special case for starry muse
+                if (cooldown.ActionId == 35349)
+                {
+                    cooldown.IconId = 3826;
+                }
+                else
+                {
+                    cooldown.IconId = action.Icon;
+                }
+
                 cooldown.Name = action.Name;
             }
 
@@ -591,42 +601,57 @@ namespace DelvUI.Interface.PartyCooldowns
             [7537] = NewData(7537, JobRoles.Tank, 48, 120, 1, 50, 5, PartyCooldownEnabled.PartyFrames), // shirk
 
             // PLD
+            [30] = NewData(30, JobIDs.PLD, 50, 420, 10, 100, 4, PartyCooldownEnabled.PartyFrames), // hallowed ground
             [3540] = NewData(3540, JobIDs.PLD, 56, 90, 30, 90, 2, PartyCooldownEnabled.PartyFrames), // divine veil
             [7385] = NewData(7385, JobIDs.PLD, 70, 120, 18, 90, 2, PartyCooldownEnabled.PartyFrames), // passage of arms
             [20] = NewData(20, JobIDs.PLD, 2, 60, 20, 10, 3, PartyCooldownEnabled.PartyFrames), // fight or flight
-            [17] = NewData(17, JobIDs.PLD, 38, 120, 15, 90, 4, PartyCooldownEnabled.PartyFrames), // sentinel
             [22] = NewData(22, JobIDs.PLD, 52, 90, 10, 90, 4, PartyCooldownEnabled.PartyFrames), // bulwark
             [27] = NewData(27, JobIDs.PLD, 45, 120, 12, 90, 4, PartyCooldownEnabled.PartyFrames), // cover
-            [30] = NewData(30, JobIDs.PLD, 50, 420, 10, 100, 4, PartyCooldownEnabled.PartyFrames), // hallowed ground
+
+            [17] = NewData(17, JobIDs.PLD, 38, 120, 15, 90, 4, PartyCooldownEnabled.PartyFrames, disabledAfterLevel: 92), // sentinel
+            [36920] = NewData(36920, JobIDs.PLD, 92, 120, 15, 90, 4, PartyCooldownEnabled.PartyFrames), // guardian
 
             // WAR
+            [43] = NewData(43, JobIDs.WAR, 42, 240, 10, 100, 4, PartyCooldownEnabled.PartyFrames), // holmgang
             [7388] = NewData(7388, JobIDs.WAR, 68, 90, 30, 90, 2, PartyCooldownEnabled.PartyFrames), // shake it off
             [52] = NewData(52, JobIDs.WAR, 50, 60, 30, 10, 3, PartyCooldownEnabled.PartyFrames), // infuriate
+            [38] = NewData(38, JobIDs.WAR, 6, 60, 30, 10, 3, PartyCooldownEnabled.PartyFrames, disabledAfterLevel: 70), // berserk
             [7389] = NewData(7389, JobIDs.WAR, 70, 60, 30, 10, 3, PartyCooldownEnabled.PartyFrames), // inner release
             [40] = NewData(40, JobIDs.WAR, 30, 90, 10, 90, 4, PartyCooldownEnabled.PartyFrames), // thrill of battle
-            [44] = NewData(44, JobIDs.WAR, 38, 120, 15, 90, 4, PartyCooldownEnabled.PartyFrames), // vengeance
             [3552] = NewData(3552, JobIDs.WAR, 58, 60, 15, 90, 4, PartyCooldownEnabled.PartyFrames), // equilibrium
-            [25751] = NewData(25751, JobIDs.WAR, 82, 25, 8, 90, 4, PartyCooldownEnabled.PartyFrames), // bloodwhetting
-            [43] = NewData(43, JobIDs.WAR, 42, 240, 10, 100, 4, PartyCooldownEnabled.PartyFrames), // holmgang
+
+            [3551] = NewData(3551, JobIDs.WAR, 56, 25, 8, 90, 4, PartyCooldownEnabled.PartyFrames, disabledAfterLevel: 82, sharedActionIds: new() { 16464 }), // raw intuition
+            [25751] = NewData(25751, JobIDs.WAR, 82, 25, 8, 90, 4, PartyCooldownEnabled.PartyFrames, sharedActionIds: new() { 16464 }), // bloodwhetting
+            [16464] = NewData(16464, JobIDs.WAR, 76, 25, 8, 90, 4, PartyCooldownEnabled.PartyFrames, sharedActionIds: new() { 3551, 25751 }), // nascent flash
+
+            [44] = NewData(44, JobIDs.WAR, 38, 120, 15, 90, 4, PartyCooldownEnabled.PartyFrames, disabledAfterLevel: 92), // vengeance
+            [36923] = NewData(36923, JobIDs.WAR, 92, 120, 15, 90, 4, PartyCooldownEnabled.PartyFrames), // damnation
 
             // DRK
+            [3638] = NewData(3638, JobIDs.DRK, 50, 300, 10, 100, 4, PartyCooldownEnabled.PartyFrames), // living dead
             [16471] = NewData(16471, JobIDs.DRK, 76, 90, 15, 90, 2, PartyCooldownEnabled.PartyFrames), // dark missionary
-            [3625] = NewData(3625, JobIDs.DRK, 35, 60, 15, 10, 3, PartyCooldownEnabled.PartyFrames), // blood weapon
-            [7390] = NewData(7390, JobIDs.DRK, 68, 60, 15, 10, 3, PartyCooldownEnabled.PartyFrames), // delirium
             [16472] = NewData(16472, JobIDs.DRK, 80, 120, 20, 10, 3, PartyCooldownEnabled.PartyFrames), // living shadow
-            [3636] = NewData(3636, JobIDs.DRK, 38, 120, 15, 90, 4, PartyCooldownEnabled.PartyFrames), // shadow wall
             [3634] = NewData(3634, JobIDs.DRK, 45, 60, 10, 90, 4, PartyCooldownEnabled.PartyFrames), // dark mind
             [25754] = NewData(25754, JobIDs.DRK, 82, 60, 10, 90, 4, PartyCooldownEnabled.PartyFrames), // oblation
-            [3638] = NewData(3638, JobIDs.DRK, 50, 300, 10, 100, 4, PartyCooldownEnabled.PartyFrames), // living dead
+
+            [3625] = NewData(3625, JobIDs.DRK, 35, 60, 15, 10, 3, PartyCooldownEnabled.PartyFrames, disabledAfterLevel: 68), // blood weapon
+            [7390] = NewData(7390, JobIDs.DRK, 68, 60, 15, 10, 3, PartyCooldownEnabled.PartyFrames), // delirium
+
+            [3636] = NewData(3636, JobIDs.DRK, 38, 120, 15, 90, 4, PartyCooldownEnabled.PartyFrames, disabledAfterLevel: 92), // shadow wall
+            [36927] = NewData(36927, JobIDs.DRK, 38, 120, 15, 90, 4, PartyCooldownEnabled.PartyFrames), // shadowed vigil
 
             // GNB
+            [16152] = NewData(16152, JobIDs.GNB, 50, 360, 10, 100, 4, PartyCooldownEnabled.PartyFrames), // superbolide
             [16160] = NewData(16160, JobIDs.GNB, 64, 90, 15, 90, 2, PartyCooldownEnabled.PartyFrames), // heart of light
             [16164] = NewData(16164, JobIDs.GNB, 76, 120, 1, 10, 3, PartyCooldownEnabled.PartyFrames), // bloodfest
             [16138] = NewData(16138, JobIDs.GNB, 2, 60, 20, 10, 3, PartyCooldownEnabled.PartyFrames), // no mercy
             [16140] = NewData(16140, JobIDs.GNB, 6, 90, 20, 90, 4, PartyCooldownEnabled.PartyFrames), // camouflage
-            [16148] = NewData(16148, JobIDs.GNB, 38, 120, 15, 90, 4, PartyCooldownEnabled.PartyFrames), // nebula
-            [16161] = NewData(16161, JobIDs.GNB, 68, 25, 7, 90, 4, PartyCooldownEnabled.PartyFrames), // heart of stone
-            [16152] = NewData(16152, JobIDs.GNB, 50, 360, 10, 100, 4, PartyCooldownEnabled.PartyFrames), // superbolide
+
+            [16161] = NewData(16161, JobIDs.GNB, 68, 25, 7, 90, 4, PartyCooldownEnabled.PartyFrames, disabledAfterLevel: 82), // heart of stone
+            [25758] = NewData(25758, JobIDs.GNB, 82, 25, 7, 90, 4, PartyCooldownEnabled.PartyFrames), // heart of corundum
+
+            [16148] = NewData(16148, JobIDs.GNB, 38, 120, 15, 90, 4, PartyCooldownEnabled.PartyFrames, disabledAfterLevel: 92), // nebula
+            [36935] = NewData(36935, JobIDs.GNB, 92, 120, 15, 90, 4, PartyCooldownEnabled.PartyFrames), // great nebula
 
             // HEALER -------------------------------------------------------------------------------------------------
             [7571] = NewData(7571, JobRoles.Healer, 48, 120, 0, 80, 5, PartyCooldownEnabled.Disabled), // rescue
@@ -642,13 +667,14 @@ namespace DelvUI.Interface.PartyCooldowns
             [3606] = NewData(3606, JobIDs.AST, 6, 90, 15, 10, 4, PartyCooldownEnabled.PartyFrames), // lightspeed
 
             // SCH
+            [7436] = NewData(7436, JobIDs.SCH, 66, 120, 20, 30, 3, PartyCooldownEnabled.PartyCooldowns), // chain stratagem
             [805] = NewData(805, JobIDs.SCH, 40, 120, 20, 50, 2, PartyCooldownEnabled.PartyFrames), // fey illumination
             [188] = NewData(188, JobIDs.SCH, 50, 30, 15, 80, 2, PartyCooldownEnabled.PartyFrames), // sacred soil
             [3585] = NewData(3585, JobIDs.SCH, 56, 90, 1, 80, 2, PartyCooldownEnabled.PartyFrames), // deployment tactics
             [25867] = NewData(25867, JobIDs.SCH, 86, 60, 10, 80, 2, PartyCooldownEnabled.PartyFrames), // protraction
             [25868] = NewData(25868, JobIDs.SCH, 90, 120, 20, 80, 2, PartyCooldownEnabled.PartyFrames), // expedient
-            [7436] = NewData(7436, JobIDs.SCH, 66, 120, 20, 30, 3, PartyCooldownEnabled.PartyCooldowns), // chain stratagem
             [7434] = NewData(7434, JobIDs.SCH, 62, 45, 1, 50, 4, PartyCooldownEnabled.PartyFrames), // excogitation
+            [37014] = NewData(37014, JobIDs.SCH, 100, 180, 20, 80, 2, PartyCooldownEnabled.PartyFrames), // seraphism
 
             // WHM
             [16536] = NewData(16536, JobIDs.WHM, 80, 120, 20, 80, 2, PartyCooldownEnabled.PartyFrames), // temperance
@@ -668,6 +694,7 @@ namespace DelvUI.Interface.PartyCooldowns
             [24303] = NewData(24303, JobIDs.SGE, 62, 45, 15, 10, 4, PartyCooldownEnabled.PartyFrames), // taurochole
             [24305] = NewData(24305, JobIDs.SGE, 70, 120, 15, 10, 4, PartyCooldownEnabled.PartyFrames), // haima
             [24317] = NewData(24317, JobIDs.SGE, 86, 60, 10, 10, 4, PartyCooldownEnabled.PartyFrames), // krasis
+            [37035] = NewData(37035, JobIDs.SGE, 100, 180, 20, 80, 2, PartyCooldownEnabled.PartyFrames), // philosophia
 
             // MELEE -------------------------------------------------------------------------------------------------
             [7549] = NewData(7549, JobRoles.DPSMelee, 22, 90, 10, 100, 1, PartyCooldownEnabled.PartyFrames), // feint
@@ -676,9 +703,14 @@ namespace DelvUI.Interface.PartyCooldowns
             // SAM
             // lol?
 
+            // VPR
+            // lol?
+
             // NIN
-            [36957] = NewData(36957, JobIDs.NIN, 15, 120, 20, 30, 3, PartyCooldownEnabled.PartyCooldowns), // dokumori
-            [2258] = NewData(2258, JobIDs.NIN, 18, 60, 15, 10, 3, PartyCooldownEnabled.PartyFrames), // trick attack
+            [2248] = NewData(2248, JobIDs.NIN, 15, 120, 20, 30, 3, PartyCooldownEnabled.PartyFrames, disabledAfterLevel: 68), // mug
+            [36957] = NewData(36957, JobIDs.NIN, 68, 120, 20, 30, 3, PartyCooldownEnabled.PartyCooldowns), // dokumori
+            [2258] = NewData(2258, JobIDs.NIN, 18, 60, 15, 10, 3, PartyCooldownEnabled.PartyFrames, disabledAfterLevel: 92), // trick attack
+            [36958] = NewData(36958, JobIDs.NIN, 92, 60, 15, 10, 3, PartyCooldownEnabled.PartyFrames), // kunai's bane
             [2241] = NewData(2241, JobIDs.NIN, 2, 120, 20, 20, 4, PartyCooldownEnabled.PartyFrames), // shade shift
 
             // DRG
@@ -694,7 +726,7 @@ namespace DelvUI.Interface.PartyCooldowns
             // RPR
             [24405] = NewData(24405, JobIDs.RPR, 72, 120, 20, 30, 3, PartyCooldownEnabled.PartyCooldowns), // arcane circle
             [24404] = NewData(24404, JobIDs.RPR, 40, 30, 5, 10, 4, PartyCooldownEnabled.PartyFrames), // arcane crest
-            
+
             // RANGED -------------------------------------------------------------------------------------------------
             // BRD
             [118] = NewData(118, JobIDs.BRD, 50, 120, 20, 30, 3, PartyCooldownEnabled.PartyCooldowns), // battle voice
@@ -738,9 +770,34 @@ namespace DelvUI.Interface.PartyCooldowns
         };
 
         #region helpers
-        private static PartyCooldownData NewData(uint actionId, uint jobId, uint level, int cooldown, int effectDuration, int priority, int column, PartyCooldownEnabled enabled, string? overriddenCooldownText = null, HashSet<uint>? excludedJobIds = null)
+        private static PartyCooldownData NewData(
+            uint actionId,
+            uint jobId,
+            uint level,
+            int cooldown,
+            int effectDuration,
+            int priority,
+            int column,
+            PartyCooldownEnabled enabled,
+            string? overriddenCooldownText = null,
+            HashSet<uint>? excludedJobIds = null,
+            uint disabledAfterLevel = 0,
+            List<uint>? sharedActionIds = null)
         {
-            PartyCooldownData data = NewData(actionId, level, cooldown, effectDuration, priority, column, enabled, overriddenCooldownText, excludedJobIds);
+            PartyCooldownData data = NewData(
+                actionId,
+                level,
+                cooldown,
+                effectDuration,
+                priority,
+                column,
+                enabled,
+                overriddenCooldownText,
+                excludedJobIds,
+                disabledAfterLevel,
+                sharedActionIds
+            );
+
             data.JobId = jobId;
             data.Role = JobRoles.Unknown;
 
@@ -749,7 +806,18 @@ namespace DelvUI.Interface.PartyCooldowns
 
         private static PartyCooldownData NewData(uint actionId, JobRoles role, uint level, int cooldown, int effectDuration, int priority, int column, PartyCooldownEnabled enabled, string? overriddenCooldownText = null, HashSet<uint>? excludedJobIds = null)
         {
-            PartyCooldownData data = NewData(actionId, level, cooldown, effectDuration, priority, column, enabled, overriddenCooldownText, excludedJobIds);
+            PartyCooldownData data = NewData(
+                actionId,
+                level,
+                cooldown,
+                effectDuration,
+                priority,
+                column,
+                enabled,
+                overriddenCooldownText,
+                excludedJobIds
+            );
+
             data.JobId = 0;
             data.Role = role;
 
@@ -758,7 +826,18 @@ namespace DelvUI.Interface.PartyCooldowns
 
         private static PartyCooldownData NewData(uint actionId, List<JobRoles> roles, uint level, int cooldown, int effectDuration, int priority, int column, PartyCooldownEnabled enabled, string? overriddenCooldownText = null, HashSet<uint>? excludedJobIds = null)
         {
-            PartyCooldownData data = NewData(actionId, level, cooldown, effectDuration, priority, column, enabled, overriddenCooldownText, excludedJobIds);
+            PartyCooldownData data = NewData(
+                actionId,
+                level,
+                cooldown,
+                effectDuration,
+                priority,
+                column,
+                enabled,
+                overriddenCooldownText,
+                excludedJobIds
+            );
+
             data.JobId = 0;
             data.Role = JobRoles.Unknown;
             data.Roles = roles;
@@ -766,17 +845,31 @@ namespace DelvUI.Interface.PartyCooldowns
             return data;
         }
 
-        private static PartyCooldownData NewData(uint actionId, uint level, int cooldown, int effectDuration, int priority, int column, PartyCooldownEnabled enabled, string? overriddenCooldownText = null, HashSet<uint>? excludedJobIds = null)
+        private static PartyCooldownData NewData(
+            uint actionId,
+            uint level,
+            int cooldown,
+            int effectDuration,
+            int priority,
+            int column,
+            PartyCooldownEnabled enabled,
+            string? overriddenCooldownText = null,
+            HashSet<uint>? excludedJobIds = null,
+            uint disabledAfterLevel = 0,
+            List<uint>? sharedActionIds = null
+        )
         {
             PartyCooldownData data = new PartyCooldownData();
             data.ActionId = actionId;
             data.RequiredLevel = level;
+            data.DisabledAfterLevel = disabledAfterLevel;
             data.CooldownDuration = cooldown;
             data.EffectDuration = effectDuration;
             data.Priority = priority;
             data.Column = column;
             data.EnabledV2 = enabled;
             data.OverriddenCooldownText = overriddenCooldownText;
+            data.SharedActionIds = sharedActionIds ?? new();
 
             if (excludedJobIds != null)
             {

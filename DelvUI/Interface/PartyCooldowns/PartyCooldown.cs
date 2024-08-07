@@ -24,6 +24,7 @@ namespace DelvUI.Interface.PartyCooldowns
 
         public double LastTimeUsed = 0;
         public double OverridenCooldownStartTime = -1;
+        public bool IgnoreNextUse = false;
 
         public PartyCooldown(PartyCooldownData data, uint sourceID, uint level, IPartyFramesMember? member)
         {
@@ -37,7 +38,7 @@ namespace DelvUI.Interface.PartyCooldowns
         {
             int duration = GetEffectDuration();
             double timeSinceUse = ImGui.GetTime() - LastTimeUsed;
-            if (timeSinceUse > duration)
+            if (IgnoreNextUse || timeSinceUse > duration)
             {
                 return 0;
             }
@@ -99,6 +100,7 @@ namespace DelvUI.Interface.PartyCooldowns
 
         public uint ActionId = 0;
         public uint RequiredLevel = 0;
+        public uint DisabledAfterLevel = 0;
 
         public uint JobId = 0; // keep this for backwards compatibility
         public List<uint>? JobIds = null;
@@ -106,13 +108,15 @@ namespace DelvUI.Interface.PartyCooldowns
         public JobRoles Role = JobRoles.Unknown; // keep this for backwards compatibility
         public List<JobRoles>? Roles = null;
 
-        public HashSet<uint> ExcludedJobIds = new HashSet<uint>();
+        public HashSet<uint> ExcludedJobIds = new();
 
         public int CooldownDuration = 0;
         public int EffectDuration = 0;
 
         public int Priority = 0;
         public int Column = 1;
+
+        public List<uint> SharedActionIds = new();
 
         [JsonIgnore] public uint IconId = 0;
         [JsonIgnore] public string Name = "";
@@ -203,12 +207,14 @@ namespace DelvUI.Interface.PartyCooldowns
             return
                 ActionId == other.ActionId &&
                 RequiredLevel == other.RequiredLevel &&
+                DisabledAfterLevel == other.DisabledAfterLevel &&
                 JobId == other.JobId &&
                 (JobIds == null && other.JobIds == null || (JobIds != null && other.JobIds != null && JobIds.Equals(other.JobIds))) &&
                 Role == other.Role &&
                 (Roles == null && other.Roles == null || (Roles != null && other.Roles != null && Roles.Equals(other.Roles))) &&
                 CooldownDuration == other.CooldownDuration &&
-                EffectDuration == other.EffectDuration;
+                EffectDuration == other.EffectDuration &&
+                SharedActionIds == other.SharedActionIds;
         }
     }
 }
