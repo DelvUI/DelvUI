@@ -5,6 +5,8 @@
   * Actions that share the same cooldown should work properly now.
   * Fixed Starry Muse's icon.
 
+- Added Window Clipping support for other plugins.
+
 # 2.2.0.9
 - Fixed inputs getting stuck when DelvUI is updated.
 - Fixed actions and status effects names on ACC Light-Heavyweight M4 Savage.

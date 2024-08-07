@@ -19,6 +19,11 @@ namespace DelvUI.Helpers
         {
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
             OnConfigReset(ConfigurationManager.Instance);
+
+            // other plugins can add clip rects for DelvUI
+            // rect start point = vector.X, vector.Y
+            // rect end point = vector.Z, vector.W
+            Plugin.PluginInterface.GetOrCreateData<Dictionary<string, Vector4>>(_sharedDataId, () => new());
         }
 
         public static void Initialize() { Instance = new ClipRectsHelper(); }
@@ -45,6 +50,8 @@ namespace DelvUI.Helpers
 
             ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
 
+            Plugin.PluginInterface.RelinquishData(_sharedDataId);
+
             Instance = null!;
         }
         #endregion
@@ -62,6 +69,9 @@ namespace DelvUI.Helpers
         private List<ClipRect> _clipRects = new List<ClipRect>();
         private List<ClipRect> _extraClipRects = new List<ClipRect>();
 
+        private static string _sharedDataId = "DelvUI.ClipRects";
+        private Dictionary<string, Vector4> _thirdPartyClipRects =>
+            Plugin.PluginInterface.GetOrCreateData<Dictionary<string, Vector4>>(_sharedDataId, () => new());
 
         private static List<string> _ignoredAddonNames = new List<string>()
         {
@@ -77,6 +87,7 @@ namespace DelvUI.Helpers
             _clipRects.Clear();
             _extraClipRects.Clear();
 
+            // find clip rects for game windows
             AtkStage* stage = AtkStage.Instance();
             if (stage == null) { return; }
 
@@ -134,15 +145,19 @@ namespace DelvUI.Helpers
                 }
                 catch { }
             }
+
+            // find clip rects from other plugins
+            Dictionary<string, Vector4> dict = _thirdPartyClipRects;
+            foreach (Vector4 vector in dict.Values)
+            {
+                ClipRect clipRect = new ClipRect(new(vector.X, vector.Y), new(vector.Z, vector.W));
+                _clipRects.Add(clipRect);
+            }
         }
 
         private List<ClipRect> ActiveClipRects()
         {
-            List<ClipRect> rects = new List<ClipRect>();
-            rects.AddRange(_clipRects);
-            rects.AddRange(_extraClipRects);
-
-            return rects;
+            return [.. _clipRects, .. _extraClipRects];
         }
 
         public void AddNameplatesClipRects()
