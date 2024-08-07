@@ -22,6 +22,7 @@ using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Hooking;
+using Dalamud.Plugin.Services;
 using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
 using FFXIVClientStructs.FFXIV.Client.Game;
@@ -82,12 +83,16 @@ namespace DelvUI.Helpers
 
             // mouseover setting
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
+            Plugin.Framework.Update += OnFrameworkUpdate;
+
             OnConfigReset(ConfigurationManager.Instance);
         }
 
         public static void Initialize() { Instance = new InputsHelper(); }
 
         public static InputsHelper Instance { get; private set; } = null!;
+
+        public static int InitializationDelay = 5;
 
         ~InputsHelper()
         {
@@ -109,6 +114,7 @@ namespace DelvUI.Helpers
             }
 
             ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
+            Plugin.Framework.Update -= OnFrameworkUpdate;
 
             Plugin.Logger.Info("\t\tDisposing _requestActionHook: " + _requestActionHook?.Address.ToString("X") ?? "null");
             _requestActionHook?.Disable();
@@ -342,13 +348,16 @@ namespace DelvUI.Helpers
             return (IntPtr)CallWindowProc(_imguiWndProcPtr, hWnd, msg, wParam, lParam);
         }
 
-        public void Update()
+        public void OnFrameworkUpdate(IFramework framework)
         {
             if (_wndProcPtr == IntPtr.Zero)
             {
                 HookWndProc();
             }
+        }
 
+        public void OnFrameEnd() 
+        { 
             _leftButtonClicked = null;
             _rightButtonClicked = null;
         }
@@ -356,7 +365,7 @@ namespace DelvUI.Helpers
         private void HookWndProc()
         {
             if (Plugin.LoadTime <= 0 ||
-                ImGui.GetTime() - Plugin.LoadTime < 3)
+                ImGui.GetTime() - Plugin.LoadTime < InitializationDelay)
             {
                 return;
             }

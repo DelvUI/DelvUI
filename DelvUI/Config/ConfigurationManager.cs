@@ -48,6 +48,7 @@ namespace DelvUI.Config
         private GridWindow _gridWindow;
 
         public bool IsConfigWindowOpened => _mainConfigWindow.IsOpen;
+        public bool IsChangelogWindowOpened => _changelogWindow.IsOpen;
         public bool ShowingModalWindow = false;
 
         public GradientDirection GradientDirection
@@ -243,6 +244,7 @@ namespace DelvUI.Config
                 }
 
                 _changelogWindow.IsOpen = needsWrite;
+                _changelogWindow.AutoClose = true;
 
                 if (needsWrite)
                 {

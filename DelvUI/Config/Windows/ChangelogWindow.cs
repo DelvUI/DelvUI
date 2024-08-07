@@ -1,4 +1,5 @@
 ﻿using Dalamud.Interface.Windowing;
+using DelvUI.Helpers;
 using ImGuiNET;
 using System;
 using System.Numerics;
@@ -9,6 +10,9 @@ namespace DelvUI.Config.Windows
     {
         public string Changelog { get; set; }
         private bool _needsToSetSize = true;
+
+        public bool AutoClose = false;
+        private double _openTime = -1;
 
         public ChangelogWindow(string name, string changelog) : base(name)
         {
@@ -35,6 +39,13 @@ namespace DelvUI.Config.Windows
             Vector2 size = ImGui.GetWindowSize();
             ImGui.PushTextWrapPos(ImGui.GetCursorPosX() + size.X - 24);
             ImGui.TextWrapped(Changelog);
+
+            if (AutoClose &&
+                _openTime > 0 && 
+                ImGui.GetTime() - _openTime > 10)
+            {
+                IsOpen = false;
+            }
         }
 
         public override void PostDraw()
@@ -42,6 +53,20 @@ namespace DelvUI.Config.Windows
             if (ConfigurationManager.Instance.OverrideDalamudStyle)
             {
                 ImGui.PopStyleColor();
+            }
+        }
+
+        public override void OnOpen()
+        {
+            _openTime = ImGui.GetTime();
+        }
+
+        public override void OnClose()
+        {
+            if (AutoClose && InputsHelper.Instance != null)
+            {
+                AutoClose = false;
+                Plugin.LoadTime = ImGui.GetTime() - InputsHelper.InitializationDelay;
             }
         }
     }

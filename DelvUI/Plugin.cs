@@ -1,5 +1,4 @@
 ﻿using Dalamud.Game;
-using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.Command;
 using Dalamud.Interface;
@@ -55,7 +54,7 @@ namespace DelvUI
         public static event JobChangedEventHandler? JobChangedEvent;
         private uint _jobId = 0;
 
-        public static double LoadTime { get; private set; } = -1;
+        public static double LoadTime = -1;
 
         public Plugin(
             IBuddyList buddyList,
@@ -175,7 +174,10 @@ namespace DelvUI
 
             WotsitHelper.Instance?.Update();
 
-            LoadTime = ImGui.GetTime();
+            if (ConfigurationManager.Instance?.IsChangelogWindowOpened == false)
+            {
+                LoadTime = ImGui.GetTime();
+            }
         }
 
         public void Dispose()
@@ -184,7 +186,7 @@ namespace DelvUI
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        
+
         private void LoadBanner()
         {
             string bannerImage = Path.Combine(Path.GetDirectoryName(AssemblyLocation) ?? "", "Media", "Images", "banner_short_x150.png");
@@ -318,7 +320,7 @@ namespace DelvUI
                 Logger.Error("Something went wrong!:\n" + e.StackTrace);
             }
 
-            InputsHelper.Instance.Update();
+            InputsHelper.Instance.OnFrameEnd();
         }
 
         private void OpenConfigUi()
@@ -336,7 +338,7 @@ namespace DelvUI
             try
             {
                 InputsHelper.Instance?.Dispose();
-            } 
+            }
             catch (Exception e)
             {
                 Logger.Error("Error disposing InputsHelper:\n" + e.StackTrace);
@@ -354,7 +356,7 @@ namespace DelvUI
 
             Logger.Info("\tDisposing ChatHelper...");
             ChatHelper.Instance?.Dispose();
-            
+
             Logger.Info("\tDisposing ClipRectsHelper...");
             ClipRectsHelper.Instance?.Dispose();
 
