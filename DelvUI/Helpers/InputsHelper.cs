@@ -281,10 +281,10 @@ namespace DelvUI.Helpers
 
         #region mouseover inputs proxy
         private bool? _leftButtonClicked = null;
-        public bool LeftButtonClicked => _leftButtonClicked.HasValue ? _leftButtonClicked.Value : ImGui.GetIO().MouseClicked[0];
+        public bool LeftButtonClicked => _leftButtonClicked.HasValue ? _leftButtonClicked.Value : false;
 
         private bool? _rightButtonClicked = null;
-        public bool RightButtonClicked => _rightButtonClicked.HasValue ? _rightButtonClicked.Value : ImGui.GetIO().MouseClicked[1];
+        public bool RightButtonClicked => _rightButtonClicked.HasValue ? _rightButtonClicked.Value : false;
 
         private bool _leftButtonWasDown = false;
         private bool _rightButtonWasDown = false;

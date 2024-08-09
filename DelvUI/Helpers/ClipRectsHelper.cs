@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 namespace DelvUI.Helpers
 {
@@ -23,7 +22,7 @@ namespace DelvUI.Helpers
             // other plugins can add clip rects for DelvUI
             // rect start point = vector.X, vector.Y
             // rect end point = vector.Z, vector.W
-            Plugin.PluginInterface.GetOrCreateData<Dictionary<string, Vector4>>(_sharedDataId, () => new());
+            _thirdPartyClipRects = Plugin.PluginInterface.GetOrCreateData<Dictionary<string, Vector4>>(_sharedDataId, () => new());
         }
 
         public static void Initialize() { Instance = new ClipRectsHelper(); }
@@ -69,9 +68,8 @@ namespace DelvUI.Helpers
         private List<ClipRect> _clipRects = new List<ClipRect>();
         private List<ClipRect> _extraClipRects = new List<ClipRect>();
 
+        private static Dictionary<string, Vector4> _thirdPartyClipRects = new();
         private static string _sharedDataId = "DelvUI.ClipRects";
-        private Dictionary<string, Vector4> _thirdPartyClipRects =>
-            Plugin.PluginInterface.GetOrCreateData<Dictionary<string, Vector4>>(_sharedDataId, () => new());
 
         private static List<string> _ignoredAddonNames = new List<string>()
         {
@@ -128,7 +126,7 @@ namespace DelvUI.Helpers
                         size.X += size.X + (16 * addon->Scale);
                         size.Y += (30 * addon->Scale);
                     }
-                    
+
                     if (name == "Journal")
                     {
                         size.X += size.X + (16 * addon->Scale);
