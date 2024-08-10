@@ -284,6 +284,12 @@ namespace DelvUI.Helpers
             DrawGradientFilledRect(cursorPos, new Vector2(Math.Max(1, barSize.X * shield), h), color, drawList);
         }
 
+        public static void DrawInWindow(string name, Vector2 pos, Vector2 size, Action<ImDrawListPtr> drawAction)
+        {
+            bool needsInput = InputsHelper.Instance?.IsHandlingClicks == true ? false : true;
+            DrawInWindow(name, pos, size, needsInput, drawAction);
+        }
+
         public static void DrawInWindow(string name, Vector2 pos, Vector2 size, bool needsInput, Action<ImDrawListPtr> drawAction)
         {
             const ImGuiWindowFlags windowFlags = ImGuiWindowFlags.NoTitleBar |

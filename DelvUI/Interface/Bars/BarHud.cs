@@ -167,7 +167,7 @@ namespace DelvUI.Interface.Bars
 
         private void DrawRects(Vector2 barPos, Vector2 backgroundPos)
         {
-            DrawHelper.DrawInWindow(ID, backgroundPos, BackgroundRect.Size, false, (drawList) =>
+            DrawHelper.DrawInWindow(ID, backgroundPos, BackgroundRect.Size, (drawList) =>
             {
                 // Draw background
                 drawList.AddRectFilled(backgroundPos, backgroundPos + BackgroundRect.Size, BackgroundRect.Color.Base);

@@ -121,14 +121,7 @@ namespace DelvUI.Helpers
             _requestActionHook?.Dispose();
 
             // give imgui the control of inputs again
-            Plugin.Logger.Info("\t\tRestoring WndProc");
-            Plugin.Logger.Info("\t\t\tOld _wndHandle = " + _wndHandle.ToString("X"));
-            Plugin.Logger.Info("\t\t\tOld _imguiWndProcPtr = " + _imguiWndProcPtr.ToString("X"));
-            if (_wndHandle != IntPtr.Zero && _imguiWndProcPtr != IntPtr.Zero)
-            {
-                SetWindowLongPtr(_wndHandle, GWL_WNDPROC, _imguiWndProcPtr);
-                Plugin.Logger.Info("\t\t\tDone!");
-            }
+            RestoreWndProc();
 
             Instance = null!;
         }
@@ -145,6 +138,8 @@ namespace DelvUI.Helpers
         public bool HandlingMouseInputs { get; private set; } = false;
         private IGameObject? _target = null;
         private bool _ignoringMouseover = false;
+
+        public bool IsHandlingClicks => _config.SpecialMouseClicksEnabled;
 
         public void SetTarget(IGameObject? target, bool ignoreMouseover = false)
         {
@@ -281,10 +276,14 @@ namespace DelvUI.Helpers
 
         #region mouseover inputs proxy
         private bool? _leftButtonClicked = null;
-        public bool LeftButtonClicked => _leftButtonClicked.HasValue ? _leftButtonClicked.Value : false;
+        public bool LeftButtonClicked => _leftButtonClicked.HasValue ? 
+            _leftButtonClicked.Value : 
+            (_config.SpecialMouseClicksEnabled ? false : ImGui.GetIO().MouseClicked[0]);
 
         private bool? _rightButtonClicked = null;
-        public bool RightButtonClicked => _rightButtonClicked.HasValue ? _rightButtonClicked.Value : false;
+        public bool RightButtonClicked => _rightButtonClicked.HasValue ? 
+            _rightButtonClicked.Value :
+            (_config.SpecialMouseClicksEnabled ? false : ImGui.GetIO().MouseClicked[1]);
 
         private bool _leftButtonWasDown = false;
         private bool _rightButtonWasDown = false;
@@ -292,8 +291,11 @@ namespace DelvUI.Helpers
 
         public void ClearClicks()
         {
-            WndProcDetour(_wndHandle, WM_LBUTTONUP, 0, 0);
-            WndProcDetour(_wndHandle, WM_RBUTTONUP, 0, 0);
+            if (_config.SpecialMouseClicksEnabled)
+            {
+                WndProcDetour(_wndHandle, WM_LBUTTONUP, 0, 0);
+                WndProcDetour(_wndHandle, WM_RBUTTONUP, 0, 0);
+            }
         }
 
         // wnd proc detour
@@ -302,7 +304,7 @@ namespace DelvUI.Helpers
         private IntPtr WndProcDetour(IntPtr hWnd, uint msg, ulong wParam, long lParam)
         {
             // eat left and right clicks?
-            if (HandlingMouseInputs)
+            if (HandlingMouseInputs && _config.SpecialMouseClicksEnabled)
             {
                 switch (msg)
                 {
@@ -350,9 +352,15 @@ namespace DelvUI.Helpers
 
         public void OnFrameworkUpdate(IFramework framework)
         {
-            if (_wndProcPtr == IntPtr.Zero)
+            if (_config.SpecialMouseClicksEnabled)
             {
-                HookWndProc();
+                if (_wndProcPtr == IntPtr.Zero) {
+                    HookWndProc();
+                }
+            }
+            else if (_wndProcPtr != IntPtr.Zero)
+            {
+                RestoreWndProc();
             }
         }
 
@@ -398,6 +406,22 @@ namespace DelvUI.Helpers
             Plugin.Logger.Info("Initializing DelvUI Inputs v" + Plugin.Version);
             Plugin.Logger.Info("\tHooking WndProc for window: " + hWnd.ToString("X"));
             Plugin.Logger.Info("\tOld WndProc: " + _imguiWndProcPtr.ToString("X"));
+        }
+
+        private void RestoreWndProc()
+        {
+            if (_wndHandle != IntPtr.Zero && _imguiWndProcPtr != IntPtr.Zero)
+            {
+                Plugin.Logger.Info("\t\tRestoring WndProc");
+                Plugin.Logger.Info("\t\t\tOld _wndHandle = " + _wndHandle.ToString("X"));
+                Plugin.Logger.Info("\t\t\tOld _imguiWndProcPtr = " + _imguiWndProcPtr.ToString("X"));
+
+                SetWindowLongPtr(_wndHandle, GWL_WNDPROC, _imguiWndProcPtr);
+                Plugin.Logger.Info("\t\t\tDone!");
+
+                _wndHandle = IntPtr.Zero;
+                _imguiWndProcPtr = IntPtr.Zero;
+            }
         }
 
         private IntPtr _wndHandle = IntPtr.Zero;

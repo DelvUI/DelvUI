@@ -1,3 +1,10 @@
+# 2.2.1.0
+- Added `Misc > HUD Options > Support Special Mouse Clicks` setting:
+  * This setting should only be used if you have actions bound to special mouse buttons such as mousewheel, M3, M4, etc.
+  * If you don't use those mouse buttons, you should leave this setting disabled.
+
+- Fixed DelvUI elements "eating" mouse clicks from other windows that are on top of them.
+
 # 2.2.0.10
 - Fixed Party Cooldowns not working properly:
   * Added some cooldowns that were missing.
