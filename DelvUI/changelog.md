@@ -1,3 +1,15 @@
+# 2.2.1.1
+- Removed `Misc > HUD Options > Support Special Mouse Clicks` setting:
+  * This has been replaced with the `/delvui mouse on/off` command.
+  * This feature should only be used by players that have actions bound to special mouse buttons that otherwise wouldn't work when hovering DelvUI elements.
+
+- Added a Window Clipping setting for third party plugins:
+  * This setting can be used to prevent DelvUI elements to be drawn on top of other plugins.
+  * Please note that this requires the developers of each plugin to implement the feature.
+  * Umbra already supports this as of version 2.2.17.
+
+- Fixed inconsistencies with mouse clicks on various DelvUI elements.
+
 # 2.2.1.0
 - Added `Misc > HUD Options > Support Special Mouse Clicks` setting:
   * This setting should only be used if you have actions bound to special mouse buttons such as mousewheel, M3, M4, etc.

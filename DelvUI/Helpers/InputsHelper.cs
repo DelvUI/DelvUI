@@ -139,10 +139,22 @@ namespace DelvUI.Helpers
         private IGameObject? _target = null;
         private bool _ignoringMouseover = false;
 
-        public bool IsHandlingClicks => _config.SpecialMouseClicksEnabled;
+        public bool IsProxyEnabled => _config.InputsProxyEnabled;
+
+        public void ToggleProxy(bool enabled)
+        {
+            _config.InputsProxyEnabled = enabled;
+            ConfigurationManager.Instance.SaveConfigurations();
+        }
 
         public void SetTarget(IGameObject? target, bool ignoreMouseover = false)
         {
+            if (!IsProxyEnabled &&
+                ClipRectsHelper.Instance?.IsPointClipped(ImGui.GetMousePos()) == false)
+            {
+                ImGui.SetNextFrameWantCaptureMouse(true);
+            }
+
             _target = target;
             HandlingMouseInputs = true;
             _ignoringMouseover = ignoreMouseover;
@@ -278,12 +290,12 @@ namespace DelvUI.Helpers
         private bool? _leftButtonClicked = null;
         public bool LeftButtonClicked => _leftButtonClicked.HasValue ? 
             _leftButtonClicked.Value : 
-            (_config.SpecialMouseClicksEnabled ? false : ImGui.GetIO().MouseClicked[0]);
+            (IsProxyEnabled ? false : ImGui.IsMouseClicked(ImGuiMouseButton.Left));
 
         private bool? _rightButtonClicked = null;
         public bool RightButtonClicked => _rightButtonClicked.HasValue ? 
             _rightButtonClicked.Value :
-            (_config.SpecialMouseClicksEnabled ? false : ImGui.GetIO().MouseClicked[1]);
+            (IsProxyEnabled ? false : ImGui.IsMouseClicked(ImGuiMouseButton.Right));
 
         private bool _leftButtonWasDown = false;
         private bool _rightButtonWasDown = false;
@@ -291,7 +303,7 @@ namespace DelvUI.Helpers
 
         public void ClearClicks()
         {
-            if (_config.SpecialMouseClicksEnabled)
+            if (IsProxyEnabled)
             {
                 WndProcDetour(_wndHandle, WM_LBUTTONUP, 0, 0);
                 WndProcDetour(_wndHandle, WM_RBUTTONUP, 0, 0);
@@ -304,7 +316,7 @@ namespace DelvUI.Helpers
         private IntPtr WndProcDetour(IntPtr hWnd, uint msg, ulong wParam, long lParam)
         {
             // eat left and right clicks?
-            if (HandlingMouseInputs && _config.SpecialMouseClicksEnabled)
+            if (HandlingMouseInputs && IsProxyEnabled)
             {
                 switch (msg)
                 {
@@ -352,7 +364,7 @@ namespace DelvUI.Helpers
 
         public void OnFrameworkUpdate(IFramework framework)
         {
-            if (_config.SpecialMouseClicksEnabled)
+            if (IsProxyEnabled)
             {
                 if (_wndProcPtr == IntPtr.Zero) {
                     HookWndProc();

@@ -144,12 +144,15 @@ namespace DelvUI.Helpers
                 catch { }
             }
 
-            // find clip rects from other plugins
-            Dictionary<string, Vector4> dict = _thirdPartyClipRects;
-            foreach (Vector4 vector in dict.Values)
+            if (_config.ThirdPartyClipRectsEnabled)
             {
-                ClipRect clipRect = new ClipRect(new(vector.X, vector.Y), new(vector.Z, vector.W));
-                _clipRects.Add(clipRect);
+                // find clip rects from other plugins
+                Dictionary<string, Vector4> dict = _thirdPartyClipRects;
+                foreach (Vector4 vector in dict.Values)
+                {
+                    ClipRect clipRect = new ClipRect(new(vector.X, vector.Y), new(vector.Z, vector.W));
+                    _clipRects.Add(clipRect);
+                }
             }
         }
 

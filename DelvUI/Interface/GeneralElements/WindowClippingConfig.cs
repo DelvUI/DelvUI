@@ -27,6 +27,8 @@ namespace DelvUI.Interface.GeneralElements
         public bool HotbarsClipRectsEnabled = false;
         public bool ChatBubblesClipRectsEnabled = true;
 
+        public bool ThirdPartyClipRectsEnabled = true;
+
         private bool _showConfirmationDialog = false;
 
         [ManualDraw]
@@ -109,6 +111,12 @@ namespace DelvUI.Interface.GeneralElements
                 ImGuiHelper.Tab(); ImGuiHelper.Tab();
                 changed |= ImGui.Checkbox("Chat Bubbles", ref ChatBubblesClipRectsEnabled);
             }
+
+            // third party
+            ImGui.NewLine();
+            ImGuiHelper.NewLineAndTab();
+            changed |= ImGui.Checkbox("Enable clipping for other plugins", ref ThirdPartyClipRectsEnabled);
+            ImGuiHelper.SetTooltip("When enabled, other plugins' windows can also be clipped so DelvUI elements don't cover them.\nPlease note that this requires the developer of each third party plugin to implement the feature.");
 
             // text
             ImGui.NewLine();

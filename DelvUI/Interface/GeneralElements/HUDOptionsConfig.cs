@@ -43,14 +43,14 @@ namespace DelvUI.Interface.GeneralElements
         [Order(16, collapseWith = nameof(MouseoverEnabled))]
         public bool MouseoverAutomaticMode = true;
 
-        [Checkbox("Support Special Mouse Clicks", isMonitored = true, spacing = true, help =
-            "When enabled DelvUI will attempt to support special mouse binds (mousewheel, M4, M5, etc) when the cursor\n" +
-            "is hovering on top of DelvUI's unit frames.\n\n" +
-            "If you don't have actions bound to these mouse buttons, it is adviced that you leave this feature disabled.\n\n" +
-            "This feature can cause some issues such as click inputs not working in DelvUI, or through out the game.\n" +
-            "If you run into these kinds of issues, you can try reloading DelvUI, restarting the game, or disabling this feature.")]
-        [Order(17)]
-        public bool SpecialMouseClicksEnabled = false;
+        //[Checkbox("Support Special Mouse Clicks", isMonitored = true, spacing = true, help =
+        //    "When enabled DelvUI will attempt to support special mouse binds (mousewheel, M4, M5, etc) when the cursor\n" +
+        //    "is hovering on top of DelvUI's unit frames.\n\n" +
+        //    "If you don't have actions bound to these mouse buttons, it is adviced that you leave this feature disabled.\n\n" +
+        //    "This feature can cause some issues such as click inputs not working in DelvUI, or through out the game.\n" +
+        //    "If you run into these kinds of issues, you can try reloading DelvUI, restarting the game, or disabling this feature.")]
+        //[Order(17)]
+        public bool InputsProxyEnabled = false;
 
         [Checkbox("Hide Default Job Gauges", isMonitored = true, separator = true)]
         [Order(40)]

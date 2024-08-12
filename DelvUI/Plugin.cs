@@ -40,6 +40,7 @@ namespace DelvUI
         public static IPluginLog Logger { get; private set; } = null!;
         public static ITextureProvider TextureProvider { get; private set; } = null!;
         public static IAddonLifecycle AddonLifecycle { get; private set; } = null!;
+        public static IChatGui Chat { get; private set; } = null!;
 
         public static ISharedImmediateTexture? BannerTexture;
 
@@ -73,7 +74,8 @@ namespace DelvUI
             ITargetManager targetManager,
             IPluginLog logger,
             ITextureProvider textureProvider,
-            IAddonLifecycle addonLifecycle)
+            IAddonLifecycle addonLifecycle,
+            IChatGui chat)
         {
             BuddyList = buddyList;
             ClientState = clientState;
@@ -93,6 +95,7 @@ namespace DelvUI
             Logger = logger;
             TextureProvider = textureProvider;
             AddonLifecycle = addonLifecycle;
+            Chat = chat;
 
             if (pluginInterface.AssemblyLocation.DirectoryName != null)
             {
@@ -103,7 +106,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.2.1.0";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.2.1.1";
 
             FontsManager.Initialize(AssemblyLocation);
             BarTexturesManager.Initialize(AssemblyLocation);
@@ -150,11 +153,12 @@ namespace DelvUI
                                 + "/delvui hide → Hides HUD.\n"
                                 + "/delvui toggledefaulthud → Toggles the game's Job Gauges visibility.\n"
                                 + "/delvui forcejob <JOB> → Forces DelvUI to show the hud for the given Job short name.\n"
-                                + "/delvui profile <PROFILE> → Switch to the given profile",
+                                + "/delvui profile <PROFILE> → Switch to the given profile.\n"
+                                + "/delvui mouse <on/off> → Toggles special input handling to support extra mouse buttons when hovering DelvUI elements.",
 
                     ShowInHelp = true
                 }
-            );
+            );;
 
             CommandManager.AddHandler(
                 "/dui",
@@ -166,7 +170,8 @@ namespace DelvUI
                                 + "/dui hide → Hides HUD."
                                 + "/dui toggledefaulthud → Toggles the game's Job Gauges visibility.\n"
                                 + "/dui forcejob <JOB> → Forces DelvUI to show the hud for the given Job short name.\n"
-                                + "/dui profile <PROFILE> → Switch to the given profile",
+                                + "/dui profile <PROFILE> → Switch to the given profile.\n"
+                                + "/dui mouse <on/off> → Toggles special input handling to support extra mouse buttons when hovering DelvUI elements.",
 
                     ShowInHelp = true
                 }
@@ -218,35 +223,60 @@ namespace DelvUI
             }
             else
             {
+                bool printHUDStatus = false;
+
                 switch (arguments)
                 {
                     case "toggle":
                         ConfigurationManager.Instance.ShowHUD = !ConfigurationManager.Instance.ShowHUD;
+                        printHUDStatus = true;
                         break;
 
                     case "toggledefaulthud":
-                        ConfigurationManager.Instance.GetConfigObject<HUDOptionsConfig>().HideDefaultJobGauges =
-                            !ConfigurationManager.Instance.GetConfigObject<HUDOptionsConfig>().HideDefaultJobGauges;
+                        HUDOptionsConfig config = ConfigurationManager.Instance.GetConfigObject<HUDOptionsConfig>();
+                        config.HideDefaultJobGauges = !config.HideDefaultJobGauges;
+
+                        string defaultJobGaugeStr = config.HideDefaultJobGauges ? "hidden" : "visible";
+                        Chat.Print($"Default Job Gauges are {defaultJobGaugeStr}.");
                         break;
 
                     case "show":
                         ConfigurationManager.Instance.ShowHUD = true;
+                        printHUDStatus = true;
                         break;
 
                     case "hide":
                         ConfigurationManager.Instance.ShowHUD = false;
+                        printHUDStatus = true;
+                        break;
+
+                    case { } argument when argument.StartsWith("mouse"):
+                        string[] mouseArgs = argument.Split(" ");
+
+                        if (mouseArgs.Length > 1)
+                        {
+                            if (mouseArgs[1] == "on")
+                            {
+                                InputsHelper.Instance?.ToggleProxy(true);
+                            }
+                            else if(mouseArgs[1] == "off")
+                            {
+                                InputsHelper.Instance?.ToggleProxy(false);
+                            }
+                        }
+
+                        string mouseStr = InputsHelper.Instance?.IsProxyEnabled == true ? "enabled" : "disabled";
+                        Chat.Print($"DelvUI special mouse handling is currently {mouseStr}.");
                         break;
 
                     case { } argument when argument.StartsWith("forcejob"):
-                        // TODO: Turn this into a helper function?
-                        var args = argument.Split(" ");
+                        string[] args = argument.Split(" ");
 
                         if (args.Length > 0)
                         {
                             if (args[1] == "off")
                             {
                                 ForcedJob.Enabled = false;
-
                                 return;
                             }
 
@@ -261,8 +291,7 @@ namespace DelvUI
                         break;
 
                     case { } argument when argument.StartsWith("profile"):
-                        // TODO: Turn this into a helper function?
-                        var profile = argument.Split(" ", 2);
+                        string[] profile = argument.Split(" ", 2);
 
                         if (profile.Length > 0)
                         {
@@ -275,6 +304,12 @@ namespace DelvUI
                         configManager.ToggleConfigWindow();
 
                         break;
+                }
+
+                if (printHUDStatus)
+                {
+                    string hudStr = ConfigurationManager.Instance.ShowHUD ? "visible" : "hidden";
+                    Chat.Print($"DelvUI HUD is {hudStr}.");
                 }
             }
         }

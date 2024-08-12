@@ -286,7 +286,7 @@ namespace DelvUI.Helpers
 
         public static void DrawInWindow(string name, Vector2 pos, Vector2 size, Action<ImDrawListPtr> drawAction)
         {
-            bool needsInput = InputsHelper.Instance?.IsHandlingClicks == true ? false : true;
+            bool needsInput = InputsHelper.Instance?.IsProxyEnabled == true ? false : true;
             DrawInWindow(name, pos, size, needsInput, drawAction);
         }
 
