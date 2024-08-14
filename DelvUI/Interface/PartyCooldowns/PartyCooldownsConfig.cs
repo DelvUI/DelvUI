@@ -638,7 +638,7 @@ namespace DelvUI.Interface.PartyCooldowns
             [7390] = NewData(7390, JobIDs.DRK, 68, 60, 15, 10, 3, PartyCooldownEnabled.PartyFrames), // delirium
 
             [3636] = NewData(3636, JobIDs.DRK, 38, 120, 15, 90, 4, PartyCooldownEnabled.PartyFrames, disabledAfterLevel: 92), // shadow wall
-            [36927] = NewData(36927, JobIDs.DRK, 38, 120, 15, 90, 4, PartyCooldownEnabled.PartyFrames), // shadowed vigil
+            [36927] = NewData(36927, JobIDs.DRK, 92, 120, 15, 90, 4, PartyCooldownEnabled.PartyFrames), // shadowed vigil
 
             // GNB
             [16152] = NewData(16152, JobIDs.GNB, 50, 360, 10, 100, 4, PartyCooldownEnabled.PartyFrames), // superbolide
@@ -765,7 +765,7 @@ namespace DelvUI.Interface.PartyCooldowns
 
             // MULTI-ROLE  -------------------------------------------------------------------------------------------------
             [7541] = NewData(7541, new List<JobRoles>() { JobRoles.DPSMelee, JobRoles.DPSRanged }, 8, 120, 0, 80, 4, PartyCooldownEnabled.PartyFrames), // second wind
-            [7561] = NewData(7561, new List<JobRoles>() { JobRoles.Healer, JobRoles.DPSCaster }, 18, 60, 1, 80, 5, PartyCooldownEnabled.PartyFrames, null, new HashSet<uint>() { JobIDs.BLM, JobIDs.SMN, JobIDs.RDM }), // swiftcast
+            [7561] = NewData(7561, new List<JobRoles>() { JobRoles.Healer, JobRoles.DPSCaster }, 18, 60, 10, 80, 5, PartyCooldownEnabled.PartyFrames, null, new HashSet<uint>() { JobIDs.BLM, JobIDs.SMN, JobIDs.RDM }), // swiftcast
             [7562] = NewData(7562, new List<JobRoles>() { JobRoles.Healer, JobRoles.DPSCaster }, 14, 60, 21, 80, 5, PartyCooldownEnabled.Disabled), // lucid dreaming
         };
 

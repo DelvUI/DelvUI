@@ -1,3 +1,8 @@
+# 2.2.1.2
+- Minor Party Cooldowns fixes:
+  * Fixed Shadowed Vigil showing up in Party Cooldowns for characters below lvl 92.
+  * Fixed duration of Swiftcast.
+
 # 2.2.1.1
 - Removed `Misc > HUD Options > Support Special Mouse Clicks` setting:
   * This has been replaced with the `/delvui mouse on/off` command.
