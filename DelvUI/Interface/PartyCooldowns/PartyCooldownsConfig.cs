@@ -638,7 +638,7 @@ namespace DelvUI.Interface.PartyCooldowns
             [7390] = NewData(7390, JobIDs.DRK, 68, 60, 15, 10, 3, PartyCooldownEnabled.PartyFrames), // delirium
 
             [3636] = NewData(3636, JobIDs.DRK, 38, 120, 15, 90, 4, PartyCooldownEnabled.PartyFrames, disabledAfterLevel: 92), // shadow wall
-            [36927] = NewData(36927, JobIDs.DRK, 38, 120, 15, 90, 4, PartyCooldownEnabled.PartyFrames), // shadowed vigil
+            [36927] = NewData(36927, JobIDs.DRK, 92, 120, 15, 90, 4, PartyCooldownEnabled.PartyFrames), // shadowed vigil
 
             // GNB
             [16152] = NewData(16152, JobIDs.GNB, 50, 360, 10, 100, 4, PartyCooldownEnabled.PartyFrames), // superbolide
