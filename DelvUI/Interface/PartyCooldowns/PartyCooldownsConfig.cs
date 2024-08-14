@@ -765,7 +765,7 @@ namespace DelvUI.Interface.PartyCooldowns
 
             // MULTI-ROLE  -------------------------------------------------------------------------------------------------
             [7541] = NewData(7541, new List<JobRoles>() { JobRoles.DPSMelee, JobRoles.DPSRanged }, 8, 120, 0, 80, 4, PartyCooldownEnabled.PartyFrames), // second wind
-            [7561] = NewData(7561, new List<JobRoles>() { JobRoles.Healer, JobRoles.DPSCaster }, 18, 60, 10, 80, 5, PartyCooldownEnabled.PartyFrames, null, new HashSet<uint>() { JobIDs.BLM, JobIDs.SMN, JobIDs.RDM }), // swiftcast
+            [7561] = NewData(7561, new List<JobRoles>() { JobRoles.Healer, JobRoles.DPSCaster }, 18, 60, 1, 80, 5, PartyCooldownEnabled.PartyFrames, null, new HashSet<uint>() { JobIDs.BLM, JobIDs.SMN, JobIDs.RDM }), // swiftcast
             [7562] = NewData(7562, new List<JobRoles>() { JobRoles.Healer, JobRoles.DPSCaster }, 14, 60, 21, 80, 5, PartyCooldownEnabled.Disabled), // lucid dreaming
         };
 
