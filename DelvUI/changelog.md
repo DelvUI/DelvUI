@@ -1,7 +1,5 @@
 # 2.2.1.2
-- Minor Party Cooldowns fixes:
-  * Fixed Shadowed Vigil showing up in Party Cooldowns for characters below lvl 92.
-  * Fixed duration of Swiftcast.
+- Fixed Shadowed Vigil showing up in Party Cooldowns for characters below lvl 92.
 
 # 2.2.1.1
 - Removed `Misc > HUD Options > Support Special Mouse Clicks` setting:
