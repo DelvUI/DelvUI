@@ -173,6 +173,7 @@ namespace DelvUI.Interface.EnemyList
                     barTextureDrawMode: Configs.HealthBar.BarTextureDrawMode
                 );
 
+                bar.NeedsInputs = true;
                 bar.SetBackground(background);
                 bar.AddForegrounds(healthFill);
 

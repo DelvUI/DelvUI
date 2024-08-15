@@ -157,6 +157,7 @@ namespace DelvUI.Interface.GeneralElements
             Rect healthFill = BarUtilities.GetFillRect(Config.Position, Config.Size, Config.FillDirection, fillColor, currentHp, maxHp);
 
             BarHud bar = new BarHud(Config, character);
+            bar.NeedsInputs = true;
             bar.SetBackground(background);
             bar.AddForegrounds(healthFill);
             bar.AddLabels(GetLabels(maxHp));
@@ -367,6 +368,7 @@ namespace DelvUI.Interface.GeneralElements
                 Rect background = new Rect(Config.Position, Config.Size, Config.BackgroundColor);
                 Rect healthFill = BarUtilities.GetFillRect(Config.Position, Config.Size, Config.FillDirection, fillColor, currentHp, maxHp);
 
+                bar.NeedsInputs = true;
                 bar.SetBackground(background);
                 bar.AddForegrounds(healthFill);
             }

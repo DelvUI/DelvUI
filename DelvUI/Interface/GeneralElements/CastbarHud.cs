@@ -76,7 +76,7 @@ namespace DelvUI.Interface.GeneralElements
             Rect background = new(Config.Position, size, Config.BackgroundColor);
             Rect progress = BarUtilities.GetFillRect(Config.Position, size, Config.FillDirection, fillColor, currentCastTime, totalCastTime);
 
-            BarHud bar = new(Config, Actor);
+            BarHud bar = new(Config, Actor);/**/
             bar.SetBackground(background);
 
             if (Config.UseReverseFill)

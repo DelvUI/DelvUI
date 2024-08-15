@@ -169,6 +169,7 @@ namespace DelvUI.Interface.Nameplates
                 barTextureDrawMode: BarConfig.BarTextureDrawMode
             );
 
+            bar.NeedsInputs = true;
             bar.SetBackground(background);
             bar.AddForegrounds(healthFill);
 

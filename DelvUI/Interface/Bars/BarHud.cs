@@ -42,6 +42,8 @@ namespace DelvUI.Interface.Bars
         private string? BarTextureName { get; set; }
         private BarTextureDrawMode BarTextureDrawMode { get; set; }
 
+        public bool NeedsInputs = false;
+
         public BarHud(
             string id,
             bool drawBorder = true,
@@ -167,7 +169,7 @@ namespace DelvUI.Interface.Bars
 
         private void DrawRects(Vector2 barPos, Vector2 backgroundPos)
         {
-            DrawHelper.DrawInWindow(ID, backgroundPos, BackgroundRect.Size, (drawList) =>
+            DrawHelper.DrawInWindow(ID, backgroundPos, BackgroundRect.Size, NeedsInputs, (drawList) =>
             {
                 // Draw background
                 drawList.AddRectFilled(backgroundPos, backgroundPos + BackgroundRect.Size, BackgroundRect.Color.Base);

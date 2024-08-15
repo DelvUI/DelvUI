@@ -248,6 +248,7 @@ namespace DelvUI.Interface.Party
                 barTextureDrawMode: _configs.HealthBar.BarTextureDrawMode
             );
 
+            bar.NeedsInputs = true;
             bar.SetBackground(background);
             bar.AddForegrounds(healthFill);
 
