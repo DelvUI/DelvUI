@@ -231,20 +231,25 @@ namespace DelvUI.Interface.StatusEffects
         [Order(44)]
         public bool IncludePetAsOwn = false;
 
-        [Checkbox("Sort by Duration", spacing = true, help = "If enabled, \"Permanent Effects First\" and \"My Effects First\" will be ignored!")]
+        [Checkbox("Show When Dead")]
         [Order(45)]
+        public bool ShowWhenDead = false;
+
+
+        [Checkbox("Sort by Duration", spacing = true, help = "If enabled, \"Permanent Effects First\" and \"My Effects First\" will be ignored!")]
+        [Order(46)]
         public bool SortByDuration = false;
 
         [RadioSelector("Ascending", "Descending")]
-        [Order(46, collapseWith = nameof(SortByDuration))]
+        [Order(47, collapseWith = nameof(SortByDuration))]
         public StatusEffectDurationSortType DurationSortType = StatusEffectDurationSortType.Ascending;
 
         [Checkbox("Tooltips", spacing = true)]
-        [Order(47)]
+        [Order(48)]
         public bool ShowTooltips = true;
 
         [Checkbox("Disable Interaction", help = "Enabling this will disable right clicking buffs off, or the shortcut to blacklist/whitelist a status effect.")]
-        [Order(48)]
+        [Order(49)]
         public bool DisableInteraction = false;
 
         [NestedConfig("Icons", 65)]
