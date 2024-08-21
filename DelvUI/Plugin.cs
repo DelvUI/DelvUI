@@ -336,8 +336,6 @@ namespace DelvUI
         {
             UpdateJob();
 
-            UiBuilder.OverrideGameCursor = false;
-
             ConfigurationManager.Instance.Draw();
             NameplatesManager.Instance?.Update();
             PartyManager.Instance?.Update();
