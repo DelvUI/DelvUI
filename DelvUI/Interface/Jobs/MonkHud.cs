@@ -102,7 +102,20 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            BarHud[] bars = BarUtilities.GetChunkedBars(Config.ChakraBar, 5, gauge.Chakra, 5, 0, player);
+            bool brotherhoodActive = false;
+
+            float brotherhoodTimer = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId == 1185 && o.RemainingTime > 0f)?.RemainingTime ?? 0f;
+            if (brotherhoodTimer > 0f) { brotherhoodActive = true; }
+
+            int maxChakra = brotherhoodActive ? 10 : 5;
+            int currentChakra = gauge.Chakra;
+            int currentBrotherhoodChakra = brotherhoodActive && (currentChakra > 5) ? (currentChakra - 5) : currentChakra;
+            bool isFull = currentChakra == maxChakra;
+
+            PluginConfigColor color = brotherhoodActive && (currentChakra > 5) ? Config.ChakraBar.BrotherhoodColor : isFull ? Config.ChakraBar.FullStacksColor : Config.ChakraBar.FillColor;
+            BarGlowConfig? glow = isFull && Config.ChakraBar.GlowConfig.Enabled ? Config.ChakraBar.GlowConfig : null;
+
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.ChakraBar, 5, brotherhoodActive && (currentChakra > 5) ? currentBrotherhoodChakra : currentChakra, 5, fillColor: color, glowConfig: glow);
             foreach (BarHud bar in bars)
             {
                 AddDrawActions(bar.GetDrawActions(origin, Config.ChakraBar.StrataLevel));
@@ -304,7 +317,7 @@ namespace DelvUI.Interface.Jobs
         }
 
         [NestedConfig("Chakra Bar", 35)]
-        public ChunkedBarConfig ChakraBar = new ChunkedBarConfig(
+        public ChakraBarConfig ChakraBar = new ChakraBarConfig(
             new(0, -32),
             new(254, 20),
             new(new Vector4(204f / 255f, 115f / 255f, 0f, 100f / 100f))
@@ -334,6 +347,29 @@ namespace DelvUI.Interface.Jobs
             new(254, 20),
             new(new Vector4(150f / 255f, 255f / 255f, 255f / 255f, 100f / 100f))
         );
+    }
+
+    [Exportable(false)]
+    public class ChakraBarConfig : ChunkedBarConfig
+    {
+        [ColorEdit4("Full Stacks Color")]
+        [Order(65)]
+        public PluginConfigColor FullStacksColor = new PluginConfigColor(new Vector4(255f / 255f, 200f / 255f, 160f / 255f, 100f / 100f));
+
+        [ColorEdit4("Brotherhood Fill Color")]
+        [Order(66)]
+        public PluginConfigColor BrotherhoodColor;
+
+        [NestedConfig("Show Glow" + "##ChakraBar", 60, separator = false, spacing = true)]
+        [Order(67)]
+        public BarGlowConfig GlowConfig = new();
+
+        public ChakraBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+             : base(position, size, fillColor)
+        {
+            GlowConfig.Color = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+            BrotherhoodColor = new PluginConfigColor(new(204 / 255f, 3f / 255f, 3f / 255f, 100f / 100f));
+        }
     }
 
     public class PerfectBalanceBar : ChunkedBarConfig
