@@ -102,20 +102,28 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            bool brotherhoodActive = false;
+            LabelConfig[]? labels = null;
+            Status? brotherhood = Utils.StatusListForBattleChara(player).Where(o => o.StatusId is 1185 && o.RemainingTime > 0f).FirstOrDefault();
+            float brotherhoodTimer = brotherhood?.RemainingTime ?? 0f;
+            bool brotherhoodActive = brotherhoodTimer > 0f;
 
-            float brotherhoodTimer = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId == 1185 && o.RemainingTime > 0f)?.RemainingTime ?? 0f;
-            if (brotherhoodTimer > 0f) { brotherhoodActive = true; }
+            if (brotherhoodActive && Config.ChakraBar.BrotherhoodDurationLabel.Enabled)
+            {
+                Config.ChakraBar.BrotherhoodDurationLabel.SetValue(brotherhoodTimer);
+                labels = new LabelConfig[5];
+                labels[2] = Config.ChakraBar.BrotherhoodDurationLabel;
+            }
 
             int maxChakra = brotherhoodActive ? 10 : 5;
             int currentChakra = gauge.Chakra;
             int currentBrotherhoodChakra = brotherhoodActive && (currentChakra > 5) ? (currentChakra - 5) : currentChakra;
             bool isFull = currentChakra == maxChakra;
 
-            PluginConfigColor color = brotherhoodActive && (currentChakra > 5) ? Config.ChakraBar.BrotherhoodColor : isFull ? Config.ChakraBar.FullStacksColor : Config.ChakraBar.FillColor;
+            PluginConfigColor color = brotherhoodActive && (currentChakra > 5) ? Config.ChakraBar.BrotherhoodColor : Config.ChakraBar.FillColor;
             BarGlowConfig? glow = isFull && Config.ChakraBar.GlowConfig.Enabled ? Config.ChakraBar.GlowConfig : null;
 
-            BarHud[] bars = BarUtilities.GetChunkedBars(Config.ChakraBar, 5, brotherhoodActive && (currentChakra > 5) ? currentBrotherhoodChakra : currentChakra, 5, fillColor: color, glowConfig: glow);
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.ChakraBar, 5, brotherhoodActive && (currentChakra > 5) ? currentBrotherhoodChakra : currentChakra, 5,
+                labels: labels, fillColor: color, glowConfig: glow);
             foreach (BarHud bar in bars)
             {
                 AddDrawActions(bar.GetDrawActions(origin, Config.ChakraBar.StrataLevel));
@@ -311,6 +319,7 @@ namespace DelvUI.Interface.Jobs
 
             config.StancesBar.Enabled = false;
             config.MastersGauge.BlitzTimerLabel.HideIfZero = true;
+            config.ChakraBar.BrotherhoodDurationLabel.HideIfZero = true;
             config.PerfectBalanceBar.PerfectBalanceLabel.HideIfZero = true;
 
             return config;
@@ -352,23 +361,24 @@ namespace DelvUI.Interface.Jobs
     [Exportable(false)]
     public class ChakraBarConfig : ChunkedBarConfig
     {
-        [ColorEdit4("Full Stacks Color")]
-        [Order(65)]
-        public PluginConfigColor FullStacksColor = new PluginConfigColor(new Vector4(255f / 255f, 200f / 255f, 160f / 255f, 100f / 100f));
-
         [ColorEdit4("Brotherhood Fill Color")]
-        [Order(66)]
+        [Order(65)]
         public PluginConfigColor BrotherhoodColor;
 
         [NestedConfig("Show Glow" + "##ChakraBar", 60, separator = false, spacing = true)]
-        [Order(67)]
+        [Order(66)]
         public BarGlowConfig GlowConfig = new();
 
+        [NestedConfig("Brotherhood Duration Text", 67)]
+        public NumericLabelConfig BrotherhoodDurationLabel;
+
+
         public ChakraBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
-             : base(position, size, fillColor)
+                 : base(position, size, fillColor)
         {
             GlowConfig.Color = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
             BrotherhoodColor = new PluginConfigColor(new(204 / 255f, 3f / 255f, 3f / 255f, 100f / 100f));
+            BrotherhoodDurationLabel = new NumericLabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
         }
     }
 
