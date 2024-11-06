@@ -433,6 +433,7 @@ namespace DelvUI.Interface
               | ImGuiWindowFlags.NoBackground
               | ImGuiWindowFlags.NoInputs
               | ImGuiWindowFlags.NoBringToFrontOnFocus
+              | ImGuiWindowFlags.NoFocusOnAppearing
               | ImGuiWindowFlags.NoSavedSettings
             );
 
