@@ -321,7 +321,7 @@ namespace DelvUI.Config.Profiles
                 return;
             }
 
-            uint jobId = player.ClassJob.Id;
+            uint jobId = player.ClassJob.RowId;
             Profile currentProfile = CurrentProfile();
             JobRoles role = JobsHelper.RoleForJob(jobId);
             int index = JobsHelper.JobsByRole[role].IndexOf(jobId);

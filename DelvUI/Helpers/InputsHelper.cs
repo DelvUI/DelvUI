@@ -36,7 +36,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using static FFXIVClientStructs.FFXIV.Client.Game.ActionManager;
-using Action = Lumina.Excel.GeneratedSheets.Action;
+using Action = Lumina.Excel.Sheets.Action;
 
 namespace DelvUI.Helpers
 {
@@ -244,8 +244,8 @@ namespace DelvUI.Helpers
                 return false;
             }
 
-            var action = _sheet.GetRow((uint)actionID);
-            if (action == null)
+            bool found = _sheet.TryGetRow((uint)actionID, out Action action);
+            if (!found)
             {
                 return false;
             }
@@ -256,8 +256,8 @@ namespace DelvUI.Helpers
             // we assume its a hostile spell
             // if this doesn't work on all cases we can switch to a hardcoded list
             // of special cases later
-            if (action.AttackType.Row == 0 && action.AnimationStart.Row == 0 &&
-                (action.CanTargetDead && !action.CanTargetFriendly && !action.CanTargetHostile && !action.CanTargetParty && action.CanTargetSelf))
+            if (action.AttackType.RowId == 0 && action.AnimationStart.RowId == 0 &&
+                (!action.CanTargetAlly && !action.CanTargetHostile && !action.CanTargetParty && action.CanTargetSelf))
             {
                 // special case for AST cards and SMN rekindle
                 if (actionID is 37019 or 37020 or 37021 or 25822)
@@ -271,7 +271,7 @@ namespace DelvUI.Helpers
             // friendly player (TODO: pvp? lol)
             if (target is IPlayerCharacter)
             {
-                return action.CanTargetFriendly || action.CanTargetParty || action.CanTargetSelf;
+                return action.CanTargetAlly || action.CanTargetParty || action.CanTargetSelf;
             }
 
             // friendly npc
@@ -279,7 +279,7 @@ namespace DelvUI.Helpers
             {
                 if (npc.BattleNpcKind != BattleNpcSubKind.Enemy)
                 {
-                    return action.CanTargetFriendly || action.CanTargetParty || action.CanTargetSelf;
+                    return action.CanTargetAlly || action.CanTargetParty || action.CanTargetSelf;
                 }
             }
 

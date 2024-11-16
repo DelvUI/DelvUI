@@ -217,9 +217,9 @@ namespace DelvUI.Helpers
 
             ["[level:hidden]"] = (chara) => (chara.Level > 1 && chara.Level < 100) ? chara.Level.ToString() : "",
 
-            ["[job]"] = (chara) => JobsHelper.JobNames.TryGetValue(chara.ClassJob.Id, out var jobName) ? jobName : "",
+            ["[job]"] = (chara) => JobsHelper.JobNames.TryGetValue(chara.ClassJob.RowId, out var jobName) ? jobName : "",
 
-            ["[job-full]"] = (chara) => JobsHelper.JobFullNames.TryGetValue(chara.ClassJob.Id, out var jobName) ? jobName : "",
+            ["[job-full]"] = (chara) => JobsHelper.JobFullNames.TryGetValue(chara.ClassJob.RowId, out var jobName) ? jobName : "",
 
             ["[time-till-max-gp]"] = JobsHelper.TimeTillMaxGP,
 

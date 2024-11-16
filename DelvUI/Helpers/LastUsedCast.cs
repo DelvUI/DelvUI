@@ -4,14 +4,14 @@ using Dalamud.Interface.Textures.TextureWraps;
 using DelvUI.Enums;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using Lumina.Excel;
-using Lumina.Excel.GeneratedSheets;
-using Companion = Lumina.Excel.GeneratedSheets.Companion;
+using Lumina.Excel.Sheets;
+using Companion = Lumina.Excel.Sheets.Companion;
 
 namespace DelvUI.Helpers
 {
     public class LastUsedCast
     {
-        private ExcelRow? _lastUsedAction;
+        private object? _lastUsedAction;
 
         public readonly bool Interruptible;
         public readonly ActionType ActionType;
@@ -112,12 +112,12 @@ namespace DelvUI.Helpers
 
         private static DamageType GetDamageType(Action? action)
         {
-            if (action == null)
+            if (!action.HasValue)
             {
                 return DamageType.Unknown;
             }
 
-            var damageType = (DamageType)action.AttackType.Row;
+            DamageType damageType = (DamageType)action.Value.AttackType.RowId;
 
             if (damageType != DamageType.Magic && damageType != DamageType.Darkness && damageType != DamageType.Unknown)
             {
@@ -135,19 +135,19 @@ namespace DelvUI.Helpers
             }
             else if (_lastUsedAction is Action action)
             {
-                return TexturesHelper.GetTexture<Action>(action);
+                return TexturesHelper.GetTextureFromIconId(action.Icon);
             }
             else if (_lastUsedAction is Mount mount)
             {
-                return TexturesHelper.GetTexture<Mount>(mount);
+                return TexturesHelper.GetTextureFromIconId(mount.Icon);
             }
             else if (_lastUsedAction is Item item)
             {
-                return TexturesHelper.GetTexture<Item>(item);
+                return TexturesHelper.GetTextureFromIconId(item.Icon);
             }
             else if (_lastUsedAction is Companion companion)
             {
-                return TexturesHelper.GetTexture<Companion>(companion);
+                return TexturesHelper.GetTextureFromIconId(companion.Icon);
             }
 
             return null;

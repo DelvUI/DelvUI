@@ -320,10 +320,10 @@ namespace DelvUI.Interface.PartyCooldowns
 
             if (cooldown.Member != null) { return cooldown.Member.JobId; }
 
-            if (cooldown.SourceId == player.GameObjectId) { return player.ClassJob.Id; }
+            if (cooldown.SourceId == player.GameObjectId) { return player.ClassJob.RowId; }
 
             ICharacter? chara = Plugin.ObjectTable.SearchById(cooldown.SourceId) as ICharacter;
-            return chara?.ClassJob.Id;
+            return chara?.ClassJob.RowId;
         }
     }
 }

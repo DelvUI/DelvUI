@@ -1,3 +1,6 @@
+# 2.3.0.0
+- Added support for Patch 7.1 and Dalamud API 11.
+
 # 2.2.1.2
 - Fixed Shadowed Vigil showing up in Party Cooldowns for characters below lvl 92.
 - Fixed some elements like castbars not being click through.

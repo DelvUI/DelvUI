@@ -9,7 +9,6 @@ using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Common.Component.BGCollision;
 using System.Numerics;
-using StructsCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 
 namespace DelvUI.Interface.Nameplates
 {
@@ -131,17 +130,15 @@ namespace DelvUI.Interface.Nameplates
 
                     if (data.GameObject is ICharacter character)
                     {
-                        StructsCharacter* chara = (StructsCharacter*)character.Address;
-
-                        if ((chara->CharacterData.Flags2 & 0x8) != 0) // PartyMember
+                        if ((character.StatusFlags & StatusFlags.PartyMember) != 0) // PartyMember
                         {
                             return _partyMemberHud;
                         }
-                        else if ((chara->CharacterData.Flags2 & 0x10) != 0) // AllianceMember
+                        else if ((character.StatusFlags & StatusFlags.AllianceMember) != 0) // AllianceMember
                         {
                             return _allianceMemberHud;
                         }
-                        else if ((chara->CharacterData.Flags2 & 0x20) != 0) // Friend
+                        else if ((character.StatusFlags & StatusFlags.Friend) != 0) // Friend
                         {
                             return _friendsHud;
                         }
@@ -157,10 +154,17 @@ namespace DelvUI.Interface.Nameplates
                         {
                             return _petHud;
                         }
-                        else if ((BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.Enemy || 
+                        else if ((BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.Enemy ||
                                  (BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.BattleNpcPart)
                         {
-                            return Utils.IsHostile(battleNpc) ? _enemyHud : _npcHud;
+                            if (data.GameObject is ICharacter chara)
+                            {
+                                return (chara.StatusFlags & StatusFlags.Hostile) != 0 ? _enemyHud : _npcHud;
+                            }
+                            else
+                            {
+                                return _npcHud;
+                            }
                         }
                         else if (battleNpc.SubKind == 10) // island released minions
                         {

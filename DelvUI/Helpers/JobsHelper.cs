@@ -143,7 +143,7 @@ namespace DelvUI.Helpers
                 return 0;
             }
 
-            uint jobId = character.ClassJob.Id;
+            uint jobId = character.ClassJob.RowId;
 
             if (IsJobGatherer(jobId))
             {
@@ -165,7 +165,7 @@ namespace DelvUI.Helpers
                 return 0;
             }
 
-            uint jobId = character.ClassJob.Id;
+            uint jobId = character.ClassJob.RowId;
 
             if (IsJobGatherer(jobId))
             {
@@ -217,7 +217,7 @@ namespace DelvUI.Helpers
                 return "";
             }
 
-            uint jobId = character.ClassJob.Id;
+            uint jobId = character.ClassJob.RowId;
 
             if (!IsJobGatherer(jobId))
             {

@@ -3,7 +3,7 @@ using Dalamud.Interface;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using System;
 using System.Numerics;
 
@@ -130,7 +130,7 @@ namespace DelvUI.Interface.GeneralElements
         {
             switch (Config.UseJobColor)
             {
-                case true when (actor is ICharacter || actor is IBattleNpc battleNpc && battleNpc.ClassJob.Id > 0):
+                case true when (actor is ICharacter || actor is IBattleNpc battleNpc && battleNpc.ClassJob.RowId > 0):
                     return ColorUtils.ColorForActor(actor);
                 case true when actor is not ICharacter:
                     return GlobalColors.Instance.NPCFriendlyColor;
@@ -138,11 +138,11 @@ namespace DelvUI.Interface.GeneralElements
 
             switch (Config.UseRoleColor)
             {
-                case true when (actor is ICharacter || actor is IBattleNpc battleNpc && battleNpc.ClassJob.Id > 0):
+                case true when (actor is ICharacter || actor is IBattleNpc battleNpc && battleNpc.ClassJob.RowId > 0):
                     {
                         ICharacter? character = actor as ICharacter;
-                        return character != null && character.ClassJob.Id > 0 ?
-                            GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id) :
+                        return character != null && character.ClassJob.RowId > 0 ?
+                            GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.RowId) :
                             ColorUtils.ColorForActor(character);
                     }
                 case true when actor is not ICharacter:

@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using LuminaStatus = Lumina.Excel.GeneratedSheets.Status;
+using LuminaStatus = Lumina.Excel.Sheets.Status;
 using StatusStruct = FFXIVClientStructs.FFXIV.Client.Game.Status;
 
 namespace DelvUI.Interface.StatusEffects
@@ -192,17 +192,17 @@ namespace DelvUI.Interface.StatusEffects
                 {
                     try
                     {
-                        data = character?.StatusList[i]?.GameData;
+                        data = character?.StatusList[i]?.GameData.Value;
                     } catch { }
                 }
 
-                if (data == null)
+                if (data == null || !data.HasValue)
                 {
                     continue;
                 }
 
                 // filter "invisible" status effects
-                if (data.Icon == 0 || data.Name.ToString().Length == 0)
+                if (data.Value.Icon == 0 || data.Value.Name.ToString().Length == 0)
                 {
                     continue;
                 }
@@ -210,24 +210,24 @@ namespace DelvUI.Interface.StatusEffects
                 // dont filter anything on preview mode
                 if (_fakeEffects != null)
                 {
-                    list.Add(new StatusEffectData(*status, data));
+                    list.Add(new StatusEffectData(*status, data.Value));
                     continue;
                 }
 
                 // buffs
-                if (!Config.ShowBuffs && data.StatusCategory == 1)
+                if (!Config.ShowBuffs && data.Value.StatusCategory == 1)
                 {
                     continue;
                 }
 
                 // debuffs
-                if (!Config.ShowDebuffs && data.StatusCategory != 1)
+                if (!Config.ShowDebuffs && data.Value.StatusCategory != 1)
                 {
                     continue;
                 }
 
                 // permanent
-                if (!Config.ShowPermanentEffects && data.IsPermanent)
+                if (!Config.ShowPermanentEffects && data.Value.IsPermanent)
                 {
                     continue;
                 }
@@ -246,12 +246,12 @@ namespace DelvUI.Interface.StatusEffects
                 }
 
                 // blacklist
-                if (Config.BlacklistConfig.Enabled && !Config.BlacklistConfig.StatusAllowed(data))
+                if (Config.BlacklistConfig.Enabled && !Config.BlacklistConfig.StatusAllowed(data.Value))
                 {
                     continue;
                 }
 
-                list.Add(new StatusEffectData(*status, data));
+                list.Add(new StatusEffectData(*status, data.Value));
             }
 
             return list;
@@ -464,7 +464,7 @@ namespace DelvUI.Interface.StatusEffects
                 {
                     TooltipsHelper.Instance.ShowTooltipOnCursor(
                         EncryptedStringsHelper.GetString(data.Data.Description.ToDalamudString().ToString()),
-                        EncryptedStringsHelper.GetString(data.Data.Name),
+                        EncryptedStringsHelper.GetString(data.Data.Name.ToString()),
                         data.Status.StatusId,
                         GetStatusActorName(data.Status)
                     );
@@ -479,7 +479,7 @@ namespace DelvUI.Interface.StatusEffects
 
                 if (data.Data.StatusCategory == 1 && (isFromPlayer || isTheEcho) && rightClick)
                 {
-                    ChatHelper.SendChatMessage("/statusoff \"" + data.Data.Name + "\"");
+                    ChatHelper.SendChatMessage($"/statusoff \"{data.Data.Name}\"");
 
                     if (NeedsSpecialInput)
                     {

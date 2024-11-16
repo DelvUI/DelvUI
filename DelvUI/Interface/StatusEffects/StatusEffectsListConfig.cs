@@ -7,7 +7,7 @@ using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Lumina.Excel;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -374,7 +374,7 @@ namespace DelvUI.Interface.StatusEffects
 
         private string KeyName(Status status)
         {
-            return status.Name + "[" + status.RowId.ToString() + "]";
+            return $"{status.Name}[{status.RowId.ToString()}]";
         }
 
         public bool StatusAllowed(Status status)
@@ -390,9 +390,9 @@ namespace DelvUI.Interface.StatusEffects
 
         public bool AddNewEntry(Status? status)
         {
-            if (status != null && !List.ContainsKey(KeyName(status)))
+            if (status != null && status.HasValue && !List.ContainsKey(KeyName(status.Value)))
             {
-                List.Add(KeyName(status), status.RowId);
+                List.Add(KeyName(status.Value), status.Value.RowId);
                 _input = "";
 
                 return true;
@@ -413,9 +413,9 @@ namespace DelvUI.Interface.StatusEffects
                     if (uintValue > 0)
                     {
                         Status? status = sheet.GetRow(uintValue);
-                        if (status != null)
+                        if (status != null && status.HasValue)
                         {
-                            statusToAdd.Add(status);
+                            statusToAdd.Add(status.Value);
                         }
                     }
                 }
@@ -618,8 +618,7 @@ namespace DelvUI.Interface.StatusEffects
                         // name
                         if (ImGui.TableSetColumnIndex(2))
                         {
-                            var displayName = row != null ? row.Name : name;
-                            ImGui.Text(displayName);
+                            ImGui.Text(row != null && row.HasValue ? row.Value.Name.ToString() : name);
                         }
 
                         // remove

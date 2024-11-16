@@ -8,7 +8,7 @@ using DelvUI.Helpers;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -180,9 +180,9 @@ namespace DelvUI.Interface.Party
             }
 
             // detect job change
-            if (player.ClassJob.Id != _previousJob)
+            if (player.ClassJob.RowId != _previousJob)
             {
-                _previousJob = player.ClassJob.Id;
+                _previousJob = player.ClassJob.RowId;
 
                 if (_config.PlayerOrderOverrideEnabled && _config.PlayerOrder == FirstOfMyRoleOrder)
                 {
@@ -361,7 +361,7 @@ namespace DelvUI.Interface.Party
                 {
                     if (_groupMembers[i].ObjectId == player.GameObjectId)
                     {
-                        _groupMembers[i].Update(EnmityForIndex(0), PartyMemberStatus.None, ReadyCheckStatus.None, true, player.ClassJob.Id);
+                        _groupMembers[i].Update(EnmityForIndex(0), PartyMemberStatus.None, ReadyCheckStatus.None, true, player.ClassJob.RowId);
                     }
                     else
                     {
@@ -416,7 +416,7 @@ namespace DelvUI.Interface.Party
             {
                 for (int i = 0; i < _groupMembers.Count; i++)
                 {
-                    _groupMembers[i].Update(i == 0 ? playerEnmity : chocoboEnmity, PartyMemberStatus.None, ReadyCheckStatus.None, i == 0, i == 0 ? player.ClassJob.Id : 0);
+                    _groupMembers[i].Update(i == 0 ? playerEnmity : chocoboEnmity, PartyMemberStatus.None, ReadyCheckStatus.None, i == 0, i == 0 ? player.ClassJob.RowId : 0);
                 }
             }
         }
@@ -733,7 +733,13 @@ namespace DelvUI.Interface.Party
             AgentHUD* agentHUD = agentModule->GetAgentHUD();
             if (agentHUD == null) { return ""; }
 
-            return Plugin.DataManager.GetExcelSheet<Addon>()?.GetRow(agentHUD->PartyTitleAddonId)?.Text.ToString();
+            Lumina.Excel.ExcelSheet<Addon> sheet = Plugin.DataManager.GetExcelSheet<Addon>();
+            if (sheet.TryGetRow(agentHUD->PartyTitleAddonId, out Addon row))
+            {
+                return row.Text.ToString();
+            }
+
+            return null;
         }
         #endregion
 

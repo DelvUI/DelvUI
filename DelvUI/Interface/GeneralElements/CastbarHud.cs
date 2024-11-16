@@ -12,7 +12,7 @@ using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using LuminaAction = Lumina.Excel.GeneratedSheets.Action;
+using LuminaAction = Lumina.Excel.Sheets.Action;
 using StructsBattleChara = FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara;
 
 namespace DelvUI.Interface.GeneralElements
@@ -276,7 +276,7 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             ICharacter? chara = (ICharacter)Actor;
-            PluginConfigColor? color = GlobalColors.Instance.ColorForJobId(chara.ClassJob.Id);
+            PluginConfigColor? color = GlobalColors.Instance.ColorForJobId(chara.ClassJob.RowId);
             return color ?? Config.FillColor;
         }
     }

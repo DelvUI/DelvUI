@@ -191,7 +191,7 @@ namespace DelvUI.Config
             ResetEvent?.Invoke(this);
         }
 
-        private void OnLogout()
+        private void OnLogout(int type, int code)
         {
             SaveConfigurations();
             ProfilesManager.Instance?.SaveCurrentProfile();

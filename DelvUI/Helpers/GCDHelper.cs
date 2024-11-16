@@ -67,7 +67,7 @@ namespace DelvUI.Helpers
 
         public static unsafe bool GetGCDInfo(IPlayerCharacter player, out float timeElapsed, out float timeTotal, ActionType actionType = ActionType.Action)
         {
-            if (player is null || !JobActionIDs.TryGetValue(player.ClassJob.Id, out var actionId))
+            if (player is null || !JobActionIDs.TryGetValue(player.ClassJob.RowId, out var actionId))
             {
                 timeElapsed = 0;
                 timeTotal = 0;

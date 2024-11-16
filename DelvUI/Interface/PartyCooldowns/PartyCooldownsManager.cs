@@ -260,7 +260,7 @@ namespace DelvUI.Interface.PartyCooldowns
                 var player = Plugin.ClientState.LocalPlayer;
                 if (_config.ShowWhenSolo && player != null)
                 {
-                    _cooldownsMap.Add((uint)player.GameObjectId, CooldownsForMember((uint)player.GameObjectId, player.ClassJob.Id, player.Level, null));
+                    _cooldownsMap.Add((uint)player.GameObjectId, CooldownsForMember((uint)player.GameObjectId, player.ClassJob.RowId, player.Level, null));
                 }
             }
             else if (!_config.ShowOnlyInDuties || Plugin.Condition[ConditionFlag.BoundByDuty])

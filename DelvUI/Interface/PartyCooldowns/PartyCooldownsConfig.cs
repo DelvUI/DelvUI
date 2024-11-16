@@ -6,12 +6,12 @@ using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Lumina.Excel;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using LuminaAction = Lumina.Excel.GeneratedSheets.Action;
+using LuminaAction = Lumina.Excel.Sheets.Action;
 
 namespace DelvUI.Interface.PartyCooldowns
 {
@@ -249,13 +249,13 @@ namespace DelvUI.Interface.PartyCooldowns
             foreach (PartyCooldownData cooldown in Cooldowns)
             {
                 LuminaAction? action = sheet?.GetRow(cooldown.ActionId);
-                if (action == null) { continue; }
+                if (!action.HasValue) { continue; }
 
                 // get real cooldown from data
                 // keep hardcoded value for technical finish
-                if (action.Recast100ms > 0 && cooldown.ActionId != 16004)
+                if (action.Value.Recast100ms > 0 && cooldown.ActionId != 16004)
                 {
-                    cooldown.CooldownDuration = action.Recast100ms / 10;
+                    cooldown.CooldownDuration = action.Value.Recast100ms / 10;
                 }
 
                 // not happy about this but didn't want to over-complicate things
@@ -284,10 +284,10 @@ namespace DelvUI.Interface.PartyCooldowns
                 }
                 else
                 {
-                    cooldown.IconId = action.Icon;
+                    cooldown.IconId = action.Value.Icon;
                 }
 
-                cooldown.Name = action.Name;
+                cooldown.Name = action.Value.Name.ToString();
             }
 
             if (needsSave)

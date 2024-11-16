@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using DelvUI.Helpers;
+using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.Party
 {
@@ -61,11 +62,10 @@ namespace DelvUI.Interface.Party
                 }
 
                 // check for disspellable debuff
-
-                var statusList = Utils.StatusListForBattleChara(battleChara); 
-                foreach (var status in statusList)
+                IEnumerable<Status> statusList = Utils.StatusListForBattleChara(battleChara);
+                foreach (Status status in statusList)
                 {
-                    if (status == null || !status.GameData.CanDispel)
+                    if (!status.GameData.Value.CanDispel)
                     {
                         continue;
                     }

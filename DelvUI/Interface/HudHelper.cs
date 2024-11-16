@@ -242,7 +242,7 @@ namespace DelvUI.Interface
             IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (player == null) { return; }
 
-            string jobName = JobsHelper.JobNames[player.ClassJob.Id];
+            string jobName = JobsHelper.JobNames[player.ClassJob.RowId];
             int i = 0;
             bool stop = false;
 

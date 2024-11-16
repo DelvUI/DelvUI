@@ -34,7 +34,7 @@ namespace DelvUI.Interface.Party
         public int Order { get; set; }
         public string Name => _partyMember != null ? _partyMember.Name.ToString() : (Character != null ? Character.Name.ToString() : _name);
         public uint Level => _partyMember != null ? _partyMember.Level : (Character != null ? Character.Level : (uint)0);
-        public uint JobId => _partyMember != null ? _partyMember.ClassJob.Id : (Character != null ? Character.ClassJob.Id : _jobId);
+        public uint JobId => _partyMember != null ? _partyMember.ClassJob.RowId : (Character != null ? Character.ClassJob.RowId : _jobId);
         public uint HP => _partyMember != null ? _partyMember.CurrentHP : (Character != null ? Character.CurrentHp : (uint)0);
         public uint MaxHP => _partyMember != null ? _partyMember.MaxHP : (Character != null ? Character.MaxHp : (uint)0);
         public uint MP => _partyMember != null ? _partyMember.CurrentMP : JobsHelper.CurrentPrimaryResource(Character);

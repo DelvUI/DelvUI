@@ -234,12 +234,12 @@ namespace DelvUI.Helpers
             }
 
             if (character.ObjectKind == ObjectKind.Player ||
-                character.SubKind == 9 && character.ClassJob.Id > 0)
+                character.SubKind == 9 && character.ClassJob.RowId > 0)
             {
-                return GlobalColors.Instance.SafeColorForJobId(character.ClassJob.Id);
+                return GlobalColors.Instance.SafeColorForJobId(character.ClassJob.RowId);
             }
 
-            bool isHostile = Utils.IsHostile(character);
+            bool isHostile = (character.StatusFlags & StatusFlags.Hostile) != 0;
 
             if (character is IBattleNpc npc)
             {
@@ -273,7 +273,7 @@ namespace DelvUI.Helpers
             else if (useRoleColor)
             {
                 return character is IPlayerCharacter ?
-                    GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id) :
+                    GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.RowId) :
                     ColorForActor(character);
             }
             else if (colorByHealthConfig != null && colorByHealthConfig.Enabled && character != null)
@@ -298,7 +298,7 @@ namespace DelvUI.Helpers
                         colorByHealthConfig.LowHealthColorThreshold / 100f,
                         colorByHealthConfig.FullHealthColorThreshold / 100f,
                         colorByHealthConfig.LowHealthColor, colorByHealthConfig.FullHealthColor,
-                        character is IPlayerCharacter ? GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id) : ColorForActor(character),
+                        character is IPlayerCharacter ? GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.RowId) : ColorForActor(character),
                         colorByHealthConfig.UseMaxHealthColor,
                         colorByHealthConfig.BlendMode
                     );

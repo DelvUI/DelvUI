@@ -29,7 +29,7 @@ namespace DelvUI.Interface.GeneralElements
                 {
                     _actor = value;
 
-                    JobRoles role = JobsHelper.RoleForJob(chara.ClassJob.Id);
+                    JobRoles role = JobsHelper.RoleForJob(chara.ClassJob.RowId);
                     ResourceType = JobsHelper.PrimaryResourceTypesByRole[role];
                 }
                 else

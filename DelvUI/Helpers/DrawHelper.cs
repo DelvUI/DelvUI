@@ -1,12 +1,9 @@
-using Dalamud.Interface;
-using Dalamud.Interface.Internal;
 using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Interface.Utility;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
-using ImGuiScene;
 using Lumina.Excel;
 using System;
 using System.Numerics;
@@ -36,7 +33,7 @@ namespace DelvUI.Helpers
                 _ => new[] { color.TopGradient, color.TopGradient, color.BottomGradient, color.BottomGradient }
             };
         }
-        
+
         private static Vector2 GetBarTextureUV1Vector(Vector2 size, int textureWidth, int textureHeight, BarTextureDrawMode drawMode)
         {
             if (drawMode == BarTextureDrawMode.Stretch) { return new Vector2(1); }
@@ -126,14 +123,14 @@ namespace DelvUI.Helpers
             // Shadow
             for (int i = 0; i < thickness; i++)
             {
-                drawList.AddText(new Vector2(pos.X + i + offset, pos.Y  + i + offset), shadowColor, text);
+                drawList.AddText(new Vector2(pos.X + i + offset, pos.Y + i + offset), shadowColor, text);
             }
 
             // Text
             drawList.AddText(new Vector2(pos.X, pos.Y), color, text);
         }
 
-        public static void DrawIcon<T>(dynamic row, Vector2 position, Vector2 size, bool drawBorder, bool cropIcon, int stackCount = 1) where T : ExcelRow
+        public static void DrawIcon<T>(dynamic row, Vector2 position, Vector2 size, bool drawBorder, bool cropIcon, int stackCount = 1) where T : struct, IExcelRow<T>
         {
             IDalamudTextureWrap texture = TexturesHelper.GetTexture<T>(row, (uint)Math.Max(0, stackCount - 1));
             if (texture == null) { return; }
@@ -150,7 +147,7 @@ namespace DelvUI.Helpers
             }
         }
 
-        public static void DrawIcon<T>(ImDrawListPtr drawList, dynamic row, Vector2 position, Vector2 size, bool drawBorder, bool cropIcon, int stackCount = 1) where T : ExcelRow
+        public static void DrawIcon<T>(ImDrawListPtr drawList, dynamic row, Vector2 position, Vector2 size, bool drawBorder, bool cropIcon, int stackCount = 1) where T : struct, IExcelRow<T>
         {
             IDalamudTextureWrap texture = TexturesHelper.GetTexture<T>(row, (uint)Math.Max(0, stackCount - 1));
             if (texture == null) { return; }
@@ -219,7 +216,7 @@ namespace DelvUI.Helpers
             int segments = (int)Math.Ceiling(completion * 4);
 
             Vector2 center = position + size / 2;
-            
+
             //Define vertices for top, left, bottom, and right points relative to the center.
             Vector2[] vertices =
             [
@@ -228,28 +225,28 @@ namespace DelvUI.Helpers
                 center with {Y = center.Y + size.Y}, // Bottom
                 center with {X = center.X + size.X}  // Right
             ];
-            
+
             ImGui.PushClipRect(position, position + size, false);
             for (int i = 0; i < segments; i++)
             {
                 Vector2 v2 = vertices[i % 4];
                 Vector2 v3 = vertices[(i + 1) % 4];
-                
-                
+
+
                 if (i == segments - 1)
                 {   // If drawing the last segment, adjust the second vertex based on the cooldown.
                     float angle = 2 * MathF.PI * (1 - completion);
                     float cos = MathF.Cos(angle);
                     float sin = MathF.Sin(angle);
 
-                    v3 = center + Vector2.Multiply(new Vector2(sin,-cos), size);
+                    v3 = center + Vector2.Multiply(new Vector2(sin, -cos), size);
                 }
 
                 drawList.AddTriangleFilled(center, v3, v2, 0xCC000000);
             }
             ImGui.PopClipRect();
         }
-        
+
         public static void DrawOvershield(float shield, Vector2 cursorPos, Vector2 barSize, float height, bool useRatioForHeight, PluginConfigColor color, ImDrawListPtr drawList)
         {
             if (shield == 0) { return; }

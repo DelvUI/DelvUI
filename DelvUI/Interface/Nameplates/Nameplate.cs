@@ -371,7 +371,7 @@ namespace DelvUI.Interface.Nameplates
                 NameplateAnchor? anchor = anchors.GetAnchor(Config.RoleIconConfig.NameplateLabelAnchor, Config.RoleIconConfig.PrioritizeHealthBarAnchor);
                 anchor = anchor ?? new NameplateAnchor(data.ScreenPosition, Vector2.Zero);
 
-                uint jobId = character.ClassJob.Id;
+                uint jobId = character.ClassJob.RowId;
                 uint iconId = Config.RoleIconConfig.UseRoleIcons ?
                         JobsHelper.RoleIconIDForJob(jobId, Config.RoleIconConfig.UseSpecificDPSRoleIcons) :
                         JobsHelper.IconIDForJob(jobId, (uint)Config.RoleIconConfig.Style);
@@ -436,11 +436,11 @@ namespace DelvUI.Interface.Nameplates
 
             if (config.UseJobColorAsBackgroundColor)
             {
-                return GlobalColors.Instance.SafeColorForJobId(character.ClassJob.Id);
+                return GlobalColors.Instance.SafeColorForJobId(character.ClassJob.RowId);
             }
             else if (config.UseRoleColorAsBackgroundColor)
             {
-                return GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id);
+                return GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.RowId);
             }
 
             return config.BackgroundColor;
@@ -546,14 +546,14 @@ namespace DelvUI.Interface.Nameplates
             {
                 StructsCharacter* chara = (StructsCharacter*)character.Address;
 
-                bool inCombat = (chara->CharacterData.Flags1 & 0x20) != 0;
+                bool inCombat = (character.StatusFlags & StatusFlags.InCombat) != 0;
                 if (inCombat && !config.ColorByHealth.Enabled)
                 {
                     return config.InCombatColor;
                 }
                 else if (!inCombat)
                 {
-                    bool isHostile = (chara->CharacterData.Flags1 & 0x10) != 0;
+                    bool isHostile = (character.StatusFlags & StatusFlags.Hostile) != 0;
                     return isHostile ? config.OutOfCombatHostileColor : config.OutOfCombatColor;
                 }
             }

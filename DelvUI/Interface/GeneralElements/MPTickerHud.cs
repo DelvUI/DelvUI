@@ -48,7 +48,7 @@ namespace DelvUI.Interface.GeneralElements
             // BLM specific settings
             if (Config.EnableOnlyForBLM)
             {
-                if (player.ClassJob.Id != JobIDs.BLM)
+                if (player.ClassJob.RowId != JobIDs.BLM)
                 {
 
                     return;
@@ -86,7 +86,7 @@ namespace DelvUI.Interface.GeneralElements
 
         private MPTickerFire3ThresholdConfig? GetFire3ThresholdConfig()
         {
-            if (Actor is not IPlayerCharacter player || player.ClassJob.Id != JobIDs.BLM)
+            if (Actor is not IPlayerCharacter player || player.ClassJob.RowId != JobIDs.BLM)
             {
                 return null;
             }

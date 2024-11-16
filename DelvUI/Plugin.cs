@@ -106,7 +106,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.2.1.2";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.3.0.0";
 
             FontsManager.Initialize(AssemblyLocation);
             BarTexturesManager.Initialize(AssemblyLocation);
@@ -319,7 +319,7 @@ namespace DelvUI
             var player = ClientState.LocalPlayer;
             if (player is null) { return; }
 
-            var newJobId = player.ClassJob.Id;
+            var newJobId = player.ClassJob.RowId;
             if (ForcedJob.Enabled)
             {
                 newJobId = ForcedJob.ForcedJobId;
@@ -335,6 +335,8 @@ namespace DelvUI
         private void Draw()
         {
             UpdateJob();
+
+            UiBuilder.OverrideGameCursor = false;
 
             ConfigurationManager.Instance.Draw();
             NameplatesManager.Instance?.Update();

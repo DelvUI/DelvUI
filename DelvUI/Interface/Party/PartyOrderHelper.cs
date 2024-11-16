@@ -51,7 +51,7 @@ namespace DelvUI.Interface.Party
             IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (player == null) { return null; }
 
-            JobRoles role = JobsHelper.RoleForJob(player.ClassJob.Id);
+            JobRoles role = JobsHelper.RoleForJob(player.ClassJob.RowId);
 
             PartySortingSetting? setting = GetPartySortingSetting(role);
             if (!setting.HasValue) { return null; }

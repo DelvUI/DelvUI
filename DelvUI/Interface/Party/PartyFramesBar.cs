@@ -198,13 +198,13 @@ namespace DelvUI.Interface.Party
             }
             else if (_configs.HealthBar.ColorsConfig.UseJobColorAsBackgroundColor && character is IBattleChara)
             {
-                bgColor = GlobalColors.Instance.SafeColorForJobId(character.ClassJob.Id);
+                bgColor = GlobalColors.Instance.SafeColorForJobId(character.ClassJob.RowId);
             }
             else if (_configs.HealthBar.ColorsConfig.UseRoleColorAsBackgroundColor && character is IBattleChara)
             {
                 bgColor = _configs.HealthBar.RangeConfig.Enabled
-                    ? GetDistanceColor(character, GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id))
-                    : GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id);
+                    ? GetDistanceColor(character, GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.RowId))
+                    : GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.RowId);
             }
 
             Rect background = new Rect(Position, _configs.HealthBar.Size, bgColor);
@@ -259,9 +259,9 @@ namespace DelvUI.Interface.Party
                 Vector2 healthMissingPos = _configs.HealthBar.FillDirection.IsInverted() ? Position : Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, _configs.HealthBar.FillDirection);
 
                 PluginConfigColor? missingHealthColor = _configs.HealthBar.ColorsConfig.UseJobColorAsMissingHealthColor && character is IBattleChara
-                    ? GlobalColors.Instance.SafeColorForJobId(character!.ClassJob.Id)
+                    ? GlobalColors.Instance.SafeColorForJobId(character!.ClassJob.RowId)
                     : _configs.HealthBar.ColorsConfig.UseRoleColorAsMissingHealthColor && character is IBattleChara
-                        ? GlobalColors.Instance.SafeRoleColorForJobId(character!.ClassJob.Id)
+                        ? GlobalColors.Instance.SafeRoleColorForJobId(character!.ClassJob.RowId)
                         : _configs.HealthBar.ColorsConfig.HealthMissingColor;
 
                 if (_configs.HealthBar.ColorsConfig.UseDeathIndicatorBackgroundColor && Member.HP <= 0 && character != null)

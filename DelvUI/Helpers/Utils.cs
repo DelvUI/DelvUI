@@ -80,14 +80,14 @@ namespace DelvUI.Helpers
             return null;
         }
 
-        public static unsafe bool IsHostile(ICharacter character)
-        {
-            StructsCharacter* chara = (StructsCharacter*)character.Address;
+        //public static unsafe bool IsHostile(ICharacter character)
+        //{
+        //    StructsCharacter* chara = (StructsCharacter*)character.Address;
 
-            return character != null
-                && ((character.SubKind == (byte)BattleNpcSubKind.Enemy || (int)character.SubKind == (byte)BattleNpcSubKind.BattleNpcPart)
-                && chara->CharacterData.Battalion > 0);
-        }
+        //    return character != null
+        //        && ((character.SubKind == (byte)BattleNpcSubKind.Enemy || (int)character.SubKind == (byte)BattleNpcSubKind.BattleNpcPart)
+        //        && chara->CharacterData.Battalion > 0);
+        //}
 
         public static unsafe float ActorShieldValue(IGameObject? actor)
         {
@@ -168,7 +168,7 @@ namespace DelvUI.Helpers
         {
             IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
 
-            return player != null && JobsHelper.IsJobWithCleanse(player.ClassJob.Id, player.Level);
+            return player != null && JobsHelper.IsJobWithCleanse(player.ClassJob.RowId, player.Level);
         }
 
         public static IGameObject? FindTargetOfTarget(IGameObject? target, IGameObject? player, IObjectTable actors)

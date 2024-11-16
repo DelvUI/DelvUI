@@ -170,9 +170,9 @@ namespace DelvUI.Interface.GeneralElements
                     : Config.Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
 
                 PluginConfigColor missingHealthColor = Config.UseJobColorAsMissingHealthColor && character is BattleChara
-                    ? GlobalColors.Instance.SafeColorForJobId(character!.ClassJob.Id)
+                    ? GlobalColors.Instance.SafeColorForJobId(character!.ClassJob.RowId)
                     : Config.UseRoleColorAsMissingHealthColor && character is BattleChara
-                        ? GlobalColors.Instance.SafeRoleColorForJobId(character!.ClassJob.Id)
+                        ? GlobalColors.Instance.SafeRoleColorForJobId(character!.ClassJob.RowId)
                         : Config.HealthMissingColor;
 
                 if (Config.UseDeathIndicatorBackgroundColor && character is BattleChara { CurrentHp: <= 0 })
@@ -219,7 +219,7 @@ namespace DelvUI.Interface.GeneralElements
             // role/job icon
             if (Config.RoleIconConfig.Enabled && character is IPlayerCharacter)
             {
-                uint jobId = character.ClassJob.Id;
+                uint jobId = character.ClassJob.RowId;
                 uint iconId = Config.RoleIconConfig.UseRoleIcons ?
                         JobsHelper.RoleIconIDForJob(jobId, Config.RoleIconConfig.UseSpecificDPSRoleIcons) :
                         JobsHelper.IconIDForJob(jobId, (uint)Config.RoleIconConfig.Style);
@@ -397,7 +397,7 @@ namespace DelvUI.Interface.GeneralElements
                     }
                     else
                     {
-                        color = new PluginConfigColor(GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id).Vector.AdjustColor(-.8f));
+                        color = new PluginConfigColor(GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.RowId).Vector.AdjustColor(-.8f));
                     }
 
                     return color;
@@ -408,11 +408,11 @@ namespace DelvUI.Interface.GeneralElements
             {
                 if (Config.UseJobColorAsBackgroundColor)
                 {
-                    return GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id);
+                    return GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.RowId);
                 }
                 else if (Config.UseRoleColorAsBackgroundColor)
                 {
-                    return GlobalColors.Instance.SafeRoleColorForJobId(chara.ClassJob.Id);
+                    return GlobalColors.Instance.SafeRoleColorForJobId(chara.ClassJob.RowId);
                 }
                 else if (Config.UseDeathIndicatorBackgroundColor && chara.CurrentHp <= 0)
                 {
@@ -445,7 +445,7 @@ namespace DelvUI.Interface.GeneralElements
 
             if (!config.Enabled || actor is not IPlayerCharacter chara) { return; }
 
-            uint jobId = chara.ClassJob.Id;
+            uint jobId = chara.ClassJob.RowId;
             if (JobsHelper.RoleForJob(jobId) != JobRoles.Tank) { return; }
 
             var tankStanceBuff = Utils.StatusListForBattleChara(chara).Where(o =>
