@@ -1,6 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sd1">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup Label="Target">
-		<Pl1tformTarget>x64</PlatformTarget>
+		<PlatformTarget>x64</PlatformTarget>
 		<TargetFramework>net8.0</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<Platforms>x64</Platforms>
