@@ -553,8 +553,7 @@ namespace DelvUI.Interface.Nameplates
                 }
                 else if (!inCombat)
                 {
-                    bool isHostile = (character.StatusFlags & StatusFlags.Hostile) != 0;
-                    return isHostile ? config.OutOfCombatHostileColor : config.OutOfCombatColor;
+                    return (character.StatusFlags & StatusFlags.Hostile) != 0 ? config.OutOfCombatHostileColor : config.OutOfCombatColor;
                 }
             }
 

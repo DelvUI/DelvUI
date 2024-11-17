@@ -80,14 +80,26 @@ namespace DelvUI.Helpers
             return null;
         }
 
-        //public static unsafe bool IsHostile(ICharacter character)
-        //{
-        //    StructsCharacter* chara = (StructsCharacter*)character.Address;
+        public static unsafe bool IsHostile(IGameObject obj)
+        {
+            if (obj is not ICharacter character)
+            {
+                return false;
+            }
 
-        //    return character != null
-        //        && ((character.SubKind == (byte)BattleNpcSubKind.Enemy || (int)character.SubKind == (byte)BattleNpcSubKind.BattleNpcPart)
-        //        && chara->CharacterData.Battalion > 0);
-        //}
+            if (character.SubKind != (byte)BattleNpcSubKind.Enemy && character.SubKind != (byte)BattleNpcSubKind.BattleNpcPart)
+            {
+                return false;
+            }
+
+            StructsCharacter* chara = (StructsCharacter*)character.Address;
+            if (chara == null)
+            {
+                return false;
+            }
+
+            return chara->CharacterData.Battalion > 0 || chara->IsHostile;
+        }
 
         public static unsafe float ActorShieldValue(IGameObject? actor)
         {

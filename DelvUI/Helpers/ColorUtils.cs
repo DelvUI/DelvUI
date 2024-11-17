@@ -239,7 +239,7 @@ namespace DelvUI.Helpers
                 return GlobalColors.Instance.SafeColorForJobId(character.ClassJob.RowId);
             }
 
-            bool isHostile = (character.StatusFlags & StatusFlags.Hostile) != 0;
+            bool isHostile = Utils.IsHostile(character);
 
             if (character is IBattleNpc npc)
             {

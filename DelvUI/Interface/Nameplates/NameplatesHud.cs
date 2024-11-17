@@ -157,14 +157,7 @@ namespace DelvUI.Interface.Nameplates
                         else if ((BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.Enemy ||
                                  (BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.BattleNpcPart)
                         {
-                            if (data.GameObject is ICharacter chara)
-                            {
-                                return (chara.StatusFlags & StatusFlags.Hostile) != 0 ? _enemyHud : _npcHud;
-                            }
-                            else
-                            {
-                                return _npcHud;
-                            }
+                            return Utils.IsHostile(data.GameObject) ? _enemyHud : _npcHud;
                         }
                         else if (battleNpc.SubKind == 10) // island released minions
                         {
