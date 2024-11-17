@@ -210,7 +210,6 @@ namespace DelvUI.Interface.Party
                         MembersChangedEvent?.Invoke(this);
                     }
 
-                    _prevMemberCount = _realMemberCount;
                     _wasRealGroup = false;
                 }
                 else
@@ -256,13 +255,13 @@ namespace DelvUI.Interface.Party
                     }
 
                     _wasRealGroup = true;
-                    _prevMemberCount = _groupMembers.Count;
                 }
 
                 UpdateTrackers();
             }
             catch { }
 
+            _prevMemberCount = _groupMemberCount;
             _wasCrossWorld = isCrossWorld;
         }
 
