@@ -116,6 +116,11 @@ namespace DelvUI.Interface.Party
 
         public unsafe ReadyCheckStatus GetStatusForContentId(ulong contentId)
         {
+            if (!_readyCheckOngoing)
+            {
+                return ReadyCheckStatus.None;
+            }
+
             try
             {
                 for (int i = 0; i < 8; i++)

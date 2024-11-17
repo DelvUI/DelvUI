@@ -1,3 +1,7 @@
+# 2.3.1.2
+- Fixed Party Frames enmity indicators.
+- Fixed Ready Check Status icon not disappearing.
+
 # 2.3.1.1
 - Fixed Party Frames preview mode.
 - Fixed Enemy Nameplates.

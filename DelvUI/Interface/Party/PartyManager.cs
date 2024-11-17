@@ -232,10 +232,6 @@ namespace DelvUI.Interface.Party
                         }
                     }
 
-                    if (partyChanged)
-                    {
-                        Plugin.Logger.Debug(partyChanged.ToString());
-                    }
                     _prevDataMap = dataMap;
 
                     // trust
@@ -274,27 +270,29 @@ namespace DelvUI.Interface.Party
                 return dataMap;
             }
 
-            Plugin.Logger.Debug(HudAgent.ToString("X"));
             int count = isCrossWorld ? _crossRealmInfo->CrossRealmGroups[0].GroupMemberCount : _realMemberCount + PartyListAddon->TrustCount;
 
             var stringArrayData = _raptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrays[PartyMembersInfoIndex];
             for (int i = 0; i < count; i++)
             {
-                int order = i;
-                string name = "asd";
+                InternalMemberData data = new InternalMemberData();
+                data.Order = i;
 
                 if (!isCrossWorld)
                 {
                     PartyListMemberRawInfo* info = (PartyListMemberRawInfo*)(HudAgent + (PartyListInfoOffset + PartyListMemberRawInfoSize * i));
-                    name = info->Name;
-                    order = info->Order;
+                    data.ObjectId = info->ObjectId;
+                    data.ContentId = info->ContentId;
+                    data.Name = info->Name;
+                    data.Order = info->Order;
                 }
                 else
                 {
-                    name = _crossRealmInfo->CrossRealmGroups[0].GroupMembers[i].NameString;
+                    CrossRealmMember member = _crossRealmInfo->CrossRealmGroups[0].GroupMembers[i];
+                    data.ObjectId = member.EntityId;
+                    data.ContentId = (long)member.ContentId;
+                    data.Name = member.NameString;
                 }
-
-                Plugin.Logger.Debug(name);
 
                 int index = i * 5;
                 if (stringArrayData->AtkArrayData.Size <= index + 3 ||
@@ -302,11 +300,11 @@ namespace DelvUI.Interface.Party
                     stringArrayData->StringArray[index + 3] == null) { break; }
 
                 IntPtr ptr = new IntPtr(stringArrayData->StringArray[index + 3]);
-                string status = MemoryHelper.ReadSeStringNullTerminated(ptr).ToString();
+                data.Status = MemoryHelper.ReadSeStringNullTerminated(ptr).ToString();
 
-                if (!dataMap.ContainsKey(name))
+                if (!dataMap.ContainsKey(data.Name))
                 {
-                    dataMap.Add(name, new InternalMemberData(order, status));
+                    dataMap.Add(data.Name, data);
                 }
             }
 
@@ -339,11 +337,11 @@ namespace DelvUI.Interface.Party
                 {
                     if (member.ObjectId == player.GameObjectId)
                     {
-                        member.Update(EnmityForIndex(member.Order), PartyMemberStatus.None, ReadyCheckStatus.None, true, player.ClassJob.RowId);
+                        member.Update(EnmityForIndex(member.Index), PartyMemberStatus.None, ReadyCheckStatus.None, true, player.ClassJob.RowId);
                     }
                     else
                     {
-                        member.Update(EnmityForTrustMemberIndex(member.Order), PartyMemberStatus.None, ReadyCheckStatus.None, false, 0);
+                        member.Update(EnmityForTrustMemberIndex(member.Index - 1), PartyMemberStatus.None, ReadyCheckStatus.None, false, 0);
                     }
                 }
             }
@@ -355,7 +353,7 @@ namespace DelvUI.Interface.Party
                     InternalMemberData data = dataMap[keys[i]];
                     if (keys[i] == player.Name.ToString())
                     {
-                        PartyFramesMember playerMember = new PartyFramesMember(player, i, data.Order, EnmityForIndex(data.Order), PartyMemberStatus.None, ReadyCheckStatus.None, true);
+                        PartyFramesMember playerMember = new PartyFramesMember(player, i, data.Order, EnmityForIndex(i), PartyMemberStatus.None, ReadyCheckStatus.None, true);
                         _groupMembers.Add(playerMember);
                     }
                     else
@@ -363,7 +361,7 @@ namespace DelvUI.Interface.Party
                         ICharacter? trustChara = Utils.GetGameObjectByName(keys[i]) as ICharacter;
                         if (trustChara != null)
                         {
-                            _groupMembers.Add(new PartyFramesMember(trustChara, i, data.Order, EnmityForTrustMemberIndex(data.Order), PartyMemberStatus.None, ReadyCheckStatus.None, false));
+                            _groupMembers.Add(new PartyFramesMember(trustChara, i, data.Order, EnmityForTrustMemberIndex(i), PartyMemberStatus.None, ReadyCheckStatus.None, false));
                         }
                     }
                 }
@@ -485,30 +483,28 @@ namespace DelvUI.Interface.Party
                 softUpdate = false;
             }
 
-            for (int i = 0; i < _groupMemberCount; i++)
-            {
-                DalamudPartyMember? member = GetPartyMemberForIndex(i);
-                if (member == null) { continue; }
-
-                if (!dataMap.TryGetValue(member.Name.ToString(), out InternalMemberData data))
+            string[] keys = dataMap.Keys.ToArray();
+            for (int i = 0; i < keys.Length; i++)
+            { 
+                if (!dataMap.TryGetValue(keys[i], out InternalMemberData data))
                 {
                     continue;
                 }
 
-                bool isPlayer = member.ObjectId == player.GameObjectId;
+                bool isPlayer = data.ObjectId == player.GameObjectId;
                 bool isLeader = _mainGroup.PartyLeaderIndex == i;
                 EnmityLevel enmity = EnmityForIndex(i);
                 PartyMemberStatus status = data.Status != null ? StatusForMember(data.Status, i) : PartyMemberStatus.None;
-                ReadyCheckStatus readyCheckStatus = GetReadyCheckStatus((ulong)member.ContentId);
+                ReadyCheckStatus readyCheckStatus = GetReadyCheckStatus((ulong)data.ContentId);
 
                 if (softUpdate)
                 {
                     IPartyFramesMember groupMember = _groupMembers.ElementAt(i);
-                    groupMember.Update(enmity, status, readyCheckStatus, isLeader, member.ClassJob.RowId);
+                    groupMember.Update(enmity, status, readyCheckStatus, isLeader);
                 }
                 else
                 {
-                    PartyFramesMember partyMember = new PartyFramesMember(member, i, data.Order, enmity, status, readyCheckStatus, isLeader);
+                    PartyFramesMember partyMember = new PartyFramesMember(data.ObjectId, i, data.Order, enmity, status, readyCheckStatus, isLeader);
                     _groupMembers.Add(partyMember);
                 }
             }
@@ -686,13 +682,15 @@ namespace DelvUI.Interface.Party
 
     internal struct InternalMemberData
     {
-        internal int Order;
-        internal string? Status;
+        internal uint ObjectId = 0;
+        internal long ContentId = 0;
+        internal string Name = "";
+        internal uint JobId = 0;
+        internal int Order = 0;
+        internal string? Status = null;
 
-        public InternalMemberData(int order, string? status)
+        public InternalMemberData()
         {
-            Order = order;
-            Status = status;
         }
     }
 

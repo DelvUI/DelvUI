@@ -80,6 +80,20 @@ namespace DelvUI.Interface.Party
             Character = character;
         }
 
+        public PartyFramesMember(uint objectId, int index, int order, EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader)
+        {
+            Index = index;
+            Order = order;
+            EnmityLevel = enmityLevel;
+            Status = status;
+            ReadyCheckStatus = readyCheckStatus;
+            IsPartyLeader = isPartyLeader;
+
+            _objectID = objectId;
+            var gameObject = Plugin.ObjectTable.SearchById(ObjectId);
+            Character = gameObject is ICharacter ? (ICharacter)gameObject : null;
+        }
+
         public PartyFramesMember(string? name, int index, int order, uint jobId, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader)
         {
             Index = index;
@@ -98,11 +112,6 @@ namespace DelvUI.Interface.Party
             ReadyCheckStatus = readyCheckStatus;
             IsPartyLeader = isPartyLeader;
 
-            if (jobId > 0)
-            {
-                _jobId = jobId;
-            }
-
             if (ObjectId == 0)
             {
                 Character = null;
@@ -111,6 +120,15 @@ namespace DelvUI.Interface.Party
 
             var gameObject = Plugin.ObjectTable.SearchById(ObjectId);
             Character = gameObject is ICharacter ? (ICharacter)gameObject : null;
+
+            if (jobId > 0)
+            {
+                _jobId = jobId;
+            } 
+            else if (Character != null)
+            {
+                _jobId = Character.ClassJob.RowId;
+            }
 
             if (status == PartyMemberStatus.None && Character != null && MaxHP > 0 && HP <= 0)
             {
@@ -167,7 +185,7 @@ namespace DelvUI.Interface.Party
             WhosTalkingState = (WhosTalkingState)RNG.Next(0, 4);
         }
 
-        public void Update(EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader, uint jobId)
+        public void Update(EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader, uint jobId = 0)
         {
 
         }
@@ -198,6 +216,6 @@ namespace DelvUI.Interface.Party
 
         public WhosTalkingState WhosTalkingState { get; }
 
-        public void Update(EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader, uint jobId);
+        public void Update(EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader, uint jobId = 0);
     }
 }
