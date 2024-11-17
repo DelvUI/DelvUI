@@ -1,6 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿1<Project Sdk="Microsoft.NET.Sd1">
 	<PropertyGroup Label="Target">
-		<PlatformTarget>x64</PlatformTarget>
+		<Pl1tformTarget>x64</PlatformTarget>
 		<TargetFramework>net8.0</TargetFramework>
 		<LangVersion>latest</LangVersion>
 		<Platforms>x64</Platforms>
@@ -10,9 +10,9 @@
 	<!-- Assembly Configuration -->
 	<PropertyGroup>
 		<AssemblyName>DelvUI</AssemblyName>
-		<AssemblyVersion>2.3.1.0</AssemblyVersion>
-		<FileVersion>2.3.1.0</FileVersion>
-		<InformationalVersion>2.3.1.0</InformationalVersion>
+		<AssemblyVersion>2.3.1.1</AssemblyVersion>
+		<FileVersion>2.3.1.1</FileVersion>
+		<InformationalVersion>2.3.1.1</InformationalVersion>
 	</PropertyGroup>
 
 	<!-- Build Configuration -->

@@ -531,7 +531,7 @@ namespace DelvUI.Interface.Party
         }
 
 
-        private void SortGroupMembers(IPlayerCharacter player)
+        private void SortGroupMembers(IPlayerCharacter? player = null)
         {
             _sortedGroupMembers.Clear();
             _sortedGroupMembers.AddRange(_groupMembers);
@@ -540,11 +540,11 @@ namespace DelvUI.Interface.Party
             {
                 if (a.Order == b.Order)
                 {
-                    if (a.ObjectId == player.GameObjectId)
+                    if (a.ObjectId == player?.GameObjectId)
                     {
                         return 1;
                     }
-                    else if (b.ObjectId == player.GameObjectId)
+                    else if (b.ObjectId == player?.GameObjectId)
                     {
                         return -1;
                     }
@@ -678,6 +678,7 @@ namespace DelvUI.Interface.Party
                 }
             }
 
+            SortGroupMembers();
             MembersChangedEvent?.Invoke(this);
         }
         #endregion

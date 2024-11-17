@@ -1,3 +1,6 @@
+# 2.3.1.1
+- Fixed Party Frames preview mode.
+
 # 2.3.1.0
 - Fixed serveral issues with the Party Frames and Party Cooldowns.
 - Fixed Ready Check Status icon in the Party Frames.
