@@ -1,20 +1,20 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Game.ClientState.Party;
 using Dalamud.Memory;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using FFXIVClientStructs.FFXIV.Client.UI.Info;
 using Lumina.Excel.Sheets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using static FFXIVClientStructs.FFXIV.Client.Game.Group.GroupManager;
 using DalamudPartyMember = Dalamud.Game.ClientState.Party.IPartyMember;
-using StructsFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework;
 using StructsPartyMember = FFXIVClientStructs.FFXIV.Client.Game.Group.PartyMember;
 
 namespace DelvUI.Interface.Party
@@ -39,6 +39,12 @@ namespace DelvUI.Interface.Party
 
             OnConfigReset(ConfigurationManager.Instance);
             UpdatePreview();
+
+            // find offline string for active language
+            if (Plugin.DataManager.GetExcelSheet<Addon>().TryGetRow(9836, out Addon row))
+            {
+                _offlineString = row.Text.ToString();
+            }
         }
 
         public static void Initialize()
@@ -92,35 +98,37 @@ namespace DelvUI.Interface.Party
         public AddonPartyList* PartyListAddon { get; private set; } = null;
         public IntPtr HudAgent { get; private set; } = IntPtr.Zero;
 
-        public RaptureAtkModule* RaptureAtkModule { get; private set; } = null;
+        private RaptureAtkModule* _raptureAtkModule = null;
 
-        private const int PartyListInfoOffset = 0x0D58;
-        private const int PartyListMemberRawInfoSize = 0x20;
-        private const int PartyJobIconIdsOffset = 0x12A8;
-
-        private const int PartyCrossWorldNameOffset = 0x1552;
-        private const int PartyCrossWorldDisplayNameOffset = 0x14EA;
-        private const int PartyCrossWorldEntrySize = 0xD8;
-
-        private const int PartyTrustNameOffset = 0x0D78;
-        private const int PartyTrustEntrySize = 0x20;
+        private const int PartyListInfoOffset = 0x0D40;
+        private const int PartyListMemberRawInfoSize = 0x28;
 
         private const int PartyMembersInfoIndex = 11;
-        private const int FirstOfMyRoleOrder = 8;
-
-        private List<PartyListMemberInfo> _partyMembersInfo = null!;
-        private bool _dirty = false;
-        private uint _previousJob = 0;
 
         private List<IPartyFramesMember> _groupMembers = new List<IPartyFramesMember>();
         public IReadOnlyCollection<IPartyFramesMember> GroupMembers => _groupMembers.AsReadOnly();
+
+        private List<IPartyFramesMember> _sortedGroupMembers = new List<IPartyFramesMember>();
+        public IReadOnlyCollection<IPartyFramesMember> SortedGroupMembers => _sortedGroupMembers.AsReadOnly();
+
         public uint MemberCount => (uint)_groupMembers.Count;
 
         private string? _partyTitle = null;
         public string PartyTitle => _partyTitle ?? "";
 
-        private uint _groupMemberCount => GroupManager.Instance()->MainGroup.MemberCount;
+        private int _groupMemberCount => GroupManager.Instance()->MainGroup.MemberCount;
         private int _realMemberCount => PartyListAddon != null ? PartyListAddon->MemberCount : Plugin.PartyList.Length;
+        private int _prevMemberCount = 0;
+
+        private Dictionary<string, InternalMemberData> _prevDataMap = new();
+
+        private bool _wasRealGroup = false;
+        private bool _wasCrossWorld = false;
+
+        private InfoProxyCrossRealm* _crossRealmInfo => InfoProxyCrossRealm.Instance();
+        private Group _mainGroup => GroupManager.Instance()->MainGroup;
+
+        private string _offlineString = "offline";
 
         private PartyReadyCheckHelper _readyCheckHelper;
         private PartyFramesRaiseTracker _raiseTracker;
@@ -151,16 +159,13 @@ namespace DelvUI.Interface.Party
                 if (_groupMembers.Count > 0)
                 {
                     _groupMembers.Clear();
-                    _dirty = false;
-
                     MembersChangedEvent?.Invoke(this);
                 }
 
                 return;
             }
 
-            UIModule* uiModule = StructsFramework.Instance()->GetUIModule();
-            RaptureAtkModule = uiModule != null ? uiModule->GetRaptureAtkModule() : null;
+            _raptureAtkModule = RaptureAtkModule.Instance();
 
             // no need to update on preview mode
             if (_config.Preview)
@@ -179,16 +184,7 @@ namespace DelvUI.Interface.Party
                 return;
             }
 
-            // detect job change
-            if (player.ClassJob.RowId != _previousJob)
-            {
-                _previousJob = player.ClassJob.RowId;
-
-                if (_config.PlayerOrderOverrideEnabled && _config.PlayerOrder == FirstOfMyRoleOrder)
-                {
-                    _dirty = true;
-                }
-            }
+            bool isCrossWorld = IsCrossWorldParty();
 
             // ready check update
             if (_iconsConfig.ReadyCheckStatus.Enabled)
@@ -201,16 +197,8 @@ namespace DelvUI.Interface.Party
                 // title
                 _partyTitle = GetPartyListTitle();
 
-                // trust
-                if (PartyListAddon->TrustCount > 0)
-                {
-                    UpdateTrustParty(player, PartyListAddon->TrustCount);
-                    UpdateTrackers();
-                    return;
-                }
-
                 // solo
-                if (_realMemberCount <= 1)
+                if (_realMemberCount <= 1 && PartyListAddon->TrustCount == 0)
                 {
                     if (_config.ShowWhenSolo)
                     {
@@ -222,152 +210,170 @@ namespace DelvUI.Interface.Party
                         MembersChangedEvent?.Invoke(this);
                     }
 
-                    UpdateTrackers();
-                    return;
+                    _prevMemberCount = _realMemberCount;
+                    _wasRealGroup = false;
                 }
-
-                // parse raw data and detect changes
-                bool partyChanged = ParseRawData();
-
-                // if party is the same, just update actor references
-                if (!partyChanged)
-                {
-                    bool jobsChanged = false;
-                    PartyFramesMember? playerMember = null;
-
-                    foreach (IPartyFramesMember member in _groupMembers)
-                    {
-                        int index = member.ObjectId == player.GameObjectId ? 0 : member.Order - 1;
-                        ReadyCheckStatus readyCheckStatus = ReadyCheckStatusForMember(member, index, (uint)player.GameObjectId);
-
-                        uint jobId = JobIdForIndex(index);
-                        jobsChanged = jobsChanged || jobId != member.JobId;
-
-                        if (index == 0)
-                        {
-                            playerMember = member as PartyFramesMember;
-                        }
-
-                        member.Update(EnmityForIndex(index), StatusForIndex(index), readyCheckStatus, IsPartyLeader(index), jobId);
-                    }
-
-                    if (jobsChanged & playerMember != null)
-                    {
-                        Sort(player, playerMember);
-                    }
-                }
-                // cross world party
-                else if (IsCrossWorldParty())
-                {
-                    UpdateCrossWorldParty(player);
-                }
-                // regular party
                 else
                 {
-                    UpdateRegularParty(player);
+                    // player maps
+                    Dictionary<string, InternalMemberData> dataMap = GetMembersDataMap(isCrossWorld);
+                    bool partyChanged = _prevDataMap.Count != dataMap.Count;
+
+                    if (!partyChanged)
+                    {
+                        foreach (string key in dataMap.Keys)
+                        {
+                            InternalMemberData newData = dataMap[key];
+                            if (!_prevDataMap.TryGetValue(key, out InternalMemberData oldData) ||
+                                newData.Order != oldData.Order)
+                            {
+                                partyChanged = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (partyChanged)
+                    {
+                        Plugin.Logger.Debug(partyChanged.ToString());
+                    }
+                    _prevDataMap = dataMap;
+
+                    // trust
+                    if (PartyListAddon->TrustCount > 0)
+                    {
+                        UpdateTrustParty(player, dataMap, partyChanged);
+                    }
+                    // cross world party
+                    else if (isCrossWorld)
+                    {
+                        UpdateCrossWorldParty(player, dataMap, partyChanged);
+                    }
+                    // regular party
+                    else
+                    {
+                        UpdateRegularParty(player, dataMap, partyChanged);
+                    }
+
+                    _wasRealGroup = true;
+                    _prevMemberCount = _groupMembers.Count;
                 }
 
                 UpdateTrackers();
             }
             catch { }
+
+            _wasCrossWorld = isCrossWorld;
+        }
+
+        private Dictionary<string, InternalMemberData> GetMembersDataMap(bool isCrossWorld)
+        {
+            Dictionary<string, InternalMemberData> dataMap = new Dictionary<string, InternalMemberData>();
+
+            if (_raptureAtkModule == null || _raptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrayCount <= PartyMembersInfoIndex)
+            {
+                return dataMap;
+            }
+
+            Plugin.Logger.Debug(HudAgent.ToString("X"));
+            int count = isCrossWorld ? _crossRealmInfo->CrossRealmGroups[0].GroupMemberCount : _realMemberCount + PartyListAddon->TrustCount;
+
+            var stringArrayData = _raptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrays[PartyMembersInfoIndex];
+            for (int i = 0; i < count; i++)
+            {
+                int order = i;
+                string name = "asd";
+
+                if (!isCrossWorld)
+                {
+                    PartyListMemberRawInfo* info = (PartyListMemberRawInfo*)(HudAgent + (PartyListInfoOffset + PartyListMemberRawInfoSize * i));
+                    name = info->Name;
+                    order = info->Order;
+                }
+                else
+                {
+                    name = _crossRealmInfo->CrossRealmGroups[0].GroupMembers[i].NameString;
+                }
+
+                Plugin.Logger.Debug(name);
+
+                int index = i * 5;
+                if (stringArrayData->AtkArrayData.Size <= index + 3 ||
+                    stringArrayData->StringArray[index] == null ||
+                    stringArrayData->StringArray[index + 3] == null) { break; }
+
+                IntPtr ptr = new IntPtr(stringArrayData->StringArray[index + 3]);
+                string status = MemoryHelper.ReadSeStringNullTerminated(ptr).ToString();
+
+                if (!dataMap.ContainsKey(name))
+                {
+                    dataMap.Add(name, new InternalMemberData(order, status));
+                }
+            }
+
+            return dataMap;
         }
 
         private bool IsCrossWorldParty()
         {
-            return _groupMemberCount < _realMemberCount;
+            return _crossRealmInfo->IsCrossRealm > 0 && _crossRealmInfo->GroupCount > 0 && _mainGroup.MemberCount == 0;
         }
 
-        private ReadyCheckStatus ReadyCheckStatusForMember(IPartyFramesMember member, int index, uint playerId)
+        private ReadyCheckStatus GetReadyCheckStatus(ulong contentId)
         {
-            if (!_iconsConfig.ReadyCheckStatus.Enabled) { return ReadyCheckStatus.None; }
-
-            bool isCrossWorld = IsCrossWorldParty();
-
-            // regular party
-            if (!isCrossWorld)
-            {
-                //  local player
-                if (member.ObjectId == playerId)
-                {
-                    return _readyCheckHelper.GetStatusForIndex(0, isCrossWorld);
-                }
-
-                // find index 
-                bool foundPlayer = false;
-                for (int i = 0; i < Plugin.PartyList.Length; i++)
-                {
-                    DalamudPartyMember? dalamudMember = GetPartyMemberForIndex(i);
-                    if (dalamudMember?.ObjectId == playerId)
-                    {
-                        foundPlayer = true;
-                        continue;
-                    }
-
-                    if (dalamudMember?.ObjectId == member.ObjectId)
-                    {
-                        return _readyCheckHelper.GetStatusForIndex(foundPlayer ? i : i + 1, isCrossWorld);
-                    }
-                }
-            }
-            else
-            {
-                return _readyCheckHelper.GetStatusForIndex(index, isCrossWorld);
-            }
-
-            return ReadyCheckStatus.None;
+            return _readyCheckHelper.GetStatusForContentId(contentId);
         }
 
-        private void UpdateTrustParty(IPlayerCharacter player, int trustCount)
+        private void UpdateTrustParty(IPlayerCharacter player, Dictionary<string, InternalMemberData> dataMap, bool forced)
         {
-            bool needsUpdate = _dirty || _groupMembers.Count != trustCount + 1;
+            bool softUpdate = true;
 
-            List<string> names = new List<string>();
-            for (int i = 0; i < trustCount; i++)
-            {
-                long* namePtr = (long*)(HudAgent + (PartyTrustNameOffset + PartyTrustEntrySize * i));
-                string? name = Marshal.PtrToStringUTF8(new IntPtr(*namePtr));
-                names.Add(name ?? i.ToString());
-
-                if (_groupMembers.Count > i + 1 && name != _groupMembers[i + 1].Name)
-                {
-                    needsUpdate = true;
-                }
-            }
-
-            if (needsUpdate)
+            if (_groupMembers.Count != dataMap.Count || forced)
             {
                 _groupMembers.Clear();
-
-                PartyFramesMember playerMember = new PartyFramesMember(player, 1, EnmityForIndex(0), PartyMemberStatus.None, ReadyCheckStatus.None, true);
-                _groupMembers.Add(playerMember);
-
-                int order = 2;
-
-                for (int i = 0; i < trustCount; i++)
-                {
-                    ICharacter? trustChara = Utils.GetGameObjectByName(names[i]) as ICharacter;
-                    if (trustChara != null)
-                    {
-                        _groupMembers.Add(new PartyFramesMember(trustChara, order, EnmityForTrustMemberIndex(i), PartyMemberStatus.None, ReadyCheckStatus.None, false));
-                        order++;
-                    }
-                }
-
-                Sort(player, playerMember);
+                softUpdate = false;
             }
-            else
+
+            if (softUpdate)
             {
-                for (int i = 0; i < _groupMembers.Count; i++)
+                foreach (IPartyFramesMember member in _groupMembers)
                 {
-                    if (_groupMembers[i].ObjectId == player.GameObjectId)
+                    if (member.ObjectId == player.GameObjectId)
                     {
-                        _groupMembers[i].Update(EnmityForIndex(0), PartyMemberStatus.None, ReadyCheckStatus.None, true, player.ClassJob.RowId);
+                        member.Update(EnmityForIndex(member.Order), PartyMemberStatus.None, ReadyCheckStatus.None, true, player.ClassJob.RowId);
                     }
                     else
                     {
-                        _groupMembers[i].Update(EnmityForTrustMemberIndex(Math.Max(0, _groupMembers[i].Order - 2)), PartyMemberStatus.None, ReadyCheckStatus.None, false, 0);
+                        member.Update(EnmityForTrustMemberIndex(member.Order), PartyMemberStatus.None, ReadyCheckStatus.None, false, 0);
                     }
                 }
+            }
+            else
+            {
+                string[] keys = dataMap.Keys.ToArray();
+                for (int i = 0; i < keys.Length; i++)
+                {
+                    InternalMemberData data = dataMap[keys[i]];
+                    if (keys[i] == player.Name.ToString())
+                    {
+                        PartyFramesMember playerMember = new PartyFramesMember(player, i, data.Order, EnmityForIndex(data.Order), PartyMemberStatus.None, ReadyCheckStatus.None, true);
+                        _groupMembers.Add(playerMember);
+                    }
+                    else
+                    {
+                        ICharacter? trustChara = Utils.GetGameObjectByName(keys[i]) as ICharacter;
+                        if (trustChara != null)
+                        {
+                            _groupMembers.Add(new PartyFramesMember(trustChara, i, data.Order, EnmityForTrustMemberIndex(data.Order), PartyMemberStatus.None, ReadyCheckStatus.None, false));
+                        }
+                    }
+                }
+            }
+
+            if (!softUpdate)
+            {
+                SortGroupMembers(player);
+                MembersChangedEvent?.Invoke(this);
             }
         }
 
@@ -388,7 +394,7 @@ namespace DelvUI.Interface.Party
                 (_groupMembers.Count != 2 && _config.ShowChocobo && chocobo != null) ||
                 (_groupMembers.Count > 1 && !_config.ShowChocobo) ||
                 (_groupMembers.Count > 1 && chocobo == null) ||
-                (_groupMembers.Count == 2 && _config.ShowChocobo && _groupMembers[1].ObjectId != chocobo?.GameObjectId);
+                (_groupMembers.Count == 2 && _config.ShowChocobo && _groupMembers[1].ObjectId != chocobo?.EntityId);
 
             EnmityLevel playerEnmity = PartyListAddon->EnmityLeaderIndex == 0 ? EnmityLevel.Leader : EnmityLevel.Last;
 
@@ -403,13 +409,14 @@ namespace DelvUI.Interface.Party
             {
                 _groupMembers.Clear();
 
-                _groupMembers.Add(new PartyFramesMember(player, 1, playerEnmity, PartyMemberStatus.None, ReadyCheckStatus.None, true));
+                _groupMembers.Add(new PartyFramesMember(player, 0, 0, playerEnmity, PartyMemberStatus.None, ReadyCheckStatus.None, true));
 
                 if (chocobo != null)
                 {
-                    _groupMembers.Add(new PartyFramesMember(chocobo, 2, chocoboEnmity, PartyMemberStatus.None, ReadyCheckStatus.None, false));
+                    _groupMembers.Add(new PartyFramesMember(chocobo, 1, 1, chocoboEnmity, PartyMemberStatus.None, ReadyCheckStatus.None, false));
                 }
 
+                SortGroupMembers(player);
                 MembersChangedEvent?.Invoke(this);
             }
             else
@@ -421,122 +428,138 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        private bool ParseRawData()
+        private void UpdateCrossWorldParty(IPlayerCharacter player, Dictionary<string, InternalMemberData> dataMap, bool forced)
         {
-            if (HudAgent == IntPtr.Zero) { return false; }
+            bool softUpdate = true;
 
-            // player status
-            Dictionary<string, string> PlayerStatusMap = new Dictionary<string, string>();
-            if (RaptureAtkModule != null && RaptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrayCount > PartyMembersInfoIndex)
+            int count = _crossRealmInfo->CrossRealmGroups[0].GroupMemberCount;
+            if (!_wasCrossWorld || count != _prevMemberCount || forced)
             {
-                var stringArrayData = RaptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrays[PartyMembersInfoIndex];
-                for (int i = 5; i < 40; i += 5)
-                {
-                    if (stringArrayData->AtkArrayData.Size <= i + 3 || stringArrayData->StringArray[i] == null || stringArrayData->StringArray[i + 3] == null) { break; }
-
-                    IntPtr ptr = new IntPtr(stringArrayData->StringArray[i]);
-                    string name = MemoryHelper.ReadSeStringNullTerminated(ptr).ToString();
-
-                    ptr = new IntPtr(stringArrayData->StringArray[i + 3]);
-                    string status = MemoryHelper.ReadSeStringNullTerminated(ptr).ToString();
-
-                    if (!PlayerStatusMap.ContainsKey(name))
-                    {
-                        PlayerStatusMap.Add(name, status);
-                    }
-                }
+                _groupMembers.Clear();
+                softUpdate = false;
             }
 
-            // party data
-            bool partyChanged = _dirty || _partyMembersInfo == null || _groupMembers.Count != _realMemberCount;
-
-            List<PartyListMemberInfo> newInfo = new List<PartyListMemberInfo>(_realMemberCount);
-            for (int i = 0; i < _realMemberCount; i++)
-            {
-                PartyListMemberRawInfo* info = (PartyListMemberRawInfo*)(HudAgent + (PartyListInfoOffset + PartyListMemberRawInfoSize * i));
-                string? name = NameForIndex(i);
-                string? status = null;
-
-                if (name != null)
-                {
-                    PlayerStatusMap.TryGetValue(name, out status);
-                }
-
-                newInfo.Add(new PartyListMemberInfo(info, name, JobIdForIndex(i), status));
-            }
-
-            if (!partyChanged && _partyMembersInfo != null)
-            {
-                partyChanged = !newInfo.SequenceEqual(_partyMembersInfo);
-            }
-            _partyMembersInfo = newInfo;
-
-            return partyChanged;
-        }
-
-        private void UpdateCrossWorldParty(IPlayerCharacter player)
-        {
             // create new members array with cross world data
-            _groupMembers.Clear();
-
-            for (int i = 0; i < _realMemberCount; i++)
+            for (int i = 0; i < _crossRealmInfo->CrossRealmGroups[0].GroupMemberCount; i++)
             {
-                bool isPlayer = i == 0;
+                CrossRealmMember member = _crossRealmInfo->CrossRealmGroups[0].GroupMembers[i];
+                string memberName = member.NameString;
 
-                int order = i + 1;
-                EnmityLevel enmity = EnmityForIndex(i);
-                PartyMemberStatus status = StatusForIndex(i);
-                bool isPartyLeader = IsPartyLeader(i);
+                if (!dataMap.TryGetValue(memberName, out InternalMemberData data))
+                {
+                    continue;
+                }
 
-                PartyFramesMember member = isPlayer ?
-                    new PartyFramesMember(player, order, enmity, status, ReadyCheckStatus.None, isPartyLeader) :
-                    new PartyFramesMember(NameForIndex(i), order, JobIdForIndex(i), status, ReadyCheckStatus.None, isPartyLeader);
-                _groupMembers.Add(member);
+                bool isPlayer = member.EntityId == player.EntityId;
+                bool isLeader = member.IsPartyLeader > 0;
+                PartyMemberStatus status = data.Status != null ? StatusForMember(data.Status, i) : PartyMemberStatus.None;
+                ReadyCheckStatus readyCheckStatus = GetReadyCheckStatus(member.ContentId);
+
+                if (softUpdate)
+                {
+                    IPartyFramesMember groupMember = _groupMembers.ElementAt(i);
+                    groupMember.Update(EnmityLevel.Last, status, readyCheckStatus, isLeader, member.ClassJobId);
+                }
+                else
+                {
+                    PartyFramesMember partyMember = isPlayer ?
+                        new PartyFramesMember(player, i, data.Order, EnmityLevel.Last, status, readyCheckStatus, isLeader) :
+                        new PartyFramesMember(memberName, i, data.Order, member.ClassJobId, status, readyCheckStatus, isLeader);
+                    _groupMembers.Add(partyMember);
+                }
             }
 
-            Sort(player, null);
+            if (!softUpdate)
+            {
+                SortGroupMembers(player);
+                MembersChangedEvent?.Invoke(this);
+            }
         }
 
-        private void UpdateRegularParty(IPlayerCharacter player)
+        private void UpdateRegularParty(IPlayerCharacter player, Dictionary<string, InternalMemberData> dataMap, bool forced)
         {
-            // create new members array with dalamud's data
-            _groupMembers.Clear();
+            bool softUpdate = true;
 
-            PartyFramesMember? playerMember = null;
+            if (!_wasRealGroup || _groupMemberCount != _prevMemberCount || forced)
+            {
+                _groupMembers.Clear();
+                softUpdate = false;
+            }
 
             for (int i = 0; i < _groupMemberCount; i++)
             {
-                DalamudPartyMember? partyMember = GetPartyMemberForIndex(i);
-                if (partyMember == null) { continue; }
+                DalamudPartyMember? member = GetPartyMemberForIndex(i);
+                if (member == null) { continue; }
 
-                bool isPlayer = partyMember.ObjectId == player.GameObjectId;
-                int order = isPlayer ? 1 : (IndexForPartyMember(partyMember) ?? 9);
-                int index = isPlayer ? 0 : order - 1;
-                EnmityLevel enmity = EnmityForIndex(index);
-                PartyMemberStatus status = StatusForIndex(index);
-                bool isPartyLeader = i == Plugin.PartyList.PartyLeaderIndex;
-
-                PartyFramesMember member = new PartyFramesMember(partyMember, order, enmity, status, ReadyCheckStatus.None, isPartyLeader);
-
-                if (isPlayer)
+                if (!dataMap.TryGetValue(member.Name.ToString(), out InternalMemberData data))
                 {
-                    playerMember = member;
+                    continue;
                 }
 
-                _groupMembers.Add(member);
+                bool isPlayer = member.ObjectId == player.GameObjectId;
+                bool isLeader = _mainGroup.PartyLeaderIndex == i;
+                EnmityLevel enmity = EnmityForIndex(i);
+                PartyMemberStatus status = data.Status != null ? StatusForMember(data.Status, i) : PartyMemberStatus.None;
+                ReadyCheckStatus readyCheckStatus = GetReadyCheckStatus((ulong)member.ContentId);
 
-                // player's chocobo (always last)
-                if (_config.ShowChocobo && member.ObjectId == player.GameObjectId)
+                if (softUpdate)
                 {
-                    var companion = Utils.GetBattleChocobo(player);
-                    if (companion is ICharacter companionCharacter)
-                    {
-                        _groupMembers.Add(new PartyFramesMember(companionCharacter, 10, EnmityLevel.Last, PartyMemberStatus.None, ReadyCheckStatus.None, false));
-                    }
+                    IPartyFramesMember groupMember = _groupMembers.ElementAt(i);
+                    groupMember.Update(enmity, status, readyCheckStatus, isLeader, member.ClassJob.RowId);
+                }
+                else
+                {
+                    PartyFramesMember partyMember = new PartyFramesMember(member, i, data.Order, enmity, status, readyCheckStatus, isLeader);
+                    _groupMembers.Add(partyMember);
                 }
             }
 
-            Sort(player, playerMember);
+            // player's chocobo (always last)
+            if (!softUpdate && _config.ShowChocobo)
+            {
+                var companion = Utils.GetBattleChocobo(player);
+                if (companion is ICharacter companionCharacter)
+                {
+                    _groupMembers.Add(new PartyFramesMember(companionCharacter, _groupMemberCount, 10, EnmityLevel.Last, PartyMemberStatus.None, ReadyCheckStatus.None, false));
+                }
+            }
+
+            if (!softUpdate)
+            {
+                SortGroupMembers(player);
+                MembersChangedEvent?.Invoke(this);
+            }
+        }
+
+
+        private void SortGroupMembers(IPlayerCharacter player)
+        {
+            _sortedGroupMembers.Clear();
+            _sortedGroupMembers.AddRange(_groupMembers);
+
+            _sortedGroupMembers.Sort((a, b) =>
+            {
+                if (a.Order == b.Order)
+                {
+                    if (a.ObjectId == player.GameObjectId)
+                    {
+                        return 1;
+                    }
+                    else if (b.ObjectId == player.GameObjectId)
+                    {
+                        return -1;
+                    }
+
+                    return a.Name.CompareTo(b.Name);
+                }
+
+                if (a.Order < b.Order)
+                {
+                    return -1;
+                }
+
+                return 1;
+            });
         }
 
         private DalamudPartyMember? GetPartyMemberForIndex(int index)
@@ -550,33 +573,6 @@ namespace DelvUI.Interface.Party
             return Plugin.PartyList.CreatePartyMemberReference(new IntPtr(memberStruct));
         }
 
-        private void Sort(IPlayerCharacter player, PartyFramesMember? playerMember)
-        {
-            // calculate player overriden position
-            if (playerMember != null && _config.PlayerOrderOverrideEnabled)
-            {
-                if (_config.PlayerOrder == FirstOfMyRoleOrder)
-                {
-                    int? roleFirstOrder = PartyOrderHelper.GetRoleFirstOrder(_groupMembers);
-                    if (roleFirstOrder.HasValue)
-                    {
-                        playerMember.Order = roleFirstOrder.Value + 1;
-                    }
-                }
-                else
-                {
-                    playerMember.Order = _config.PlayerOrder + 1;
-                }
-            }
-
-            // sort
-            SortGroupMembers(player);
-            _dirty = false;
-
-            // fire event
-            MembersChangedEvent?.Invoke(this);
-        }
-
         private void UpdateTrackers()
         {
             _raiseTracker.Update(_groupMembers);
@@ -585,68 +581,26 @@ namespace DelvUI.Interface.Party
         }
 
         #region utils
-        private string? NameForIndex(int index)
+
+        private PartyMemberStatus StatusForMember(string name, int index)
         {
-            if (HudAgent == IntPtr.Zero || index < 0 || index > 7)
-            {
-                return null;
-            }
-
-            IntPtr namePtr = (HudAgent + (PartyCrossWorldNameOffset + PartyCrossWorldEntrySize * index));
-            return Marshal.PtrToStringUTF8(namePtr);
-        }
-
-        private string? DisplayNameForIndex(int index)
-        {
-            if (HudAgent == IntPtr.Zero || index < 0 || index > 7)
-            {
-                return null;
-            }
-
-            IntPtr namePtr = (HudAgent + (PartyCrossWorldDisplayNameOffset + PartyCrossWorldEntrySize * index));
-            return Marshal.PtrToStringUTF8(namePtr);
-        }
-
-        private PartyMemberStatus StatusForIndex(int index)
-        {
-            if (index < 0 || index > 7)
-            {
-                return PartyMemberStatus.None;
-            }
-
             // TODO: support for other languages
             // couldn't figure out another way of doing this sadly
 
             // offline status
-            string status = _partyMembersInfo[index].Status;
-            if (status.Contains("Offline"))
+            if (name.Contains(_offlineString, StringComparison.InvariantCultureIgnoreCase))
             {
                 return PartyMemberStatus.Offline;
             }
 
             // viewing cutscene status
-            string? displayName = DisplayNameForIndex(index);
-            if (displayName != null && displayName.Contains("Viewing Cutscene"))
+            if (index >= 0 && index < _mainGroup.MemberCount &&
+                (_mainGroup.PartyMembers[index].Flags & 0x10) != 0)
             {
                 return PartyMemberStatus.ViewingCutscene;
             }
 
             return PartyMemberStatus.None;
-        }
-
-        private uint JobIdForIndex(int index)
-        {
-            if (PartyListAddon == null || index < 0 || index > 7)
-            {
-                return 0;
-            }
-
-            // since we don't get the job info in a nice way when another player is out of reach
-            // we infer it from the icon id in the party list
-            int* ptr = (int*)(new IntPtr(PartyListAddon) + PartyJobIconIdsOffset + (4 * index));
-            int iconId = *ptr;
-
-            return (uint)(Math.Max(0, iconId - 62100));
         }
 
         private EnmityLevel EnmityForIndex(int index)
@@ -675,56 +629,6 @@ namespace DelvUI.Interface.Party
             return (EnmityLevel)PartyListAddon->TrustMembers[index].EmnityByte;
         }
 
-        private bool IsPartyLeader(int index)
-        {
-            if (PartyListAddon == null)
-            {
-                return false;
-            }
-
-            // we use the icon Y coordinate in the party list to know the index (lmao)
-            uint partyLeadIndex = (uint)PartyListAddon->LeaderMarkResNode->ChildNode->Y / 40;
-            return index == partyLeadIndex;
-        }
-
-        private int? IndexForPartyMember(IPartyMember member)
-        {
-            if (_partyMembersInfo == null || _partyMembersInfo.Count == 0)
-            {
-                return null;
-            }
-
-            var name = member.Name.ToString();
-            return _partyMembersInfo.FindIndex(o => (member.ObjectId != 0 && o.ObjectId == member.ObjectId) || o.Name == name) + 1;
-        }
-
-        private void SortGroupMembers(IPlayerCharacter player)
-        {
-            _groupMembers.Sort((a, b) =>
-            {
-                if (a.Order == b.Order)
-                {
-                    if (a.ObjectId == player.GameObjectId)
-                    {
-                        return 1;
-                    }
-                    else if (b.ObjectId == player.GameObjectId)
-                    {
-                        return -1;
-                    }
-
-                    return a.Name.CompareTo(b.Name);
-                }
-
-                if (a.Order < b.Order)
-                {
-                    return -1;
-                }
-
-                return 1;
-            });
-        }
-
         private static unsafe string? GetPartyListTitle()
         {
             AgentModule* agentModule = AgentModule.Instance();
@@ -744,27 +648,11 @@ namespace DelvUI.Interface.Party
         #endregion
 
         #region events
-        public void OnPlayerOrderChange()
-        {
-            if (_config.PlayerOrderOverrideEnabled)
-            {
-                _dirty = true;
-            }
-        }
-
         private void OnConfigPropertyChanged(object sender, OnChangeBaseArgs args)
         {
             if (args.PropertyName == "Preview")
             {
                 UpdatePreview();
-            }
-            else if (args.PropertyName == "PlayerOrder" || args.PropertyName == "PlayerOrderOverrideEnabled")
-            {
-                OnPlayerOrderChange();
-            }
-            else if (args.PropertyName == "ShowChocobo")
-            {
-                _dirty = true;
             }
         }
 
@@ -793,50 +681,38 @@ namespace DelvUI.Interface.Party
 
             MembersChangedEvent?.Invoke(this);
         }
-
         #endregion
+    }
 
-        #region raw party info
-        internal unsafe class PartyListMemberInfo : IEquatable<PartyListMemberInfo>
+    internal struct InternalMemberData
+    {
+        internal int Order;
+        internal string? Status;
+
+        public InternalMemberData(int order, string? status)
         {
-            public readonly string Name;
-            public readonly uint ObjectId;
-            public readonly byte Type;
-            public readonly uint JobId;
-            public readonly string Status;
-
-            public PartyListMemberInfo(PartyListMemberRawInfo* info, string? crossWorldName, uint jobId, string? status)
-            {
-                Name = crossWorldName ?? (Marshal.PtrToStringUTF8(new IntPtr(info->NamePtr)) ?? "");
-                ObjectId = info->ObjectId;
-                Type = info->Type;
-                JobId = jobId;
-                Status = status ?? "";
-            }
-
-            public bool Equals(PartyListMemberInfo? other)
-            {
-                return ObjectId == other?.ObjectId && Name == other?.Name;
-            }
+            Order = order;
+            Status = status;
         }
+    }
 
-        [StructLayout(LayoutKind.Explicit, Size = 24)]
-        public unsafe struct PartyListMemberRawInfo
-        {
-            [FieldOffset(0x00)] public byte* NamePtr;
-            [FieldOffset(0x08)] public long ContentId;
-            [FieldOffset(0x10)] public uint ObjectId;
+    [StructLayout(LayoutKind.Explicit, Size = 28)]
+    public unsafe struct PartyListMemberRawInfo
+    {
+        [FieldOffset(0x00)] public byte* NamePtr;
+        [FieldOffset(0x08)] public long ContentId;
+        [FieldOffset(0x10)] public uint ObjectId;
 
-            // some kind of type
-            // 1 = player
-            // 2 = party member?
-            // 3 = unknown
-            // 4 = chocobo
-            // 5 = summon?
-            [FieldOffset(0x14)] public byte Type;
+        // some kind of type
+        // 1 = player
+        // 2 = party member?
+        // 3 = unknown
+        // 4 = chocobo
+        // 5 = summon?
+        [FieldOffset(0x14)] public byte Type;
 
-            public string Name => Marshal.PtrToStringUTF8(new IntPtr(NamePtr)) ?? "";
-        }
-        #endregion
+        [FieldOffset(0x18)] public byte Order;
+
+        public string Name => Marshal.PtrToStringUTF8(new IntPtr(NamePtr)) ?? "";
     }
 }

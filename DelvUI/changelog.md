@@ -1,3 +1,10 @@
+# 2.3.1.0
+- Fixed serveral issues with the Party Frames and Party Cooldowns.
+- Fixed Ready Check Status icon in the Party Frames.
+- Removed the Player Order Override setting from Party Frames:
+  * This is now possible through the game's systems.
+  * In order to simplify the logic, DelvUI's Party Frames will follow the order in the game's party list at all times.
+
 # 2.3.0.0
 - Added support for Patch 7.1 and Dalamud API 11.
 

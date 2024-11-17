@@ -31,6 +31,7 @@ namespace DelvUI.Interface.Party
         public uint ObjectId => _partyMember != null ? _partyMember.ObjectId : _objectID;
         public ICharacter? Character { get; private set; }
 
+        public int Index { get; set; }
         public int Order { get; set; }
         public string Name => _partyMember != null ? _partyMember.Name.ToString() : (Character != null ? Character.Name.ToString() : _name);
         public uint Level => _partyMember != null ? _partyMember.Level : (Character != null ? Character.Level : (uint)0);
@@ -49,9 +50,10 @@ namespace DelvUI.Interface.Party
         public bool HasDispellableDebuff { get; set; } = false;
         public WhosTalkingState WhosTalkingState => WhosTalkingHelper.Instance?.GetUserState(Name) ?? WhosTalkingState.None;
 
-        public PartyFramesMember(IPartyMember partyMember, int order, EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader)
+        public PartyFramesMember(IPartyMember partyMember, int index, int order, EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader)
         {
             _partyMember = partyMember;
+            Index = index;
             Order = order;
             EnmityLevel = enmityLevel;
             Status = status;
@@ -65,8 +67,9 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        public PartyFramesMember(ICharacter character, int order, EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader)
+        public PartyFramesMember(ICharacter character, int index, int order, EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader)
         {
+            Index = index;
             Order = order;
             EnmityLevel = enmityLevel;
             Status = status;
@@ -77,8 +80,9 @@ namespace DelvUI.Interface.Party
             Character = character;
         }
 
-        public PartyFramesMember(string? name, int order, uint jobId, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader)
+        public PartyFramesMember(string? name, int index, int order, uint jobId, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader)
         {
+            Index = index;
             Order = order;
             Status = status;
             ReadyCheckStatus = readyCheckStatus;
@@ -122,6 +126,7 @@ namespace DelvUI.Interface.Party
         public uint ObjectId => 0xE0000000;
         public ICharacter? Character => null;
 
+        public int Index { get; set; }
         public int Order { get; set; }
         public string Name { get; private set; }
         public uint Level { get; private set; }
@@ -143,6 +148,7 @@ namespace DelvUI.Interface.Party
         public FakePartyFramesMember(int order)
         {
             Name = RNG.Next(0, 2) == 1 ? "Fake Name" : "FakeLonger MockedName";
+            Index = order;
             Order = order + 1;
             Level = (uint)RNG.Next(1, 80);
             JobId = (uint)RNG.Next(19, 41);
@@ -172,6 +178,7 @@ namespace DelvUI.Interface.Party
         public uint ObjectId { get; }
         public ICharacter? Character { get; }
 
+        public int Index { get; }
         public int Order { get; }
         public string Name { get; }
         public uint Level { get; }

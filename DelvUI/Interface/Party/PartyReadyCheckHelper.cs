@@ -114,17 +114,18 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        public unsafe ReadyCheckStatus GetStatusForIndex(int index, bool isCrossWorld)
+        public unsafe ReadyCheckStatus GetStatusForContentId(ulong contentId)
         {
-            if (!_readyCheckOngoing || index < 0 || index > 7)
-            {
-                return ReadyCheckStatus.None;
-            }
-
             try
             {
-                ReadyCheckEntry entry = AgentReadyCheck.Instance()->ReadyCheckEntries[index];
-                return ParseStatus(entry);
+                for (int i = 0; i < 8; i++)
+                {
+                    ReadyCheckEntry entry = AgentReadyCheck.Instance()->ReadyCheckEntries[i];
+                    if (entry.ContentId == contentId)
+                    {
+                        return ParseStatus(entry);
+                    }
+                }
             }
             catch { }
 

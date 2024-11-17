@@ -45,14 +45,6 @@ namespace DelvUI.Interface.Party
         [Order(20)]
         public bool FillRowsFirst = true;
 
-        [Checkbox("Player Order Override Enabled (Tip: Ctrl+Alt+Shift Click on a bar to set your desired spot in the frames)", spacing = true)]
-        [Order(25)]
-        public bool PlayerOrderOverrideEnabled = false;
-
-        [Combo("Player Position", "1", "2", "3", "4", "5", "6", "7", "8", "First of my role", isMonitored = true)]
-        [Order(25, collapseWith = nameof(PlayerOrderOverrideEnabled))]
-        public int PlayerOrder = 1;
-
         [Checkbox("Show When Solo", spacing = true)]
         [Order(50)]
         public bool ShowWhenSolo = false;

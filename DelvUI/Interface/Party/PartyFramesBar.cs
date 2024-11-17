@@ -19,7 +19,6 @@ namespace DelvUI.Interface.Party
     public class PartyFramesBar
     {
         public delegate void PartyFramesBarEventHandler(PartyFramesBar bar);
-        public PartyFramesBarEventHandler? MovePlayerEvent;
         public PartyFramesBarEventHandler? OpenContextMenuEvent;
 
         private PartyFramesConfigs _configs;
@@ -155,18 +154,9 @@ namespace DelvUI.Interface.Party
                 InputsHelper.Instance.SetTarget(character, ignoreMouseover);
 
                 // left click
-                if (InputsHelper.Instance.LeftButtonClicked)
+                if (InputsHelper.Instance.LeftButtonClicked && character != null)
                 {
-                    // move player bar to this spot on ctrl+alt+shift click
-                    if (ImGui.GetIO().KeyCtrl && ImGui.GetIO().KeyAlt && ImGui.GetIO().KeyShift)
-                    {
-                        MovePlayerEvent?.Invoke(this);
-                    }
-                    // target
-                    else if (character != null)
-                    {
-                        Plugin.TargetManager.Target = character;
-                    }
+                    Plugin.TargetManager.Target = character;
                 }
                 // right click (context menu)
                 else if (InputsHelper.Instance.RightButtonClicked)
@@ -611,8 +601,7 @@ namespace DelvUI.Interface.Party
             // order
             if (character == null || character?.ObjectKind != ObjectKind.BattleNpc)
             {
-                int order = Member.ObjectId == player.GameObjectId ? 1 : Member.Order;
-                string str = char.ConvertFromUtf32(0xE090 + order - 1).ToString();
+                string str = char.ConvertFromUtf32(0xE090 + Member.Order).ToString();
 
                 drawActions.Add((_configs.HealthBar.OrderNumberConfig.StrataLevel, () =>
                 {

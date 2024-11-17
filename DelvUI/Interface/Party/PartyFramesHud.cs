@@ -48,7 +48,6 @@ namespace DelvUI.Interface.Party
             for (int i = 0; i < bars.Capacity; i++)
             {
                 PartyFramesBar bar = new PartyFramesBar("DelvUI_partyFramesBar" + i, Configs);
-                bar.MovePlayerEvent += OnMovePlayer;
                 bar.OpenContextMenuEvent += OnOpenContextMenu;
 
                 bars.Add(bar);
@@ -96,18 +95,6 @@ namespace DelvUI.Interface.Party
             PartyManager.Instance.MembersChangedEvent -= OnMembersChanged;
         }
 
-        private void OnMovePlayer(PartyFramesBar bar)
-        {
-            if (Config.PlayerOrderOverrideEnabled && bar.Member != null)
-            {
-                int offset = bar.Member.Order - 1 > Config.PlayerOrder ? -1 : -2;
-                Config.PlayerOrder = Math.Max(0, Math.Min(7, bar.Member.Order + offset));
-                PartyManager.Instance.OnPlayerOrderChange();
-
-                ConfigurationManager.Instance.SaveConfigurations();
-            }
-        }
-
         private unsafe void OnOpenContextMenu(PartyFramesBar bar)
         {
             if (bar.Member == null || Plugin.ClientState.LocalPlayer == null)
@@ -121,9 +108,7 @@ namespace DelvUI.Interface.Party
             }
 
             int addonId = PartyManager.Instance.PartyListAddon->AtkUnitBase.Id;
-            int index = bar.Member.Character?.GameObjectId == Plugin.ClientState.LocalPlayer.GameObjectId ? 0 : bar.Member.Order - 1;
-
-            _openContextMenu?.Invoke(PartyManager.Instance.HudAgent, addonId, index);
+            _openContextMenu?.Invoke(PartyManager.Instance.HudAgent, addonId, bar.Member.Index);
         }
 
         private void OnLayoutPropertyChanged(object sender, OnChangeBaseArgs args)
@@ -160,7 +145,7 @@ namespace DelvUI.Interface.Party
                 }
 
                 // update bar
-                IPartyFramesMember member = PartyManager.Instance.GroupMembers.ElementAt(i);
+                IPartyFramesMember member = PartyManager.Instance.SortedGroupMembers.ElementAt(i);
                 bar.Member = member;
                 bar.Visible = true;
 
