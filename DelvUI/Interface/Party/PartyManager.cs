@@ -504,7 +504,15 @@ namespace DelvUI.Interface.Party
                 }
                 else
                 {
-                    PartyFramesMember partyMember = new PartyFramesMember(data.ObjectId, i, data.Order, enmity, status, readyCheckStatus, isLeader);
+                    PartyFramesMember partyMember;
+                    if (GetDalamudPartyMember(data.ObjectId) is DalamudPartyMember dalamudPartyMember)
+                    {
+                        partyMember = new PartyFramesMember(dalamudPartyMember, i, data.Order, enmity, status, readyCheckStatus, isLeader);
+                    }
+                    else
+                    {
+                        partyMember = new PartyFramesMember(data.ObjectId, i, data.Order, enmity, status, readyCheckStatus, isLeader);
+                    }
                     _groupMembers.Add(partyMember);
                 }
             }
@@ -557,14 +565,11 @@ namespace DelvUI.Interface.Party
             });
         }
 
-        private DalamudPartyMember? GetPartyMemberForIndex(int index)
+        private DalamudPartyMember? GetDalamudPartyMember(uint objectId)
         {
-            if (_groupMemberCount <= 0)
-            {
-                return null;
-            }
+            StructsPartyMember* memberStruct = GroupManager.Instance()->GetGroup()->GetPartyMemberByEntityId(objectId);
+            if (memberStruct == null) { return null; }
 
-            StructsPartyMember* memberStruct = GroupManager.Instance()->GetGroup()->GetPartyMemberByIndex(index);
             return Plugin.PartyList.CreatePartyMemberReference(new IntPtr(memberStruct));
         }
 

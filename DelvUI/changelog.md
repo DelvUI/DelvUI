@@ -1,3 +1,6 @@
+# 2.3.1.3
+- Fixed Party Frames sometimes showing empty bars.
+
 # 2.3.1.2
 - Fixed Party Frames enmity indicators.
 - Fixed Ready Check Status icon not disappearing.
