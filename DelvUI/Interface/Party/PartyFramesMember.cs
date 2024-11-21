@@ -45,12 +45,13 @@ namespace DelvUI.Interface.Party
         public PartyMemberStatus Status { get; private set; } = PartyMemberStatus.None;
         public ReadyCheckStatus ReadyCheckStatus { get; private set; } = ReadyCheckStatus.None;
         public bool IsPartyLeader { get; private set; } = false;
+        public bool IsChocobo { get; private set; } = false;
         public float? RaiseTime { get; set; }
         public InvulnStatus? InvulnStatus { get; set; }
         public bool HasDispellableDebuff { get; set; } = false;
         public WhosTalkingState WhosTalkingState => WhosTalkingHelper.Instance?.GetUserState(Name) ?? WhosTalkingState.None;
 
-        public PartyFramesMember(IPartyMember partyMember, int index, int order, EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader)
+        public PartyFramesMember(IPartyMember partyMember, int index, int order, EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader, bool isChocobo = false)
         {
             _partyMember = partyMember;
             Index = index;
@@ -59,6 +60,7 @@ namespace DelvUI.Interface.Party
             Status = status;
             ReadyCheckStatus = readyCheckStatus;
             IsPartyLeader = isPartyLeader;
+            IsChocobo = isChocobo;
 
             var gameObject = partyMember.GameObject;
             if (gameObject is ICharacter character)
@@ -67,7 +69,7 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        public PartyFramesMember(ICharacter character, int index, int order, EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader)
+        public PartyFramesMember(ICharacter character, int index, int order, EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader, bool isChocobo = false)
         {
             Index = index;
             Order = order;
@@ -75,12 +77,13 @@ namespace DelvUI.Interface.Party
             Status = status;
             ReadyCheckStatus = readyCheckStatus;
             IsPartyLeader = isPartyLeader;
+            IsChocobo = isChocobo;
 
             _objectID = (uint)character.GameObjectId;
             Character = character;
         }
 
-        public PartyFramesMember(uint objectId, int index, int order, EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader)
+        public PartyFramesMember(uint objectId, int index, int order, EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader, bool isChocobo = false)
         {
             Index = index;
             Order = order;
@@ -88,19 +91,22 @@ namespace DelvUI.Interface.Party
             Status = status;
             ReadyCheckStatus = readyCheckStatus;
             IsPartyLeader = isPartyLeader;
+            IsChocobo = isChocobo;
 
             _objectID = objectId;
             var gameObject = Plugin.ObjectTable.SearchById(ObjectId);
             Character = gameObject is ICharacter ? (ICharacter)gameObject : null;
         }
 
-        public PartyFramesMember(string? name, int index, int order, uint jobId, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader)
+        public PartyFramesMember(string? name, int index, int order, uint jobId, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader, bool isChocobo = false)
         {
             Index = index;
             Order = order;
             Status = status;
             ReadyCheckStatus = readyCheckStatus;
             IsPartyLeader = isPartyLeader;
+            IsChocobo = isChocobo;
+
             _name = name ?? "";
             _jobId = jobId;
         }
@@ -158,6 +164,7 @@ namespace DelvUI.Interface.Party
         public PartyMemberStatus Status { get; private set; }
         public ReadyCheckStatus ReadyCheckStatus { get; private set; }
         public bool IsPartyLeader { get; }
+        public bool IsChocobo { get; }
         public float? RaiseTime { get; set; }
         public InvulnStatus? InvulnStatus { get; set; }
         public bool HasDispellableDebuff { get; set; }
@@ -179,6 +186,7 @@ namespace DelvUI.Interface.Party
             Status = order < 3 ? PartyMemberStatus.None : (order == 3 ? PartyMemberStatus.Dead : (PartyMemberStatus)RNG.Next(0, 3));
             ReadyCheckStatus = (ReadyCheckStatus)RNG.Next(0, 3);
             IsPartyLeader = order == 0;
+            IsChocobo = RNG.Next(0, 8) == 1;
             HasDispellableDebuff = RNG.Next(0, 2) == 1;
             RaiseTime = order == 2 ? RNG.Next(0, 60) : null;
             InvulnStatus = order == 0 ? new InvulnStatus(3077, RNG.Next(0, 10), 810) : null;
@@ -210,6 +218,7 @@ namespace DelvUI.Interface.Party
         public PartyMemberStatus Status { get; }
         public ReadyCheckStatus ReadyCheckStatus { get; }
         public bool IsPartyLeader { get; }
+        public bool IsChocobo { get; }
         public float? RaiseTime { get; set; }
         public InvulnStatus? InvulnStatus { get; set; }
         public bool HasDispellableDebuff { get; set; }

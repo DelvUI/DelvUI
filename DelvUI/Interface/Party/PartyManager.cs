@@ -117,8 +117,7 @@ namespace DelvUI.Interface.Party
         public string PartyTitle => _partyTitle ?? "";
 
         private int _groupMemberCount => GroupManager.Instance()->MainGroup.MemberCount;
-        private int _realMemberCount => PartyListAddon != null ? PartyListAddon->MemberCount : Plugin.PartyList.Length;
-        private int _prevMemberCount = 0;
+        private int _realMemberCount => PartyListAddon != null ? PartyListAddon->MemberCount + Math.Max(1, (int)PartyListAddon->ChocoboCount) : Plugin.PartyList.Length;
 
         private Dictionary<string, InternalMemberData> _prevDataMap = new();
 
@@ -255,9 +254,11 @@ namespace DelvUI.Interface.Party
 
                 UpdateTrackers();
             }
-            catch { }
+            catch (Exception e)
+            {
+                Plugin.Logger.Warning(e.Message);
+            }
 
-            _prevMemberCount = _groupMemberCount;
             _wasCrossWorld = isCrossWorld;
         }
 
@@ -430,7 +431,7 @@ namespace DelvUI.Interface.Party
             bool softUpdate = true;
 
             int count = _crossRealmInfo->CrossRealmGroups[0].GroupMemberCount;
-            if (!_wasCrossWorld || count != _prevMemberCount || forced)
+            if (!_wasCrossWorld || count != _groupMembers.Count || forced)
             {
                 _groupMembers.Clear();
                 softUpdate = false;
@@ -477,7 +478,7 @@ namespace DelvUI.Interface.Party
         {
             bool softUpdate = true;
 
-            if (!_wasRealGroup || _groupMemberCount != _prevMemberCount || forced)
+            if (!_wasRealGroup || _realMemberCount != _groupMembers.Count || forced)
             {
                 _groupMembers.Clear();
                 softUpdate = false;
@@ -485,7 +486,7 @@ namespace DelvUI.Interface.Party
 
             string[] keys = dataMap.Keys.ToArray();
             for (int i = 0; i < keys.Length; i++)
-            { 
+            {
                 if (!dataMap.TryGetValue(keys[i], out InternalMemberData data))
                 {
                     continue;
@@ -518,12 +519,24 @@ namespace DelvUI.Interface.Party
             }
 
             // player's chocobo (always last)
-            if (!softUpdate && _config.ShowChocobo)
+            if (_config.ShowChocobo)
             {
-                var companion = Utils.GetBattleChocobo(player);
-                if (companion is ICharacter companionCharacter)
+                IGameObject? companion = Utils.GetBattleChocobo(player);
+
+                if (softUpdate && _groupMembers.FirstOrDefault(o => o.IsChocobo) is PartyFramesMember chocoboMember)
                 {
-                    _groupMembers.Add(new PartyFramesMember(companionCharacter, _groupMemberCount, 10, EnmityLevel.Last, PartyMemberStatus.None, ReadyCheckStatus.None, false));
+                    if (companion is ICharacter)
+                    {
+                        chocoboMember.Update(EnmityLevel.Last, PartyMemberStatus.None, ReadyCheckStatus.None, false);
+                    }
+                    else
+                    {
+                        _groupMembers.Remove(chocoboMember);
+                    }
+                }
+                else if (companion is ICharacter companionCharacter)
+                {
+                    _groupMembers.Add(new PartyFramesMember(companionCharacter, _groupMemberCount, 10, EnmityLevel.Last, PartyMemberStatus.None, ReadyCheckStatus.None, false, true));
                 }
             }
 

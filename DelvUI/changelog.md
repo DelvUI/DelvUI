@@ -1,3 +1,6 @@
+# 2.3.1.4
+- Fixed Party Frames issues with Chocobos.
+
 # 2.3.1.3
 - Fixed Party Frames sometimes showing empty bars.
 
