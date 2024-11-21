@@ -117,7 +117,8 @@ namespace DelvUI.Interface.Party
         public string PartyTitle => _partyTitle ?? "";
 
         private int _groupMemberCount => GroupManager.Instance()->MainGroup.MemberCount;
-        private int _realMemberCount => PartyListAddon != null ? PartyListAddon->MemberCount + Math.Max(1, (int)PartyListAddon->ChocoboCount) : Plugin.PartyList.Length;
+        private int _realMemberCount => PartyListAddon != null ? PartyListAddon->MemberCount : Plugin.PartyList.Length;
+        private int _realMemberAndChocoboCount => PartyListAddon != null ? PartyListAddon->MemberCount + Math.Max(1, (int)PartyListAddon->ChocoboCount) : Plugin.PartyList.Length;
 
         private Dictionary<string, InternalMemberData> _prevDataMap = new();
 
