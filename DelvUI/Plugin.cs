@@ -106,7 +106,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.3.1.4";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.3.1.5";
 
             FontsManager.Initialize(AssemblyLocation);
             BarTexturesManager.Initialize(AssemblyLocation);
@@ -158,7 +158,7 @@ namespace DelvUI
 
                     ShowInHelp = true
                 }
-            );;
+            ); ;
 
             CommandManager.AddHandler(
                 "/dui",
@@ -259,7 +259,7 @@ namespace DelvUI
                             {
                                 InputsHelper.Instance?.ToggleProxy(true);
                             }
-                            else if(mouseArgs[1] == "off")
+                            else if (mouseArgs[1] == "off")
                             {
                                 InputsHelper.Instance?.ToggleProxy(false);
                             }

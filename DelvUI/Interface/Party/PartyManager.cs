@@ -223,7 +223,8 @@ namespace DelvUI.Interface.Party
                         foreach (string key in dataMap.Keys)
                         {
                             InternalMemberData newData = dataMap[key];
-                            if (!_prevDataMap.TryGetValue(key, out InternalMemberData oldData) ||
+                            if (!_prevDataMap.TryGetValue(key, out InternalMemberData? oldData) ||
+                                oldData == null ||
                                 newData.Order != oldData.Order)
                             {
                                 partyChanged = true;
@@ -272,9 +273,8 @@ namespace DelvUI.Interface.Party
                 return dataMap;
             }
 
+            // raw info
             int count = isCrossWorld ? _crossRealmInfo->CrossRealmGroups[0].GroupMemberCount : _realMemberCount + PartyListAddon->TrustCount;
-
-            var stringArrayData = _raptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrays[PartyMembersInfoIndex];
             for (int i = 0; i < count; i++)
             {
                 InternalMemberData data = new InternalMemberData();
@@ -296,17 +296,32 @@ namespace DelvUI.Interface.Party
                     data.Name = member.NameString;
                 }
 
+                if (!dataMap.ContainsKey(data.Name))
+                {
+                    dataMap.Add(data.Name, data);
+                }
+            }
+
+            // status string
+            var stringArrayData = _raptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrays[PartyMembersInfoIndex];
+            for (int i = 0; i < count; i++)
+            {
                 int index = i * 5;
                 if (stringArrayData->AtkArrayData.Size <= index + 3 ||
                     stringArrayData->StringArray[index] == null ||
                     stringArrayData->StringArray[index + 3] == null) { break; }
 
-                IntPtr ptr = new IntPtr(stringArrayData->StringArray[index + 3]);
-                data.Status = MemoryHelper.ReadSeStringNullTerminated(ptr).ToString();
+                IntPtr ptr = new IntPtr(stringArrayData->StringArray[index]);
+                string name = MemoryHelper.ReadSeStringNullTerminated(ptr).ToString();
 
-                if (!dataMap.ContainsKey(data.Name))
+                ptr = new IntPtr(stringArrayData->StringArray[index + 3]);
+
+                string a = MemoryHelper.ReadSeStringNullTerminated(ptr).ToString();
+
+
+                if (dataMap.TryGetValue(name, out InternalMemberData? data) && data != null)
                 {
-                    dataMap.Add(data.Name, data);
+                    data.Status = MemoryHelper.ReadSeStringNullTerminated(ptr).ToString();
                 }
             }
 
@@ -444,7 +459,7 @@ namespace DelvUI.Interface.Party
                 CrossRealmMember member = _crossRealmInfo->CrossRealmGroups[0].GroupMembers[i];
                 string memberName = member.NameString;
 
-                if (!dataMap.TryGetValue(memberName, out InternalMemberData data))
+                if (!dataMap.TryGetValue(memberName, out InternalMemberData? data) || data == null)
                 {
                     continue;
                 }
@@ -488,7 +503,7 @@ namespace DelvUI.Interface.Party
             string[] keys = dataMap.Keys.ToArray();
             for (int i = 0; i < keys.Length; i++)
             {
-                if (!dataMap.TryGetValue(keys[i], out InternalMemberData data))
+                if (!dataMap.TryGetValue(keys[i], out InternalMemberData? data) || data == null)
                 {
                     continue;
                 }
@@ -699,7 +714,7 @@ namespace DelvUI.Interface.Party
         #endregion
     }
 
-    internal struct InternalMemberData
+    internal class InternalMemberData
     {
         internal uint ObjectId = 0;
         internal long ContentId = 0;

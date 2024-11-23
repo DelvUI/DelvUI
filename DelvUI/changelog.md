@@ -1,3 +1,6 @@
+# 2.3.1.5
+- Fixed Party Frames status icons.
+
 # 2.3.1.4
 - Fixed Party Frames issues with Chocobos.
 
