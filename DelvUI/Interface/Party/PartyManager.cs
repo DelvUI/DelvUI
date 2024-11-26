@@ -279,6 +279,7 @@ namespace DelvUI.Interface.Party
             {
                 InternalMemberData data = new InternalMemberData();
                 data.Order = i;
+                data.Index = i;
 
                 if (!isCrossWorld)
                 {
@@ -370,7 +371,7 @@ namespace DelvUI.Interface.Party
                     InternalMemberData data = dataMap[keys[i]];
                     if (keys[i] == player.Name.ToString())
                     {
-                        PartyFramesMember playerMember = new PartyFramesMember(player, i, data.Order, EnmityForIndex(i), PartyMemberStatus.None, ReadyCheckStatus.None, true);
+                        PartyFramesMember playerMember = new PartyFramesMember(player, data.Index, data.Order, EnmityForIndex(i), PartyMemberStatus.None, ReadyCheckStatus.None, true);
                         _groupMembers.Add(playerMember);
                     }
                     else
@@ -378,7 +379,7 @@ namespace DelvUI.Interface.Party
                         ICharacter? trustChara = Utils.GetGameObjectByName(keys[i]) as ICharacter;
                         if (trustChara != null)
                         {
-                            _groupMembers.Add(new PartyFramesMember(trustChara, i, data.Order, EnmityForTrustMemberIndex(i), PartyMemberStatus.None, ReadyCheckStatus.None, false));
+                            _groupMembers.Add(new PartyFramesMember(trustChara, data.Index, data.Order, EnmityForTrustMemberIndex(i), PartyMemberStatus.None, ReadyCheckStatus.None, false));
                         }
                     }
                 }
@@ -509,20 +510,20 @@ namespace DelvUI.Interface.Party
                 }
 
                 bool isPlayer = data.ObjectId == player.GameObjectId;
-                bool isLeader = _mainGroup.PartyLeaderIndex == i;
-                EnmityLevel enmity = EnmityForIndex(i);
-                PartyMemberStatus status = data.Status != null ? StatusForMember(data.Status, i) : PartyMemberStatus.None;
+                bool isLeader = IsPartyLeader(data.Order);
+                EnmityLevel enmity = EnmityForIndex(data.Index);
+                PartyMemberStatus status = data.Status != null ? StatusForMember(data.Status, data.Index) : PartyMemberStatus.None;
                 ReadyCheckStatus readyCheckStatus = GetReadyCheckStatus((ulong)data.ContentId);
 
                 if (softUpdate)
                 {
-                    IPartyFramesMember groupMember = _groupMembers.ElementAt(i);
+                    IPartyFramesMember groupMember = _groupMembers.ElementAt(data.Index);
                     groupMember.Update(enmity, status, readyCheckStatus, isLeader);
                 }
                 else
                 {
                     PartyFramesMember partyMember;
-                    if (GetDalamudPartyMember(data.ObjectId) is DalamudPartyMember dalamudPartyMember)
+                    if (GetDalamudPartyMember(data.Index) is DalamudPartyMember dalamudPartyMember)
                     {
                         partyMember = new PartyFramesMember(dalamudPartyMember, i, data.Order, enmity, status, readyCheckStatus, isLeader);
                     }
@@ -594,9 +595,9 @@ namespace DelvUI.Interface.Party
             });
         }
 
-        private DalamudPartyMember? GetDalamudPartyMember(uint objectId)
+        private DalamudPartyMember? GetDalamudPartyMember(int index)
         {
-            StructsPartyMember* memberStruct = GroupManager.Instance()->GetGroup()->GetPartyMemberByEntityId(objectId);
+            StructsPartyMember* memberStruct = GroupManager.Instance()->GetGroup()->GetPartyMemberByIndex(index);
             if (memberStruct == null) { return null; }
 
             return Plugin.PartyList.CreatePartyMemberReference(new IntPtr(memberStruct));
@@ -610,6 +611,17 @@ namespace DelvUI.Interface.Party
         }
 
         #region utils
+        private bool IsPartyLeader(int index)
+        {
+            if (PartyListAddon == null)
+            {
+                return false;
+            }
+
+            // we use the icon Y coordinate in the party list to know the index (lmao)
+            uint partyLeadIndex = (uint)PartyListAddon->LeaderMarkResNode->ChildNode->Y / 40;
+            return index == partyLeadIndex;
+        }
 
         private PartyMemberStatus StatusForMember(string name, int index)
         {
@@ -721,6 +733,7 @@ namespace DelvUI.Interface.Party
         internal string Name = "";
         internal uint JobId = 0;
         internal int Order = 0;
+        internal int Index = 0;
         internal string? Status = null;
 
         public InternalMemberData()
