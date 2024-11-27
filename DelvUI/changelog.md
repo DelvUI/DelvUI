@@ -1,3 +1,6 @@
+# 2.3.1.7
+- Fixed Party Frames sorting.
+
 # 2.3.1.6
 - Fixed Party Frames showing the wrong names.
 - Fixed Party Leader indicator.

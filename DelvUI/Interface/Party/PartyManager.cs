@@ -278,7 +278,6 @@ namespace DelvUI.Interface.Party
             for (int i = 0; i < count; i++)
             {
                 InternalMemberData data = new InternalMemberData();
-                data.Order = i;
                 data.Index = i;
 
                 if (!isCrossWorld)
@@ -295,6 +294,7 @@ namespace DelvUI.Interface.Party
                     data.ObjectId = member.EntityId;
                     data.ContentId = (long)member.ContentId;
                     data.Name = member.NameString;
+                    data.Order = i;
                 }
 
                 if (!dataMap.ContainsKey(data.Name))
@@ -467,7 +467,7 @@ namespace DelvUI.Interface.Party
 
                 bool isPlayer = member.EntityId == player.EntityId;
                 bool isLeader = member.IsPartyLeader > 0;
-                PartyMemberStatus status = data.Status != null ? StatusForMember(data.Status, i) : PartyMemberStatus.None;
+                PartyMemberStatus status = data.Status != null ? StatusForCrossWorldMember(data.Status) : PartyMemberStatus.None;
                 ReadyCheckStatus readyCheckStatus = GetReadyCheckStatus(member.ContentId);
 
                 if (softUpdate)
@@ -512,18 +512,19 @@ namespace DelvUI.Interface.Party
                 bool isPlayer = data.ObjectId == player.GameObjectId;
                 bool isLeader = IsPartyLeader(data.Order);
                 EnmityLevel enmity = EnmityForIndex(data.Index);
-                PartyMemberStatus status = data.Status != null ? StatusForMember(data.Status, data.Index) : PartyMemberStatus.None;
+                PartyMemberStatus status = data.Status != null ? StatusForMember(data.Status, data.Name) : PartyMemberStatus.None;
                 ReadyCheckStatus readyCheckStatus = GetReadyCheckStatus((ulong)data.ContentId);
 
                 if (softUpdate)
                 {
-                    IPartyFramesMember groupMember = _groupMembers.ElementAt(data.Index);
+                    IPartyFramesMember groupMember = _groupMembers.ElementAt(i);
                     groupMember.Update(enmity, status, readyCheckStatus, isLeader);
                 }
                 else
                 {
                     PartyFramesMember partyMember;
-                    if (GetDalamudPartyMember(data.Index) is DalamudPartyMember dalamudPartyMember)
+                    var member = GetDalamudPartyMember(data.Name);
+                    if (member.HasValue && member.Value.Item1 is DalamudPartyMember dalamudPartyMember)
                     {
                         partyMember = new PartyFramesMember(dalamudPartyMember, i, data.Order, enmity, status, readyCheckStatus, isLeader);
                     }
@@ -595,12 +596,18 @@ namespace DelvUI.Interface.Party
             });
         }
 
-        private DalamudPartyMember? GetDalamudPartyMember(int index)
+        private (DalamudPartyMember?, int)? GetDalamudPartyMember(string name)
         {
-            StructsPartyMember* memberStruct = GroupManager.Instance()->GetGroup()->GetPartyMemberByIndex(index);
-            if (memberStruct == null) { return null; }
+            for (int i = 0; i < Plugin.PartyList.Length; i++)
+            {
+                DalamudPartyMember? member = Plugin.PartyList[i];
+                if (member != null && member.Name.ToString() == name)
+                {
+                    return (member, i);
+                }
+            }
 
-            return Plugin.PartyList.CreatePartyMemberReference(new IntPtr(memberStruct));
+            return null;
         }
 
         private void UpdateTrackers()
@@ -623,22 +630,37 @@ namespace DelvUI.Interface.Party
             return index == partyLeadIndex;
         }
 
-        private PartyMemberStatus StatusForMember(string name, int index)
+        private PartyMemberStatus StatusForCrossWorldMember(string statusStr)
         {
-            // TODO: support for other languages
-            // couldn't figure out another way of doing this sadly
-
             // offline status
-            if (name.Contains(_offlineString, StringComparison.InvariantCultureIgnoreCase))
+            if (statusStr.Contains(_offlineString, StringComparison.InvariantCultureIgnoreCase))
             {
                 return PartyMemberStatus.Offline;
             }
 
-            // viewing cutscene status
-            if (index >= 0 && index < _mainGroup.MemberCount &&
-                (_mainGroup.PartyMembers[index].Flags & 0x10) != 0)
+            return PartyMemberStatus.None;
+        }
+
+
+        private PartyMemberStatus StatusForMember(string statusStr, string name)
+        {
+            // offline status
+            if (statusStr.Contains(_offlineString, StringComparison.InvariantCultureIgnoreCase))
             {
-                return PartyMemberStatus.ViewingCutscene;
+                return PartyMemberStatus.Offline;
+            }
+        
+            // viewing cutscene status
+            for (int i = 0; i < _mainGroup.MemberCount; i++)
+            {
+                if (_mainGroup.PartyMembers[i].NameString == name)
+                {
+                    if ((_mainGroup.PartyMembers[i].Flags & 0x10) != 0)
+                    {
+                        return PartyMemberStatus.ViewingCutscene;
+                    }
+                    break;
+                }
             }
 
             return PartyMemberStatus.None;
