@@ -247,6 +247,10 @@ namespace DelvUI.Interface.StatusEffects
         [Order(48)]
         public bool DisableInteraction = false;
 
+        [Checkbox("Hide when Dead")]
+        [Order(49)]
+        public bool HideWhenDead = true;
+
         [NestedConfig("Icons", 65)]
         public StatusEffectIconConfig IconConfig;
 

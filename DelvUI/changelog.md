@@ -1,4 +1,7 @@
 # 2.3.1.7
+- Added a "Hide when Dead" setting to Status Effects lists.
+  * This was always on by default, now it can be changed.
+  
 - Fixed Party Frames sorting.
 
 # 2.3.1.6
