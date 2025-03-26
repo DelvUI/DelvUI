@@ -1,3 +1,6 @@
+# 2.4.0.0
+- Added support for Patch 7.2 and Dalamud API 12.
+
 # 2.3.1.7
 - Added a "Hide when Dead" setting to Status Effects lists.
   * This was always on by default, now it can be changed.
