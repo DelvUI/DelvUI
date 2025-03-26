@@ -103,7 +103,7 @@ namespace DelvUI.Interface.Jobs
             var innerReleaseStatus = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1177 or 86);
 
             float innerReleaseDuration = Math.Max(innerReleaseStatus?.RemainingTime ?? 0f, 0f);
-            byte innerReleaseStacks = innerReleaseStatus?.StackCount ?? 0;
+            int innerReleaseStacks = innerReleaseStatus?.Param ?? 0;
 
             BarGlowConfig? primalRendGlow = null;
             if (Config.InnerReleaseBar.PrimalRendReadyGlowConfig.Enabled)

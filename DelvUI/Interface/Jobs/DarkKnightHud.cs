@@ -169,7 +169,7 @@ namespace DelvUI.Interface.Jobs
         {
             Status? bloodWeaponBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 742);
             float duration = bloodWeaponBuff?.RemainingTime ?? 0f;
-            int stacks = bloodWeaponBuff?.StackCount ?? 0;
+            int stacks = bloodWeaponBuff?.Param ?? 0;
 
             if (Config.BloodWeaponBar.HideWhenInactive && duration <= 0)
             {
@@ -201,7 +201,7 @@ namespace DelvUI.Interface.Jobs
         {
             Status? deliriumBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1972);
             float deliriumDuration = Math.Max(0f, deliriumBuff?.RemainingTime ?? 0f);
-            byte stacks = deliriumBuff?.StackCount ?? 0;
+            int stacks = deliriumBuff?.Param ?? 0;
 
             if (Config.DeliriumBar.HideWhenInactive && deliriumDuration <= 0)
             {

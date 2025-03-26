@@ -138,7 +138,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawOverheatBar(Vector2 origin, IPlayerCharacter player)
         {
             MCHGauge gauge = Plugin.JobGauges.Get<MCHGauge>();
-            byte stackCount = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 2688)?.StackCount ?? 0;
+            ushort stackCount = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 2688)?.Param ?? 0;
 
             if (!Config.OverheatChunkedGauge.HideWhenInactive || stackCount > 0)
             {

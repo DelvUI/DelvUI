@@ -128,7 +128,7 @@ namespace DelvUI.Interface.Jobs
                 {
                     max = 6f;
                     current = tcjBuff is null || tcjBuff.RemainingTime < 0 ? max : tcjBuff.RemainingTime;
-                    Config.MudraBar.Label.SetText(GenerateNinjutsuText(tcjBuff?.StackCount ?? 0, hasKassatsuBuff, hasTCJBuff));
+                    Config.MudraBar.Label.SetText(GenerateNinjutsuText(tcjBuff?.Param ?? 0, hasKassatsuBuff, hasTCJBuff));
                 }
                 else if (hasKassatsuBuff)
                 {
@@ -141,7 +141,7 @@ namespace DelvUI.Interface.Jobs
                 {
                     max = 6f;
                     current = ninjutsuBuff is null || ninjutsuBuff.RemainingTime < 0 ? max : ninjutsuBuff.RemainingTime;
-                    Config.MudraBar.Label.SetText(GenerateNinjutsuText(ninjutsuBuff?.StackCount ?? 0, hasKassatsuBuff, hasTCJBuff));
+                    Config.MudraBar.Label.SetText(GenerateNinjutsuText(ninjutsuBuff?.Param ?? 0, hasKassatsuBuff, hasTCJBuff));
                 }
 
                 PluginConfigColor fillColor = hasTCJBuff ? Config.MudraBar.TCJBarColor : hasKassatsuBuff ? Config.MudraBar.KassatsuBarColor : Config.MudraBar.FillColor;
@@ -243,7 +243,7 @@ namespace DelvUI.Interface.Jobs
             AddDrawActions(bar.GetDrawActions(origin, Config.SuitonBar.StrataLevel));
         }
 
-        private string GenerateNinjutsuText(byte param, bool haveKassatsuBuff, bool haveTCJBuff)
+        private string GenerateNinjutsuText(ushort param, bool haveKassatsuBuff, bool haveTCJBuff)
         {
             return param switch
             {

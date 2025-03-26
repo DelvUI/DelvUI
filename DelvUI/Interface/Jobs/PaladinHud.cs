@@ -102,7 +102,7 @@ namespace DelvUI.Interface.Jobs
         {
             Status? requiescatBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1368);
             float requiescatDuration = Math.Max(0f, requiescatBuff?.RemainingTime ?? 0f);
-            byte stacks = requiescatBuff?.StackCount ?? 0;
+            int stacks = requiescatBuff?.Param ?? 0;
 
             if (!Config.RequiescatStacksBar.HideWhenInactive || requiescatDuration > 0)
             {

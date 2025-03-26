@@ -386,7 +386,7 @@ namespace DelvUI.Interface.StatusEffects
 
                         // icon
                         var cropIcon = Config.IconConfig.CropIcon;
-                        int stackCount = cropIcon ? 1 : statusEffectData.Data.MaxStacks > 0 ? statusEffectData.Status.StackCount : 0;
+                        int stackCount = cropIcon ? 1 : statusEffectData.Data.MaxStacks > 0 ? statusEffectData.Status.Param : 0;
                         DrawHelper.DrawIcon<LuminaStatus>(drawList, statusEffectData.Data, iconPos, Config.IconConfig.Size, false, cropIcon, stackCount);
 
                         // border
@@ -437,12 +437,12 @@ namespace DelvUI.Interface.StatusEffects
                 // stacks
                 if (Config.IconConfig.StacksLabelConfig.Enabled &&
                     statusEffectData.Data.MaxStacks > 0 &&
-                    statusEffectData.Status.StackCount > 0 &&
+                    statusEffectData.Status.Param > 0 &&
                     !statusEffectData.Data.IsFcBuff)
                 {
                     AddDrawAction(Config.IconConfig.StacksLabelConfig.StrataLevel, () =>
                     {
-                        Config.IconConfig.StacksLabelConfig.SetText($"{statusEffectData.Status.StackCount}");
+                        Config.IconConfig.StacksLabelConfig.SetText($"{statusEffectData.Status.Param}");
                         _stacksLabel.Draw(iconPos, Config.IconConfig.Size, character);
                     });
                 }
@@ -566,7 +566,7 @@ namespace DelvUI.Interface.StatusEffects
                 // forcing "triplecast" buff first to always be able to test stacks
                 fakeStruct.StatusId = i == 0 ? (ushort)1211 : (ushort)RNG.Next(1, 200);
                 fakeStruct.RemainingTime = RNG.Next(1, 30);
-                fakeStruct.StackCount = (byte)RNG.Next(1, 3);
+                fakeStruct.Param = (byte)RNG.Next(1, 3);
                 fakeStruct.SourceId = 0;
 
                 _fakeEffects[i] = fakeStruct;

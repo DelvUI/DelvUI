@@ -183,7 +183,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawAetherBar(Vector2 origin, IPlayerCharacter player)
         {
-            byte stackCount = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId == 304)?.StackCount ?? 0;
+            ushort stackCount = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId == 304)?.Param ?? 0;
 
             if (Config.AetherflowBar.HideWhenInactive && stackCount == 0)
             {
@@ -219,7 +219,7 @@ namespace DelvUI.Interface.Jobs
             if (primal != Primal.None)
             {
                 tranceColor = primal == Primal.Ifrit ? Config.TranceBar.IfritColor : primal == Primal.Titan ? Config.TranceBar.TitanColor : primal == Primal.Garuda ? Config.TranceBar.GarudaColor : Config.TranceBar.FillColor;
-                tranceDuration = gauge.AttunmentTimerRemaining;
+                tranceDuration = gauge.AttunementTimerRemaining;
                 maxDuration = 30f;
             }
             else
@@ -249,7 +249,7 @@ namespace DelvUI.Interface.Jobs
 
             if (tranceDuration != 0)
             {
-                if (gauge.AttunmentTimerRemaining > 0 && Config.TranceBar.HidePrimals)
+                if (gauge.AttunementTimerRemaining > 0 && Config.TranceBar.HidePrimals)
                 {
                     return;
                 }
@@ -263,7 +263,7 @@ namespace DelvUI.Interface.Jobs
             {
                 if (!Config.TranceBar.HideWhenInactive)
                 {
-                    if (gauge.AttunmentTimerRemaining == 0)
+                    if (gauge.AttunementTimerRemaining == 0)
                     {
                         maxDuration = SpellHelper.Instance.GetRecastTime(spellID);
                         float tranceCooldown = SpellHelper.Instance.GetSpellCooldown(spellID);

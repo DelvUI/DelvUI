@@ -10,8 +10,10 @@ using DelvUI.Interface.GeneralElements;
 using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -74,22 +76,10 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.ParadoxBar.Size);
             }
 
-            if (Config.ThundercloudBar.Enabled && !Config.ThundercloudBar.HideWhenInactive)
-            {
-                positions.Add(Config.Position + Config.ThundercloudBar.Position);
-                sizes.Add(Config.ThundercloudBar.Size);
-            }
-
             if (Config.ThunderDoTBar.Enabled && !Config.ThunderDoTBar.HideWhenInactive)
             {
                 positions.Add(Config.Position + Config.ThunderDoTBar.Position);
                 sizes.Add(Config.ThunderDoTBar.Size);
-            }
-
-            if (Config.FirestarterBar.Enabled && !Config.FirestarterBar.HideWhenInactive)
-            {
-                positions.Add(Config.Position + Config.FirestarterBar.Position);
-                sizes.Add(Config.FirestarterBar.Size);
             }
 
             return (positions, sizes);
@@ -139,28 +129,21 @@ namespace DelvUI.Interface.Jobs
                 DrawEnochianBar(pos, player);
             }
 
-            if (Config.ThundercloudBar.Enabled)
-            {
-                DrawThundercloudBar(pos, player);
-            }
-
             if (Config.ThunderDoTBar.Enabled)
             {
                 DrawThunderDoTBar(pos, player);
             }
-
-            if (Config.FirestarterBar.Enabled)
-            {
-                DrawFirestarterBar(pos, player);
-            }
         }
 
-        protected void DrawManaBar(Vector2 origin, IPlayerCharacter player)
+        protected unsafe void DrawManaBar(Vector2 origin, IPlayerCharacter player)
         {
             BlackMageManaBarConfig config = Config.ManaBar;
-            BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
+            BLMGauge _gauge = Plugin.JobGauges.Get<BLMGauge>();
+            BlackMageGaugeTmp* gauge = (BlackMageGaugeTmp*)_gauge.Address;
+            bool inUmbralIce = gauge->ElementStance < 0;
+            bool inAstralFire = gauge->ElementStance > 0;
 
-            if (config.HideWhenInactive && !gauge.InAstralFire && !gauge.InUmbralIce && player.CurrentMp == player.MaxMp)
+            if (config.HideWhenInactive && !inAstralFire && !inUmbralIce && player.CurrentMp == player.MaxMp)
             {
                 return;
             }
@@ -168,31 +151,20 @@ namespace DelvUI.Interface.Jobs
             // value
             config.ValueLabelConfig.SetValue(player.CurrentMp);
 
-            // element timer
-            if (gauge.InAstralFire || gauge.InUmbralIce)
-            {
-                float time = gauge.ElementTimeRemaining > 10 ? gauge.ElementTimeRemaining / 1000f : 0;
-                config.ElementTimerLabelConfig.SetValue(time);
-            }
-            else
-            {
-                config.ElementTimerLabelConfig.SetText("");
-            }
-
-            bool drawTreshold = gauge.InAstralFire || !config.ThresholdConfig.ShowOnlyDuringAstralFire;
+            bool drawTreshold = inAstralFire || !config.ThresholdConfig.ShowOnlyDuringAstralFire;
 
             PluginConfigColor fillColor = config.FillColor;
             PluginConfigColor bgColor = config.BackgroundColor;
             if (config.UseElementColor)
             {
-                fillColor = gauge.InAstralFire ? config.FireColor : gauge.InUmbralIce ? config.IceColor : config.FillColor;
-                bgColor = gauge.InAstralFire ? config.FireBackgroundColor : gauge.InUmbralIce ? config.IceBackgroundColor : config.BackgroundColor;
+                fillColor = inAstralFire ? config.FireColor : inUmbralIce ? config.IceColor : config.FillColor;
+                bgColor = inAstralFire ? config.FireBackgroundColor : inUmbralIce ? config.IceBackgroundColor : config.BackgroundColor;
             }
 
             BarHud bar = BarUtilities.GetProgressBar(
                 config,
                 drawTreshold ? config.ThresholdConfig : null,
-                new LabelConfig[] { config.ValueLabelConfig, config.ElementTimerLabelConfig },
+                [config.ValueLabelConfig],
                 player.CurrentMp,
                 player.MaxMp,
                 0,
@@ -204,16 +176,20 @@ namespace DelvUI.Interface.Jobs
             AddDrawActions(bar.GetDrawActions(origin, config.StrataLevel));
         }
 
-        protected void DrawStacksBar(Vector2 origin)
+        protected unsafe void DrawStacksBar(Vector2 origin)
         {
-            BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
-            if (Config.StacksBar.HideWhenInactive && gauge.UmbralIceStacks == 0 && gauge.AstralFireStacks == 0)
+            BLMGauge _gauge = Plugin.JobGauges.Get<BLMGauge>();
+            BlackMageGaugeTmp* gauge = (BlackMageGaugeTmp*)_gauge.Address;
+            int umbralIceStacks = gauge->UmbralStacks;
+            int astralFireStacks = gauge->AstralStacks;
+
+            if (Config.StacksBar.HideWhenInactive && umbralIceStacks == 0 && astralFireStacks == 0)
             {
                 return;
             };
 
-            PluginConfigColor color = gauge.UmbralIceStacks > 0 ? Config.StacksBar.IceColor : Config.StacksBar.FireColor;
-            byte stacks = gauge.UmbralIceStacks > 0 ? gauge.UmbralIceStacks : gauge.AstralFireStacks;
+            PluginConfigColor color = umbralIceStacks > 0 ? Config.StacksBar.IceColor : Config.StacksBar.FireColor;
+            int stacks = umbralIceStacks > 0 ? umbralIceStacks : astralFireStacks;
 
             BarHud[] bars = BarUtilities.GetChunkedBars(Config.StacksBar, 3, stacks, 3f, fillColor: color);
             foreach (BarHud bar in bars)
@@ -222,15 +198,17 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        protected void DrawUmbralHeartBar(Vector2 origin)
+        protected unsafe void DrawUmbralHeartBar(Vector2 origin)
         {
-            BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
-            if (Config.UmbralHeartBar.HideWhenInactive && gauge.UmbralHearts == 0)
+            BLMGauge _gauge = Plugin.JobGauges.Get<BLMGauge>();
+            BlackMageGaugeTmp* gauge = (BlackMageGaugeTmp*)_gauge.Address;
+
+            if (Config.UmbralHeartBar.HideWhenInactive && gauge->UmbralHearts == 0)
             {
                 return;
             };
 
-            BarHud[] bars = BarUtilities.GetChunkedBars(Config.UmbralHeartBar, 3, gauge.UmbralHearts, 3f);
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.UmbralHeartBar, 3, gauge->UmbralHearts, 3f);
             foreach (BarHud bar in bars)
             {
                 AddDrawActions(bar.GetDrawActions(origin, Config.UmbralHeartBar.StrataLevel));
@@ -240,8 +218,8 @@ namespace DelvUI.Interface.Jobs
         protected unsafe void DrawAstralSoulBar(Vector2 origin)
         {
             BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
-            BlackMageGauge* internalGauge = (BlackMageGauge*)gauge.Address;
-            int stacks = ((int)internalGauge->EnochianFlags >> 2) & 7;
+            BlackMageGaugeTmp* internalGauge = (BlackMageGaugeTmp*)gauge.Address;
+            int stacks = internalGauge->AstralSoulStacks;
             const int maxStacks = 6;
 
             if (Config.AstralSoulBar.HideWhenInactive && stacks == 0)
@@ -262,7 +240,7 @@ namespace DelvUI.Interface.Jobs
 
         protected void DrawTripleCastBar(Vector2 origin, IPlayerCharacter player)
         {
-            byte stackCount = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1211)?.StackCount ?? 0;
+            ushort stackCount = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1211)?.Param ?? 0;
             int maxCount = 3;
 
             if (Config.TriplecastBar.CountSwiftcast)
@@ -287,27 +265,29 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        protected void DrawEnochianBar(Vector2 origin, IPlayerCharacter player)
+        protected unsafe void DrawEnochianBar(Vector2 origin, IPlayerCharacter player)
         {
-            BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
+            BLMGauge _gauge = Plugin.JobGauges.Get<BLMGauge>();
+            BlackMageGaugeTmp* gauge = (BlackMageGaugeTmp*)_gauge.Address;
 
-            if (Config.EnochianBar.HideWhenInactive && !gauge.IsEnochianActive)
+            if (Config.EnochianBar.HideWhenInactive && !gauge->EnochianActive)
             {
                 return;
             }
 
-            float timer = gauge.IsEnochianActive ? (30000f - gauge.EnochianTimer) : 0f;
+            float timer = gauge->EnochianActive ? (30000f - gauge->EnochianTimer) : 0f;
             Config.EnochianBar.Label.SetValue(timer / 1000);
 
             BarHud bar = BarUtilities.GetProgressBar(Config.EnochianBar, timer / 1000, 30, 0f, player);
             AddDrawActions(bar.GetDrawActions(origin, Config.EnochianBar.StrataLevel));
         }
 
-        protected void DrawPolyglotBar(Vector2 origin, IPlayerCharacter player)
+        protected unsafe void DrawPolyglotBar(Vector2 origin, IPlayerCharacter player)
         {
-            BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
+            BLMGauge _gauge = Plugin.JobGauges.Get<BLMGauge>();
+            BlackMageGaugeTmp* gauge = (BlackMageGaugeTmp*)_gauge.Address;
 
-            if (Config.PolyglotBar.HideWhenInactive && gauge.PolyglotStacks == 0)
+            if (Config.PolyglotBar.HideWhenInactive && gauge->PolyglotStacks == 0)
             {
                 return;
             }
@@ -315,8 +295,8 @@ namespace DelvUI.Interface.Jobs
             // only 1 stack before level 80
             if (player.Level < 80)
             {
-                BarGlowConfig? glow = gauge.PolyglotStacks == 1 && Config.PolyglotBar.GlowConfig.Enabled ? Config.PolyglotBar.GlowConfig : null;
-                BarHud bar = BarUtilities.GetBar(Config.PolyglotBar, gauge.PolyglotStacks, 1, 0, glowConfig: glow);
+                BarGlowConfig? glow = gauge->PolyglotStacks == 1 && Config.PolyglotBar.GlowConfig.Enabled ? Config.PolyglotBar.GlowConfig : null;
+                BarHud bar = BarUtilities.GetBar(Config.PolyglotBar, gauge->PolyglotStacks, 1, 0, glowConfig: glow);
                 AddDrawActions(bar.GetDrawActions(origin, Config.PolyglotBar.StrataLevel));
             }
             // 2-3 stacks after
@@ -324,7 +304,7 @@ namespace DelvUI.Interface.Jobs
             {
                 int stacks = player.Level < 98 ? 2 : 3;
                 BarGlowConfig? glow = Config.PolyglotBar.GlowConfig.Enabled ? Config.PolyglotBar.GlowConfig : null;
-                BarHud[] bars = BarUtilities.GetChunkedBars(Config.PolyglotBar, stacks, gauge.PolyglotStacks, stacks, 0, glowConfig: glow);
+                BarHud[] bars = BarUtilities.GetChunkedBars(Config.PolyglotBar, stacks, gauge->PolyglotStacks, stacks, 0, glowConfig: glow);
                 foreach (BarHud bar in bars)
                 {
                     AddDrawActions(bar.GetDrawActions(origin, Config.PolyglotBar.StrataLevel));
@@ -332,11 +312,14 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        protected void DrawParadoxBar(Vector2 origin, IPlayerCharacter player)
+        protected unsafe void DrawParadoxBar(Vector2 origin, IPlayerCharacter player)
         {
-            BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
+            BLMGauge _gauge = Plugin.JobGauges.Get<BLMGauge>();
+            BlackMageGaugeTmp* gauge = (BlackMageGaugeTmp*)_gauge.Address;
+            bool inUmbralIce = gauge->ElementStance < 0;
+            bool inAstralFire = gauge->ElementStance > 0;
 
-            if (Config.ParadoxBar.HideWhenInactive && !gauge.IsParadoxActive)
+            if (Config.ParadoxBar.HideWhenInactive && !gauge->ParadoxActive)
             {
                 return;
             };
@@ -344,30 +327,12 @@ namespace DelvUI.Interface.Jobs
             PluginConfigColor color = Config.ParadoxBar.FillColor;
             if (Config.ParadoxBar.UseElementColor)
             {
-                color = gauge.InUmbralIce ? Config.ParadoxBar.IceColor : (gauge.InAstralFire ? Config.ParadoxBar.FireColor : color);
+                color = inUmbralIce ? Config.ParadoxBar.IceColor : (inAstralFire ? Config.ParadoxBar.FireColor : color);
             }
 
-            BarGlowConfig? glow = gauge.IsParadoxActive && Config.ParadoxBar.GlowConfig.Enabled ? Config.ParadoxBar.GlowConfig : null;
-            BarHud bar = BarUtilities.GetBar(Config.ParadoxBar, gauge.IsParadoxActive ? 1 : 0, 1, 0, fillColor: color, glowConfig: glow);
+            BarGlowConfig? glow = gauge->ParadoxActive && Config.ParadoxBar.GlowConfig.Enabled ? Config.ParadoxBar.GlowConfig : null;
+            BarHud bar = BarUtilities.GetBar(Config.ParadoxBar, gauge->ParadoxActive ? 1 : 0, 1, 0, fillColor: color, glowConfig: glow);
             AddDrawActions(bar.GetDrawActions(origin, Config.ParadoxBar.StrataLevel));
-        }
-
-        protected void DrawThundercloudBar(Vector2 origin, IPlayerCharacter player)
-        {
-            BarHud? bar = BarUtilities.GetProcBar(Config.ThundercloudBar, player, 3870, 30f);
-            if (bar != null)
-            {
-                AddDrawActions(bar.GetDrawActions(origin, Config.ThundercloudBar.StrataLevel));
-            }
-        }
-
-        protected void DrawFirestarterBar(Vector2 origin, IPlayerCharacter player)
-        {
-            BarHud? bar = BarUtilities.GetProcBar(Config.FirestarterBar, player, 165, 30f);
-            if (bar != null)
-            {
-                AddDrawActions(bar.GetDrawActions(origin, Config.FirestarterBar.StrataLevel));
-            }
         }
 
         protected void DrawThunderDoTBar(Vector2 origin, IPlayerCharacter player)
@@ -398,20 +363,10 @@ namespace DelvUI.Interface.Jobs
             config.EnochianBar.Label.FrameAnchor = DrawAnchor.Left;
             config.EnochianBar.Label.Position = new Vector2(2, 0);
 
-            config.ThundercloudBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
-            config.ThundercloudBar.Label.TextAnchor = DrawAnchor.Right;
-            config.ThundercloudBar.Label.FrameAnchor = DrawAnchor.Right;
-            config.ThundercloudBar.Label.Position = new Vector2(-2, 0);
-
             config.ThunderDoTBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
             config.ThunderDoTBar.Label.TextAnchor = DrawAnchor.Left;
             config.ThunderDoTBar.Label.FrameAnchor = DrawAnchor.Left;
             config.ThunderDoTBar.Label.Position = new Vector2(2, 0);
-
-            config.FirestarterBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
-            config.FirestarterBar.Label.TextAnchor = DrawAnchor.Left;
-            config.FirestarterBar.Label.FrameAnchor = DrawAnchor.Left;
-            config.FirestarterBar.Label.Position = new Vector2(2, 0);
 
             return config;
         }
@@ -471,26 +426,11 @@ namespace DelvUI.Interface.Jobs
             new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Thunderhead Bar", 55)]
-        public ProgressBarConfig ThundercloudBar = new ProgressBarConfig(
-            new(-64, -69),
-            new(126, 14),
-            new PluginConfigColor(new Vector4(240f / 255f, 163f / 255f, 255f / 255f, 100f / 100f)),
-            BarDirection.Left
-        );
-
         [NestedConfig("Thunder DoT Bar", 60)]
         public ProgressBarConfig ThunderDoTBar = new ProgressBarConfig(
             new(64, -69),
             new(126, 14),
             new PluginConfigColor(new Vector4(67f / 255f, 187 / 255f, 255f / 255f, 100f / 100f))
-        );
-
-        [NestedConfig("Firestarter Bar", 65)]
-        public ProgressBarConfig FirestarterBar = new ProgressBarConfig(
-            new(0, -85),
-            new(254, 14),
-            new PluginConfigColor(new Vector4(255f / 255f, 136f / 255f, 0 / 255f, 100f / 100f))
         );
     }
 
@@ -519,9 +459,6 @@ namespace DelvUI.Interface.Jobs
 
         [NestedConfig("Value Label", 60, separator = false, spacing = true)]
         public NumericLabelConfig ValueLabelConfig = new NumericLabelConfig(new Vector2(2, 0), "", DrawAnchor.Left, DrawAnchor.Left);
-
-        [NestedConfig("Element Timer Label", 65, separator = false, spacing = true)]
-        public NumericLabelConfig ElementTimerLabelConfig = new NumericLabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
 
         [NestedConfig("Threshold", 70, separator = false, spacing = true)]
         public BlackMakeManaBarThresholdConfig ThresholdConfig = new BlackMakeManaBarThresholdConfig();
@@ -632,4 +569,20 @@ namespace DelvUI.Interface.Jobs
         {
         }
     }
+}
+
+[StructLayout(LayoutKind.Explicit, Size = 0x30)]
+public struct BlackMageGaugeTmp
+{
+    [FieldOffset(0x08)] public short EnochianTimer;
+    [FieldOffset(0x0A)] public sbyte ElementStance;
+    [FieldOffset(0x0B)] public byte UmbralHearts;
+    [FieldOffset(0x0C)] public byte PolyglotStacks;
+    [FieldOffset(0x0D)] public EnochianFlags EnochianFlags;
+
+    public int UmbralStacks => ElementStance >= 0 ? 0 : ElementStance * -1;
+    public int AstralStacks => ElementStance <= 0 ? 0 : ElementStance;
+    public bool EnochianActive => EnochianFlags.HasFlag(EnochianFlags.Enochian);
+    public bool ParadoxActive => EnochianFlags.HasFlag(EnochianFlags.Paradox);
+    public int AstralSoulStacks => ((int)EnochianFlags >> 2) & 7;
 }

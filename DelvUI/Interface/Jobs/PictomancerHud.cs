@@ -314,7 +314,7 @@ namespace DelvUI.Interface.Jobs
         {
             StacksWithDurationBarConfig config = Config.HammerTimeBar;
             Status? status = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3680);
-            int stacks = status?.StackCount ?? 0;
+            int stacks = status?.Param ?? 0;
             float time = Math.Abs(status?.RemainingTime ?? 0f);
 
             if (config.HideWhenInactive && stacks == 0)
@@ -335,7 +335,7 @@ namespace DelvUI.Interface.Jobs
         {
             StacksWithDurationBarConfig config = Config.HyperphantasiaBar;
             Status? status = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3688);
-            int stacks = status?.StackCount ?? 0;
+            int stacks = status?.Param ?? 0;
             float time = Math.Abs(status?.RemainingTime ?? 0f);
 
             if (config.HideWhenInactive && stacks == 0)

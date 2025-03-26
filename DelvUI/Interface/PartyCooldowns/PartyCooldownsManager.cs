@@ -4,13 +4,18 @@ using Dalamud.Hooking;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.Party;
+using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
+using static FFXIVClientStructs.FFXIV.Client.Game.Character.ActionEffectHandler;
 
 namespace DelvUI.Interface.PartyCooldowns
 {
-    public class PartyCooldownsManager
+    public unsafe class PartyCooldownsManager
     {
         #region Singleton
         public static PartyCooldownsManager Instance { get; private set; } = null!;
@@ -21,8 +26,8 @@ namespace DelvUI.Interface.PartyCooldowns
         {
             try
             {
-                _onActionUsedHook = Plugin.GameInteropProvider.HookFromSignature<OnActionUsedDelegate>(
-                    "40 ?? 56 57 41 ?? 41 ?? 41 ?? 48 ?? ?? ?? ?? ?? ?? ?? 48",
+                _onActionUsedHook = Plugin.GameInteropProvider.HookFromAddress<ActionEffectHandler.Delegates.Receive>(
+                    ActionEffectHandler.MemberFunctionPointers.Receive,
                     OnActionUsed
                 );
                 _onActionUsedHook?.Enable();
@@ -50,10 +55,8 @@ namespace DelvUI.Interface.PartyCooldowns
             Plugin.JobChangedEvent += OnJobChanged;
             Plugin.ClientState.TerritoryChanged += OnTerritoryChanged;
 
-            OnConfigReset(ConfigurationManager.Instance);
+            ConfigReset(ConfigurationManager.Instance, false);
             UpdatePreview();
-
-            OnMembersChanged(PartyManager.Instance);
         }
 
         public static void Initialize()
@@ -96,6 +99,11 @@ namespace DelvUI.Interface.PartyCooldowns
 
         private void OnConfigReset(ConfigurationManager sender)
         {
+            ConfigReset(sender);
+        }
+
+        private void ConfigReset(ConfigurationManager sender, bool forceUpdate = true)
+        {
             if (_config != null)
             {
                 _config.ValueChangeEvent -= OnConfigPropertyChanged;
@@ -113,13 +121,15 @@ namespace DelvUI.Interface.PartyCooldowns
             _dataConfig.CooldownsDataEnabledChangedEvent += OnCooldownEnabledChanged;
             _dataConfig.UpdateDataIfNeeded();
 
-            ForcedUpdate();
+            if (forceUpdate)
+            {
+                ForcedUpdate();
+            }
         }
 
         #endregion Singleton
 
-        private delegate void OnActionUsedDelegate(int characterId, IntPtr characterAddress, IntPtr position, IntPtr effect, IntPtr unk1, IntPtr unk2);
-        private Hook<OnActionUsedDelegate>? _onActionUsedHook;
+        private Hook<ActionEffectHandler.Delegates.Receive>? _onActionUsedHook;
 
         private delegate void ActorControlDelegate(uint entityId, uint id, uint unk1, uint type, uint unk2, uint unk3, uint unk4, uint unk5, UInt64 targetId, byte unk6);
         private Hook<ActorControlDelegate>? _actorControlHook;
@@ -157,80 +167,76 @@ namespace DelvUI.Interface.PartyCooldowns
             }
         }
 
-        private unsafe void OnActionUsed(int characterId, IntPtr characterAddress, IntPtr position, IntPtr effect, IntPtr unk1, IntPtr unk2)
+        private unsafe void OnActionUsed(uint actorId, Character* casterPtr, Vector3* targetPos, Header* header, TargetEffects* effects, GameObjectId* targetEntityIds)
         {
-            _onActionUsedHook?.Original(characterId, characterAddress, position, effect, unk1, unk2);
-
-            uint actorId = (uint)characterId;
-            bool isAction = *((byte*)effect.ToPointer() + 0x1F) == 1;
+            _onActionUsedHook?.Original(actorId, casterPtr, targetPos, header, effects, targetEntityIds);
 
             // check if its an action
-            if (isAction)
+            if (header->ActionType != ActionType.Action ) { return; }
+
+            // check if its a member in the party
+            if (!_cooldownsMap.ContainsKey(actorId))
             {
-                // check if its a member in the party
-                if (!_cooldownsMap.ContainsKey(actorId))
-                {
-                    // check if its a party member's pet
-                    IGameObject? actor = Plugin.ObjectTable.SearchById(actorId);
+                // check if its a party member's pet
+                IGameObject? actor = Plugin.ObjectTable.SearchById(actorId);
 
-                    if (actor is IBattleNpc battleNpc && _cooldownsMap.ContainsKey(battleNpc.OwnerId))
-                    {
-                        actorId = battleNpc.OwnerId;
-                    }
-                    else
-                    {
-                        actorId = 0;
-                    }
+                if (actor is IBattleNpc battleNpc && _cooldownsMap.ContainsKey(battleNpc.OwnerId))
+                {
+                    actorId = battleNpc.OwnerId;
                 }
-
-                // if its a valid actor
-                if (actorId > 0)
+                else
                 {
-                    uint actionID = *((uint*)effect.ToPointer() + 0x2);
+                    actorId = 0;
+                }
+            }
 
-                    // special case for starry muse > set id to scenic muse
-                    if (actionID == 34675)
+            if (actorId <= 0) { return; }
+
+            uint actionID = header->ActionId;
+
+            Plugin.Logger.Debug("Action: " + actionID.ToString());
+
+            // special case for starry muse > set id to scenic muse
+            if (actionID == 34675)
+            {
+                actionID = 35349;
+            }
+
+            // special case for technical step / finish
+            // we detect when technical step is pressed and save the time
+            // so we can properly calculate the cooldown once finish is pressed
+            if (actionID == 16193 || actionID == 16194 || actionID == 16195 || actionID == 16196)
+            {
+                actionID = 16004;
+            }
+
+            if (actionID == 15998)
+            {
+                _technicalStepMap[actorId] = ImGui.GetTime();
+            }
+            else
+            {
+                // check if its an action we track
+                if (_cooldownsMap[actorId].TryGetValue(actionID, out PartyCooldown? cooldown) && cooldown != null)
+                {
+                    // if its technical finish, we set the cooldown start time to
+                    // the time when step was pressed
+                    if (_technicalStepMap.TryGetValue(actorId, out double stepStartTime) && actionID == 16004)
                     {
-                        actionID = 35349;
+                        cooldown.OverridenCooldownStartTime = stepStartTime;
+                        _technicalStepMap.Remove(actorId);
                     }
 
-                    // special case for technical step / finish
-                    // we detect when technical step is pressed and save the time
-                    // so we can properly calculate the cooldown once finish is pressed
-                    if (actionID == 16193 || actionID == 16194 || actionID == 16195 || actionID == 16196)
-                    {
-                        actionID = 16004;
-                    }
+                    double now = ImGui.GetTime();
+                    cooldown.LastTimeUsed = now;
+                    cooldown.IgnoreNextUse = false;
 
-                    if (actionID == 15998)
+                    foreach (uint id in cooldown.Data.SharedActionIds)
                     {
-                        _technicalStepMap[actorId] = ImGui.GetTime();
-                    }
-                    else
-                    {
-                        // check if its an action we track
-                        if (_cooldownsMap[actorId].TryGetValue(actionID, out PartyCooldown? cooldown) && cooldown != null)
+                        if (_cooldownsMap[actorId].TryGetValue(id, out PartyCooldown? sharedCooldown) && sharedCooldown != null)
                         {
-                            // if its technical finish, we set the cooldown start time to
-                            // the time when step was pressed
-                            if (_technicalStepMap.TryGetValue(actorId, out double stepStartTime) && actionID == 16004)
-                            {
-                                cooldown.OverridenCooldownStartTime = stepStartTime;
-                                _technicalStepMap.Remove(actorId);
-                            }
-
-                            double now = ImGui.GetTime();
-                            cooldown.LastTimeUsed = now;
-                            cooldown.IgnoreNextUse = false;
-
-                            foreach (uint id in cooldown.Data.SharedActionIds)
-                            {
-                                if (_cooldownsMap[actorId].TryGetValue(id, out PartyCooldown? sharedCooldown) && sharedCooldown != null)
-                                {
-                                    sharedCooldown.LastTimeUsed = now;
-                                    sharedCooldown.IgnoreNextUse = true;
-                                }
-                            }
+                            sharedCooldown.LastTimeUsed = now;
+                            sharedCooldown.IgnoreNextUse = true;
                         }
                     }
                 }
@@ -244,38 +250,41 @@ namespace DelvUI.Interface.PartyCooldowns
 
         private void OnMembersChanged(PartyManager sender)
         {
-            if (sender.Previewing || _config.Preview) { return; }
-
-            _cooldownsMap.Clear();
-
-            if (_config.ShowOnlyInDuties && !Plugin.Condition[ConditionFlag.BoundByDuty])
+            Plugin.Framework.RunOnFrameworkThread(() =>
             {
-                CooldownsChangedEvent?.Invoke(this);
-                return;
-            }
+                if (sender.Previewing || _config.Preview) { return; }
 
-            // show when solo
-            if (sender.IsSoloParty() || sender.MemberCount == 0)
-            {
-                var player = Plugin.ClientState.LocalPlayer;
-                if (_config.ShowWhenSolo && player != null)
+                _cooldownsMap.Clear();
+
+                if (_config.ShowOnlyInDuties && !Plugin.Condition[ConditionFlag.BoundByDuty])
                 {
-                    _cooldownsMap.Add((uint)player.GameObjectId, CooldownsForMember((uint)player.GameObjectId, player.ClassJob.RowId, player.Level, null));
+                    CooldownsChangedEvent?.Invoke(this);
+                    return;
                 }
-            }
-            else if (!_config.ShowOnlyInDuties || Plugin.Condition[ConditionFlag.BoundByDuty])
-            {
-                // add new members
-                foreach (IPartyFramesMember member in sender.GroupMembers)
+
+                // show when solo
+                if (sender.IsSoloParty() || sender.MemberCount == 0)
                 {
-                    if (member.ObjectId > 0)
+                    var player = Plugin.ClientState.LocalPlayer;
+                    if (_config.ShowWhenSolo && player != null)
                     {
-                        _cooldownsMap.Add(member.ObjectId, CooldownsForMember(member));
+                        _cooldownsMap.Add((uint)player.GameObjectId, CooldownsForMember((uint)player.GameObjectId, player.ClassJob.RowId, player.Level, null));
                     }
                 }
-            }
+                else if (!_config.ShowOnlyInDuties || Plugin.Condition[ConditionFlag.BoundByDuty])
+                {
+                    // add new members
+                    foreach (IPartyFramesMember member in sender.GroupMembers)
+                    {
+                        if (member.ObjectId > 0)
+                        {
+                            _cooldownsMap.Add(member.ObjectId, CooldownsForMember(member));
+                        }
+                    }
+                }
 
-            CooldownsChangedEvent?.Invoke(this);
+                CooldownsChangedEvent?.Invoke(this);
+            });
         }
 
         private Dictionary<uint, PartyCooldown> CooldownsForMember(IPartyFramesMember member)

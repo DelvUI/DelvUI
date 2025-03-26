@@ -141,10 +141,10 @@ namespace DelvUI.Interface.Jobs
             MNKGauge gauge = Plugin.JobGauges.Get<MNKGauge>();
 
             if (Config.MastersGauge.HideWhenInactive &&
-                gauge.Nadi == Nadi.NONE &&
-                gauge.BeastChakra[0] == BeastChakra.NONE &&
-                gauge.BeastChakra[1] == BeastChakra.NONE &&
-                gauge.BeastChakra[2] == BeastChakra.NONE)
+                gauge.Nadi == Nadi.None &&
+                gauge.BeastChakra[0] == BeastChakra.None &&
+                gauge.BeastChakra[1] == BeastChakra.None &&
+                gauge.BeastChakra[2] == BeastChakra.None)
             {
                 return;
             }
@@ -152,11 +152,11 @@ namespace DelvUI.Interface.Jobs
             int[] order = Config.MastersGauge.ChakraOrder;
             int[] hasChakra =
             [
-                gauge.Nadi.HasFlag(Nadi.LUNAR) ? 1 : 0,
-                gauge.BeastChakra[0] != BeastChakra.NONE ? 1 : 0,
-                gauge.BeastChakra[0] != BeastChakra.NONE ? 1 : 0,
-                gauge.BeastChakra[0] != BeastChakra.NONE ? 1 : 0,
-                gauge.Nadi.HasFlag(Nadi.SOLAR) ? 1 : 0,
+                gauge.Nadi.HasFlag(Nadi.Lunar) ? 1 : 0,
+                gauge.BeastChakra[0] != BeastChakra.None ? 1 : 0,
+                gauge.BeastChakra[0] != BeastChakra.None ? 1 : 0,
+                gauge.BeastChakra[0] != BeastChakra.None ? 1 : 0,
+                gauge.Nadi.HasFlag(Nadi.Solar) ? 1 : 0,
             ];
 
             PluginConfigColor[] colors = new[]
@@ -250,7 +250,7 @@ namespace DelvUI.Interface.Jobs
         {
             Status? perfectBalance = Utils.StatusListForBattleChara(player).Where(o => o.StatusId is 110 && o.RemainingTime > 0f).FirstOrDefault();
             float duration = perfectBalance?.RemainingTime ?? 0f;
-            float stacks = perfectBalance?.StackCount ?? 0f;
+            float stacks = perfectBalance?.Param ?? 0f;
 
             if (Config.PerfectBalanceBar.HideWhenInactive && duration <= 0)
             {
@@ -278,9 +278,9 @@ namespace DelvUI.Interface.Jobs
 
         private PluginConfigColor GetChakraColor(BeastChakra chakra) => chakra switch
         {
-            BeastChakra.OPOOPO => Config.MastersGauge.OpoopoChakraColor,
-            BeastChakra.RAPTOR => Config.MastersGauge.RaptorChakraColor,
-            BeastChakra.COEURL => Config.MastersGauge.CoeurlChakraColor,
+            BeastChakra.OpoOpo => Config.MastersGauge.OpoopoChakraColor,
+            BeastChakra.Raptor => Config.MastersGauge.RaptorChakraColor,
+            BeastChakra.Coeurl => Config.MastersGauge.CoeurlChakraColor,
             _ => new PluginConfigColor(new(0, 0, 0, 0))
         };
     }
