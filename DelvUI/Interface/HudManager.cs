@@ -413,6 +413,7 @@ namespace DelvUI.Interface
                 return;
             }
 
+            WhosTalkingHelper.Instance?.Update();
             _hudHelper.UpdateCombatActionBars();
 
             ClipRectsHelper.Instance.Update();

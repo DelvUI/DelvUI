@@ -1,3 +1,6 @@
+# 2.4.0.1
+- Fixed crash when logging out.
+
 # 2.4.0.0
 - Added support for Patch 7.2 and Dalamud API 12.
 
