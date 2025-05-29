@@ -1,11 +1,13 @@
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using StructsBattleChara = FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara;
 
 namespace DelvUI.Helpers
 {
@@ -214,6 +216,16 @@ namespace DelvUI.Helpers
             ["[company-formatted]"] = (chara) => !String.IsNullOrEmpty(chara.CompanyTag.ToString()) ? $"«{chara.CompanyTag}»" : "",
 
             ["[level]"] = (chara) => chara.Level > 0 ? chara.Level.ToString() : "-",
+            
+            ["[level:adjusted]"] = (chara) =>
+            {
+                if (chara is IBattleChara npc)
+                {
+                    return GetZoneAdjustedLevel(npc, chara.Level);
+                }
+
+                return chara.Level > 0 ? chara.Level.ToString() : "-";
+            },
 
             ["[level:hidden]"] = (chara) => (chara.Level > 1 && chara.Level < 100) ? chara.Level.ToString() : "",
 
@@ -486,6 +498,34 @@ namespace DelvUI.Helpers
         {
             var rawPercentage = 100f * currentVal / Math.Max(1f, maxVal);
             return rawPercentage >= 100 || rawPercentage <= 0 ? rawPercentage.ToString("N0") : rawPercentage.ToString("N1");
+        }
+        
+        private static string GetZoneAdjustedLevel(IBattleChara? npc, int fallbackLevel)
+        {
+            if (npc == null)
+            {
+                return fallbackLevel > 0 ? fallbackLevel.ToString() : "-";
+            }
+
+            try
+            {
+                unsafe
+                {
+                    StructsBattleChara* battleChara = (StructsBattleChara*)npc.Address;
+                    ForayInfo forayInfo = battleChara->ForayInfo;
+
+                    if (forayInfo.Level > 0)
+                    {
+                        return forayInfo.Level.ToString();
+                    }
+                }
+            }
+            catch
+            {
+                Plugin.Logger.Error("Error in getting ZoneAdjustedLevel");
+            }
+
+            return fallbackLevel > 0 ? fallbackLevel.ToString() : "-";
         }
     }
 }
