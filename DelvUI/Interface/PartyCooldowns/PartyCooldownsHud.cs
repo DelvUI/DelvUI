@@ -224,6 +224,7 @@ namespace DelvUI.Interface.PartyCooldowns
                         Vector2 iconPos = origin + new Vector2(pos.X - size.Y + 1, pos.Y);
                         Vector2 iconSize = new Vector2(size.Y);
                         bool recharging = effectTime == 0 && cooldownTime > 0;
+                        bool shouldDrawCooldown = ClipRectsHelper.Instance.GetClipRectForArea(iconPos, iconSize) == null;
 
                         AddDrawAction(_barConfig.StrataLevel, () =>
                         {
@@ -232,7 +233,11 @@ namespace DelvUI.Interface.PartyCooldowns
                                 uint color = recharging ? 0xAAFFFFFF : 0xFFFFFFFF;
                                 DrawHelper.DrawIcon(cooldown.Data.IconId, iconPos, iconSize, false, color, drawList);
 
-                                if (_barConfig.ShowIconCooldownAnimation && effectTime == 0 && cooldownTime > 0)
+                                // cooldown
+                                if (shouldDrawCooldown && 
+                                    _barConfig.ShowIconCooldownAnimation && 
+                                    effectTime == 0 && 
+                                    cooldownTime > 0)
                                 {
                                     DrawHelper.DrawIconCooldown(iconPos, iconSize, cooldownTime, cooldown.GetCooldown(), drawList);
                                 }

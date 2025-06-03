@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Plugin.Services;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
@@ -184,7 +185,7 @@ namespace DelvUI.Interface.Party
             // imgui clips the left and right borders inside windows for some reason
             // we make the window bigger so the actual drawable size is the expected one
             Vector2 windowPos = minPos - margin;
-            Vector2 windowSize = maxPos - minPos;
+            Vector2 windowSize = maxPos - minPos;            
 
             AddDrawAction(Config.StrataLevel, () =>
             {
@@ -207,9 +208,11 @@ namespace DelvUI.Interface.Party
                         // icon
                         bool recharging = effectTime == 0 && cooldownTime > 0;
                         uint color = recharging ? 0xAAFFFFFF : 0xFFFFFFFF;
+                        bool shouldDrawCooldown = ClipRectsHelper.Instance.GetClipRectForArea(iconPos, Config.IconSize) == null;
+
                         DrawHelper.DrawIcon(cooldown.Data.IconId, iconPos, Config.IconSize, false, color, drawList);
 
-                        if (effectTime == 0 && cooldownTime > 0)
+                        if (shouldDrawCooldown && effectTime == 0 && cooldownTime > 0)
                         {
                             DrawHelper.DrawIconCooldown(iconPos, Config.IconSize, cooldownTime, cooldown.Data.CooldownDuration, drawList);
                         }
