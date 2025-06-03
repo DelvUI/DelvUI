@@ -98,7 +98,7 @@ namespace DelvUI.Helpers
                 return false;
             }
 
-            return chara->CharacterData.Battalion > 0 || chara->IsHostile;
+            return chara->CharacterData.Battalion > 0 && chara->IsHostile;
         }
 
         public static unsafe float ActorShieldValue(IGameObject? actor)

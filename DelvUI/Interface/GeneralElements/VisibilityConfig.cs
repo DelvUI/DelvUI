@@ -77,9 +77,9 @@ namespace DelvUI.Interface
 
         private bool IsInDuty() => Plugin.Condition[ConditionFlag.BoundByDuty];
 
-        private bool IsCrafting() => Plugin.Condition[ConditionFlag.Crafting] || Plugin.Condition[ConditionFlag.Crafting40];
+        private bool IsCrafting() => Plugin.Condition[ConditionFlag.Crafting] || Plugin.Condition[ConditionFlag.ExecutingCraftingAction];
 
-        private bool IsGathering() => Plugin.Condition[ConditionFlag.Gathering] || Plugin.Condition[ConditionFlag.Gathering42];
+        private bool IsGathering() => Plugin.Condition[ConditionFlag.Gathering] || Plugin.Condition[ConditionFlag.ExecutingGatheringAction];
 
         private bool HasWeaponDrawn() => (Plugin.ClientState.LocalPlayer != null && Plugin.ClientState.LocalPlayer.StatusFlags.HasFlag(StatusFlags.WeaponOut));
 

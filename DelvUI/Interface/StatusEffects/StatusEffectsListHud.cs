@@ -95,7 +95,7 @@ namespace DelvUI.Interface.StatusEffects
 
         protected string GetStatusActorName(StatusStruct status)
         {
-            var character = Plugin.ObjectTable.SearchById(status.SourceId);
+            var character = Plugin.ObjectTable.SearchById(status.SourceObject.Id);
             return character == null ? "" : character.Name.ToString();
         }
 
@@ -238,11 +238,11 @@ namespace DelvUI.Interface.StatusEffects
                 }
 
                 // only mine
-                var mine = player?.GameObjectId == status->SourceId;
+                var mine = player?.GameObjectId == status->SourceObject.Id;
 
                 if (Config.IncludePetAsOwn)
                 {
-                    mine = player?.GameObjectId == status->SourceId || IsStatusFromPlayerPet(*status);
+                    mine = player?.GameObjectId == status->SourceObject.Id || IsStatusFromPlayerPet(*status);
                 }
 
                 if (Config.ShowOnlyMine && !mine)
@@ -271,7 +271,7 @@ namespace DelvUI.Interface.StatusEffects
                 return false;
             }
 
-            return buddy.ObjectId == status.SourceId;
+            return buddy.ObjectId == status.SourceObject.Id;
         }
 
         protected List<StatusEffectData> OrderByMineOrPermanentFirst(List<StatusEffectData> list)
@@ -284,15 +284,15 @@ namespace DelvUI.Interface.StatusEffects
 
             if (Config.ShowMineFirst && Config.ShowPermanentFirst)
             {
-                return list.OrderByDescending(x => x.Status.SourceId == player.GameObjectId && x.Data.IsPermanent || x.Data.IsFcBuff)
-                    .ThenByDescending(x => x.Status.SourceId == player.GameObjectId)
+                return list.OrderByDescending(x => x.Status.SourceObject.Id == player.GameObjectId && x.Data.IsPermanent || x.Data.IsFcBuff)
+                    .ThenByDescending(x => x.Status.SourceObject.Id == player.GameObjectId)
                     .ThenByDescending(x => x.Data.IsPermanent)
                     .ThenByDescending(x => x.Data.IsFcBuff)
                     .ToList();
             }
             else if (Config.ShowMineFirst && !Config.ShowPermanentFirst)
             {
-                return list.OrderByDescending(x => x.Status.SourceId == player.GameObjectId)
+                return list.OrderByDescending(x => x.Status.SourceObject.Id == player.GameObjectId)
                     .ToList();
             }
             else if (!Config.ShowMineFirst && Config.ShowPermanentFirst)
@@ -479,8 +479,8 @@ namespace DelvUI.Interface.StatusEffects
                 bool rightClick = InputsHelper.Instance.HandlingMouseInputs ? InputsHelper.Instance.RightButtonClicked : ImGui.GetIO().MouseClicked[1];
 
                 // remove buff on right click
-                bool isFromPlayer = data.Status.SourceId == Plugin.ClientState.LocalPlayer?.GameObjectId;
-                bool isTheEcho = data.Status.SourceId is 42 or 239;
+                bool isFromPlayer = data.Status.SourceObject.Id == Plugin.ClientState.LocalPlayer?.GameObjectId;
+                bool isTheEcho = data.Status.SourceObject.Id is 42 or 239;
 
                 if (data.Data.StatusCategory == 1 && (isFromPlayer || isTheEcho) && rightClick)
                 {
@@ -524,7 +524,7 @@ namespace DelvUI.Interface.StatusEffects
                 isFromPlayerPet = IsStatusFromPlayerPet(statusEffectData.Status);
             }
 
-            if (Config.IconConfig.OwnedBorderConfig.Enabled && (statusEffectData.Status.SourceId == Plugin.ClientState.LocalPlayer?.GameObjectId || isFromPlayerPet))
+            if (Config.IconConfig.OwnedBorderConfig.Enabled && (statusEffectData.Status.SourceObject.Id == Plugin.ClientState.LocalPlayer?.GameObjectId || isFromPlayerPet))
             {
                 borderConfig = Config.IconConfig.OwnedBorderConfig;
             }
@@ -567,7 +567,7 @@ namespace DelvUI.Interface.StatusEffects
                 fakeStruct.StatusId = i == 0 ? (ushort)1211 : (ushort)RNG.Next(1, 200);
                 fakeStruct.RemainingTime = RNG.Next(1, 30);
                 fakeStruct.Param = (byte)RNG.Next(1, 3);
-                fakeStruct.SourceId = 0;
+                fakeStruct.SourceObject.Id = 0;
 
                 _fakeEffects[i] = fakeStruct;
             }

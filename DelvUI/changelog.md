@@ -1,3 +1,7 @@
+# 2.4.0.2
+- Added the `[level:adjusted]` text tag.
+- Fixed friendly NPCs nameplates showing as hostile.
+
 # 2.4.0.1
 - Fixed crash when logging out.
 
