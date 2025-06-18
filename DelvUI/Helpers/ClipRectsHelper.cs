@@ -100,7 +100,7 @@ namespace DelvUI.Helpers
                 try
                 {
                     AtkUnitBase* addon = *(AtkUnitBase**)Unsafe.AsPointer(ref loadedUnitsList->Entries[i]);
-                    if (addon->RootNode == null || addon == null || !addon->IsVisible || addon->WindowNode == null || addon->Scale == 0 || !addon->WindowNode->IsVisible())
+                    if (addon == null || addon->RootNode == null || !addon->IsVisible || addon->WindowNode == null || addon->Scale == 0 || !addon->WindowNode->IsVisible())
                     {
                         continue;
                     }
