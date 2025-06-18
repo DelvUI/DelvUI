@@ -100,7 +100,7 @@ namespace DelvUI.Helpers
                 try
                 {
                     AtkUnitBase* addon = *(AtkUnitBase**)Unsafe.AsPointer(ref loadedUnitsList->Entries[i]);
-                    if (addon == null || !addon->IsVisible || addon->WindowNode == null || addon->Scale == 0)
+                    if (addon == null || addon->RootNode == null || !addon->IsVisible || addon->WindowNode == null || addon->Scale == 0 || !addon->WindowNode->IsVisible())
                     {
                         continue;
                     }
@@ -114,23 +114,11 @@ namespace DelvUI.Helpers
                     float margin = 5 * addon->Scale;
                     float bottomMargin = 13 * addon->Scale;
 
-                    Vector2 pos = new Vector2(addon->X + margin, addon->Y + margin);
+                    Vector2 pos = new Vector2(addon->RootNode->X + margin, addon->RootNode->Y + margin);
                     Vector2 size = new Vector2(
-                        addon->WindowNode->AtkResNode.Width * addon->Scale - margin,
-                        addon->WindowNode->AtkResNode.Height * addon->Scale - bottomMargin
+                        addon->RootNode->Width * addon->Scale - margin,
+                        addon->RootNode->Height * addon->Scale - bottomMargin
                     );
-
-                    // special case for duty finder
-                    if (name == "ContentsFinder")
-                    {
-                        size.X += size.X + (16 * addon->Scale);
-                        size.Y += (30 * addon->Scale);
-                    }
-
-                    if (name == "Journal")
-                    {
-                        size.X += size.X + (16 * addon->Scale);
-                    }
 
                     // just in case this causes weird issues / crashes (doubt it though...)
                     ClipRect clipRect = new ClipRect(pos, pos + size);
