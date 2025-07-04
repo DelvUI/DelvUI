@@ -80,25 +80,19 @@ namespace DelvUI.Helpers
             return null;
         }
 
+        private static readonly unsafe delegate* unmanaged<nint, byte> GetNameplateColor =
+            (delegate* unmanaged<nint, byte>)Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 49 8B CD 89 44 24 40");
+
         public static unsafe bool IsHostile(IGameObject obj)
         {
-            if (obj is not ICharacter character)
-            {
-                return false;
-            }
-
-            if (character.SubKind != (byte)BattleNpcSubKind.Enemy && character.SubKind != (byte)BattleNpcSubKind.BattleNpcPart)
-            {
-                return false;
-            }
-
-            StructsCharacter* chara = (StructsCharacter*)character.Address;
-            if (chara == null)
-            {
-                return false;
-            }
-
-            return chara->CharacterData.Battalion > 0 && chara->IsHostile;
+            var plateType = GetNameplateColor(obj.Address);
+            //4, 5, 6: Enemy players in PvP
+            //7: yellow, can be attacked, not engaged
+            //8: dead
+            //9: red, engaged with your party
+            //11: orange, aggro'd to your party but not attacked yet
+            //10: purple, engaged with other party
+            return plateType is 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11;
         }
 
         public static unsafe float ActorShieldValue(IGameObject? actor)
