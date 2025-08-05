@@ -8,7 +8,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -92,7 +92,7 @@ namespace DelvUI.Interface.Nameplates
             UI3DModule* ui3DModule = uiModule->GetUI3DModule();
             if (ui3DModule == null) { return; }
 
-            AddonNamePlate* addon = (AddonNamePlate*)Plugin.GameGui.GetAddonByName("NamePlate", 1);
+            AddonNamePlate* addon = (AddonNamePlate*)Plugin.GameGui.GetAddonByName("NamePlate", 1).Address;
             if (addon == null) { return; }
 
             RaptureAtkModule* atkModule = uiModule->GetRaptureAtkModule();

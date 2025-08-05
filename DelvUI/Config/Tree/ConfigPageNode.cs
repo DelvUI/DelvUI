@@ -3,7 +3,7 @@ using DelvUI.Config.Attributes;
 using DelvUI.Config.Profiles;
 using DelvUI.Helpers;
 using DelvUI.Interface;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

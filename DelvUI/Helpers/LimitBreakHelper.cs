@@ -58,7 +58,7 @@ namespace DelvUI.Helpers
         }
 
         #endregion
-        
+
         public bool LimitBreakActive { get; set; }
         public int LimitBreakLevel { get; set; }
         public int LimitBreakMaxLevel { get; set; }
@@ -68,9 +68,9 @@ namespace DelvUI.Helpers
         public void Update()
         {
             //Get Limit Break Bar
-            AtkUnitBase* LBWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_LimitBreak", 1);
+            AtkUnitBase* LBWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_LimitBreak", 1).Address;
             //Get Compressed Aether Bar
-            AtkUnitBase* CAWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("HWDAetherGauge", 1);
+            AtkUnitBase* CAWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("HWDAetherGauge", 1).Address;
 
             var foundCaGauge = false;
 

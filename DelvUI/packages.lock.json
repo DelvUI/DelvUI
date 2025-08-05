@@ -4,15 +4,15 @@
     "net9.0": {
       "Colourful": {
         "type": "Direct",
-        "requested": "[3.1.0, )",
-        "resolved": "3.1.0",
-        "contentHash": "ZeiISkERDoKQfUYnr7L3H9LjRbcklIs932Ud1de81tK5Q9TkC+TZjQ5Vy1y70wd47JBcU/DcG+G0W0RNOMo29g=="
+        "requested": "[3.2.0, )",
+        "resolved": "3.2.0",
+        "contentHash": "kCWbQLDDbI+KImpxYC7rmeNg3toWyWoc6mMBJ6sJX3VJdEZENfzbtdLLgIJECviQhh0SltjeY5FljsZdPmv78g=="
       },
       "DalamudPackager": {
         "type": "Direct",
-        "requested": "[12.0.0, )",
-        "resolved": "12.0.0",
-        "contentHash": "J5TJLV3f16T/E2H2P17ClWjtfEBPpq3yxvqW46eN36JCm6wR+EaoaYkqG9Rm5sHqs3/nK/vKjWWyvEs/jhKoXw=="
+        "requested": "[13.0.0, )",
+        "resolved": "13.0.0",
+        "contentHash": "Mb3cUDSK/vDPQ8gQIeuCw03EMYrej1B4J44a1AvIJ9C759p9XeqdU9Hg4WgOmlnlPe0G7ILTD32PKSUpkQNa8w=="
       }
     }
   }

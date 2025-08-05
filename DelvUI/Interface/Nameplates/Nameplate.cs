@@ -7,7 +7,7 @@ using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System.Collections.Generic;
 using System.Numerics;
 using Action = System.Action;

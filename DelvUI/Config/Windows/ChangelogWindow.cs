@@ -1,6 +1,6 @@
 ﻿using Dalamud.Interface.Windowing;
 using DelvUI.Helpers;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Numerics;
 

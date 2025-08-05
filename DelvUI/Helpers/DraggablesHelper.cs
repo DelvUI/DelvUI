@@ -4,7 +4,7 @@ using DelvUI.Interface;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Jobs;
 using DelvUI.Interface.StatusEffects;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -217,8 +217,7 @@ namespace DelvUI.Helpers
                 ImGui.Begin("DelvUI_draggablesArrow " + i.ToString(), windowFlags);
 
                 // fake button
-                ImGui.ArrowButton("arrow button " + i.ToString(), (ImGuiDir)i);
-
+                ImGuiP.ArrowButtonEx($"arrow button {i}", (ImGuiDir)i, new Vector2(ArrowSize.X, ArrowSize.Y));
                 if (ImGui.IsMouseHoveringRect(pos, pos + windowSize))
                 {
                     // track click manually to not deal with window focus stuff

@@ -1,6 +1,6 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Tree;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,7 +51,7 @@ namespace DelvUI.Helpers
         {
             Node? nodeToReset = null;
 
-            if (ImGui.BeginPopupContextItem())
+            if (ImGui.BeginPopupContextItem("ResetContextMenu"))
             {
                 if (canExport && ImGui.Selectable("Export"))
                 {

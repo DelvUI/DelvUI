@@ -4,7 +4,7 @@ using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Interface.Utility;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using ImGuiScene;
 using System;
 using System.Collections.Generic;
@@ -182,7 +182,7 @@ namespace DelvUI.Config.Tree
                     if (delvUiBanner != null)
                     {
                         ImGui.SetCursorPos(new Vector2(15 + 150 * _scale / 2f - delvUiBanner.Width / 2f, 5));
-                        ImGui.Image(delvUiBanner.ImGuiHandle, new Vector2(delvUiBanner.Width, delvUiBanner.Height));
+                        ImGui.Image(delvUiBanner.Handle, new Vector2(delvUiBanner.Width, delvUiBanner.Height));
                     }
 
                     // version

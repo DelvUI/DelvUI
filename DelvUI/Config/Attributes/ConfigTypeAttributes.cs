@@ -3,7 +3,7 @@ using Dalamud.Interface.Utility;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -323,7 +323,7 @@ namespace DelvUI.Config.Attributes
     [AttributeUsage(AttributeTargets.Field)]
     public class InputTextAttribute : ConfigAttribute
     {
-        public uint maxLength;
+        public int maxLength;
         public bool formattable = true;
 
         private string _searchText = "";
@@ -341,10 +341,10 @@ namespace DelvUI.Config.Attributes
             string? finalValue = null;
 
             string popupId = ID != null ? "DelvUI_TextTagsList " + ID : "DelvUI_TextTagsList ##" + friendlyName;
-           
+
             if (!formattable)
             {
-                if (ImGui.InputText(friendlyName + IDText(ID), ref stringVal, maxLength))
+                if (ImGui.InputText(friendlyName + IDText(ID), ref stringVal))
                 {
                     finalValue = stringVal;
                 }
@@ -440,7 +440,7 @@ namespace DelvUI.Config.Attributes
                 intVal = (int)fieldVal;
             }
 
-            if (ImGui.Combo(friendlyName + IDText(ID), ref intVal, options, options.Length, 4))
+            if (ImGui.Combo(friendlyName + IDText(ID), ref intVal, options, options.Length))
             {
                 field.SetValue(config, intVal);
 
@@ -537,7 +537,7 @@ namespace DelvUI.Config.Attributes
 
             var options = fontsConfig.Fonts.Values.Select(fontData => fontData.Name + "  " + fontData.Size.ToString()).ToArray();
 
-            if (ImGui.Combo(friendlyName + IDText(ID), ref index, options, options.Length, 4))
+            if (ImGui.Combo(friendlyName + IDText(ID), ref index, options, options.Length))
             {
                 stringVal = fontsConfig.Fonts.Keys[index];
                 field.SetValue(config, stringVal);
@@ -566,7 +566,7 @@ namespace DelvUI.Config.Attributes
             List<string> textures = BarTexturesManager.Instance.BarTextureNames.ToList();
             string? stringVal = (string?)field.GetValue(config);
 
-            int index = 0; 
+            int index = 0;
             if (stringVal != null && stringVal.Length > 0 && textures.Contains(stringVal))
             {
                 index = textures.IndexOf(stringVal);
@@ -574,7 +574,7 @@ namespace DelvUI.Config.Attributes
 
             string[] options = textures.ToArray();
 
-            if (ImGui.Combo(friendlyName + IDText(ID), ref index, options, options.Length, 10))
+            if (ImGui.Combo(friendlyName + IDText(ID), ref index, options, options.Length))
             {
                 stringVal = options[index];
                 field.SetValue(config, stringVal);
@@ -625,7 +625,7 @@ namespace DelvUI.Config.Attributes
                 intVal = (int)fieldVal;
             }
 
-            if (ImGui.Combo(friendlyName + IDText(ID), ref intVal, options, options.Length, 4))
+            if (ImGui.Combo(friendlyName + IDText(ID), ref intVal, options, options.Length))
             {
                 field.SetValue(config, (StrataLevel?)intVal);
 

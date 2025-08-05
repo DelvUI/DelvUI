@@ -2,7 +2,7 @@
 using Dalamud.Interface;
 using DelvUI.Config;
 using DelvUI.Helpers;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using Lumina.Excel.Sheets;
 using System;
 using System.Numerics;

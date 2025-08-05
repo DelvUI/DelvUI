@@ -151,7 +151,7 @@ namespace DelvUI.Interface.Party
         public void Update()
         {
             // find party list hud agent
-            PartyListAddon = (AddonPartyList*)Plugin.GameGui.GetAddonByName("_PartyList", 1);
+            PartyListAddon = (AddonPartyList*)Plugin.GameGui.GetAddonByName("_PartyList", 1).Address;
             HudAgent = Plugin.GameGui.FindAgentInterface(PartyListAddon);
 
             if (PartyListAddon == null || HudAgent == IntPtr.Zero)
@@ -331,7 +331,7 @@ namespace DelvUI.Interface.Party
 
         private bool IsCrossWorldParty()
         {
-            return _crossRealmInfo->IsCrossRealm > 0 && _crossRealmInfo->GroupCount > 0 && _mainGroup.MemberCount == 0;
+            return _crossRealmInfo->IsCrossRealm && _crossRealmInfo->GroupCount > 0 && _mainGroup.MemberCount == 0;
         }
 
         private ReadyCheckStatus GetReadyCheckStatus(ulong contentId)
@@ -466,7 +466,7 @@ namespace DelvUI.Interface.Party
                 }
 
                 bool isPlayer = member.EntityId == player.EntityId;
-                bool isLeader = member.IsPartyLeader > 0;
+                bool isLeader = member.IsPartyLeader;
                 PartyMemberStatus status = data.Status != null ? StatusForCrossWorldMember(data.Status) : PartyMemberStatus.None;
                 ReadyCheckStatus readyCheckStatus = GetReadyCheckStatus(member.ContentId);
 
@@ -649,7 +649,7 @@ namespace DelvUI.Interface.Party
             {
                 return PartyMemberStatus.Offline;
             }
-        
+
             // viewing cutscene status
             for (int i = 0; i < _mainGroup.MemberCount; i++)
             {

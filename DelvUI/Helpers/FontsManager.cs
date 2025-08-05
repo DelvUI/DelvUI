@@ -3,7 +3,7 @@ using Dalamud.Interface.ManagedFontAtlas;
 using Dalamud.Interface.Utility;
 using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -208,7 +208,7 @@ namespace DelvUI.Helpers
                 return null;
             }
 
-            var builder = new ImFontGlyphRangesBuilderPtr(ImGuiNative.ImFontGlyphRangesBuilder_ImFontGlyphRangesBuilder());
+            var builder = new ImFontGlyphRangesBuilderPtr(ImGuiNative.ImFontGlyphRangesBuilder());
 
             if (config.SupportChineseCharacters)
             {

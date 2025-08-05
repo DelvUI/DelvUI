@@ -75,8 +75,8 @@
 			<HintPath>$(DalamudLibPath)Dalamud.dll</HintPath>
 			<Private>false</Private>
 		</Reference>
-		<Reference Include="ImGui.NET">
-			<HintPath>$(DalamudLibPath)ImGui.NET.dll</HintPath>
+		<Reference Include="Dalamud.Bindings.ImGui">
+			<HintPath>$(DalamudLibPath)Dalamud.Bindings.ImGui.dll</HintPath>
 			<Private>false</Private>
 		</Reference>
 		<Reference Include="ImGuiScene">
@@ -99,7 +99,7 @@
 
 	<!-- NuGet Packages -->
 	<ItemGroup>
-		<PackageReference Include="DalamudPackager" Version="12.0.0" />
-		<PackageReference Include="Colourful" Version="3.1.0" />
+		<PackageReference Include="DalamudPackager" Version="13.0.0" />
+		<PackageReference Include="Colourful" Version="3.2.0" />
 	</ItemGroup>
 </Project>

@@ -79,7 +79,7 @@ namespace DelvUI.Interface.EnemyList
         {
             // gets enmity level by checking texture in enemy list addon
 
-            AtkUnitBase* enemyList = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_EnemyList", 1);
+            AtkUnitBase* enemyList = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_EnemyList", 1).Address;
             if (enemyList == null || enemyList->RootNode == null) { return 0; }
 
             int id = index == 0 ? 2 : 20000 + index; // makes no sense but it is what it is (blame SE)

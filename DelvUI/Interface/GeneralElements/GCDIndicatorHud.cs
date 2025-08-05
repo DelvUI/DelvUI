@@ -1,7 +1,7 @@
 ﻿using System;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System.Collections.Generic;
 using System.Numerics;
 using DelvUI.Config;

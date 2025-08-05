@@ -6,11 +6,12 @@ using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using LuminaStatus = Lumina.Excel.Sheets.Status;
 using StatusStruct = FFXIVClientStructs.FFXIV.Client.Game.Status;
 
@@ -120,7 +121,7 @@ namespace DelvUI.Interface.StatusEffects
                         return bTime.CompareTo(aTime);
                     }
                 });
-            } 
+            }
             // show mine or permanent first
             else if (Config.ShowMineFirst || Config.ShowPermanentFirst)
             {
@@ -352,7 +353,7 @@ namespace DelvUI.Interface.StatusEffects
                 LayoutHelper.GetFillsRowsFirst(Config.FillRowsFirst, growthDirections),
                 _layoutInfo
             );
-     
+
             // window
             // imgui clips the left and right borders inside windows for some reason
             // we make the window bigger so the actual drawable size is the expected one
@@ -485,6 +486,7 @@ namespace DelvUI.Interface.StatusEffects
                 if (data.Data.StatusCategory == 1 && (isFromPlayer || isTheEcho) && rightClick)
                 {
                     ChatHelper.SendChatMessage($"/statusoff \"{data.Data.Name}\"");
+                    StatusManager.ExecuteStatusOff(data.Status.StatusId, data.Status.SourceObject.ObjectId);
 
                     if (NeedsSpecialInput)
                     {

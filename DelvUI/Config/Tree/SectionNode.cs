@@ -1,5 +1,5 @@
 ﻿using DelvUI.Config.Attributes;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.IO;
 using System.Numerics;

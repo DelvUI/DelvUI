@@ -2,7 +2,7 @@
 using DelvUI.Config.Attributes;
 using DelvUI.Config.Profiles;
 using DelvUI.Helpers;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;

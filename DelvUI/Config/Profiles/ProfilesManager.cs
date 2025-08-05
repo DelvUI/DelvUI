@@ -6,7 +6,7 @@ using DelvUI.Config.Attributes;
 using DelvUI.Config.Tree;
 using DelvUI.Helpers;
 using DelvUI.Interface;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -113,8 +113,8 @@ namespace DelvUI.Config.Profiles
             }
 
             // attempt to reconstruct profile from files if the Profiles directory is missing
-            if (attemptRepair && 
-                !ConfigurationManager.Instance.IsFreshInstall() && 
+            if (attemptRepair &&
+                !ConfigurationManager.Instance.IsFreshInstall() &&
                 !Directory.Exists(ProfilesPath))
             {
                 Instance.CurrentProfileName = "Restored Profile";
@@ -687,7 +687,7 @@ namespace DelvUI.Config.Profiles
 
                 ImGui.PushItemWidth(408);
                 ImGuiHelper.NewLineAndTab();
-                if (ImGui.Combo("Active Profile", ref _selectedProfileIndex, profiles, profiles.Length, 10))
+                if (ImGui.Combo("Active Profile", ref _selectedProfileIndex, profiles, profiles.Length))
                 {
                     string newProfileName = profiles[_selectedProfileIndex];
 
@@ -772,7 +772,7 @@ namespace DelvUI.Config.Profiles
 
                 ImGuiHelper.Tab();
                 ImGui.PushItemWidth(200);
-                ImGui.Combo("", ref _copyFromIndex, profiles, profiles.Length, 10);
+                ImGui.Combo("", ref _copyFromIndex, profiles, profiles.Length);
 
                 ImGui.SameLine();
                 if (ImGui.Button("Copy", new Vector2(200, 0)))

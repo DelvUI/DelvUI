@@ -9,7 +9,7 @@ using DelvUI.Interface.Bars;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -319,7 +319,7 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            AtkUnitBase* TargetWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_TargetInfoMainTarget", 1);
+            AtkUnitBase* TargetWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_TargetInfoMainTarget", 1).Address;
             if (TargetWidget != null)
             {
                 AtkTextNode* textNode = TargetWidget->GetTextNodeById(11);
@@ -477,7 +477,7 @@ namespace DelvUI.Interface.GeneralElements
             {
                 DrawHelper.DrawInWindow(ID + "_TankStance", startPos, endPos - startPos, false, (drawList) =>
                 {
-                    // TODO: clean up hacky math 
+                    // TODO: clean up hacky math
                     // there's some 1px errors prob due to negative sizes
                     // couldn't figure it out so I did the hacky fixes
 

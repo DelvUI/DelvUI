@@ -5,7 +5,7 @@ using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -132,7 +132,7 @@ namespace DelvUI.Interface
 
         private unsafe void SetHotbarVisible(int index, bool visible)
         {
-            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName(_hotbarAddonNames[index], 1);
+            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName(_hotbarAddonNames[index], 1).Address;
             if (addon == null || addon->IsVisible == visible) { return; }
 
             string numberText = (index + 1).ToString();
@@ -157,7 +157,7 @@ namespace DelvUI.Interface
             {
                 Plugin.AddonLifecycle.RegisterListener(AddonEvent.PreDraw, "_CastBar", (addonEvent, args) =>
                 {
-                    AtkUnitBase* addon = (AtkUnitBase*)args.Addon;
+                    AtkUnitBase* addon = (AtkUnitBase*)args.Addon.Address;
 
                     if (!_hidingCastBar)
                     {
@@ -173,7 +173,7 @@ namespace DelvUI.Interface
             {
                 Plugin.AddonLifecycle.UnregisterListener(AddonEvent.PreDraw, "_CastBar");
 
-                AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_CastBar", 1);
+                AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_CastBar", 1).Address;
                 if (addon != null)
                 {
                     addon->RootNode->SetPositionFloat(_castBarPos.X, _castBarPos.Y);
@@ -191,7 +191,7 @@ namespace DelvUI.Interface
             {
                 Plugin.AddonLifecycle.RegisterListener(AddonEvent.PreDraw, "ScreenInfo_CountDown", (addonEvent, args) =>
                 {
-                    AtkUnitBase* addon = (AtkUnitBase*)args.Addon;
+                    AtkUnitBase* addon = (AtkUnitBase*)args.Addon.Address;
 
                     if (!_hidingPullTimer)
                     {
@@ -201,7 +201,7 @@ namespace DelvUI.Interface
                     addon->RootNode->SetPositionFloat(-9999.0f, -9999.0f);
                 });
 
-                AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("ScreenInfo_CountDown", 1);
+                AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("ScreenInfo_CountDown", 1).Address;
                 if (addon != null)
                 {
                     _pullTimerPos = new Vector2(addon->RootNode->GetXFloat(), addon->RootNode->GetYFloat());
@@ -214,7 +214,7 @@ namespace DelvUI.Interface
             {
                 Plugin.AddonLifecycle.UnregisterListener(AddonEvent.PreDraw, "ScreenInfo_CountDown");
 
-                AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("ScreenInfo_CountDown", 1);
+                AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("ScreenInfo_CountDown", 1).Address;
                 if (addon != null)
                 {
                     addon->RootNode->SetPositionFloat(_pullTimerPos.X, _pullTimerPos.Y);
@@ -232,7 +232,7 @@ namespace DelvUI.Interface
             ["JobHudPCT1"] = "JobHudRPM1",
 
             ["JobHudNIN1"] = "JobHudNIN1v70",
-            
+
             ["JobHudVPR0"] = "JobHudRDB0",
             ["JobHudVPR1"] = "JobHudRDB1"
         };
@@ -254,7 +254,7 @@ namespace DelvUI.Interface
                     addonName = name;
                 }
 
-                AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName(addonName, 1);
+                AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName(addonName, 1).Address;
                 if (addon == null)
                 {
                     stop = true;

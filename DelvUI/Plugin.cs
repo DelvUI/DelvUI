@@ -13,7 +13,7 @@ using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Nameplates;
 using DelvUI.Interface.Party;
 using DelvUI.Interface.PartyCooldowns;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.IO;
 using System.Reflection;

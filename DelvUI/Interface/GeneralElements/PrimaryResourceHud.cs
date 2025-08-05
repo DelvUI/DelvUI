@@ -1,6 +1,6 @@
 using DelvUI.Config;
 using DelvUI.Helpers;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System.Collections.Generic;
 using System.Numerics;
 using Dalamud.Game.ClientState.Objects.Types;

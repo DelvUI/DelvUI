@@ -1,6 +1,6 @@
 ﻿using DelvUI.Helpers;
 using DelvUI.Interface.Party;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

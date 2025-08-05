@@ -227,7 +227,7 @@ namespace DelvUI.Helpers
         /// <returns>Target ID of your targets targer. Returns -1 if old code should be ran.</returns>
         private static unsafe int GetActualTargetId(IGameObject target)
         {
-            // We only need to check for companions. 
+            // We only need to check for companions.
             // Why not check target.TargetObject?.ObjectKind == ObjectKind.Companion?
             // Due to the Non-Networked game object bug the game is unaware of what type the object should actually be
             if (target.TargetObject?.ObjectKind != ObjectKind.Player)
@@ -328,7 +328,7 @@ namespace DelvUI.Helpers
 
         public static unsafe bool? IsTargetCasting()
         {
-            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_TargetInfo", 1);
+            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_TargetInfo", 1).Address;
             if (addon != null && addon->IsVisible)
             {
                 if (addon->UldManager.NodeListCount < 41) { return true; }
@@ -336,7 +336,7 @@ namespace DelvUI.Helpers
                 return addon->UldManager.NodeList[41]->IsVisible();
             }
 
-            addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_TargetInfoCastBar", 1);
+            addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_TargetInfoCastBar", 1).Address;
             if (addon != null && addon->IsVisible)
             {
                 if (addon->UldManager.NodeListCount < 2) { return true; }
@@ -349,7 +349,7 @@ namespace DelvUI.Helpers
 
         public static unsafe bool? IsFocusTargetCasting()
         {
-            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_FocusTargetInfo", 1);
+            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_FocusTargetInfo", 1).Address;
             if (addon != null && addon->IsVisible)
             {
                 if (addon->UldManager.NodeListCount < 16) { return true; }
@@ -364,7 +364,7 @@ namespace DelvUI.Helpers
         {
             if (index < 0 || index > 7) { return null; }
 
-            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_EnemyList", 1);
+            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_EnemyList", 1).Address;
             if (addon != null && addon->IsVisible)
             {
                 if (addon->UldManager.NodeListCount < 12) { return true; }

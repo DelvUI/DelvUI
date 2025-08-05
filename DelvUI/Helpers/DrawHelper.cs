@@ -3,7 +3,7 @@ using Dalamud.Interface.Utility;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using Lumina.Excel;
 using System;
 using System.Numerics;
@@ -56,7 +56,7 @@ namespace DelvUI.Helpers
             Vector2 uv0 = new Vector2(0);
             Vector2 uv1 = GetBarTextureUV1Vector(size, texture.Width, texture.Height, drawMode);
 
-            drawList.AddImage(texture.ImGuiHandle, position, position + size, uv0, uv1, color.Base);
+            drawList.AddImage(texture.Handle, position, position + size, uv0, uv1, color.Base);
         }
 
         public static void DrawGradientFilledRect(Vector2 position, Vector2 size, PluginConfigColor color, ImDrawListPtr drawList)
@@ -138,7 +138,7 @@ namespace DelvUI.Helpers
             (Vector2 uv0, Vector2 uv1) = GetTexCoordinates(texture, size, cropIcon);
 
             ImGui.SetCursorPos(position);
-            ImGui.Image(texture.ImGuiHandle, size, uv0, uv1);
+            ImGui.Image(texture.Handle, size, uv0, uv1);
 
             if (drawBorder)
             {
@@ -154,7 +154,7 @@ namespace DelvUI.Helpers
 
             (Vector2 uv0, Vector2 uv1) = GetTexCoordinates(texture, size, cropIcon);
 
-            drawList.AddImage(texture.ImGuiHandle, position, position + size, uv0, uv1);
+            drawList.AddImage(texture.Handle, position, position + size, uv0, uv1);
 
             if (drawBorder)
             {
@@ -180,7 +180,7 @@ namespace DelvUI.Helpers
             IDalamudTextureWrap? texture = TexturesHelper.GetTextureFromIconId(iconId);
             if (texture == null) { return; }
 
-            drawList.AddImage(texture.ImGuiHandle, position, position + size, Vector2.Zero, Vector2.One, color);
+            drawList.AddImage(texture.Handle, position, position + size, Vector2.Zero, Vector2.One, color);
 
             if (drawBorder)
             {
