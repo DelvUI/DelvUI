@@ -485,7 +485,6 @@ namespace DelvUI.Interface.StatusEffects
 
                 if (data.Data.StatusCategory == 1 && (isFromPlayer || isTheEcho) && rightClick)
                 {
-                    ChatHelper.SendChatMessage($"/statusoff \"{data.Data.Name}\"");
                     StatusManager.ExecuteStatusOff(data.Status.StatusId, data.Status.SourceObject.ObjectId);
 
                     if (NeedsSpecialInput)
