@@ -13,6 +13,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using FFXIVClientStructs.FFXIV.Client.UI.Arrays;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using static FFXIVClientStructs.FFXIV.Client.Game.Group.GroupManager;
 using DalamudPartyMember = Dalamud.Game.ClientState.Party.IPartyMember;
 using StructsPartyMember = FFXIVClientStructs.FFXIV.Client.Game.Group.PartyMember;
@@ -103,7 +105,7 @@ namespace DelvUI.Interface.Party
         private const int PartyListInfoOffset = 0x0D40;
         private const int PartyListMemberRawInfoSize = 0x28;
 
-        private const int PartyMembersInfoIndex = 11;
+        private const int PartyMembersInfoIndex = 12; // TODO: Should be reworked to use PartyMemberListStringArray.Instance()
 
         private List<IPartyFramesMember> _groupMembers = new List<IPartyFramesMember>();
         public IReadOnlyCollection<IPartyFramesMember> GroupMembers => _groupMembers.AsReadOnly();

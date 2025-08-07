@@ -133,7 +133,7 @@ namespace DelvUI.Interface.EnemyList
             for (int i = 0; i < count; i++)
             {
                 // hp bar
-                ICharacter? character = Config.Preview ? null : Plugin.ObjectTable.SearchById((uint)_helper.EnemiesData.ElementAt(i).ObjectId) as ICharacter;
+                ICharacter? character = Config.Preview ? null : Plugin.ObjectTable.SearchById((uint)_helper.EnemiesData.ElementAt(i).EntityId) as ICharacter;
 
                 uint currentHp = Config.Preview ? (uint)(_previewValues[i] * fakeMaxHp) : character?.CurrentHp ?? fakeMaxHp;
                 uint maxHp = Config.Preview ? fakeMaxHp : character?.MaxHp ?? fakeMaxHp;
