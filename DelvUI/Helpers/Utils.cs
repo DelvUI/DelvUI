@@ -85,14 +85,15 @@ namespace DelvUI.Helpers
 
         public static unsafe bool IsHostile(IGameObject obj)
         {
-            var plateType = GetNameplateColor(obj.Address);
-            //4, 5, 6: Enemy players in PvP
-            //7: yellow, can be attacked, not engaged
-            //8: dead
-            //9: red, engaged with your party
-            //11: orange, aggro'd to your party but not attacked yet
-            //10: purple, engaged with other party
-            return plateType is 4 or 5 or 6 or 7 or 8 or 9 or 10 or 11;
+            byte plateType = GetNameplateColor(obj.Address);
+
+            // 4, 5, 6: Enemy players in PvP
+            // 7: yellow, can be attacked, not engaged
+            // 8: dead
+            // 9: red, engaged with your party
+            // 10: purple, engaged with other party
+            // 11: orange, aggro'd to your party but not attacked yet
+            return plateType >= 4 && plateType <= 11;
         }
 
         public static unsafe float ActorShieldValue(IGameObject? actor)
