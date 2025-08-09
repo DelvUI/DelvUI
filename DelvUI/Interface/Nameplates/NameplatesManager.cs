@@ -8,7 +8,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -69,9 +69,8 @@ namespace DelvUI.Interface.Nameplates
         #endregion Singleton
 
         private const int NameplateCount = 50;
-        private const int NameplateDataArrayIndex = 4;
+        private const int NameplateDataArrayIndex = 4; // TODO: Rework to use NamePlateStringArray if it exists or use AtkStage.Instance()->GetStringArrayData(StringArrayType.NamePlate)
         private Vector2 _averageNameplateSize = new Vector2(250, 150);
-
         private List<NameplateData> _data = new List<NameplateData>();
         public IReadOnlyCollection<NameplateData> Data => _data.AsReadOnly();
 
@@ -92,7 +91,7 @@ namespace DelvUI.Interface.Nameplates
             UI3DModule* ui3DModule = uiModule->GetUI3DModule();
             if (ui3DModule == null) { return; }
 
-            AddonNamePlate* addon = (AddonNamePlate*)Plugin.GameGui.GetAddonByName("NamePlate", 1);
+            AddonNamePlate* addon = (AddonNamePlate*)Plugin.GameGui.GetAddonByName("NamePlate", 1).Address;
             if (addon == null) { return; }
 
             RaptureAtkModule* atkModule = uiModule->GetRaptureAtkModule();

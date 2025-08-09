@@ -9,7 +9,7 @@ using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -367,7 +367,7 @@ namespace DelvUI.Interface.Party
                         DrawHelper.DrawInWindow(WhosTalkingIcon.Icon.ID, iconPos, WhosTalkingIcon.Icon.Size, false, (drawList) =>
                         {
                             ImGui.SetCursorPos(iconPos);
-                            ImGui.Image(texture.ImGuiHandle, WhosTalkingIcon.Icon.Size);
+                            ImGui.Image(texture.Handle, WhosTalkingIcon.Icon.Size);
                         });
                     }
                     ));
@@ -478,7 +478,7 @@ namespace DelvUI.Interface.Party
                     {
                         Vector2 uv0 = new Vector2(0.5f * (int)Member.ReadyCheckStatus, 0f);
                         Vector2 uv1 = new Vector2(0.5f + 0.5f * (int)Member.ReadyCheckStatus, 1f);
-                        drawList.AddImage(_readyCheckTexture.ImGuiHandle, iconPos, iconPos + ReadyCheckIcon.Icon.Size, uv0, uv1);
+                        drawList.AddImage(_readyCheckTexture.Handle, iconPos, iconPos + ReadyCheckIcon.Icon.Size, uv0, uv1);
                     });
                 }
                 ));

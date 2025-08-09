@@ -2,7 +2,7 @@
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Collections.Generic;
 using System.Numerics;

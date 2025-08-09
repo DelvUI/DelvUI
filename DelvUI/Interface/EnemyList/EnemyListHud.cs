@@ -6,7 +6,7 @@ using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -133,7 +133,7 @@ namespace DelvUI.Interface.EnemyList
             for (int i = 0; i < count; i++)
             {
                 // hp bar
-                ICharacter? character = Config.Preview ? null : Plugin.ObjectTable.SearchById((uint)_helper.EnemiesData.ElementAt(i).ObjectId) as ICharacter;
+                ICharacter? character = Config.Preview ? null : Plugin.ObjectTable.SearchById((uint)_helper.EnemiesData.ElementAt(i).EntityId) as ICharacter;
 
                 uint currentHp = Config.Preview ? (uint)(_previewValues[i] * fakeMaxHp) : character?.CurrentHp ?? fakeMaxHp;
                 uint maxHp = Config.Preview ? fakeMaxHp : character?.MaxHp ?? fakeMaxHp;
@@ -230,7 +230,7 @@ namespace DelvUI.Interface.EnemyList
                             float h = 48f / _iconsTexture.Height;
                             Vector2 uv0 = new Vector2(w * enmityIndex, 0.48f);
                             Vector2 uv1 = new Vector2(w * (enmityIndex + 1), 0.48f + h);
-                            drawList.AddImage(_iconsTexture.ImGuiHandle, iconPos, iconPos + Configs.EnmityIcon.Size, uv0, uv1);
+                            drawList.AddImage(_iconsTexture.Handle, iconPos, iconPos + Configs.EnmityIcon.Size, uv0, uv1);
                         });
                     });
                 }

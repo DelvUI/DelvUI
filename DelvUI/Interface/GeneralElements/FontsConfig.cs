@@ -3,7 +3,7 @@ using Dalamud.Interface.ImGuiFileDialog;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -51,7 +51,7 @@ namespace DelvUI.Interface.GeneralElements
             {"MiedingerMid", "meidinger-ffxiv"},
             {"Meidinger", "meidinger-numberic-ffxiv"},
             {"TrumpGothic", "trumpgothic-ffxiv"},
-            
+
         };
 
         [JsonIgnore] public static readonly List<string> DefaultFontsKeys = new List<string>() { "Expressway_24", "Expressway_20", "Expressway_16" };
@@ -131,7 +131,7 @@ namespace DelvUI.Interface.GeneralElements
 
             return fonts;
         }
-        
+
         private string[] FontsFromGame()
         {
             string[] gameFontArray = Enum.GetNames(typeof(GameFontFamily)).Skip(1).ToArray();
@@ -236,7 +236,7 @@ namespace DelvUI.Interface.GeneralElements
                 ImGui.PopFont();
 
                 ImGuiHelper.Tab();
-                ImGui.Combo("Font ##font", ref _inputFont, _fonts, _fonts.Length, 10);
+                ImGui.Combo("Font ##font", ref _inputFont, _fonts, 10);
 
                 ImGui.SameLine();
                 ImGui.PushFont(UiBuilder.IconFont);
@@ -247,7 +247,7 @@ namespace DelvUI.Interface.GeneralElements
                 ImGui.PopFont();
 
                 ImGuiHelper.Tab();
-                ImGui.Combo("Size  ##size", ref _inputSize, _sizes, _sizes.Length, 10);
+                ImGui.Combo("Size  ##size", ref _inputSize, _sizes, 10);
 
                 ImGui.SameLine();
                 ImGui.PushFont(UiBuilder.IconFont);

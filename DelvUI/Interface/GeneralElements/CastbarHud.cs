@@ -8,7 +8,7 @@ using DelvUI.Interface.Bars;
 using DelvUI.Interface.EnemyList;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -113,7 +113,7 @@ namespace DelvUI.Interface.GeneralElements
                         IDalamudTextureWrap? texture = Config.Preview ? TexturesHelper.GetTexture<LuminaAction>(3577) : iconTexture;
                         if (texture != null)
                         {
-                            ImGui.Image(texture.ImGuiHandle, finalIconSize);
+                            ImGui.Image(texture.Handle, finalIconSize);
                         }
 
                         if (Config.DrawBorder)

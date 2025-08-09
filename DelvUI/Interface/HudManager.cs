@@ -13,7 +13,7 @@ using DelvUI.Interface.Party;
 using DelvUI.Interface.PartyCooldowns;
 using DelvUI.Interface.StatusEffects;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -509,14 +509,14 @@ namespace DelvUI.Interface
                 Plugin.Condition[ConditionFlag.BetweenAreas] ||
                 Plugin.Condition[ConditionFlag.BetweenAreas51] ||
                 Plugin.Condition[ConditionFlag.OccupiedSummoningBell];
-            
+
             if (hudHidden)
             {
                 return false;
             }
 
-            AtkUnitBase* parameterWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_ParameterWidget", 1);
-            AtkUnitBase* fadeMiddleWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("FadeMiddle", 1);
+            AtkUnitBase* parameterWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_ParameterWidget", 1).Address;
+            AtkUnitBase* fadeMiddleWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("FadeMiddle", 1).Address;
 
             bool paramenterVisible = parameterWidget != null && parameterWidget->IsVisible;
             bool fadeMiddleVisible = fadeMiddleWidget != null && fadeMiddleWidget->IsVisible;
@@ -755,7 +755,7 @@ namespace DelvUI.Interface
         internal static Vector2 DefaultBigUnitFrameSize = new Vector2(270, 50);
         internal static Vector2 DefaultSmallUnitFrameSize = new Vector2(120, 20);
         internal static Vector2 DefaultStatusEffectsListSize = new Vector2(292, 82);
-        
+
         internal static Vector2 DefaultPlayerNameplateBarSize = new Vector2(120, 10);
         internal static Vector2 DefaultEnemyNameplateBarSize = new Vector2(220, 26);
     }

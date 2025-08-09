@@ -2,7 +2,7 @@
 using Dalamud.Interface.Utility;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Numerics;
 
@@ -94,7 +94,7 @@ namespace DelvUI.Helpers
 
                 using (FontsManager.Instance.PushFont(_config.TitleFontID))
                 {
-                    _titleSize = ImGui.CalcTextSize(_currentTooltipTitle, MaxWidth);
+                    _titleSize = ImGui.CalcTextSize(_currentTooltipTitle, false, MaxWidth);
                     _titleSize.Y += Margin;
                 }
             }
@@ -102,7 +102,7 @@ namespace DelvUI.Helpers
             // calculate text size
             using (FontsManager.Instance.PushFont(_config.TextFontID))
             {
-                _textSize = ImGui.CalcTextSize(_currentTooltipText, MaxWidth);
+                _textSize = ImGui.CalcTextSize(_currentTooltipText, false, MaxWidth);
             }
 
             _size = new Vector2(Math.Max(_titleSize.X, _textSize.X) + Margin * 2, _titleSize.Y + _textSize.Y + Margin * 2);

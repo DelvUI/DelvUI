@@ -45,7 +45,7 @@ namespace DelvUI.Helpers
 
         public AddonExp* GetExpAddon()
         {
-            return (AddonExp*)Plugin.GameGui.GetAddonByName("_Exp", 1);
+            return (AddonExp*)Plugin.GameGui.GetAddonByName("_Exp", 1).Address;
         }
 
         public uint CurrentExp

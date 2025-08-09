@@ -1,7 +1,7 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 
 namespace DelvUI.Interface.GeneralElements
 {

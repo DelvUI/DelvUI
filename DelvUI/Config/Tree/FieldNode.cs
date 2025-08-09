@@ -5,7 +5,7 @@ using System.Numerics;
 using System.Reflection;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 
 namespace DelvUI.Config.Tree
 {

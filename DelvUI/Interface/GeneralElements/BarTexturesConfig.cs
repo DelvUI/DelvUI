@@ -6,7 +6,7 @@ using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using ImGuiScene;
 using Newtonsoft.Json;
 using System;
@@ -89,10 +89,10 @@ namespace DelvUI.Interface.GeneralElements
                 ImGuiHelper.NewLineAndTab();
                 ImGui.Text("Preview");
                 ImGuiHelper.Tab();
-                ImGui.Combo("Bar Texture ##bar texture", ref _inputBarTexture, textureNames, textureNames.Length, 10);
+                ImGui.Combo("Bar Texture ##bar texture", ref _inputBarTexture, textureNames);
 
                 ImGuiHelper.Tab();
-                ImGui.Combo("Draw Mode", ref _drawModeIndex, drawModes, drawModes.Length, 4);
+                ImGui.Combo("Draw Mode", ref _drawModeIndex, drawModes);
 
                 ImGuiHelper.Tab();
                 if (ImGui.ColorEdit4("Color", ref _color))

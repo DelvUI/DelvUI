@@ -11,7 +11,7 @@ using Dalamud.Interface.Textures.TextureWraps;
 using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using ImGuiScene;
 
 namespace DelvUI.Helpers

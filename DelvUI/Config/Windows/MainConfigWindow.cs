@@ -2,7 +2,7 @@
 using Dalamud.Logging;
 using DelvUI.Config.Tree;
 using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Numerics;
 

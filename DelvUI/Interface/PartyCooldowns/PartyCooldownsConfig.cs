@@ -4,7 +4,7 @@ using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using Lumina.Excel;
 using Lumina.Excel.Sheets;
 using System;
@@ -368,7 +368,7 @@ namespace DelvUI.Interface.PartyCooldowns
                         ImGui.PushItemWidth(178);
                         ImGui.SetCursorPos(new Vector2(ImGui.GetCursorPosX() + 2, ImGui.GetCursorPosY() + 2));
                         int enabled = (int)cooldown.EnabledV2;
-                        if (ImGui.Combo($"##{cooldown.ActionId}_enabled", ref enabled, _enabledOptions, _enabledOptions.Length))
+                        if (ImGui.Combo($"##{cooldown.ActionId}_enabled", ref enabled, _enabledOptions))
                         {
                             changed = true;
                             cooldown.EnabledV2 = (PartyCooldownEnabled)enabled;

@@ -13,6 +13,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using FFXIVClientStructs.FFXIV.Client.UI.Arrays;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using static FFXIVClientStructs.FFXIV.Client.Game.Group.GroupManager;
 using DalamudPartyMember = Dalamud.Game.ClientState.Party.IPartyMember;
 using StructsPartyMember = FFXIVClientStructs.FFXIV.Client.Game.Group.PartyMember;
@@ -103,7 +105,7 @@ namespace DelvUI.Interface.Party
         private const int PartyListInfoOffset = 0x0D40;
         private const int PartyListMemberRawInfoSize = 0x28;
 
-        private const int PartyMembersInfoIndex = 11;
+        private const int PartyMembersInfoIndex = 12; // TODO: Should be reworked to use PartyMemberListStringArray.Instance()
 
         private List<IPartyFramesMember> _groupMembers = new List<IPartyFramesMember>();
         public IReadOnlyCollection<IPartyFramesMember> GroupMembers => _groupMembers.AsReadOnly();
@@ -151,7 +153,7 @@ namespace DelvUI.Interface.Party
         public void Update()
         {
             // find party list hud agent
-            PartyListAddon = (AddonPartyList*)Plugin.GameGui.GetAddonByName("_PartyList", 1);
+            PartyListAddon = (AddonPartyList*)Plugin.GameGui.GetAddonByName("_PartyList", 1).Address;
             HudAgent = Plugin.GameGui.FindAgentInterface(PartyListAddon);
 
             if (PartyListAddon == null || HudAgent == IntPtr.Zero)
@@ -331,7 +333,7 @@ namespace DelvUI.Interface.Party
 
         private bool IsCrossWorldParty()
         {
-            return _crossRealmInfo->IsCrossRealm > 0 && _crossRealmInfo->GroupCount > 0 && _mainGroup.MemberCount == 0;
+            return _crossRealmInfo->IsCrossRealm && _crossRealmInfo->GroupCount > 0 && _mainGroup.MemberCount == 0;
         }
 
         private ReadyCheckStatus GetReadyCheckStatus(ulong contentId)
@@ -466,7 +468,7 @@ namespace DelvUI.Interface.Party
                 }
 
                 bool isPlayer = member.EntityId == player.EntityId;
-                bool isLeader = member.IsPartyLeader > 0;
+                bool isLeader = member.IsPartyLeader;
                 PartyMemberStatus status = data.Status != null ? StatusForCrossWorldMember(data.Status) : PartyMemberStatus.None;
                 ReadyCheckStatus readyCheckStatus = GetReadyCheckStatus(member.ContentId);
 
@@ -649,7 +651,7 @@ namespace DelvUI.Interface.Party
             {
                 return PartyMemberStatus.Offline;
             }
-        
+
             // viewing cutscene status
             for (int i = 0; i < _mainGroup.MemberCount; i++)
             {

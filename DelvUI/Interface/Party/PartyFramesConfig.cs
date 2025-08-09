@@ -6,7 +6,7 @@ using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.PartyCooldowns;
 using DelvUI.Interface.StatusEffects;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Numerics;
 

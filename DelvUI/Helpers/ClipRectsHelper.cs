@@ -2,7 +2,7 @@ using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -176,7 +176,7 @@ namespace DelvUI.Helpers
         {
             if (!_config.TargetCastbarClipRectEnabled) { return null; }
 
-            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_TargetInfoCastBar", 1);
+            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_TargetInfoCastBar", 1).Address;
             if (addon == null || !addon->IsVisible) { return null; }
 
             if (addon->UldManager.NodeListCount < 2) { return null; }
@@ -206,7 +206,7 @@ namespace DelvUI.Helpers
 
             foreach (string addonName in _hotbarAddonNames)
             {
-                AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName(addonName, 1);
+                AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName(addonName, 1).Address;
                 if (addon == null || !addon->IsVisible) { continue; }
 
                 if (addon->UldManager.NodeListCount < 20) { continue; }
@@ -238,7 +238,7 @@ namespace DelvUI.Helpers
             List<ClipRect> rects = new List<ClipRect>();
             if (!_config.ChatBubblesClipRectsEnabled) { return rects; }
 
-            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_MiniTalk", 1);
+            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_MiniTalk", 1).Address;
             if (addon == null || !addon->IsVisible) { return rects; }
             if (addon->UldManager.NodeListCount < 10) { return rects; }
 
