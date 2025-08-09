@@ -81,7 +81,7 @@ namespace DelvUI.Helpers
         }
 
         private static readonly unsafe delegate* unmanaged<nint, byte> GetNameplateColor =
-            (delegate* unmanaged<nint, byte>)Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 49 8B CD 89 44 24 40");
+            (delegate* unmanaged<nint, byte>)Plugin.SigScanner.ScanText("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC 20 48 8B 35 ?? ?? ?? ?? 48 8B F9");
 
         public static unsafe bool IsHostile(IGameObject obj)
         {
