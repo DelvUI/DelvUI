@@ -3,84 +3,114 @@ name: Debug Build and Test
 on: [push, pull_request]
 
 jobs:
-  build-debug:
+  build-latest:
+    name: Build against Latest Dalamud
     runs-on: windows-2022
 
+    # Define the plugin name and Dalamud version variables for this job
     env:
-      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+      PLUGIN_NAME: DelvUI
+      DALAMUD_VERSION_NAME: "Latest"
+      DALAMUD_VERSION_URL: "https://goatcorp.github.io/dalamud-distrib/latest.zip"
 
     steps:
+      # Checkout the repository code
       - name: Checkout and Initialise
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # Get Date and time
-      - name: Set Date Output
-        id: date
-        shell: pwsh
-        run: |
-          echo "date-month=$(Get-Date -Format 'yyyy-MM')" >> $GITHUB_ENV
-          echo "date-time=$(Get-Date -Format 'yyyy-MM-dd_HH-mm')" >> $GITHUB_ENV
+      # Install the required .NET SDK
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.x.x'
 
-      # Get Dalamud version from project file
-      - name: Extract Project Dalamud Version
-        id: project-dalamud-version
-        shell: pwsh
-        run: |
-          [xml]$xml = Get-Content "./DelvUI/DelvUI.csproj"
-          $dalamudVersion = $xml.Project.PropertyGroup.DalamudCIDist
-          echo "dalamud-version=$dalamudVersion" >> $GITHUB_ENV
-
-      # Set Dalamud Version Normalised URL Env
-      - name: Set Dalamud Version Normalised URL Env
-        id: dalamud-norm-url
-        shell: pwsh
-        run: |
-          $url = if ('${{ env.dalamud-version }}' -eq 'release') { '' } else { '${{ env.dalamud-version }}' }
-          echo "url=$url" >> $GITHUB_ENV
-
-      # Request the version information from Dalamud
-      - name: Get Dalamud Version JSON
-        id: request-dalamud-version
-        shell: pwsh
-        run: |
-          $DALAMUD_VER_INFO = Invoke-RestMethod -Uri https://goatcorp.github.io/dalamud-distrib/${{ env.url }}/version
-          echo $DALAMUD_VER_INFO
-          $DALAMUD_VER_INFO | ConvertTo-Json | Set-Content dalamud-version.json
-
-      # Cache the nuget packages and Dalamud build
+      # Cache the nuget packages.
       - name: Cache Dependencies
         id: cache-dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
-            ./dalamud
             ~/.nuget/packages
-          key: ${{ runner.os }}-${{ hashFiles('**/*.csproj') }}-${{ hashFiles('dalamud-version.json') }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/${{ env.PLUGIN_NAME }}.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
 
-      # If the cache didn't hit, download and extract Dalamud
-      - name: Setup Dalamud
-        if: steps.cache-dependencies.outputs.cache-hit != 'true'
-        shell: pwsh
+      # Create the required directory structure and download/extract Dalamud.
+      - name: Download and extract Dalamud (${{ env.DALAMUD_VERSION_NAME }})
         run: |
-          mkdir ./dalamud
-          Invoke-WebRequest -Uri https://goatcorp.github.io/dalamud-distrib/${{ env.url }}/latest.zip -OutFile ./dalamud/latest.zip
-          Expand-Archive -Path ./dalamud/latest.zip ./dalamud
+          mkdir -p "$env:AppData\XIVLauncher\addon\Hooks\dev"
+          Invoke-WebRequest -Uri "${{ env.DALAMUD_VERSION_URL }}" -OutFile "dalamud.zip"
+          Expand-Archive -Path "dalamud.zip" -DestinationPath "$env:AppData\XIVLauncher\addon\Hooks\dev" -Force
 
-      # Restore, Build and Test
-      - name: Restore project dependencies
-        run: dotnet restore --verbosity normal
+      # Restore, build, and test.
+      - name: Build Debug (${{ env.DALAMUD_VERSION_NAME }})
+        id: build_step
+        run: |
+          dotnet restore `
+            && dotnet build --no-restore --configuration Debug `
+            && dotnet test --no-build --configuration Debug
 
-      - name: Build Debug
-        run: dotnet build --no-restore --verbosity normal --configuration Debug
-
-      - name: Test Debug
-        run: dotnet test --no-build --verbosity normal --configuration Debug
-
-      # Upload build artifact
-      - name: Upload Artifact
+      # Upload the build artifact. This step will only run if the build_step succeeded.
+      - name: Upload Artifact (${{ env.DALAMUD_VERSION_NAME }})
+        if: steps.build_step.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
-          name: DelvUI-debug-${{ github.sha }}
+          name: ${{ env.PLUGIN_NAME }}-debug-${{ env.DALAMUD_VERSION_NAME }}-${{ github.sha }}
           path: |
-            DelvUI/bin/x64/Debug
-            !DelvUI/bin/x64/Debug/DelvUI
+            ${{ env.PLUGIN_NAME }}/bin/x64/Debug/
+
+  build-staging:
+    name: Build against Staging Dalamud
+    runs-on: windows-2022
+
+    # Define the plugin name and Dalamud version variables for this job
+    env:
+      PLUGIN_NAME: DelvUI
+      DALAMUD_VERSION_NAME: "Staging"
+      DALAMUD_VERSION_URL: "https://goatcorp.github.io/dalamud-distrib/stg/latest.zip"
+
+    steps:
+      # Checkout the repository code
+      - name: Checkout and Initialise
+        uses: actions/checkout@v4
+
+      # Install the required .NET SDK
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.x.x'
+
+      # Cache the nuget packages
+      - name: Cache Dependencies
+        id: cache-dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/${{ env.PLUGIN_NAME }}.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      # Create the required directory structure and download/extract Dalamud.
+      - name: Download and extract Dalamud (${{ env.DALAMUD_VERSION_NAME }})
+        run: |
+          mkdir -p "$env:AppData\XIVLauncher\addon\Hooks\dev"
+          Invoke-WebRequest -Uri "${{ env.DALAMUD_VERSION_URL }}" -OutFile "dalamud.zip"
+          Expand-Archive -Path "dalamud.zip" -DestinationPath "$env:AppData\XIVLauncher\addon\Hooks\dev" -Force
+
+      # Restore, build, and test.
+      - name: Build Debug (${{ env.DALAMUD_VERSION_NAME }})
+        id: build_step
+        run: |
+          dotnet restore `
+            && dotnet build --no-restore --configuration Debug `
+            && dotnet test --no-build --configuration Debug
+
+      # Upload the build artifact.
+      - name: Upload Artifact (${{ env.DALAMUD_VERSION_NAME }})
+        if: steps.build_step.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PLUGIN_NAME }}-debug-${{ env.DALAMUD_VERSION_NAME }}-${{ github.sha }}
+          path: |
+            ${{ env.PLUGIN_NAME }}/bin/x64/Debug/
