@@ -17,6 +17,8 @@ namespace DelvUI.Config.Windows
         private Vector2 _lastWindowPos = Vector2.Zero;
         private Vector2 _size = new Vector2(1050, 750);
 
+        private bool _popColors = false;
+
         public MainConfigWindow(string name) : base(name)
         {
             Flags = ImGuiWindowFlags.NoTitleBar;
@@ -53,6 +55,7 @@ namespace DelvUI.Config.Windows
                 ImGui.PushStyleColor(ImGuiCol.Border, new Vector4(0f / 255f, 0f / 255f, 0f / 255f, _alpha));
                 ImGui.PushStyleColor(ImGuiCol.BorderShadow, new Vector4(0f / 255f, 0f / 255f, 0f / 255f, _alpha));
                 ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(20f / 255f, 21f / 255f, 20f / 255f, _alpha));
+                _popColors = true;
             }
 
             ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 1);
@@ -63,9 +66,10 @@ namespace DelvUI.Config.Windows
         {
             _lastWindowPos = ImGui.GetWindowPos();
 
-            if (ConfigurationManager.Instance.OverrideDalamudStyle)
+            if (_popColors)
             {
                 ImGui.PopStyleColor(3);
+                _popColors = false;
             }
 
             ImGui.PopStyleVar(2);

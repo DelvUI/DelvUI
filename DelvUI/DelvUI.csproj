@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Dalamud.NET.Sdk/13.0.0">
 	<PropertyGroup Label="Target">
 		<PlatformTarget>x64</PlatformTarget>
 		<TargetFramework>net9.0</TargetFramework>
@@ -10,9 +10,9 @@
 	<!-- Assembly Configuration -->
 	<PropertyGroup>
 		<AssemblyName>DelvUI</AssemblyName>
-		<AssemblyVersion>2.4.0.2</AssemblyVersion>
-		<FileVersion>2.4.0.2</FileVersion>
-		<InformationalVersion>2.4.0.2</InformationalVersion>
+		<AssemblyVersion>2.5.0.0</AssemblyVersion>
+		<FileVersion>2.5.0.0</FileVersion>
+		<InformationalVersion>2.5.0.0</InformationalVersion>
 	</PropertyGroup>
 
 	<!-- Build Configuration -->
@@ -42,7 +42,7 @@
 		<DalamudCIDist>release</DalamudCIDist>
 		<DalamudVersion>dev</DalamudVersion>
 		<DalamudLocal>../dalamud/</DalamudLocal>
-		<DalamudLibPath>$(APPDATA)\XIVLauncher\addon\Hooks\$(DalamudVersion)\</DalamudLibPath>
+		<!--<DalamudLibPath>$(APPDATA)\XIVLauncher\addon\Hooks\$(DalamudVersion)\</DalamudLibPath>-->
 	</PropertyGroup>
 
 	<!-- Assembly Reference Locations -->
@@ -62,44 +62,8 @@
 		<!-- <Content Include="$(ProjectDir)Media\Images\icon.png" Link="images/icon.png" CopyToOutputDirectory="PreserveNewest" Visible="false" /> -->
 	</ItemGroup>
 
-	<ItemGroup>
-		<Reference Include="FFXIVClientStructs">
-			<HintPath>$(DalamudLibPath)FFXIVClientStructs.dll</HintPath>
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="Newtonsoft.Json">
-			<HintPath>$(DalamudLibPath)Newtonsoft.Json.dll</HintPath>
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="Dalamud">
-			<HintPath>$(DalamudLibPath)Dalamud.dll</HintPath>
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="Dalamud.Bindings.ImGui">
-			<HintPath>$(DalamudLibPath)Dalamud.Bindings.ImGui.dll</HintPath>
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="ImGuiScene">
-			<HintPath>$(DalamudLibPath)ImGuiScene.dll</HintPath>
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="Lumina">
-			<HintPath>$(DalamudLibPath)Lumina.dll</HintPath>
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="Lumina.Excel">
-			<HintPath>$(DalamudLibPath)Lumina.Excel.dll</HintPath>
-			<Private>false</Private>
-		</Reference>
-		<Reference Include="InteropGenerator.Runtime">
-			<HintPath>$(DalamudLibPath)InteropGenerator.Runtime.dll</HintPath>
-			<Private>false</Private>
-		</Reference>
-	</ItemGroup>
-
 	<!-- NuGet Packages -->
 	<ItemGroup>
-		<PackageReference Include="DalamudPackager" Version="13.0.0" />
 		<PackageReference Include="Colourful" Version="3.2.0" />
 	</ItemGroup>
 </Project>

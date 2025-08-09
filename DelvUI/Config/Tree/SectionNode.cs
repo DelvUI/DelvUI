@@ -33,18 +33,19 @@ namespace DelvUI.Config.Tree
 
             ImGui.NewLine();
 
-            ImGui.BeginChild(
+            if (ImGui.BeginChild(
                 "DelvU_Settings_Tab",
                 new Vector2(0, -10),
                 false,
                 ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse
-            ); // Leave room for 1 line below us
-
+            ))
             {
+                bool popColors = false;
                 if (ConfigurationManager.Instance.OverrideDalamudStyle)
                 {
                     ImGui.PushStyleColor(ImGuiCol.Tab, new Vector4(45f / 255f, 45f / 255f, 45f / 255f, alpha));
                     ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(45f / 255f, 45f / 255f, 45f / 255f, alpha));
+                    popColors = true;
                 }
 
                 if (ImGui.BeginTabBar("##Tabs", ImGuiTabBarFlags.None))
@@ -82,7 +83,7 @@ namespace DelvUI.Config.Tree
                     ForceSelectedTabName = null;
                 }
 
-                if (ConfigurationManager.Instance.OverrideDalamudStyle)
+                if (popColors)
                 {
                     ImGui.PopStyleColor(2);
                 }

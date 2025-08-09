@@ -14,6 +14,8 @@ namespace DelvUI.Config.Windows
         public bool AutoClose = false;
         private double _openTime = -1;
 
+        private bool _popColors = false;
+
         public ChangelogWindow(string name, string changelog) : base(name)
         {
             Changelog = changelog;
@@ -24,6 +26,7 @@ namespace DelvUI.Config.Windows
             if (ConfigurationManager.Instance.OverrideDalamudStyle)
             {
                 ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(10f / 255f, 10f / 255f, 10f / 255f, 0.95f));
+                _popColors = true;
             }
 
             if (_needsToSetSize)
@@ -50,9 +53,10 @@ namespace DelvUI.Config.Windows
 
         public override void PostDraw()
         {
-            if (ConfigurationManager.Instance.OverrideDalamudStyle)
+            if (_popColors)
             {
                 ImGui.PopStyleColor();
+                _popColors = false;
             }
         }
 

@@ -7,6 +7,7 @@ namespace DelvUI.Config.Windows
 {
     public class GridWindow : Window
     {
+        private bool _popColors = false;
         public GridWindow(string name) : base(name)
         {
             Flags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse;
@@ -23,6 +24,7 @@ namespace DelvUI.Config.Windows
             if (ConfigurationManager.Instance.OverrideDalamudStyle)
             {
                 ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(10f / 255f, 10f / 255f, 10f / 255f, 0.95f));
+                _popColors = true;
             }
 
             ImGui.SetNextWindowFocus();
@@ -44,9 +46,10 @@ namespace DelvUI.Config.Windows
 
         public override void PostDraw()
         {
-            if (ConfigurationManager.Instance.OverrideDalamudStyle)
+            if (_popColors)
             {
                 ImGui.PopStyleColor();
+                _popColors = false;
             }
         }
     }

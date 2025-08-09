@@ -1,3 +1,6 @@
+# 2.5.0.0
+- Added support for Patch 7.3 and Dalamud API 13.
+
 # 2.4.0.2
 - Added the `[level:adjusted]` text tag.
 - Fixed friendly NPCs nameplates showing as hostile.
