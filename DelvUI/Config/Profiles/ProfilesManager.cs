@@ -687,7 +687,7 @@ namespace DelvUI.Config.Profiles
 
                 ImGui.PushItemWidth(408);
                 ImGuiHelper.NewLineAndTab();
-                if (ImGui.Combo("Active Profile", ref _selectedProfileIndex, profiles, profiles.Length))
+                if (ImGui.Combo("Active Profile", ref _selectedProfileIndex, profiles, 10))
                 {
                     string newProfileName = profiles[_selectedProfileIndex];
 
@@ -772,7 +772,7 @@ namespace DelvUI.Config.Profiles
 
                 ImGuiHelper.Tab();
                 ImGui.PushItemWidth(200);
-                ImGui.Combo("", ref _copyFromIndex, profiles, profiles.Length);
+                ImGui.Combo("", ref _copyFromIndex, profiles, 10);
 
                 ImGui.SameLine();
                 if (ImGui.Button("Copy", new Vector2(200, 0)))

@@ -440,7 +440,7 @@ namespace DelvUI.Config.Attributes
                 intVal = (int)fieldVal;
             }
 
-            if (ImGui.Combo(friendlyName + IDText(ID), ref intVal, options, options.Length))
+            if (ImGui.Combo(friendlyName + IDText(ID), ref intVal, options, 4))
             {
                 field.SetValue(config, intVal);
 
@@ -537,7 +537,7 @@ namespace DelvUI.Config.Attributes
 
             var options = fontsConfig.Fonts.Values.Select(fontData => fontData.Name + "  " + fontData.Size.ToString()).ToArray();
 
-            if (ImGui.Combo(friendlyName + IDText(ID), ref index, options, options.Length))
+            if (ImGui.Combo(friendlyName + IDText(ID), ref index, options, 4))
             {
                 stringVal = fontsConfig.Fonts.Keys[index];
                 field.SetValue(config, stringVal);
@@ -574,7 +574,7 @@ namespace DelvUI.Config.Attributes
 
             string[] options = textures.ToArray();
 
-            if (ImGui.Combo(friendlyName + IDText(ID), ref index, options, options.Length))
+            if (ImGui.Combo(friendlyName + IDText(ID), ref index, options, 10))
             {
                 stringVal = options[index];
                 field.SetValue(config, stringVal);
@@ -625,7 +625,7 @@ namespace DelvUI.Config.Attributes
                 intVal = (int)fieldVal;
             }
 
-            if (ImGui.Combo(friendlyName + IDText(ID), ref intVal, options, options.Length))
+            if (ImGui.Combo(friendlyName + IDText(ID), ref intVal, options, 4))
             {
                 field.SetValue(config, (StrataLevel?)intVal);
 

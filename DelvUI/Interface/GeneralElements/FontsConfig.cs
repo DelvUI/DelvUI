@@ -236,7 +236,7 @@ namespace DelvUI.Interface.GeneralElements
                 ImGui.PopFont();
 
                 ImGuiHelper.Tab();
-                ImGui.Combo("Font ##font", ref _inputFont, _fonts, _fonts.Length);
+                ImGui.Combo("Font ##font", ref _inputFont, _fonts, 10);
 
                 ImGui.SameLine();
                 ImGui.PushFont(UiBuilder.IconFont);
@@ -247,7 +247,7 @@ namespace DelvUI.Interface.GeneralElements
                 ImGui.PopFont();
 
                 ImGuiHelper.Tab();
-                ImGui.Combo("Size  ##size", ref _inputSize, _sizes, _sizes.Length);
+                ImGui.Combo("Size  ##size", ref _inputSize, _sizes, 10);
 
                 ImGui.SameLine();
                 ImGui.PushFont(UiBuilder.IconFont);
