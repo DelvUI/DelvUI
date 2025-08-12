@@ -1,3 +1,6 @@
+# 2.5.0.1
+- Added support for chat player bubbles.
+
 # 2.5.0.0
 - Added support for Patch 7.3 and Dalamud API 13.
 - Fixed nameplate colors sometimes not being correct.
