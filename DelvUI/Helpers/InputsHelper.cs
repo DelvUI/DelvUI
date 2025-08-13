@@ -1,7 +1,7 @@
 ﻿/*
 Copyright(c) 2021 attickdoor (https://github.com/attickdoor/MOActionPlugin)
 Modifications Copyright(c) 2021 DelvUI
-09/21/2021 - Used original's code hooks and action validations while using 
+09/21/2021 - Used original's code hooks and action validations while using
 DelvUI's own logic to select a target.
 
 This program is free software: you can redistribute it and/or modify
@@ -37,6 +37,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using static FFXIVClientStructs.FFXIV.Client.Game.ActionManager;
 using Action = Lumina.Excel.Sheets.Action;
+using BattleNpcSubKind = Dalamud.Game.ClientState.Objects.Enums.BattleNpcSubKind;
 
 namespace DelvUI.Helpers
 {
@@ -98,7 +99,7 @@ namespace DelvUI.Helpers
         {
             Dispose(false);
         }
-        
+
         public void Dispose()
         {
             Plugin.Logger.Info("\tDisposing InputsHelper...");
@@ -288,12 +289,12 @@ namespace DelvUI.Helpers
 
         #region mouseover inputs proxy
         private bool? _leftButtonClicked = null;
-        public bool LeftButtonClicked => _leftButtonClicked.HasValue ? 
-            _leftButtonClicked.Value : 
+        public bool LeftButtonClicked => _leftButtonClicked.HasValue ?
+            _leftButtonClicked.Value :
             (IsProxyEnabled ? false : ImGui.IsMouseClicked(ImGuiMouseButton.Left));
 
         private bool? _rightButtonClicked = null;
-        public bool RightButtonClicked => _rightButtonClicked.HasValue ? 
+        public bool RightButtonClicked => _rightButtonClicked.HasValue ?
             _rightButtonClicked.Value :
             (IsProxyEnabled ? false : ImGui.IsMouseClicked(ImGuiMouseButton.Right));
 
@@ -376,8 +377,8 @@ namespace DelvUI.Helpers
             }
         }
 
-        public void OnFrameEnd() 
-        { 
+        public void OnFrameEnd()
+        {
             _leftButtonClicked = null;
             _rightButtonClicked = null;
         }

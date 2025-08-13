@@ -25,7 +25,8 @@ namespace DelvUI.Interface.GeneralElements
         public bool NameplatesClipRectsEnabled = true;
         public bool TargetCastbarClipRectEnabled = false;
         public bool HotbarsClipRectsEnabled = false;
-        public bool ChatBubblesClipRectsEnabled = true;
+        public bool ChatBubblesPlayersClipRectsEnabled = true;
+        public bool ChatBubblesNPCClipRectsEnabled = true;
 
         public bool ThirdPartyClipRectsEnabled = true;
 
@@ -109,7 +110,10 @@ namespace DelvUI.Interface.GeneralElements
                 ImGuiHelper.SetTooltip("When enabled, active hotbar will not be covered by DelvUI Nameplates.\nNote that the way this is calculated is not perfect and it might not work well for hotbars that have empty slots.");
 
                 ImGuiHelper.Tab(); ImGuiHelper.Tab();
-                changed |= ImGui.Checkbox("Chat Bubbles", ref ChatBubblesClipRectsEnabled);
+                changed |= ImGui.Checkbox("NPC Chat Bubbles", ref ChatBubblesNPCClipRectsEnabled);
+
+                ImGuiHelper.Tab(); ImGuiHelper.Tab();
+                changed |= ImGui.Checkbox("Player Chat Bubbles", ref ChatBubblesPlayersClipRectsEnabled);
             }
 
             // third party
@@ -134,12 +138,12 @@ namespace DelvUI.Interface.GeneralElements
                     break;
 
                 case WindowClippingMode.Performance:
-                    ImGui.Text("Window Clipping functionallity will be reduced in favor of performance.\nOnly one game window will be clipped at a time. This might yield unexpected / ugly results.\n\nNote: This mode won't work well with Nameplates.");
+                    ImGui.Text("Window Clipping functionality will be reduced in favor of performance.\nOnly one game window will be clipped at a time. This might yield unexpected / ugly results.\n\nNote: This mode won't work well with Nameplates.");
                     break;
             }
 
             ImGuiHelper.NewLineAndTab();
-            ImGui.Text("If you're exepriencing random crashes or bad performance, we recommend you try a different mode\nor disable Window Clipping alltogether");
+            ImGui.Text("If you're experiencing random crashes or bad performance, we recommend you try a different mode\nor disable Window Clipping altogether");
 
             return false;
         }

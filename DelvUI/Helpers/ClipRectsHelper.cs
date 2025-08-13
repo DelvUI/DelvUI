@@ -164,7 +164,8 @@ namespace DelvUI.Helpers
             _extraClipRects.AddRange(GetHotbarsClipRects());
 
             // chat bubbles
-            _extraClipRects.AddRange(GetChatBubbleClipRect());
+            _extraClipRects.AddRange(GetNPCChatBubbleClipRect());
+            _extraClipRects.AddRange(GetPlayerChatBubbleClipRect());
         }
 
         public void RemoveNameplatesClipRects()
@@ -233,35 +234,85 @@ namespace DelvUI.Helpers
             return rects;
         }
 
-        private unsafe List<ClipRect> GetChatBubbleClipRect()
+        private unsafe List<ClipRect> GetNPCChatBubbleClipRect()
         {
             List<ClipRect> rects = new List<ClipRect>();
-            if (!_config.ChatBubblesClipRectsEnabled) { return rects; }
+            if (!_config.ChatBubblesNPCClipRectsEnabled) { return rects; }
 
-            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_MiniTalk", 1).Address;
-            if (addon == null || !addon->IsVisible) { return rects; }
-            if (addon->UldManager.NodeListCount < 10) { return rects; }
-
-            for (int i = 1; i <= 10; i++)
+            var addon = (AddonMiniTalk*) Plugin.GameGui.GetAddonByName("_MiniTalk").Address;
+            if (addon is null)
             {
-                AtkResNode* node = addon->UldManager.NodeList[i];
-                if (node == null || !node->IsVisible()) { continue; }
+                return rects;
+            }
 
-                AtkComponentNode* component = node->GetAsAtkComponentNode();
-                if (component == null) { continue; }
-                if (component->Component->UldManager.NodeListCount < 1) { continue; }
+            foreach (var talkBubble in addon->TalkBubbles) {
+                if (!talkBubble.ComponentNode->IsVisible())
+                {
+                    continue;
+                }
 
-                AtkResNode* bubble = component->Component->UldManager.NodeList[1];
-                Vector2 pos = new Vector2(
-                    node->X + (bubble->X * addon->Scale),
-                    node->Y + (bubble->Y * addon->Scale)
+                AtkNineGridNode* bubbleNineGridNode = talkBubble.BubbleNineGridNode;
+
+                Vector2 position = new Vector2(
+                    bubbleNineGridNode->ScreenX,
+                    bubbleNineGridNode->ScreenY
                 );
                 Vector2 size = new Vector2(
-                    bubble->Width * addon->Scale,
-                    bubble->Height * addon->Scale
+                    bubbleNineGridNode->Width * addon->Scale,
+                    bubbleNineGridNode->Height * addon->Scale
                 );
 
-                rects.Add(new ClipRect(pos, pos + size));
+                rects.Add(new ClipRect(position, position + size));
+            }
+
+            return rects;
+        }
+
+        private unsafe List<ClipRect> GetPlayerChatBubbleClipRect()
+        {
+            List<ClipRect> rects = new List<ClipRect>();
+            if (!_config.ChatBubblesPlayersClipRectsEnabled) { return rects; }
+
+            AtkUnitBase* addon = (AtkUnitBase*) Plugin.GameGui.GetAddonByName("MiniTalkPlayer").Address;
+            if (addon is null)
+            {
+                return rects;
+            }
+
+            foreach (var node in addon->UldManager.Nodes) {
+                if (node.Value is null)
+                {
+                    continue;
+                }
+
+                if (node.Value->GetNodeType() is not NodeType.Component || !node.Value->IsVisible())
+                {
+                    continue;
+                }
+
+                AtkComponentNode* componentNode = (AtkComponentNode*)node.Value;
+                AtkComponentBase* component = componentNode->GetComponent();
+                if (component is null)
+                {
+                    continue;
+                }
+
+                AtkResNode* bubbleNode = component->UldManager.SearchNodeById(4);
+                if (bubbleNode is null)
+                {
+                    continue;
+                }
+
+                Vector2 position = new Vector2(
+                    componentNode->ScreenX,
+                    componentNode->ScreenY
+                );
+                Vector2 size = new Vector2(
+                    bubbleNode->Width * addon->Scale,
+                    bubbleNode->Height * addon->Scale
+                );
+
+                rects.Add(new ClipRect(position, position + size));
             }
 
             return rects;
