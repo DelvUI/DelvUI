@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 
 namespace DelvUI.Config.Profiles
 {
@@ -363,7 +364,7 @@ namespace DelvUI.Config.Profiles
             }
         }
 
-        private string? SwitchToProfile(string profile, bool save = true)
+        private unsafe string? SwitchToProfile(string profile, bool save = true)
         {
             // save if needed before switching
             if (save)
@@ -377,7 +378,7 @@ namespace DelvUI.Config.Profiles
 
             if (currentProfile.AttachHudEnabled && currentProfile.HudLayout != 0)
             {
-                ChatHelper.SendChatMessage("/hudlayout " + currentProfile.HudLayout);
+                AddonConfig.Instance()->ChangeHudLayout((uint)currentProfile.HudLayout - 1);
             }
 
             if (!LoadCurrentProfile(oldProfile))

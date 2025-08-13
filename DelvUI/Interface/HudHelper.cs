@@ -5,19 +5,18 @@ using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Dalamud.Bindings.ImGui;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Dalamud.Utility.Signatures;
+using DelvUI.Enums;
+using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 
 namespace DelvUI.Interface
 {
     public class HudHelper : IDisposable
     {
         private HUDOptionsConfig Config => ConfigurationManager.Instance.GetConfigObject<HUDOptionsConfig>();
-
-        private readonly string[] _hotbarAddonNames = { "_ActionBar", "_ActionBar01", "_ActionBar02", "_ActionBar03", "_ActionBar04", "_ActionBar05", "_ActionBar06", "_ActionBar07", "_ActionBar08", "_ActionBar09" };
-        private bool? _previousHotbarCrossVisible = null;
 
         private bool _firstUpdate = true;
 
@@ -92,22 +91,26 @@ namespace DelvUI.Interface
 
         public void UpdateCombatActionBars()
         {
-            if (Plugin.Condition[ConditionFlag.OccupiedInEvent] ||
-                Plugin.Condition[ConditionFlag.OccupiedInQuestEvent] ||
-                Plugin.Condition[ConditionFlag.OccupiedInCutSceneEvent] ||
-                Plugin.Condition[ConditionFlag.OccupiedSummoningBell] ||
-                Plugin.Condition[ConditionFlag.Occupied] ||
-                Plugin.Condition[ConditionFlag.Occupied30] ||
-                Plugin.Condition[ConditionFlag.Occupied33] ||
-                Plugin.Condition[ConditionFlag.Occupied38] ||
-                Plugin.Condition[ConditionFlag.Occupied39] ||
-                Plugin.Condition[ConditionFlag.WatchingCutscene] ||
-                Plugin.Condition[ConditionFlag.WatchingCutscene78] ||
-                Plugin.Condition[ConditionFlag.CreatingCharacter] ||
-                Plugin.Condition[ConditionFlag.BetweenAreas] ||
-                Plugin.Condition[ConditionFlag.BetweenAreas51] ||
-                Plugin.Condition[ConditionFlag.ChocoboRacing] ||
-                Plugin.ClientState.IsPvP)
+            if(Plugin.Condition.Any(
+                   ConditionFlag.OccupiedInEvent,
+                   ConditionFlag.OccupiedInQuestEvent,
+                   ConditionFlag.OccupiedInCutSceneEvent,
+                   ConditionFlag.OccupiedSummoningBell,
+                   ConditionFlag.Occupied,
+                   ConditionFlag.Occupied30,
+                   ConditionFlag.Occupied33,
+                   ConditionFlag.Occupied38,
+                   ConditionFlag.Occupied39,
+                   ConditionFlag.WatchingCutscene,
+                   ConditionFlag.WatchingCutscene78,
+                   ConditionFlag.CreatingCharacter,
+                   ConditionFlag.BetweenAreas,
+                   ConditionFlag.BetweenAreas51,
+                   ConditionFlag.BoundByDuty95,
+                   ConditionFlag.ChocoboRacing,
+                   ConditionFlag.PlayingLordOfVerminion)
+                   || Plugin.ClientState.IsPvP
+               )
             {
                 return;
             }
@@ -116,39 +119,60 @@ namespace DelvUI.Interface
             if (config == null) { return; }
 
             List<VisibilityConfig> hotbarConfigs = config.GetHotbarConfigs();
+            SetHotbarsVisibility(hotbarConfigs, config.HotbarConfigCross);
+        }
+
+        private unsafe void SetHotbarsVisibility(List<VisibilityConfig> hotbarConfigs, VisibilityConfig crossHotbarConfig)
+        {
+            AddonConfig* config = AddonConfig.Instance();
+            Span<AddonConfigEntry> entries = config->ModuleData->HudLayoutConfigEntries;
+            bool hasChanges = false;
+
+            var hashToConfig = new Dictionary<uint, VisibilityConfig>();
             for (int i = 0; i < hotbarConfigs.Count; i++)
             {
                 if (hotbarConfigs[i].Enabled)
                 {
-                    SetHotbarVisible(i, hotbarConfigs[i].IsElementVisible());
+                    uint hash = (uint)ElementKindHelper.ElementKindByHotBarId(i);
+                    hashToConfig[hash] = hotbarConfigs[i];
                 }
             }
 
-            if (config.HotbarConfigCross.Enabled)
+            if (crossHotbarConfig.Enabled)
             {
-                SetCrossHotbarVisible(config.HotbarConfigCross.IsElementVisible());
+                uint crossHash = (uint)ElementKind.CrossHotbar;
+                hashToConfig[crossHash] = crossHotbarConfig;
             }
-        }
 
-        private unsafe void SetHotbarVisible(int index, bool visible)
-        {
-            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName(_hotbarAddonNames[index], 1).Address;
-            if (addon == null || addon->IsVisible == visible) { return; }
+            foreach (ref var entry in entries)
+            {
+                if (hashToConfig.TryGetValue(entry.AddonNameHash, out var configVal))
+                {
+                    bool isVisible = configVal.IsElementVisible();
+                    byte shouldBeVisible = 1;
+                    if (entry.AddonNameHash == (uint)ElementKind.CrossHotbar)
+                    {
+                        shouldBeVisible = (byte)(isVisible ? 0x2 : 0x0);
+                    }
+                    else
+                    {
+                        shouldBeVisible = (byte)(isVisible ? 0x1 : 0x0);
+                    }
 
-            string numberText = (index + 1).ToString();
-            string onOffText = visible ? "on" : "off";
+                    if(entry.ByteValue2 == shouldBeVisible)
+                    {
+                        continue;
+                    }
+                    entry.ByteValue2 = shouldBeVisible;
+                    hasChanges = true;
+                }
+            }
 
-            ChatHelper.SendChatMessage("/hotbar display " + numberText + " " + onOffText);
-        }
-
-        private unsafe void SetCrossHotbarVisible(bool visible)
-        {
-            if (_previousHotbarCrossVisible.HasValue && _previousHotbarCrossVisible.Value == visible) { return; }
-
-            _previousHotbarCrossVisible = visible;
-
-            string onOffText = visible ? "on" : "off";
-            ChatHelper.SendChatMessage("/crosshotbardisplay" + " " + onOffText);
+            if (hasChanges)
+            {
+                config->SaveFile(true);
+                config->ApplyHudLayout();
+            }
         }
 
         private unsafe void UpdateDefaultCastBar(bool forceVisible = false)
