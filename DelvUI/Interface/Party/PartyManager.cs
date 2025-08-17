@@ -481,7 +481,7 @@ namespace DelvUI.Interface.Party
                 {
                     PartyFramesMember partyMember = isPlayer ?
                         new PartyFramesMember(player, i, data.Order, EnmityLevel.Last, status, readyCheckStatus, isLeader) :
-                        new PartyFramesMember(memberName, i, data.Order, member.ClassJobId, status, readyCheckStatus, isLeader);
+                        new PartyFramesMember(member, i, data.Order, status, readyCheckStatus, isLeader);
                     _groupMembers.Add(partyMember);
                 }
             }
