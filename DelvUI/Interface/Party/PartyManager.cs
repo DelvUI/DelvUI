@@ -187,7 +187,6 @@ namespace DelvUI.Interface.Party
             }
 
             bool isCrossWorld = IsCrossWorldParty();
-            bool isCrossWorldAlliance = IsCrossWorldAlliance();
 
             // ready check update
             if (_iconsConfig.ReadyCheckStatus.Enabled)
