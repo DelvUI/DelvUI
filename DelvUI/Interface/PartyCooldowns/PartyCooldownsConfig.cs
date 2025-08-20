@@ -629,7 +629,7 @@ namespace DelvUI.Interface.PartyCooldowns
 
             // DRK
             [3638] = NewData(3638, JobIDs.DRK, 50, 300, 10, 100, 4, PartyCooldownEnabled.PartyFrames), // living dead
-            [16471] = NewData(16471, JobIDs.DRK, 76, 90, 15, 90, 2, PartyCooldownEnabled.PartyFrames), // dark missionary
+            [16471] = NewData(16471, JobIDs.DRK, 66, 90, 15, 90, 2, PartyCooldownEnabled.PartyFrames), // dark missionary
             [16472] = NewData(16472, JobIDs.DRK, 80, 120, 20, 10, 3, PartyCooldownEnabled.PartyFrames), // living shadow
             [3634] = NewData(3634, JobIDs.DRK, 45, 60, 10, 90, 4, PartyCooldownEnabled.PartyFrames), // dark mind
             [25754] = NewData(25754, JobIDs.DRK, 82, 60, 10, 90, 4, PartyCooldownEnabled.PartyFrames), // oblation
