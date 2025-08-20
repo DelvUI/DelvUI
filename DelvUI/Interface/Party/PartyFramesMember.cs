@@ -3,6 +3,7 @@ using Dalamud.Game.ClientState.Party;
 using DelvUI.Helpers;
 using Dalamud.Bindings.ImGui;
 using System;
+using FFXIVClientStructs.FFXIV.Client.UI.Info;
 
 namespace DelvUI.Interface.Party
 {
@@ -30,6 +31,7 @@ namespace DelvUI.Interface.Party
 
         public uint ObjectId => _partyMember != null ? _partyMember.ObjectId : _objectID;
         public ICharacter? Character { get; private set; }
+        public CrossRealmMember? CrossCharacter { get; private set; }
 
         public int Index { get; set; }
         public int Order { get; set; }
@@ -98,7 +100,7 @@ namespace DelvUI.Interface.Party
             Character = gameObject is ICharacter ? (ICharacter)gameObject : null;
         }
 
-        public PartyFramesMember(string? name, int index, int order, uint jobId, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader, bool isChocobo = false)
+        public PartyFramesMember(CrossRealmMember member, int index, int order, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader, bool isChocobo = false)
         {
             Index = index;
             Order = order;
@@ -107,9 +109,12 @@ namespace DelvUI.Interface.Party
             IsPartyLeader = isPartyLeader;
             IsChocobo = isChocobo;
 
-            _name = name ?? "";
-            _jobId = jobId;
+            _objectID = (uint)member.EntityId;
+            CrossCharacter = member;
+            _name = member.NameString;
+            _jobId = member.ClassJobId;
         }
+
 
         public void Update(EnmityLevel enmityLevel, PartyMemberStatus status, ReadyCheckStatus readyCheckStatus, bool isPartyLeader, uint jobId = 0)
         {
