@@ -120,7 +120,6 @@ namespace DelvUI
             FontsManager.Instance.LoadConfig();
             BarTexturesManager.Instance.LoadConfig();
 
-            ChatHelper.Initialize();
             ClipRectsHelper.Initialize();
             GlobalColors.Initialize();
             LimitBreakHelper.Initialize();
@@ -387,9 +386,6 @@ namespace DelvUI
 
             Logger.Info("\tDisposing BarTexturesManager...");
             BarTexturesManager.Instance?.Dispose();
-
-            Logger.Info("\tDisposing ChatHelper...");
-            ChatHelper.Instance?.Dispose();
 
             Logger.Info("\tDisposing ClipRectsHelper...");
             ClipRectsHelper.Instance?.Dispose();
