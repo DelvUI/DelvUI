@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
 namespace DelvUI.Interface.Party
 {
@@ -17,9 +18,6 @@ namespace DelvUI.Interface.Party
         private PartyFramesConfig Config => (PartyFramesConfig)_config;
         public VisibilityConfig VisibilityConfig => Config.VisibilityConfig;
         private PartyFramesConfigs Configs;
-
-        private delegate void OpenContextMenu(IntPtr agentHud, int parentAddonId, int index);
-        private readonly OpenContextMenu? _openContextMenu;
 
         private Vector2 _contentMargin = new Vector2(2, 2);
         private static readonly int MaxMemberCount = 9; // 8 players + chocobo
@@ -57,32 +55,6 @@ namespace DelvUI.Interface.Party
 
             PartyManager.Instance.MembersChangedEvent += OnMembersChanged;
             UpdateBars(Vector2.Zero);
-
-            try
-            {
-                /*
-                 Part of openContextMenu disassembly signature
-                .text:00007FF648519790                   OpenPartyContextMenu proc near
-                .text:00007FF648519790
-                .text:00007FF648519790                   arg_0= qword ptr  8
-                .text:00007FF648519790                   arg_8= qword ptr  10h
-                .text:00007FF648519790                   arg_10= qword ptr  18h
-                .text:00007FF648519790
-                .text:00007FF648519790 48 89 5C 24 10    mov     [rsp+arg_8], rbx
-                .text:00007FF648519795 48 89 6C 24 18    mov     [rsp+arg_10], rbp
-                .text:00007FF64851979A 57                push    rdi
-                .text:00007FF64851979B 48 83 EC 20       sub     rsp, 20h
-                .text:00007FF64851979F 49 63 D8          movsxd  rbx, r8d
-                .text:00007FF6485197A2 8B EA             mov     ebp, edx
-                .text:00007FF6485197A4 48 8B F9          mov     rdi, rcx
-                .text:00007FF6485197A7 E8 74 BC 86 FF    call    sub_7FF647D85420
-                .text:00007FF6485197AC 84 C0             test    al, al
-                .text:00007FF6485197AE 0F 85 DF 00 00 00 jnz     loc_7FF648519893
-                */
-                _openContextMenu =
-                    Marshal.GetDelegateForFunctionPointer<OpenContextMenu>(Plugin.SigScanner.ScanText("48 89 5C 24 ?? 48 89 6C 24 ?? 57 48 83 EC 20 49 63 D8"));
-            }
-            catch { }
         }
 
         protected override void InternalDispose()
@@ -108,7 +80,7 @@ namespace DelvUI.Interface.Party
             }
 
             int addonId = PartyManager.Instance.PartyListAddon->AtkUnitBase.Id;
-            _openContextMenu?.Invoke(PartyManager.Instance.HudAgent, addonId, bar.Member.Index);
+            AgentModule.Instance()->GetAgentHUD()->OpenContextMenuFromPartyAddon(addonId, bar.Member.Index);
         }
 
         private void OnLayoutPropertyChanged(object sender, OnChangeBaseArgs args)
