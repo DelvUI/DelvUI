@@ -180,10 +180,8 @@ namespace DelvUI.Helpers
             AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_TargetInfoCastBar", 1).Address;
             if (addon == null || !addon->IsVisible) { return null; }
 
-            if (addon->UldManager.NodeListCount < 2) { return null; }
-
-            AtkResNode* baseNode = addon->UldManager.NodeList[1];
-            AtkResNode* imageNode = addon->UldManager.NodeList[2];
+            AtkResNode* baseNode = addon->GetNodeById(2);
+            AtkImageNode* imageNode = addon->GetImageNodeById(7);
 
             if (baseNode == null || !baseNode->IsVisible()) { return null; }
             if (imageNode == null || !imageNode->IsVisible()) { return null; }
@@ -210,22 +208,21 @@ namespace DelvUI.Helpers
                 AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName(addonName, 1).Address;
                 if (addon == null || !addon->IsVisible) { continue; }
 
-                if (addon->UldManager.NodeListCount < 20) { continue; }
-
-                AtkResNode* firstNode = addon->UldManager.NodeList[20];
-                AtkResNode* lastNode = addon->UldManager.NodeList[9];
+                AtkComponentNode* firstNode = addon->GetComponentNodeById(8);
+                AtkComponentNode* lastNode = addon->GetComponentNodeById(19);
 
                 if (firstNode == null || lastNode == null) { continue; }
+
 
                 float margin = 10f * addon->Scale;
 
                 Vector2 min = new Vector2(
-                    addon->X + (firstNode->X * addon->Scale) + margin,
-                    addon->Y + (firstNode->Y * addon->Scale) + margin
+                    addon->X + (firstNode->AtkResNode.X * addon->Scale) + margin,
+                    addon->Y + (firstNode->AtkResNode.Y * addon->Scale) + margin
                 );
                 Vector2 max = new Vector2(
-                    addon->X + (lastNode->X * addon->Scale) + (lastNode->Width * addon->Scale) - margin,
-                    addon->Y + (lastNode->Y * addon->Scale) + (lastNode->Height * addon->Scale) - margin
+                    addon->X + (lastNode->AtkResNode.X * addon->Scale) + (lastNode->AtkResNode.Width * addon->Scale) - margin,
+                    addon->Y + (lastNode->AtkResNode.Y * addon->Scale) + (lastNode->AtkResNode.Height * addon->Scale) - margin
                 );
 
                 rects.Add(new ClipRect(min, max));
