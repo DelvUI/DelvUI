@@ -22,6 +22,7 @@ using System.Runtime.InteropServices;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Hooking;
 using Dalamud.Logging;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace DelvUI.Helpers
@@ -68,7 +69,7 @@ namespace DelvUI.Helpers
         public void Update()
         {
             //Get Limit Break Bar
-            AtkUnitBase* LBWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_LimitBreak", 1).Address;
+            LimitBreakController* lbController = LimitBreakController.Instance();
             //Get Compressed Aether Bar
             AtkUnitBase* CAWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("HWDAetherGauge", 1).Address;
 
@@ -76,11 +77,12 @@ namespace DelvUI.Helpers
 
             LimitBreakActive = false;
             LimitBreakMaxLevel = 1;
-            MaxLimitBarWidth = 128;
+            MaxLimitBarWidth = foundCaGauge ? 1000 : 10000;
 
             // Diadem Compatibility
-            if (CAWidget != null && CAWidget->UldManager.NodeListCount == 10)
+            if (CAWidget != null)
             {
+                int gauge = CAWidget->AtkValuesSpan[1].Int;
                 if ((CAWidget->UldManager.SearchNodeById(3)->Alpha_2 > 0 && CAWidget->UldManager.SearchNodeById(3)->IsVisible()))
                 {
                     bool usedAuger = CAWidget->UldManager.SearchNodeById(10)->IsVisible();
@@ -102,35 +104,7 @@ namespace DelvUI.Helpers
 
             if (!foundCaGauge)
             {
-                // Get LB Width
-                if (LBWidget == null || LBWidget->UldManager.NodeListCount != 6)
-                {
-                    return;
-                }
 
-                AtkResNode* node = LBWidget->UldManager.SearchNodeById(3);
-                if (node == null)
-                {
-                    return;
-                }
-
-                if (node->Alpha_2 == 0 || !node->IsVisible())
-                {
-                    return;
-                }
-
-                for (uint i = 0; i < 3; i++)
-                {
-                    if (LimitBreakBarWidth != null)
-                    {
-                        LimitBreakBarWidth[i] = LBWidget->UldManager.SearchNodeById(6 - i)->GetComponent()->UldManager.SearchNodeById(3)->Width - 18;
-                    }
-
-                    if (LBWidget->UldManager.SearchNodeById(6 - i)->IsVisible() && i > 0)
-                    {
-                        LimitBreakMaxLevel++;
-                    }
-                }
             }
 
             // Set Limit Break Level

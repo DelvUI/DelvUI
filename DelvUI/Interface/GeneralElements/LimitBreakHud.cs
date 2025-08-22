@@ -4,6 +4,7 @@ using DelvUI.Interface.Bars;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -21,7 +22,7 @@ namespace DelvUI.Interface.GeneralElements
             return (new List<Vector2>() { Config.Position }, new List<Vector2>() { Config.Size });
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override unsafe void DrawChildren(Vector2 origin)
         {
             LimitBreakHelper helper = LimitBreakHelper.Instance;
 
@@ -37,9 +38,13 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
+            LimitBreakController* lbController = LimitBreakController.Instance();
             int currentLimitBreak = helper.LimitBreakActive ? helper.LimitBreakBarWidth.Sum() : 0;
             int maxLimitBreak = helper.LimitBreakMaxLevel * helper.MaxLimitBarWidth;
             int limitBreakChunks = helper.LimitBreakActive ? helper.LimitBreakMaxLevel : 3;
+
+            Plugin.Logger.Info($"Helper Limit Break: {currentLimitBreak}, Max Limit Break: {maxLimitBreak}, Chunks: {limitBreakChunks}");
+            Plugin.Logger.Info($"Controller Limit Break: {lbController->CurrentUnits}, Max Limit Break: {lbController->BarUnits}, Chunks: {lbController->BarCount}");
 
             Config.Label.SetValue(helper.LimitBreakLevel / limitBreakChunks);
 
