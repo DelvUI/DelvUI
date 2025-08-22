@@ -6,6 +6,7 @@ using DelvUI.Interface.Bars;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using System.Collections.Generic;
 using System.Numerics;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -32,9 +33,9 @@ namespace DelvUI.Interface.GeneralElements
 
         public override void DrawChildren(Vector2 origin)
         {
-            if (!Config.Enabled || 
-                Actor is null || 
-                Config.HideWhenInactive && (Plugin.ClientState.LocalPlayer?.Level ?? 0) >= 100 || 
+            if (!Config.Enabled ||
+                Actor is null ||
+                Config.HideWhenInactive && (Plugin.ClientState.LocalPlayer?.Level ?? 0) >= 100 ||
                 (Config.HideWhenInactive && Config.HideWhenDownsynced && _helper.IsMaxLevel()))
             {
                 return;
@@ -74,9 +75,10 @@ namespace DelvUI.Interface.GeneralElements
         {
             AddonExp* addon = ExperienceHelper.Instance.GetExpAddon();
             if (addon == null) { return false; }
-            if (addon->AtkUnitBase.UldManager.NodeListCount < 4) { return false; }
+            AtkImageNode* sanctuaryNode = addon->GetImageNodeById(3);
+            if (sanctuaryNode == null) { return false; }
 
-            return addon->AtkUnitBase.UldManager.NodeList[4]->IsVisible();
+            return sanctuaryNode->IsVisible();
         }
     }
 }
