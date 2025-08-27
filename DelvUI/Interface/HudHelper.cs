@@ -51,10 +51,35 @@ namespace DelvUI.Interface
 
             Config.ValueChangeEvent -= ConfigValueChanged;
 
-            UpdateCombatActionBars();
-            UpdateDefaultCastBar(true);
-            UpdateDefaultPulltimer(true);
-            UpdateJobGauges(true);
+            if (Plugin.Framework.IsInFrameworkUpdateThread && Plugin.ClientState.LocalPlayer != null)
+            {
+                UpdateCombatActionBars();
+                UpdateDefaultCastBar(true);
+                UpdateDefaultPulltimer(true);
+                UpdateJobGauges(true);
+            }
+            else
+            {
+                try
+                {
+                    Plugin.Framework.RunOnFrameworkThread(() =>
+                    {
+                        if (Plugin.ClientState.LocalPlayer == null)
+                        {
+                            return;
+                        }
+
+                        UpdateCombatActionBars();
+                        UpdateDefaultCastBar(true);
+                        UpdateDefaultPulltimer(true);
+                        UpdateJobGauges(true);
+                    });
+                }
+                catch(Exception ex)
+                {
+                    Plugin.Logger.Error($"Exception during HudHelper.Dispose: {ex}");
+                }
+            }
         }
 
         public void Update()
