@@ -217,7 +217,7 @@ namespace DelvUI.Interface.Party
                 else
                 {
                     // player maps
-                    Dictionary<string, InternalMemberData> dataMap = GetMembersDataMap(isCrossWorld);
+                    Dictionary<string, InternalMemberData> dataMap = GetMembersDataMap(player, isCrossWorld);
                     bool partyChanged = _prevDataMap.Count != dataMap.Count;
 
                     if (!partyChanged)
@@ -242,7 +242,7 @@ namespace DelvUI.Interface.Party
                     {
                         UpdateTrustParty(player, dataMap, partyChanged);
                     }
-                    // cross world party
+                    // cross world party/alliance
                     else if (isCrossWorld)
                     {
                         UpdateCrossWorldParty(player, dataMap, partyChanged);
@@ -266,7 +266,7 @@ namespace DelvUI.Interface.Party
             _wasCrossWorld = isCrossWorld;
         }
 
-        private Dictionary<string, InternalMemberData> GetMembersDataMap(bool isCrossWorld)
+        private Dictionary<string, InternalMemberData> GetMembersDataMap(IPlayerCharacter player, bool isCrossWorld)
         {
             Dictionary<string, InternalMemberData> dataMap = new Dictionary<string, InternalMemberData>();
 
@@ -276,7 +276,8 @@ namespace DelvUI.Interface.Party
             }
 
             // raw info
-            int count = isCrossWorld ? _crossRealmInfo->CrossRealmGroups[0].GroupMemberCount : _realMemberCount + PartyListAddon->TrustCount;
+            int allianceNum = FindAlliance(player);
+            int count = isCrossWorld ? _crossRealmInfo->CrossRealmGroups[allianceNum].GroupMemberCount : _realMemberCount + PartyListAddon->TrustCount;
             for (int i = 0; i < count; i++)
             {
                 InternalMemberData data = new InternalMemberData();
@@ -292,7 +293,7 @@ namespace DelvUI.Interface.Party
                 }
                 else
                 {
-                    CrossRealmMember member = _crossRealmInfo->CrossRealmGroups[0].GroupMembers[i];
+                    CrossRealmMember member = _crossRealmInfo->CrossRealmGroups[allianceNum].GroupMembers[i];
                     data.ObjectId = member.EntityId;
                     data.ContentId = (long)member.ContentId;
                     data.Name = member.NameString;
@@ -448,8 +449,9 @@ namespace DelvUI.Interface.Party
         private void UpdateCrossWorldParty(IPlayerCharacter player, Dictionary<string, InternalMemberData> dataMap, bool forced)
         {
             bool softUpdate = true;
+            int allianceNum = FindAlliance(player);
 
-            int count = _crossRealmInfo->CrossRealmGroups[0].GroupMemberCount;
+            int count = _crossRealmInfo->CrossRealmGroups[allianceNum].GroupMemberCount;
             if (!_wasCrossWorld || count != _groupMembers.Count || forced)
             {
                 _groupMembers.Clear();
@@ -457,9 +459,9 @@ namespace DelvUI.Interface.Party
             }
 
             // create new members array with cross world data
-            for (int i = 0; i < _crossRealmInfo->CrossRealmGroups[0].GroupMemberCount; i++)
+            for (int i = 0; i < count; i++)
             {
-                CrossRealmMember member = _crossRealmInfo->CrossRealmGroups[0].GroupMembers[i];
+                CrossRealmMember member = _crossRealmInfo->CrossRealmGroups[allianceNum].GroupMembers[i];
                 string memberName = member.NameString;
 
                 if (!dataMap.TryGetValue(memberName, out InternalMemberData? data) || data == null)
@@ -481,7 +483,7 @@ namespace DelvUI.Interface.Party
                 {
                     PartyFramesMember partyMember = isPlayer ?
                         new PartyFramesMember(player, i, data.Order, EnmityLevel.Last, status, readyCheckStatus, isLeader) :
-                        new PartyFramesMember(memberName, i, data.Order, member.ClassJobId, status, readyCheckStatus, isLeader);
+                        new PartyFramesMember(member, i, data.Order, status, readyCheckStatus, isLeader);
                     _groupMembers.Add(partyMember);
                 }
             }
@@ -491,6 +493,22 @@ namespace DelvUI.Interface.Party
                 SortGroupMembers(player);
                 MembersChangedEvent?.Invoke(this);
             }
+        }
+
+        private int FindAlliance(IPlayerCharacter player)
+        {
+            for (int i = 0; i < _crossRealmInfo->CrossRealmGroups.Length; i++)
+            {
+                for (int j = 0; j < _crossRealmInfo->CrossRealmGroups[i].GroupMemberCount; j++)
+                {
+                    CrossRealmMember member = _crossRealmInfo->CrossRealmGroups[i].GroupMembers[j];
+                    if (member.EntityId == player.EntityId)
+                    {
+                        return i;
+                    }
+                }
+            }
+            return 0;
         }
 
         private void UpdateRegularParty(IPlayerCharacter player, Dictionary<string, InternalMemberData> dataMap, bool forced)
