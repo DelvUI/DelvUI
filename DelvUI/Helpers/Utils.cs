@@ -324,17 +324,15 @@ namespace DelvUI.Helpers
             AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_TargetInfo", 1).Address;
             if (addon != null && addon->IsVisible)
             {
-                if (addon->UldManager.NodeListCount < 41) { return true; }
-
-                return addon->UldManager.NodeList[41]->IsVisible();
+                AtkImageNode* imageNode = addon->GetImageNodeById(15);
+                return imageNode == null || imageNode->IsVisible();
             }
 
             addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_TargetInfoCastBar", 1).Address;
             if (addon != null && addon->IsVisible)
             {
-                if (addon->UldManager.NodeListCount < 2) { return true; }
-
-                return addon->UldManager.NodeList[2]->IsVisible();
+                AtkImageNode* imageNode = addon->GetImageNodeById(7);
+                return imageNode != null || imageNode->IsVisible();
             }
 
             return null;
@@ -345,9 +343,8 @@ namespace DelvUI.Helpers
             AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_FocusTargetInfo", 1).Address;
             if (addon != null && addon->IsVisible)
             {
-                if (addon->UldManager.NodeListCount < 16) { return true; }
-
-                return addon->UldManager.NodeList[16]->IsVisible();
+                AtkTextNode* textNode = addon->GetTextNodeById(5);
+                return textNode == null || textNode->IsVisible();
             }
 
             return null;
@@ -360,15 +357,11 @@ namespace DelvUI.Helpers
             AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_EnemyList", 1).Address;
             if (addon != null && addon->IsVisible)
             {
-                if (addon->UldManager.NodeListCount < 12) { return true; }
+                AtkComponentButton* button = addon->GetComponentButtonById((uint)(20001 + index));
+                if (button == null || !button->AtkResNode->IsVisible()) { return false; }
 
-                AtkResNode* node = addon->UldManager.NodeList[11 - index];
-                if (node == null || !node->IsVisible()) { return false; }
-
-                AtkComponentBase* component = node->GetComponent();
-                if (component == null || component->UldManager.NodeListCount < 13) { return true; }
-
-                return component->UldManager.NodeList[12]->IsVisible();
+                AtkImageNode* imageNode = button->GetImageNodeById(8);
+                return imageNode == null || imageNode->IsVisible();
             }
 
             return null;
