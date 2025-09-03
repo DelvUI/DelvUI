@@ -395,11 +395,6 @@ namespace DelvUI.Interface
 
             try
             {
-                LimitBreakHelper.Instance.Update();
-            } catch { }
-
-            try
-            {
                 PullTimerHelper.Instance.Update();
             }
             catch { }

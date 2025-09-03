@@ -122,7 +122,6 @@ namespace DelvUI
 
             ClipRectsHelper.Initialize();
             GlobalColors.Initialize();
-            LimitBreakHelper.Initialize();
             InputsHelper.Initialize();
             NameplatesManager.Initialize();
             PartyManager.Initialize();
@@ -398,9 +397,6 @@ namespace DelvUI
 
             Logger.Info("\tDisposing GlobalColors...");
             GlobalColors.Instance?.Dispose();
-
-            Logger.Info("\tDisposing LimitBreakHelper...");
-            LimitBreakHelper.Instance?.Dispose();
 
             Logger.Info("\tDisposing NameplatesManager...");
             NameplatesManager.Instance?.Dispose();

@@ -1,9 +1,12 @@
-﻿using Dalamud.Game.ClientState.Objects.Types;
+﻿using System;
+using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using FFXIVClientStructs.FFXIV.Client.UI;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -21,10 +24,8 @@ namespace DelvUI.Interface.GeneralElements
             return (new List<Vector2>() { Config.Position }, new List<Vector2>() { Config.Size });
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override unsafe void DrawChildren(Vector2 origin)
         {
-            LimitBreakHelper helper = LimitBreakHelper.Instance;
-
             Config.Label.SetText("");
 
             if (!Config.Enabled)
@@ -32,16 +33,27 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            if (Config.HideWhenInactive && !helper.LimitBreakActive)
+            LimitBreakController* lbController = LimitBreakController.Instance();
+            AddonHWDAetherGauge* caGauge = (AddonHWDAetherGauge*) Plugin.GameGui.GetAddonByName("HWDAetherGauge", 1).Address;
+
+            int currentLimitBreak = lbController->CurrentUnits;
+            int maxLimitBreak = lbController->BarUnits;
+            int limitBreakChunks = lbController->BarCount;
+
+            if (caGauge != null)
+            {
+                currentLimitBreak = caGauge->MaxGaugeValue;
+                maxLimitBreak = 1000;
+                limitBreakChunks = 5;
+            }
+            int currentChunksFilled = (int)Math.Floor((double)currentLimitBreak / maxLimitBreak * limitBreakChunks);
+
+            if (Config.HideWhenInactive && limitBreakChunks == 0)
             {
                 return;
             }
 
-            int currentLimitBreak = helper.LimitBreakActive ? helper.LimitBreakBarWidth.Sum() : 0;
-            int maxLimitBreak = helper.LimitBreakMaxLevel * helper.MaxLimitBarWidth;
-            int limitBreakChunks = helper.LimitBreakActive ? helper.LimitBreakMaxLevel : 3;
-
-            Config.Label.SetValue(helper.LimitBreakLevel / limitBreakChunks);
+            Config.Label.SetValue(currentChunksFilled);
 
             BarHud[] bars = BarUtilities.GetChunkedProgressBars(Config, limitBreakChunks, currentLimitBreak, maxLimitBreak);
 
