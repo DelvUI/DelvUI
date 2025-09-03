@@ -1,5 +1,4 @@
-﻿using Dalamud.Game.ClientState.Objects.Enums;
-using Dalamud.Game.ClientState.Objects.SubKinds;
+﻿using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
@@ -15,41 +14,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
 using BattleChara = Dalamud.Game.ClientState.Objects.Types.IBattleChara;
+using BattleNpcSubKind = Dalamud.Game.ClientState.Objects.Enums.BattleNpcSubKind;
 using Character = Dalamud.Game.ClientState.Objects.Types.ICharacter;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public unsafe class UnitFrameHud : DraggableHudElement, IHudElementWithActor, IHudElementWithMouseOver, IHudElementWithPreview, IHudElementWithVisibilityConfig
+    public unsafe class UnitFrameHud(UnitFrameConfig config, string displayName)
+        : DraggableHudElement(config, displayName), IHudElementWithActor, IHudElementWithMouseOver, IHudElementWithPreview, IHudElementWithVisibilityConfig
     {
         public UnitFrameConfig Config => (UnitFrameConfig)_config;
         public VisibilityConfig VisibilityConfig => Config.VisibilityConfig;
-
-        private readonly OpenContextMenuFromTarget _openContextMenuFromTarget;
 
         private SmoothHPHelper _smoothHPHelper = new SmoothHPHelper();
 
         public IGameObject? Actor { get; set; }
 
         private bool _wasHovering = false;
-
-        public UnitFrameHud(UnitFrameConfig config, string displayName) : base(config, displayName)
-        {
-            // interaction stuff
-
-            /*
-             Part of openContextMenuFromTarget disassembly signature
-            .text:00007FF648523940                   Client__UI__Agent__AgentHUD_OpenContextMenuFromTarget proc near
-            .text:00007FF648523940
-            .text:00007FF648523940                   arg_0= qword ptr  8
-            .text:00007FF648523940                   arg_8= qword ptr  10h
-            .text:00007FF648523940
-            .text:00007FF648523940 48 85 D2          test    rdx, rdx
-            .text:00007FF648523943 74 7F             jz      short locret_7FF6485239C4
-            */
-            _openContextMenuFromTarget =
-                Marshal.GetDelegateForFunctionPointer<OpenContextMenuFromTarget>(Plugin.SigScanner.ScanText("48 85 D2 74 7F 48 89 5C 24"));
-        }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
@@ -107,8 +89,7 @@ namespace DelvUI.Interface.GeneralElements
                 }
                 else if (InputsHelper.Instance.RightButtonClicked)
                 {
-                    var agentHud = new IntPtr(Framework.Instance()->GetUIModule()->GetAgentModule()->GetAgentByInternalId(AgentId.Hud));
-                    _openContextMenuFromTarget(agentHud, Actor.Address);
+                    AgentModule.Instance()->GetAgentHUD()->OpenContextMenuFromTarget((GameObject*)Actor.Address);
                 }
             }
             else if (_wasHovering)
@@ -426,8 +407,6 @@ namespace DelvUI.Interface.GeneralElements
 
             return GlobalColors.Instance.EmptyUnitFrameColor;
         }
-
-        private delegate void OpenContextMenuFromTarget(IntPtr agentHud, IntPtr gameObject);
     }
 
     public class PlayerUnitFrameHud : UnitFrameHud

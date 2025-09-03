@@ -80,12 +80,10 @@ namespace DelvUI.Helpers
             return null;
         }
 
-        private static readonly unsafe delegate* unmanaged<nint, byte> GetNameplateColor =
-            (delegate* unmanaged<nint, byte>)Plugin.SigScanner.ScanText("48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 57 48 83 EC 20 48 8B 35 ?? ?? ?? ?? 48 8B F9");
-
         public static unsafe bool IsHostile(IGameObject obj)
         {
-            byte plateType = GetNameplateColor(obj.Address);
+            StructsGameObject* gameObject = (StructsGameObject*)obj.Address;
+            byte plateType = gameObject->GetNamePlateColorType();
 
             // 4, 5, 6: Enemy players in PvP
             // 7: yellow, can be attacked, not engaged
