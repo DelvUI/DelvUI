@@ -1,3 +1,9 @@
+# 2.5.1.0
+- Improved logic around hotbars visibility.
+- Fixed the plugin sometimes not disposing correctly.
+- Fixed showing the wrong alliance in cross-world parties.
+- Fixed the players not updating properly in cross-world parties.
+
 # 2.5.0.1
 - Added support for chat player bubbles.
 

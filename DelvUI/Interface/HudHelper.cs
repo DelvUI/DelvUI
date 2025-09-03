@@ -150,7 +150,7 @@ namespace DelvUI.Interface
         private unsafe void SetHotbarsVisibility(List<VisibilityConfig> hotbarConfigs, VisibilityConfig crossHotbarConfig)
         {
             AddonConfig* config = AddonConfig.Instance();
-            Span<AddonConfigEntry> entries = config->ModuleData->HudLayoutConfigEntries;
+            Span<AddonConfigEntry> entries = config->ActiveDataSet->HudLayoutConfigEntries;
             bool hasChanges = false;
 
             var hashToConfig = new Dictionary<uint, VisibilityConfig>();
