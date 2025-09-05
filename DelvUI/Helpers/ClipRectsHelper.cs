@@ -254,10 +254,11 @@ namespace DelvUI.Helpers
                     bubbleNineGridNode->ScreenX,
                     bubbleNineGridNode->ScreenY
                 );
+                Vector2 scale = DrawHelper.GetNodeScale((AtkResNode*) bubbleNineGridNode, new Vector2(bubbleNineGridNode->ScaleX, bubbleNineGridNode->ScaleY));
                 Vector2 size = new Vector2(
-                    bubbleNineGridNode->Width * addon->Scale,
-                    bubbleNineGridNode->Height * addon->Scale
-                );
+                    bubbleNineGridNode->Width,
+                    bubbleNineGridNode->Height
+                ) * scale;
 
                 rects.Add(new ClipRect(position, position + size));
             }
@@ -265,7 +266,7 @@ namespace DelvUI.Helpers
             return rects;
         }
 
-        private unsafe List<ClipRect> GetPlayerChatBubbleClipRect()
+        public unsafe List<ClipRect> GetPlayerChatBubbleClipRect()
         {
             List<ClipRect> rects = new List<ClipRect>();
             if (!_config.ChatBubblesPlayersClipRectsEnabled) { return rects; }
@@ -304,10 +305,11 @@ namespace DelvUI.Helpers
                     componentNode->ScreenX,
                     componentNode->ScreenY
                 );
+                Vector2 scale = DrawHelper.GetNodeScale(bubbleNode, new Vector2(bubbleNode->ScaleX, bubbleNode->ScaleY));
                 Vector2 size = new Vector2(
-                    bubbleNode->Width * addon->Scale,
-                    bubbleNode->Height * addon->Scale
-                );
+                    bubbleNode->Width,
+                    bubbleNode->Height
+                ) * scale;
 
                 rects.Add(new ClipRect(position, position + size));
             }

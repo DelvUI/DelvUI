@@ -7,6 +7,7 @@ using Dalamud.Bindings.ImGui;
 using Lumina.Excel;
 using System;
 using System.Numerics;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace DelvUI.Helpers
 {
@@ -378,6 +379,22 @@ namespace DelvUI.Helpers
                     ImGui.End();
                 }
             }
+        }
+
+        public static unsafe Vector2 GetNodeScale(AtkResNode* node, Vector2 currentScale) {
+            if (node is null)
+            {
+                return currentScale;
+            }
+
+            if (node->ParentNode is not null) {
+                currentScale.X *= node->ParentNode->GetScaleX();
+                currentScale.Y *= node->ParentNode->GetScaleY();
+
+                return GetNodeScale(node->ParentNode, currentScale);
+            }
+
+            return currentScale;
         }
     }
 }
