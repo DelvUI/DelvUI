@@ -7,6 +7,7 @@ using Dalamud.Bindings.ImGui;
 using Lumina.Excel;
 using System;
 using System.Numerics;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace DelvUI.Helpers
 {
