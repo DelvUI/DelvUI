@@ -40,8 +40,6 @@ namespace DelvUI.Interface.GeneralElements
             int maxLimitBreak = lbController->BarUnits * lbController->BarCount;
             int limitBreakChunks = lbController->BarCount;
 
-            Plugin.Logger.Info($"LB: {currentLimitBreak}/{maxLimitBreak} ({limitBreakChunks})");
-
             if (caGauge != null)
             {
                 currentLimitBreak = caGauge->MaxGaugeValue;
