@@ -254,7 +254,7 @@ namespace DelvUI.Helpers
                     bubbleNineGridNode->ScreenX,
                     bubbleNineGridNode->ScreenY
                 );
-                Vector2 scale = DrawHelper.GetNodeScale((AtkResNode*) bubbleNineGridNode, new Vector2(bubbleNineGridNode->ScaleX, bubbleNineGridNode->ScaleY));
+                Vector2 scale = GetNodeScale((AtkResNode*) bubbleNineGridNode, new Vector2(bubbleNineGridNode->ScaleX, bubbleNineGridNode->ScaleY));
                 Vector2 size = new Vector2(
                     bubbleNineGridNode->Width,
                     bubbleNineGridNode->Height
@@ -305,7 +305,7 @@ namespace DelvUI.Helpers
                     componentNode->ScreenX,
                     componentNode->ScreenY
                 );
-                Vector2 scale = DrawHelper.GetNodeScale(bubbleNode, new Vector2(bubbleNode->ScaleX, bubbleNode->ScaleY));
+                Vector2 scale = GetNodeScale(bubbleNode, new Vector2(bubbleNode->ScaleX, bubbleNode->ScaleY));
                 Vector2 size = new Vector2(
                     bubbleNode->Width,
                     bubbleNode->Height
@@ -374,6 +374,22 @@ namespace DelvUI.Helpers
             }
 
             return false;
+        }
+
+        public static unsafe Vector2 GetNodeScale(AtkResNode* node, Vector2 currentScale) {
+            if (node is null)
+            {
+                return currentScale;
+            }
+
+            if (node->ParentNode is not null) {
+                currentScale.X *= node->ParentNode->GetScaleX();
+                currentScale.Y *= node->ParentNode->GetScaleY();
+
+                return GetNodeScale(node->ParentNode, currentScale);
+            }
+
+            return currentScale;
         }
     }
 
