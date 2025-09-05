@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using Dalamud.Utility.Signatures;
 using DelvUI.Enums;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 
 namespace DelvUI.Interface
@@ -152,6 +153,8 @@ namespace DelvUI.Interface
             AddonConfig* config = AddonConfig.Instance();
             Span<AddonConfigEntry> entries = config->ActiveDataSet->HudLayoutConfigEntries;
             bool hasChanges = false;
+            bool isPadModeEnabled = UIModule.Instance()->IsPadModeEnabled();
+            int visibilityFlag = isPadModeEnabled ? 0x2 : 0x1;
 
             var hashToConfig = new Dictionary<uint, VisibilityConfig>();
             for (int i = 0; i < hotbarConfigs.Count; i++)
@@ -174,22 +177,12 @@ namespace DelvUI.Interface
                 if (hashToConfig.TryGetValue(entry.AddonNameHash, out var configVal))
                 {
                     bool isVisible = configVal.IsElementVisible();
-                    byte shouldBeVisible = 1;
-                    if (entry.AddonNameHash == (uint)ElementKind.CrossHotbar)
+                    byte shouldBeVisible = (byte)(isVisible ? visibilityFlag : 0x0);
+                    if (entry.ByteValue2 != shouldBeVisible)
                     {
-                        shouldBeVisible = (byte)(isVisible ? 0x2 : 0x0);
+                        entry.ByteValue2 = shouldBeVisible;
+                        hasChanges = true;
                     }
-                    else
-                    {
-                        shouldBeVisible = (byte)(isVisible ? 0x1 : 0x0);
-                    }
-
-                    if(entry.ByteValue2 == shouldBeVisible)
-                    {
-                        continue;
-                    }
-                    entry.ByteValue2 = shouldBeVisible;
-                    hasChanges = true;
                 }
             }
 
