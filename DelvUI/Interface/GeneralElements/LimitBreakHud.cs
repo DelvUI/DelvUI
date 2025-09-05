@@ -37,8 +37,10 @@ namespace DelvUI.Interface.GeneralElements
             AddonHWDAetherGauge* caGauge = (AddonHWDAetherGauge*) Plugin.GameGui.GetAddonByName("HWDAetherGauge", 1).Address;
 
             int currentLimitBreak = lbController->CurrentUnits;
-            int maxLimitBreak = lbController->BarUnits;
+            int maxLimitBreak = lbController->BarUnits * lbController->BarCount;
             int limitBreakChunks = lbController->BarCount;
+
+            Plugin.Logger.Info($"LB: {currentLimitBreak}/{maxLimitBreak} ({limitBreakChunks})");
 
             if (caGauge != null)
             {
@@ -46,7 +48,9 @@ namespace DelvUI.Interface.GeneralElements
                 maxLimitBreak = 1000;
                 limitBreakChunks = 5;
             }
-            int currentChunksFilled = (int)Math.Floor((double)currentLimitBreak / maxLimitBreak * limitBreakChunks);
+
+            int valuePerChunk = limitBreakChunks == 0 ? 0 : maxLimitBreak / limitBreakChunks;
+            int currentChunksFilled = valuePerChunk == 0 ? 0 : currentLimitBreak / valuePerChunk;
 
             if (Config.HideWhenInactive && limitBreakChunks == 0)
             {
@@ -56,7 +60,6 @@ namespace DelvUI.Interface.GeneralElements
             Config.Label.SetValue(currentChunksFilled);
 
             BarHud[] bars = BarUtilities.GetChunkedProgressBars(Config, limitBreakChunks, currentLimitBreak, maxLimitBreak);
-
             foreach (BarHud bar in bars)
             {
                 AddDrawActions(bar.GetDrawActions(origin, Config.StrataLevel));
