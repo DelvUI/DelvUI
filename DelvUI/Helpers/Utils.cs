@@ -355,16 +355,17 @@ namespace DelvUI.Helpers
             if (index < 0 || index > 7) { return null; }
 
             AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_EnemyList", 1).Address;
-            if (addon != null && addon->IsVisible)
-            {
-                AtkComponentButton* button = addon->GetComponentButtonById((uint)(20001 + index));
-                if (button == null || !button->AtkResNode->IsVisible()) { return false; }
+            if (addon == null || !addon->IsVisible) { return null; }
 
-                AtkImageNode* imageNode = button->GetImageNodeById(8);
-                return imageNode == null || imageNode->IsVisible();
+            uint buttonId = (index == 0) ? 2u : (uint)(20000 + index);
+            AtkComponentButton* button = addon->GetComponentButtonById(buttonId);
+            if (button == null || button->AtkResNode == null || !button->AtkResNode->IsVisible())
+            {
+                return false;
             }
 
-            return null;
+            AtkImageNode* imageNode = button->GetImageNodeById(8);
+            return imageNode == null || imageNode->IsVisible();
         }
 
         public static unsafe uint? SignIconIDForActor(IGameObject? actor)
