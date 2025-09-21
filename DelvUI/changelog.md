@@ -1,3 +1,9 @@
+# 2.5.1.1
+- Fixed Hotbars visibility.
+- Fixed enemy list cast bars.
+- Fixed Limit Break bar.
+- Fixed window clipping around chat bubbles.
+
 # 2.5.1.0
 - Improved logic around hotbars visibility.
 - Fixed the plugin sometimes not disposing correctly.
