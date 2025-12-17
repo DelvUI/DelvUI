@@ -342,7 +342,7 @@ namespace DelvUI.Interface.Party
         {
             List<(StrataLevel, Action)> drawActions = new List<(StrataLevel, Action)>();
 
-            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IPlayerCharacter? player = Plugin.ObjectTable.LocalPlayer;
             if (!Visible || Member is null || player == null)
             {
                 StopMouseover();

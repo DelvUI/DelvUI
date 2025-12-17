@@ -180,7 +180,7 @@ namespace DelvUI.Interface.Party
 
         private void InternalUpdate()
         {
-            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IPlayerCharacter? player = Plugin.ObjectTable.LocalPlayer;
             if (player is null || player is not IPlayerCharacter)
             {
                 return;

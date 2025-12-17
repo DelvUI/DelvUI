@@ -171,7 +171,7 @@ namespace DelvUI.Helpers
 
         public static bool IsOnCleanseJob()
         {
-            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IPlayerCharacter? player = Plugin.ObjectTable.LocalPlayer;
 
             return player != null && JobsHelper.IsJobWithCleanse(player.ClassJob.RowId, player.Level);
         }

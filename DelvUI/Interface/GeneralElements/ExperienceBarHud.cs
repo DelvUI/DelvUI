@@ -35,7 +35,7 @@ namespace DelvUI.Interface.GeneralElements
         {
             if (!Config.Enabled ||
                 Actor is null ||
-                Config.HideWhenInactive && (Plugin.ClientState.LocalPlayer?.Level ?? 0) >= 100 ||
+                Config.HideWhenInactive && (Plugin.ObjectTable.LocalPlayer?.Level ?? 0) >= 100 ||
                 (Config.HideWhenInactive && Config.HideWhenDownsynced && _helper.IsMaxLevel()))
             {
                 return;

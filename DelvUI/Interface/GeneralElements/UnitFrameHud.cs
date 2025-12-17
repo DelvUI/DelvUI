@@ -294,7 +294,7 @@ namespace DelvUI.Interface.GeneralElements
             currentHp = 0;
             maxHp = 0;
 
-            var player = Plugin.ClientState.LocalPlayer;
+            var player = Plugin.ObjectTable.LocalPlayer;
             if (player == null || actor == null || player.TargetObject == null || actor.GameObjectId != player.TargetObject.GameObjectId)
             {
                 return;

@@ -69,7 +69,7 @@ namespace DelvUI.Interface.Party
 
         private unsafe void OnOpenContextMenu(PartyFramesBar bar)
         {
-            if (bar.Member == null || Plugin.ClientState.LocalPlayer == null)
+            if (bar.Member == null || Plugin.ObjectTable.LocalPlayer == null)
             {
                 return;
             }

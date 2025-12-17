@@ -12,7 +12,6 @@ using DelvUI.Interface.Jobs;
 using DelvUI.Interface.Party;
 using DelvUI.Interface.PartyCooldowns;
 using DelvUI.Interface.StatusEffects;
-using ImGuiScene;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -572,7 +571,7 @@ namespace DelvUI.Config
             typeof(TargetPrimaryResourceConfig),
             typeof(TargetOfTargetPrimaryResourceConfig),
             typeof(FocusTargetPrimaryResourceConfig),
-            
+
             // Castbars
             typeof(PlayerCastbarConfig),
             typeof(TargetCastbarConfig),

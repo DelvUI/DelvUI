@@ -316,7 +316,7 @@ namespace DelvUI.Config.Profiles
 
         public void UpdateCurrentProfile()
         {
-            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IPlayerCharacter? player = Plugin.ObjectTable.LocalPlayer;
             if (player == null)
             {
                 return;

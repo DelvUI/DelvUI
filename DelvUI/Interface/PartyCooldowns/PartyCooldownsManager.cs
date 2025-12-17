@@ -265,7 +265,7 @@ namespace DelvUI.Interface.PartyCooldowns
                 // show when solo
                 if (sender.IsSoloParty() || sender.MemberCount == 0)
                 {
-                    var player = Plugin.ClientState.LocalPlayer;
+                    var player = Plugin.ObjectTable.LocalPlayer;
                     if (_config.ShowWhenSolo && player != null)
                     {
                         _cooldownsMap.Add((uint)player.GameObjectId, CooldownsForMember((uint)player.GameObjectId, player.ClassJob.RowId, player.Level, null));

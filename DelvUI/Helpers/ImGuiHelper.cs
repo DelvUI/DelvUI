@@ -266,9 +266,9 @@ namespace DelvUI.Helpers
                     }
 
                     // help tooltip
-                    if (ImGui.IsItemHovered() && Plugin.ClientState.LocalPlayer != null)
+                    if (ImGui.IsItemHovered() && Plugin.ObjectTable.LocalPlayer != null)
                     {
-                        string formattedText = TextTagsHelper.FormattedText(key, Plugin.ClientState.LocalPlayer);
+                        string formattedText = TextTagsHelper.FormattedText(key, Plugin.ObjectTable.LocalPlayer);
 
                         if (formattedText.Length > 0)
                         {

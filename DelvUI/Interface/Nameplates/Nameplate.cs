@@ -536,7 +536,7 @@ namespace DelvUI.Interface.Nameplates
         {
             NameplateEnemyBarConfig config = (NameplateEnemyBarConfig)BarConfig;
 
-            bool targetingPlayer = character.TargetObjectId == Plugin.ClientState.LocalPlayer?.GameObjectId;
+            bool targetingPlayer = character.TargetObjectId == Plugin.ObjectTable.LocalPlayer?.GameObjectId;
             if (targetingPlayer && config.UseCustomColorWhenBeingTargeted)
             {
                 return config.CustomColorWhenBeingTargeted;

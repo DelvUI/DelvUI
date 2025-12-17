@@ -72,7 +72,7 @@ namespace DelvUI.Helpers
                 case ActionType.BgcArmyAction:
                 case ActionType.PvPAction:
                 case ActionType.CraftAction:
-                case ActionType.Ability:
+                case ActionType.EventAction:
                     Action? action = Plugin.DataManager.GetExcelSheet<Action>()?.GetRow(CastId);
                     ActionText = action?.Name.ToString() ?? "";
                     DamageType = GetDamageType(action);
@@ -87,7 +87,7 @@ namespace DelvUI.Helpers
                     _lastUsedAction = mount;
                     break;
 
-                case ActionType.KeyItem:
+                case ActionType.EventItem:
                 case ActionType.Item:
                     Item? item = Plugin.DataManager.GetExcelSheet<Item>()?.GetRow(CastId);
                     ActionText = item?.Name.ToString() ?? "Using item...";
