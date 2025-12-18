@@ -21,7 +21,9 @@ namespace DelvUI.Interface.EnemyList
 
             var enemyListNumberInstance = EnemyListNumberArray.Instance();
             var enemyNumberArrayEnemies = enemyListNumberInstance->Enemies;
-            int enemyCount = enemyListNumberInstance->Unk1;
+            int enemyCount = *(int*)((byte*)enemyListNumberInstance + 0x04);
+            //TODO: Change it to the correct property when it lands in CS
+            //int enemyCount = enemyListNumberInstance->Unk1;
 
             if(enemyCount == 0)
             {
