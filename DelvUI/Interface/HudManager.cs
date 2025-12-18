@@ -491,7 +491,7 @@ namespace DelvUI.Interface
 
         protected unsafe bool ShouldBeVisible()
         {
-            if (!ConfigurationManager.Instance.ShowHUD || Plugin.ClientState.LocalPlayer == null)
+            if (!ConfigurationManager.Instance.ShowHUD || Plugin.ObjectTable.LocalPlayer == null)
             {
                 return false;
             }
@@ -578,7 +578,7 @@ namespace DelvUI.Interface
         private void AssignActors()
         {
             // player
-            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IPlayerCharacter? player = Plugin.ObjectTable.LocalPlayer;
             foreach (var element in _hudElementsUsingPlayer)
             {
                 element.Actor = player;

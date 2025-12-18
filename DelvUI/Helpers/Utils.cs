@@ -121,19 +121,19 @@ namespace DelvUI.Helpers
             return false;
         }
 
-        public static IEnumerable<Status> StatusListForActor(IGameObject? obj)
+        public static IEnumerable<IStatus> StatusListForActor(IGameObject? obj)
         {
             if (obj is IBattleChara chara)
             {
                 return StatusListForBattleChara(chara);
             }
 
-            return new List<Status>();
+            return new List<IStatus>();
         }
 
-        public static IEnumerable<Status> StatusListForBattleChara(IBattleChara? chara)
+        public static IEnumerable<IStatus> StatusListForBattleChara(IBattleChara? chara)
         {
-            List<Status> statusList = new List<Status>();
+            List<IStatus> statusList = new List<IStatus>();
             if (chara == null)
             {
                 return statusList;
@@ -164,14 +164,14 @@ namespace DelvUI.Helpers
             return duration.ToString("N" + decimalCount, ConfigurationManager.Instance.ActiveCultreInfo);
         }
 
-        public static Status? GetTankInvulnerabilityID(IBattleChara actor)
+        public static IStatus? GetTankInvulnerabilityID(IBattleChara actor)
         {
             return StatusListForBattleChara(actor).FirstOrDefault(o => o.StatusId is 810 or 811 or 3255 or 1302 or 409 or 1836 or 82);
         }
 
         public static bool IsOnCleanseJob()
         {
-            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IPlayerCharacter? player = Plugin.ObjectTable.LocalPlayer;
 
             return player != null && JobsHelper.IsJobWithCleanse(player.ClassJob.RowId, player.Level);
         }

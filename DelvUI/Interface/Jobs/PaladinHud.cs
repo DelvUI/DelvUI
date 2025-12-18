@@ -100,7 +100,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawRequiescatBar(Vector2 origin, IPlayerCharacter player)
         {
-            Status? requiescatBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1368);
+            IStatus? requiescatBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1368);
             float requiescatDuration = Math.Max(0f, requiescatBuff?.RemainingTime ?? 0f);
             int stacks = requiescatBuff?.Param ?? 0;
 

@@ -12,7 +12,6 @@ using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
 using Dalamud.Bindings.ImGui;
-using ImGuiScene;
 
 namespace DelvUI.Helpers
 {
@@ -141,7 +140,7 @@ namespace DelvUI.Helpers
         {
             _textures.Clear();
 
-            // embedded textures 
+            // embedded textures
             _textures.AddRange(TexturesFromPath(DefaultBarTexturesPath, true));
 
             // custom textures

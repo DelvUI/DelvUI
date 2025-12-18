@@ -134,7 +134,7 @@ namespace DelvUI.Interface.StatusEffects
         protected unsafe List<StatusEffectData> StatusEffectDataList(IGameObject? actor)
         {
             List<StatusEffectData> list = new List<StatusEffectData>();
-            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IPlayerCharacter? player = Plugin.ObjectTable.LocalPlayer;
             IBattleChara? character = null;
             int count = StatusEffectListsSize;
 
@@ -272,12 +272,12 @@ namespace DelvUI.Interface.StatusEffects
                 return false;
             }
 
-            return buddy.ObjectId == status.SourceObject.Id;
+            return buddy.EntityId == status.SourceObject.Id;
         }
 
         protected List<StatusEffectData> OrderByMineOrPermanentFirst(List<StatusEffectData> list)
         {
-            var player = Plugin.ClientState.LocalPlayer;
+            var player = Plugin.ObjectTable.LocalPlayer;
             if (player == null)
             {
                 return list;
@@ -480,7 +480,7 @@ namespace DelvUI.Interface.StatusEffects
                 bool rightClick = InputsHelper.Instance.HandlingMouseInputs ? InputsHelper.Instance.RightButtonClicked : ImGui.GetIO().MouseClicked[1];
 
                 // remove buff on right click
-                bool isFromPlayer = data.Status.SourceObject.Id == Plugin.ClientState.LocalPlayer?.GameObjectId;
+                bool isFromPlayer = data.Status.SourceObject.Id == Plugin.ObjectTable.LocalPlayer?.GameObjectId;
                 bool isTheEcho = data.Status.SourceObject.Id is 42 or 239;
 
                 if (data.Data.StatusCategory == 1 && (isFromPlayer || isTheEcho) && rightClick)
@@ -525,7 +525,7 @@ namespace DelvUI.Interface.StatusEffects
                 isFromPlayerPet = IsStatusFromPlayerPet(statusEffectData.Status);
             }
 
-            if (Config.IconConfig.OwnedBorderConfig.Enabled && (statusEffectData.Status.SourceObject.Id == Plugin.ClientState.LocalPlayer?.GameObjectId || isFromPlayerPet))
+            if (Config.IconConfig.OwnedBorderConfig.Enabled && (statusEffectData.Status.SourceObject.Id == Plugin.ObjectTable.LocalPlayer?.GameObjectId || isFromPlayerPet))
             {
                 borderConfig = Config.IconConfig.OwnedBorderConfig;
             }

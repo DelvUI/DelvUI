@@ -48,7 +48,7 @@ namespace DelvUI.Interface.Party
         // in the party frames
         public static int? GetRoleFirstOrder(List<IPartyFramesMember> members)
         {
-            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IPlayerCharacter? player = Plugin.ObjectTable.LocalPlayer;
             if (player == null) { return null; }
 
             JobRoles role = JobsHelper.RoleForJob(player.ClassJob.RowId);
@@ -99,7 +99,7 @@ namespace DelvUI.Interface.Party
         {
             PartyRoles rolesCount = new PartyRoles();
 
-            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IPlayerCharacter? player = Plugin.ObjectTable.LocalPlayer;
             if (player == null) { return rolesCount; }
 
             foreach (IPartyFramesMember member in members)

@@ -51,7 +51,7 @@ namespace DelvUI.Interface
 
             Config.ValueChangeEvent -= ConfigValueChanged;
 
-            if (Plugin.Framework.IsInFrameworkUpdateThread && Plugin.ClientState.LocalPlayer != null)
+            if (Plugin.Framework.IsInFrameworkUpdateThread && Plugin.ObjectTable.LocalPlayer != null)
             {
                 UpdateCombatActionBars();
                 UpdateDefaultCastBar(true);
@@ -64,7 +64,7 @@ namespace DelvUI.Interface
                 {
                     Plugin.Framework.RunOnFrameworkThread(() =>
                     {
-                        if (Plugin.ClientState.LocalPlayer == null)
+                        if (Plugin.ObjectTable.LocalPlayer == null)
                         {
                             return;
                         }
@@ -281,7 +281,7 @@ namespace DelvUI.Interface
 
         private unsafe void UpdateJobGauges(bool forceVisible = false)
         {
-            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IPlayerCharacter? player = Plugin.ObjectTable.LocalPlayer;
             if (player == null) { return; }
 
             string jobName = JobsHelper.JobNames[player.ClassJob.RowId];

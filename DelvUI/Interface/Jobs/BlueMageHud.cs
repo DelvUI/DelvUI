@@ -172,7 +172,7 @@ namespace DelvUI.Interface.Jobs
 
         protected void DrawMoonFluteBar(Vector2 origin, IPlayerCharacter player)
         {
-            Status? buff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1718 or 1727 && o.RemainingTime > 0f);
+            IStatus? buff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1718 or 1727 && o.RemainingTime > 0f);
             if (!Config.MoonFluteBar.HideWhenInactive || buff is not null)
             {
                 var buffColor = buff is not null ? buff.StatusId switch
@@ -193,7 +193,7 @@ namespace DelvUI.Interface.Jobs
 
         protected void DrawSpellAmpBar(Vector2 origin, IPlayerCharacter player)
         {
-            Status? buff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 2118 or 1716 && o.RemainingTime > 0f);
+            IStatus? buff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 2118 or 1716 && o.RemainingTime > 0f);
             if (!Config.SpellAmpBar.HideWhenInactive || buff is not null)
             {
                 var buffColor = buff is not null ? buff.StatusId switch

@@ -29,7 +29,7 @@ namespace DelvUI.Interface.Party
         private uint _jobId = 0;
         private uint _objectID = 0;
 
-        public uint ObjectId => _partyMember != null ? _partyMember.ObjectId : _objectID;
+        public uint ObjectId => _partyMember != null ? _partyMember.EntityId : _objectID;
         public ICharacter? Character { get; private set; }
         public CrossRealmMember? CrossCharacter { get; private set; }
 
@@ -135,7 +135,7 @@ namespace DelvUI.Interface.Party
             if (jobId > 0)
             {
                 _jobId = jobId;
-            } 
+            }
             else if (Character != null)
             {
                 _jobId = Character.ClassJob.RowId;

@@ -163,7 +163,7 @@ namespace DelvUI.Interface.GeneralElements
 
                 if (Config.UseCustomInvulnerabilityColor && character is BattleChara battleChara)
                 {
-                    Status? tankInvuln = Utils.GetTankInvulnerabilityID(battleChara);
+                    IStatus? tankInvuln = Utils.GetTankInvulnerabilityID(battleChara);
                     if (tankInvuln is not null)
                     {
                         missingHealthColor = Config.CustomInvulnerabilityColor;
@@ -294,7 +294,7 @@ namespace DelvUI.Interface.GeneralElements
             currentHp = 0;
             maxHp = 0;
 
-            var player = Plugin.ClientState.LocalPlayer;
+            var player = Plugin.ObjectTable.LocalPlayer;
             if (player == null || actor == null || player.TargetObject == null || actor.GameObjectId != player.TargetObject.GameObjectId)
             {
                 return;
@@ -363,7 +363,7 @@ namespace DelvUI.Interface.GeneralElements
                 !Config.UseMissingHealthBar &&
                 chara is BattleChara battleChara)
             {
-                Status? tankInvuln = Utils.GetTankInvulnerabilityID(battleChara);
+                IStatus? tankInvuln = Utils.GetTankInvulnerabilityID(battleChara);
 
                 if (tankInvuln != null)
                 {

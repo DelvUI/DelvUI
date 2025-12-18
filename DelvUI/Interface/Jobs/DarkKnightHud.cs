@@ -107,7 +107,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ManaBar.HideWhenInactive && !gauge.HasDarkArts && player.CurrentMp == player.MaxMp)
             {
-                return; 
+                return;
             }
 
             Config.ManaBar.UsePartialFillColor = !gauge.HasDarkArts;
@@ -135,9 +135,9 @@ namespace DelvUI.Interface.Jobs
         private void DrawDarkside(Vector2 origin, IPlayerCharacter player)
         {
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
-            if (Config.DarksideBar.HideWhenInactive && gauge.DarksideTimeRemaining == 0) 
+            if (Config.DarksideBar.HideWhenInactive && gauge.DarksideTimeRemaining == 0)
             {
-                return; 
+                return;
             };
 
             float timer = Math.Abs(gauge.DarksideTimeRemaining) / 1000;
@@ -167,13 +167,13 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBloodWeaponBar(Vector2 origin, IPlayerCharacter player)
         {
-            Status? bloodWeaponBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 742);
+            IStatus? bloodWeaponBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 742);
             float duration = bloodWeaponBuff?.RemainingTime ?? 0f;
             int stacks = bloodWeaponBuff?.Param ?? 0;
 
             if (Config.BloodWeaponBar.HideWhenInactive && duration <= 0)
             {
-                return; 
+                return;
             }
 
             var chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[3];
@@ -199,7 +199,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDeliriumBar(Vector2 origin, IPlayerCharacter player)
         {
-            Status? deliriumBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1972);
+            IStatus? deliriumBuff = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1972);
             float deliriumDuration = Math.Max(0f, deliriumBuff?.RemainingTime ?? 0f);
             int stacks = deliriumBuff?.Param ?? 0;
 
@@ -213,7 +213,7 @@ namespace DelvUI.Interface.Jobs
             {
                 chunks[i] = new(Config.DeliriumBar.FillColor, i < stacks ? 1 : 0, i == 1 ? Config.DeliriumBar.Label : null);
             }
-            
+
             if(Config.DeliriumBar.FillDirection is BarDirection.Left or BarDirection.Up)
             {
                 chunks = chunks.Reverse().ToArray();
@@ -231,10 +231,10 @@ namespace DelvUI.Interface.Jobs
         private unsafe void DrawLivingShadowBar(Vector2 origin, IPlayerCharacter player)
         {
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
-            
+
             if (Config.LivingShadowBar.HideWhenInactive && gauge.ShadowTimeRemaining <= 0)
             {
-                return; 
+                return;
             }
 
             float timer = Math.Abs(gauge.ShadowTimeRemaining) / 1000;

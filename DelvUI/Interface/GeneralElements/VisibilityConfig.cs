@@ -81,7 +81,7 @@ namespace DelvUI.Interface
 
         private bool IsGathering() => Plugin.Condition[ConditionFlag.Gathering] || Plugin.Condition[ConditionFlag.ExecutingGatheringAction];
 
-        private bool HasWeaponDrawn() => (Plugin.ClientState.LocalPlayer != null && Plugin.ClientState.LocalPlayer.StatusFlags.HasFlag(StatusFlags.WeaponOut));
+        private bool HasWeaponDrawn() => (Plugin.ObjectTable.LocalPlayer != null && Plugin.ObjectTable.LocalPlayer.StatusFlags.HasFlag(StatusFlags.WeaponOut));
 
         private bool IsInGoldSaucer() => _goldSaucerIDs.Any(id => id == Plugin.ClientState.TerritoryType);
 
@@ -98,7 +98,7 @@ namespace DelvUI.Interface
 
             bool isInIslandSanctuary = IsInIslandSanctuary();
             bool isInDuty = IsInDuty() && !isInIslandSanctuary;
-            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IPlayerCharacter? player = Plugin.ObjectTable.LocalPlayer;
 
             // show
             if (ShowInDuty && isInDuty) { return true; }

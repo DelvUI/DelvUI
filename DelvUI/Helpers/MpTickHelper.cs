@@ -43,7 +43,7 @@ namespace DelvUI.Helpers
 
         private void FrameworkOnOnUpdateEvent(IFramework framework)
         {
-            var player = Plugin.ClientState.LocalPlayer;
+            var player = Plugin.ObjectTable.LocalPlayer;
             if (player is null)
             {
                 return;

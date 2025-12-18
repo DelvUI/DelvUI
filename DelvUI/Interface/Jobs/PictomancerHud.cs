@@ -19,7 +19,7 @@ namespace DelvUI.Interface.Jobs
     public class PictomancerHud : JobHud
     {
         private new PictomancerConfig Config => (PictomancerConfig)_config;
-        
+
         private static PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         public PictomancerHud(PictomancerConfig config, string? displayName = null) : base(config, displayName)
@@ -163,7 +163,7 @@ namespace DelvUI.Interface.Jobs
 
             bool hasBlackPaint = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3691) != null;
             Tuple<PluginConfigColor, float, LabelConfig?>[] chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[5];
-            
+
             for (int i = 0; i < 5; i++)
             {
                 PluginConfigColor color = PluginConfigColor.Empty;
@@ -208,7 +208,7 @@ namespace DelvUI.Interface.Jobs
             else if(gauge.CanvasFlags.HasFlag(CanvasFlags.Pom))
             {
                 canvasColor = config.PomColor;
-            }  
+            }
             Tuple<PluginConfigColor, float, LabelConfig?> canvas = new(
                 canvasColor ?? PluginConfigColor.Empty,
                 canvasColor != null ? 1 : 0,
@@ -313,7 +313,7 @@ namespace DelvUI.Interface.Jobs
         private unsafe void DrawHammerTimeBar(Vector2 origin, IPlayerCharacter player)
         {
             StacksWithDurationBarConfig config = Config.HammerTimeBar;
-            Status? status = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3680);
+            IStatus? status = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3680);
             int stacks = status?.Param ?? 0;
             float time = Math.Abs(status?.RemainingTime ?? 0f);
 
@@ -334,7 +334,7 @@ namespace DelvUI.Interface.Jobs
         private unsafe void DrawHyperphantasiaBar(Vector2 origin, IPlayerCharacter player)
         {
             StacksWithDurationBarConfig config = Config.HyperphantasiaBar;
-            Status? status = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3688);
+            IStatus? status = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 3688);
             int stacks = status?.Param ?? 0;
             float time = Math.Abs(status?.RemainingTime ?? 0f);
 

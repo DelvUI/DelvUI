@@ -7,7 +7,6 @@ using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using Dalamud.Bindings.ImGui;
-using ImGuiScene;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

@@ -244,7 +244,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawTechnicalBar(Vector2 origin, IPlayerCharacter player)
         {
-            IEnumerable<Status> devilmentBuff = Utils.StatusListForBattleChara(player).Where(o => o.StatusId is 1825 && o.SourceId == player.GameObjectId);
+            IEnumerable<IStatus> devilmentBuff = Utils.StatusListForBattleChara(player).Where(o => o.StatusId is 1825 && o.SourceId == player.GameObjectId);
 
             float technicalFinishDuration = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1822 or 2050 && o.SourceId == player.GameObjectId)?.RemainingTime ?? 0f;
 

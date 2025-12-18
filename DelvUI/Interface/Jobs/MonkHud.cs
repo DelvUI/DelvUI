@@ -186,7 +186,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawFormsBar(Vector2 origin, IPlayerCharacter player)
         {
             // formless fist
-            Status? formlessFist = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId == 2513);
+            IStatus? formlessFist = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId == 2513);
             if (formlessFist != null)
             {
                 float remaining = Math.Abs(formlessFist.RemainingTime);
@@ -209,7 +209,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             // forms
-            Status? form = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 107 or 108 or 109);
+            IStatus? form = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 107 or 108 or 109);
             if (Config.StancesBar.HideWhenInactive && form is null)
             {
                 return;
@@ -248,12 +248,12 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawPerfectBalanceBar(Vector2 origin, IPlayerCharacter player)
         {
-            Status? perfectBalance = Utils.StatusListForBattleChara(player).Where(o => o.StatusId is 110 && o.RemainingTime > 0f).FirstOrDefault();
+            IStatus? perfectBalance = Utils.StatusListForBattleChara(player).Where(o => o.StatusId is 110 && o.RemainingTime > 0f).FirstOrDefault();
             float duration = perfectBalance?.RemainingTime ?? 0f;
             float stacks = perfectBalance?.Param ?? 0f;
 
             if (Config.PerfectBalanceBar.HideWhenInactive && duration <= 0)
-            {
+            {  
                 return;
             }
 

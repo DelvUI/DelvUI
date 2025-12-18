@@ -172,7 +172,7 @@ namespace DelvUI.Interface.PartyCooldowns
             _onActionUsedHook?.Original(actorId, casterPtr, targetPos, header, effects, targetEntityIds);
 
             // check if its an action
-            if (header->ActionType != ActionType.Action ) { return; }
+            if ((ActionType)header->ActionType != ActionType.Action ) { return; }
 
             // check if its a member in the party
             if (!_cooldownsMap.ContainsKey(actorId))
@@ -265,7 +265,7 @@ namespace DelvUI.Interface.PartyCooldowns
                 // show when solo
                 if (sender.IsSoloParty() || sender.MemberCount == 0)
                 {
-                    var player = Plugin.ClientState.LocalPlayer;
+                    var player = Plugin.ObjectTable.LocalPlayer;
                     if (_config.ShowWhenSolo && player != null)
                     {
                         _cooldownsMap.Add((uint)player.GameObjectId, CooldownsForMember((uint)player.GameObjectId, player.ClassJob.RowId, player.Level, null));

@@ -6,7 +6,6 @@ using Dalamud.Plugin.Ipc;
 using DelvUI.Config;
 using DelvUI.Config.Tree;
 using DelvUI.Interface.Party;
-using ImGuiScene;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -27,7 +26,7 @@ namespace DelvUI.Helpers
     {
         private readonly ICallGateSubscriber<string, int> _getUserState;
         private Dictionary<string, WhosTalkingState> _cachedStates = new Dictionary<string, WhosTalkingState>();
-        
+
         private string speakingPath = "";
         private string mutedPath = "";
         private string deafenedPath = "";
@@ -46,7 +45,7 @@ namespace DelvUI.Helpers
 
                 // muted
                 mutedPath = Path.Combine(imagesPath, "muted.png");
-                
+
                 // deafened
                 deafenedPath = Path.Combine(imagesPath, "deafened.png");
             }

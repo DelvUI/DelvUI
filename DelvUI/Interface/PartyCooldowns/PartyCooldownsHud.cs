@@ -126,7 +126,7 @@ namespace DelvUI.Interface.PartyCooldowns
         {
             if (!Config.Enabled) { return; }
 
-            IPlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            IPlayerCharacter? player = Plugin.ObjectTable.LocalPlayer;
             if (player == null) { return; }
 
             float offset = 0;

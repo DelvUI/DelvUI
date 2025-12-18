@@ -314,7 +314,7 @@ namespace DelvUI
 
         private void UpdateJob()
         {
-            var player = ClientState.LocalPlayer;
+            var player = ObjectTable.LocalPlayer;
             if (player is null) { return; }
 
             var newJobId = player.ClassJob.RowId;
