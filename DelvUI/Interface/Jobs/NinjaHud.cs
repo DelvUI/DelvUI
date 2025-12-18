@@ -88,7 +88,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        public (bool, bool, bool) GetMudraBuffs(IPlayerCharacter? player, out Status? ninjutsuBuff, out Status? kassatsuBuff, out Status? tcjBuff)
+        public (bool, bool, bool) GetMudraBuffs(IPlayerCharacter? player, out IStatus? ninjutsuBuff, out IStatus? kassatsuBuff, out IStatus? tcjBuff)
         {
             ninjutsuBuff = null;
             kassatsuBuff = null;
@@ -97,7 +97,7 @@ namespace DelvUI.Interface.Jobs
             if (player is not null)
             {
                 var statusList = Utils.StatusListForBattleChara(player);
-                foreach (Status status in statusList)
+                foreach (IStatus status in statusList)
                 {
                     if (status.StatusId == 496) { ninjutsuBuff = status; }
                     if (status.StatusId == 497) { kassatsuBuff = status; }
@@ -110,7 +110,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawMudraBars(Vector2 origin, IPlayerCharacter player)
         {
-            var (hasNinjutsuBuff, hasKassatsuBuff, hasTCJBuff) = GetMudraBuffs(player, out Status? ninjutsuBuff, out Status? kassatsuBuff, out Status? tcjBuff);
+            var (hasNinjutsuBuff, hasKassatsuBuff, hasTCJBuff) = GetMudraBuffs(player, out IStatus? ninjutsuBuff, out IStatus? kassatsuBuff, out IStatus? tcjBuff);
 
             int mudraStacks = SpellHelper.Instance.GetStackCount(2, 2259);
             float mudraCooldown = SpellHelper.Instance.GetSpellCooldown(2259);

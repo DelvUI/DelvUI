@@ -62,8 +62,8 @@ namespace DelvUI.Interface.Party
                 }
 
                 // check for disspellable debuff
-                IEnumerable<Status> statusList = Utils.StatusListForBattleChara(battleChara);
-                foreach (Status status in statusList)
+                IEnumerable<IStatus> statusList = Utils.StatusListForBattleChara(battleChara);
+                foreach (IStatus status in statusList)
                 {
                     if (!status.GameData.Value.CanDispel)
                     {

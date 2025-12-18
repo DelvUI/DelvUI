@@ -163,7 +163,7 @@ namespace DelvUI.Interface.GeneralElements
 
                 if (Config.UseCustomInvulnerabilityColor && character is BattleChara battleChara)
                 {
-                    Status? tankInvuln = Utils.GetTankInvulnerabilityID(battleChara);
+                    IStatus? tankInvuln = Utils.GetTankInvulnerabilityID(battleChara);
                     if (tankInvuln is not null)
                     {
                         missingHealthColor = Config.CustomInvulnerabilityColor;
@@ -363,7 +363,7 @@ namespace DelvUI.Interface.GeneralElements
                 !Config.UseMissingHealthBar &&
                 chara is BattleChara battleChara)
             {
-                Status? tankInvuln = Utils.GetTankInvulnerabilityID(battleChara);
+                IStatus? tankInvuln = Utils.GetTankInvulnerabilityID(battleChara);
 
                 if (tankInvuln != null)
                 {

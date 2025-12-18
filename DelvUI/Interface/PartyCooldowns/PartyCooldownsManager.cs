@@ -172,7 +172,7 @@ namespace DelvUI.Interface.PartyCooldowns
             _onActionUsedHook?.Original(actorId, casterPtr, targetPos, header, effects, targetEntityIds);
 
             // check if its an action
-            if (header->ActionType != ActionType.Action ) { return; }
+            if ((ActionType)header->ActionType != ActionType.Action ) { return; }
 
             // check if its a member in the party
             if (!_cooldownsMap.ContainsKey(actorId))

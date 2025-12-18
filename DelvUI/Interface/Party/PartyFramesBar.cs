@@ -261,7 +261,7 @@ namespace DelvUI.Interface.Party
 
                 if (_configs.Trackers.Invuln.ChangeBackgroundColorWhenInvuln && character is IBattleChara battleChara)
                 {
-                    Status? tankInvuln = Utils.GetTankInvulnerabilityID(battleChara);
+                    IStatus? tankInvuln = Utils.GetTankInvulnerabilityID(battleChara);
                     if (tankInvuln is not null)
                     {
                         missingHealthColor = _configs.Trackers.Invuln.BackgroundColor;

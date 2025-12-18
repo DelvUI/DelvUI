@@ -74,7 +74,7 @@ namespace DelvUI.Interface.Bars
         {
             if (statusIDs.Count == 0 || maxDurations.Count == 0) { return null; }
 
-            Status? status = Utils.StatusListForBattleChara(player).FirstOrDefault(o => statusIDs.Contains(o.StatusId));
+            IStatus? status = Utils.StatusListForBattleChara(player).FirstOrDefault(o => statusIDs.Contains(o.StatusId));
             if (status == null && config.HideWhenInactive)
             {
                 return null;
@@ -112,7 +112,7 @@ namespace DelvUI.Interface.Bars
         {
             if (statusIDs.Count == 0 || maxDurations.Count == 0) { return null; }
 
-            Status? status = null;
+            IStatus? status = null;
 
             if (target != null && target is IBattleChara targetChara)
             {
@@ -299,7 +299,7 @@ namespace DelvUI.Interface.Bars
                                 label = chunkPercent < 1f && chunkPercent > 0f ? config.Label.Clone(i) : null;
                                 break;
                         };
-                    } 
+                    }
                     else
                     {
                         label = forceLabelIndex == i ? config.Label : null;
