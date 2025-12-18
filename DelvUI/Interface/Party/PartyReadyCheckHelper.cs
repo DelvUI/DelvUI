@@ -21,7 +21,7 @@ namespace DelvUI.Interface.Party
         private Hook<AgentReadyCheck.Delegates.InitiateReadyCheck>? _onReadyCheckStartHook;
         private Hook<AgentReadyCheck.Delegates.EndReadyCheck>? _onReadyCheckEndHook;
 
-        private delegate void ActorControlDelegate(uint entityId, uint id, uint unk1, uint type, uint unk2, uint unk3, uint unk4, uint unk5, UInt64 targetId, byte unk6);
+        private delegate void ActorControlDelegate(uint entityId, uint type, uint buffID, uint direct, uint actionId, uint sourceId, uint arg7, uint arg8, uint arg9, uint arg10, ulong targetId, byte arg12);
         private Hook<ActorControlDelegate>? _actorControlHook;
 
         private bool _readyCheckOngoing = false;
@@ -92,13 +92,13 @@ namespace DelvUI.Interface.Party
             _lastReadyCheckEndTime = ImGui.GetTime();
         }
 
-        private void OnActorControl(uint entityId, uint id, uint unk1, uint type, uint unk2, uint unk3, uint unk4, uint unk5, UInt64 targetId, byte unk6)
+        private void OnActorControl(uint entityId, uint type, uint buffID, uint direct, uint actionId, uint sourceId, uint arg7, uint arg8, uint arg9, uint arg10, ulong targetId, byte arg12)
         {
-            _actorControlHook?.Original(entityId, id, unk1, type, unk2, unk3, unk4, unk5, targetId, unk6);
+            _actorControlHook?.Original(entityId, type, buffID, direct, actionId, sourceId, arg7, arg8, arg9, arg10, targetId, arg12);
 
             // I'm not exactly sure what id == 503 means, but its always triggered when the fight starts
             // which is all I care about
-            if (id == 503)
+            if (type == 503)
             {
                 _readyCheckOngoing = false;
             }
