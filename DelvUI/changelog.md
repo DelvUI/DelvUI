@@ -1,4 +1,4 @@
-# 2.5.1.2
+# 2.6.0.0
 - Added support for Patch 7.4 and Dalamud API 14.
 
 # 2.5.1.1
