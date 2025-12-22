@@ -55,6 +55,8 @@ namespace DelvUI.Interface.Jobs
             if (!Config.PowderGauge.HideWhenInactive || gauge.Ammo > 0)
             {
                 var maxCartridges = player.Level >= 88 ? 3 : 2;
+                maxCartridges = Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 5051)?.RemainingTime > 0f ? maxCartridges * 2 : maxCartridges;
+
                 BarHud[] bars = BarUtilities.GetChunkedBars(Config.PowderGauge, maxCartridges, gauge.Ammo, maxCartridges, 0, player);
                 foreach (BarHud bar in bars)
                 {
