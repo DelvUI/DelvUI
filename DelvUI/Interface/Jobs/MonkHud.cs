@@ -8,6 +8,7 @@ using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -102,9 +103,17 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            var maxChakra = (Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1182)?.RemainingTime > 0f) ? 10 : 5;
+            PluginConfigColor mainColor = Config.ChakraBar.FillColor;
+            PluginConfigColor extraColor = Config.ChakraBar.BrotherhoodExtraCharkaColor;
 
-            BarHud[] bars = BarUtilities.GetChunkedBars(Config.ChakraBar, maxChakra, gauge.Chakra, 5, 0, player);
+            List<Tuple<PluginConfigColor, float, LabelConfig?>> chunks = new();
+            for (int i = 1; i < 6; i++)
+            {
+                PluginConfigColor color = (gauge.Chakra < i || gauge.Chakra - 5 < i) ? mainColor : extraColor;
+                chunks.Add(new(color, i <= gauge.Chakra ? 1 : 0, null));
+            }
+
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.ChakraBar, chunks.ToArray(), player);
             foreach (BarHud bar in bars)
             {
                 AddDrawActions(bar.GetDrawActions(origin, Config.ChakraBar.StrataLevel));
@@ -306,7 +315,7 @@ namespace DelvUI.Interface.Jobs
         }
 
         [NestedConfig("Chakra Bar", 35)]
-        public ChunkedBarConfig ChakraBar = new ChunkedBarConfig(
+        public ChakraBar ChakraBar = new ChakraBar(
             new(0, -32),
             new(254, 20),
             new(new Vector4(204f / 255f, 115f / 255f, 0f, 100f / 100f))
@@ -336,6 +345,17 @@ namespace DelvUI.Interface.Jobs
             new(254, 20),
             new(new Vector4(150f / 255f, 255f / 255f, 255f / 255f, 100f / 100f))
         );
+    }
+
+    public class ChakraBar: ChunkedBarConfig
+    {
+        [ColorEdit4("Brotherhood Extra Chakra Color")]
+        [Order(26)]
+        public PluginConfigColor BrotherhoodExtraCharkaColor = new(new Vector4(204f / 255f, 0, 0, 1));
+
+        public ChakraBar(Vector2 position, Vector2 size, PluginConfigColor fillColor, int padding = 2) : base(position, size, fillColor, padding)
+        {
+        }
     }
 
     public class PerfectBalanceBar : ChunkedBarConfig
