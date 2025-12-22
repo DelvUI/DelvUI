@@ -102,7 +102,9 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            BarHud[] bars = BarUtilities.GetChunkedBars(Config.ChakraBar, 5, gauge.Chakra, 5, 0, player);
+            var maxChakra = (Utils.StatusListForBattleChara(player).FirstOrDefault(o => o.StatusId is 1182)?.RemainingTime > 0f) ? 10 : 5;
+
+            BarHud[] bars = BarUtilities.GetChunkedBars(Config.ChakraBar, maxChakra, gauge.Chakra, 5, 0, player);
             foreach (BarHud bar in bars)
             {
                 AddDrawActions(bar.GetDrawActions(origin, Config.ChakraBar.StrataLevel));
