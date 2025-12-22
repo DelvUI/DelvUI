@@ -184,6 +184,10 @@ namespace DelvUI.Interface.GeneralElements
         [Order(6)]
         public bool ShowMaxCastTime = false;
 
+        [Checkbox("Truncate Cast Name", help = "This will automatically truncate the cast name if it's too long and won't fit inside the bar.")]
+        [Order(7)]
+        public bool TruncateCastName = false;
+
         [Checkbox("Separate Icon", spacing = true)]
         [Order(100)]
         public bool SeparateIcon = false;

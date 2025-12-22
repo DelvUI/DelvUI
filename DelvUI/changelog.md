@@ -1,3 +1,11 @@
+# 2.6.1.0
+- Added new features for Cast Bars:
+  * Added a "Truncate Cast Name" setting that will attempt to truncate the current cast name if the text woulnd't fit inside the bar.
+  * Made the player cast bar replicate the exact cast name shown by the default UI. This will reflect changes that other plugins might make to your casts, like VanillaPlus' "Cast Bar Aetheryte Names" feature.
+  
+- Added "Brotherhood Extra Chakra Color" setting for Monk's Chakra bar.
+- Added "Bloodgest Extra Cartridges Color" setting for Gunbreaker's Powder Gauge bar.
+
 # 2.6.0.0
 - Added support for Patch 7.4 and Dalamud API 14.
 
