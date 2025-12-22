@@ -252,8 +252,6 @@ namespace DelvUI.Interface.GeneralElements
                 }
             }
 
-            Plugin.Logger.Debug(text + " - " + size.X.ToString() + " - " + maxWidth.ToString());
-
             if (size.X > maxWidth)
             {
                 return TruncatedCastName(text.Substring(0, text.Length - 5) + "...");
