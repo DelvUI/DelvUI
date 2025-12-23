@@ -2,6 +2,7 @@
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Interface.Textures.TextureWraps;
+using Dalamud.Utility;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
@@ -294,7 +295,7 @@ namespace DelvUI.Interface.GeneralElements
             AtkTextNode* node = castBar->GetTextNodeById(4);
             if (node == null) { return null; }
 
-            return node->GetText().ToString();
+            return node->GetText().ExtractText();
         }
 
         public override void AddExtras(BarHud bar, float totalCastTime, IDalamudTextureWrap? iconTexture)
