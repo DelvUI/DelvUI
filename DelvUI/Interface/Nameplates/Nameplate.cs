@@ -19,6 +19,7 @@ namespace DelvUI.Interface.Nameplates
     public class Nameplate
     {
         protected NameplateConfig _config;
+        public bool Enabled => _config.Enabled;
 
         protected LabelHud _nameLabelHud;
         protected LabelHud _titleLabelHud;

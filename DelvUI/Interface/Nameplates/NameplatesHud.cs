@@ -72,7 +72,7 @@ namespace DelvUI.Interface.Nameplates
             foreach (NameplateData data in NameplatesManager.Instance.Data)
             {
                 Nameplate? nameplate = GetNameplate(data);
-                if (nameplate == null) { continue; }
+                if (nameplate == null || !nameplate.Enabled) { continue; }
 
                 // raycasting
                 if (IsPointObstructed(data)) { continue; }

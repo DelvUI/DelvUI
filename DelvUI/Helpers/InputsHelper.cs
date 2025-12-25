@@ -334,18 +334,14 @@ namespace DelvUI.Helpers
                             _leftButtonClicked = _leftButtonWasDown && msg == WM_LBUTTONUP;
                             _rightButtonClicked = _rightButtonWasDown && msg == WM_RBUTTONUP;
 
-                            bool shouldTakeInput = true;
-                            if (msg == WM_LBUTTONUP && !_leftButtonWasDown ||
-                                msg == WM_RBUTTONUP && !_rightButtonWasDown)
-                            {
-                                shouldTakeInput = false;
-                            }
 
                             _leftButtonWasDown = msg == WM_LBUTTONDOWN;
                             _rightButtonWasDown = msg == WM_RBUTTONDOWN;
 
-                            if (shouldTakeInput)
+                            // never eat BUTTONUP messages to prevent clicks from getting stuck!!!
+                            if (msg != WM_LBUTTONUP && msg != WM_RBUTTONUP)
                             {
+                                // INPUT EATEN!!!
                                 return (IntPtr)0;
                             }
                         }

@@ -194,8 +194,6 @@ namespace DelvUI.Interface.PartyCooldowns
 
             uint actionID = header->ActionId;
 
-            Plugin.Logger.Debug("Action: " + actionID.ToString());
-
             // special case for starry muse > set id to scenic muse
             if (actionID == 34675)
             {
