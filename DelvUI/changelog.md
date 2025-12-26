@@ -1,3 +1,10 @@
+# 2.6.2.0
+- Updated Enemy Nameplates state colors so they behave the same way as the default nameplates:
+  * Added Engaged, Unengaged, Claimed and Unclaimed colors for enemy nameplates.
+  * Some of the older settings were removed, you might need to tinker with the new colors in `Nameplates > Enemies > Health Bar`.
+
+- New attempt to fix the cursor sometimes getting stuck (specifically with `/delvui mouse on`).
+
 # 2.6.1.1
 - Fixed a bug introduced in the last version with some item cast names.
 

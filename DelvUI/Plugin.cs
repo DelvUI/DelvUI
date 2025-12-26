@@ -106,7 +106,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.6.1.1";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "2.6.2.0";
 
             FontsManager.Initialize(AssemblyLocation);
             BarTexturesManager.Initialize(AssemblyLocation);
