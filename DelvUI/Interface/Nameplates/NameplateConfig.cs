@@ -614,24 +614,28 @@ namespace DelvUI.Interface.GeneralElements
         [Order(46, collapseWith = nameof(UseStateColor))]
         public PluginConfigColor UnengagedColor = PluginConfigColor.FromHex(0xFFDA9D2E);
 
-        [ColorEdit4("Engaged")]
+        [ColorEdit4("Unengaged (Hostile)")]
         [Order(47, collapseWith = nameof(UseStateColor))]
+        public PluginConfigColor UnengagedHostileColor = PluginConfigColor.FromHex(0xFF994B35);
+
+        [ColorEdit4("Engaged")]
+        [Order(48, collapseWith = nameof(UseStateColor))]
         public PluginConfigColor EngagedColor = PluginConfigColor.FromHex(0xFF993535);
 
         [ColorEdit4("Claimed")]
-        [Order(48, collapseWith = nameof(UseStateColor))]
+        [Order(49, collapseWith = nameof(UseStateColor))]
         public PluginConfigColor ClaimedColor = PluginConfigColor.FromHex(0xFFEA93EA);
 
         [ColorEdit4("Unclaimed")]
-        [Order(49, collapseWith = nameof(UseStateColor))]
+        [Order(50, collapseWith = nameof(UseStateColor))]
         public PluginConfigColor UnclaimedColor = PluginConfigColor.FromHex(0xFFE5BB9E);
 
         [Checkbox("Use Custom Color when being targeted", spacing = true, help = "This will change the color of the bar when the enemy is targeting the player.")]
-        [Order(49)]
+        [Order(51)]
         public bool UseCustomColorWhenBeingTargeted = false;
 
-        [ColorEdit4("Custom Color when being targeted")]
-        [Order(50, collapseWith = nameof(UseCustomColorWhenBeingTargeted))]
+        [ColorEdit4("Targeted")]
+        [Order(52, collapseWith = nameof(UseCustomColorWhenBeingTargeted))]
         public PluginConfigColor CustomColorWhenBeingTargeted = PluginConfigColor.FromHex(0xFFC4216D);
 
         [NestedConfig("Order Label", 132)]

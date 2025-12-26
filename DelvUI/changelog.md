@@ -1,3 +1,6 @@
+# 2.6.2.1
+- Re-added the unengaged color for hostile enemies in the nameplates settings.
+
 # 2.6.2.0
 - Updated Enemy Nameplates state colors so they behave the same way as the default nameplates:
   * Added Engaged, Unengaged, Claimed and Unclaimed colors for enemy nameplates.

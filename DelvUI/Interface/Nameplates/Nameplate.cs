@@ -549,7 +549,7 @@ namespace DelvUI.Interface.Nameplates
                 byte nameplateColorId = chara->GetNamePlateColorType();
 
                 switch (nameplateColorId) {
-                    case 7: return config.UnengagedColor;
+                    case 7: return (character.StatusFlags & StatusFlags.Hostile) != 0 ? config.UnengagedHostileColor : config.UnengagedColor;
                     case 9: return config.EngagedColor;
                     case 10: return config.ClaimedColor;
                     case 11: return config.UnclaimedColor;
