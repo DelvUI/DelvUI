@@ -22,6 +22,7 @@ using System.Runtime.InteropServices;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Hooking;
 using Dalamud.Logging;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
 namespace DelvUI.Helpers
 {
@@ -34,10 +35,9 @@ namespace DelvUI.Helpers
 
             try
             {
-                _countdownTimerHook = Plugin.GameInteropProvider.HookFromSignature<CountdownTimer>(
-                    "40 53 48 83 EC 40 80 79 38 00",
-                    CountdownTimerFunc
-                );
+                _countdownTimerHook = Plugin.GameInteropProvider.HookFromAddress<AgentInterface.Delegates.Update>(
+                    AgentModule.Instance()->GetAgentByInternalId(AgentId.CountDownSettingDialog)->VirtualTable->Update,
+                    CountdownTimerFunc);
                 _countdownTimerHook?.Enable();
             }
             catch
@@ -81,7 +81,7 @@ namespace DelvUI.Helpers
 
         private int _countDownStallTicks;
 
-        private readonly Hook<CountdownTimer>? _countdownTimerHook;
+        private readonly Hook<AgentInterface.Delegates.Update>? _countdownTimerHook;
         public float LastCountDownValue;
         private bool _shouldRestartCombatTimer = true;
         private bool _lastMaxValueSet = false;
@@ -100,10 +100,10 @@ namespace DelvUI.Helpers
             PullTimerState.InInstance = Plugin.Condition[ConditionFlag.BoundByDuty];
         }
 
-        private IntPtr CountdownTimerFunc(ulong value)
+        private void CountdownTimerFunc(AgentInterface* agentInterface, uint frameCount)
         {
-            _agentData = value;
-            return _countdownTimerHook?.Original(value) ?? IntPtr.Zero;
+            _agentData = (ulong)agentInterface;
+            _countdownTimerHook?.Original(agentInterface, frameCount);
         }
 
         private void UpdateEncounterTimer()
@@ -144,7 +144,7 @@ namespace DelvUI.Helpers
             {
                 _lastMaxValueSet = false;
                 return;
-            } 
+            }
 
             float countDownPointerValue = Marshal.PtrToStructure<float>((IntPtr)_agentData + 0x2c);
 
@@ -182,9 +182,6 @@ namespace DelvUI.Helpers
 
             LastCountDownValue = countDownPointerValue;
         }
-
-        [UnmanagedFunctionPointer(CallingConvention.ThisCall, CharSet = CharSet.Ansi)]
-        private delegate IntPtr CountdownTimer(ulong param1);
     }
 
     public class PullTimerState
@@ -233,6 +230,5 @@ namespace DelvUI.Helpers
         public float CountDownMax { get; set; } = 0f;
         public event EventHandler? InCombatChanged;
         public event EventHandler? CountingDownChanged;
-        //
     }
 }
