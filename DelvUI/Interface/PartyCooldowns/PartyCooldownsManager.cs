@@ -1,6 +1,7 @@
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Hooking;
+using Dalamud.Plugin.Services;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.Party;
@@ -21,6 +22,7 @@ namespace DelvUI.Interface.PartyCooldowns
         public static PartyCooldownsManager Instance { get; private set; } = null!;
         private PartyCooldownsConfig _config = null!;
         private PartyCooldownsDataConfig _dataConfig = null!;
+        private static IDutyState DutyState { get; set; } = null!;
 
         private PartyCooldownsManager()
         {
@@ -59,9 +61,13 @@ namespace DelvUI.Interface.PartyCooldowns
             UpdatePreview();
         }
 
-        public static void Initialize()
+        public static void Initialize(IDutyState dutyState)
         {
+            DutyState = dutyState;
             Instance = new PartyCooldownsManager();
+            DutyState.DutyWiped += ResetCooldowns;
+            DutyState.DutyStarted += ResetCooldowns;
+            DutyState.DutyRecommenced += ResetCooldowns;
         }
 
         ~PartyCooldownsManager()
@@ -152,15 +158,15 @@ namespace DelvUI.Interface.PartyCooldowns
             // detect wipe fadeouts (not 100% reliable but good enough)
             if (type == 0x4000000F)
             {
-                ResetCooldowns();
+                ResetCooldowns(null, 0);
             }
         }
 
-        private void ResetCooldowns()
+        private static void ResetCooldowns(object? sender, ushort e)
         {
-            foreach (uint actorId in _cooldownsMap.Keys)
+            foreach (uint actorId in Instance._cooldownsMap.Keys)
             {
-                foreach (PartyCooldown cooldown in _cooldownsMap[actorId].Values)
+                foreach (PartyCooldown cooldown in Instance._cooldownsMap[actorId].Values)
                 {
                     cooldown.LastTimeUsed = 0;
                 }

@@ -75,7 +75,8 @@ namespace DelvUI
             IPluginLog logger,
             ITextureProvider textureProvider,
             IAddonLifecycle addonLifecycle,
-            IChatGui chat)
+            IChatGui chat,
+            IDutyState dutyState)
         {
             BuddyList = buddyList;
             ClientState = clientState;
@@ -125,7 +126,7 @@ namespace DelvUI
             InputsHelper.Initialize();
             NameplatesManager.Initialize();
             PartyManager.Initialize();
-            PartyCooldownsManager.Initialize();
+            PartyCooldownsManager.Initialize(dutyState);
             PullTimerHelper.Initialize();
             TextTagsHelper.Initialize();
             TooltipsHelper.Initialize();
