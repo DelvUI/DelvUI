@@ -1,3 +1,6 @@
+# 2.6.2.2
+- Made resetting party cooldowns more reliable after a wipe.
+
 # 2.6.2.1
 - Re-added the unengaged color for hostile enemies in the nameplates settings.
 
