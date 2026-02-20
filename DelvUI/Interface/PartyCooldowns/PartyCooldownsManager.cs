@@ -12,6 +12,7 @@ using Dalamud.Bindings.ImGui;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using FFXIVClientStructs.FFXIV.Client.Network;
 using static FFXIVClientStructs.FFXIV.Client.Game.Character.ActionEffectHandler;
 
 namespace DelvUI.Interface.PartyCooldowns
@@ -27,8 +28,8 @@ namespace DelvUI.Interface.PartyCooldowns
         {
             try
             {
-                _onActionUsedHook = Plugin.GameInteropProvider.HookFromAddress<ActionEffectHandler.Delegates.Receive>(
-                    ActionEffectHandler.MemberFunctionPointers.Receive,
+                _onActionUsedHook = Plugin.GameInteropProvider.HookFromAddress<Delegates.Receive>(
+                    MemberFunctionPointers.Receive,
                     OnActionUsed
                 );
                 _onActionUsedHook?.Enable();
@@ -40,10 +41,9 @@ namespace DelvUI.Interface.PartyCooldowns
 
             try
             {
-                _actorControlHook = Plugin.GameInteropProvider.HookFromSignature<ActorControlDelegate>(
-                    "E8 ?? ?? ?? ?? 0F B7 0B 83 E9 64",
-                    OnActorControl
-                );
+                _actorControlHook = Plugin.GameInteropProvider.HookFromAddress(
+                    (nint)PacketDispatcher.MemberFunctionPointers.HandleActorControlPacket,
+                    new PacketDispatcher.Delegates.HandleActorControlPacket(OnActorControl));
                 _actorControlHook?.Enable();
             }
             catch
@@ -75,6 +75,10 @@ namespace DelvUI.Interface.PartyCooldowns
 
         public void Dispose()
         {
+            Plugin.DutyState.DutyWiped -= ResetCooldowns;
+            Plugin.DutyState.DutyStarted -= ResetCooldowns;
+            Plugin.DutyState.DutyRecommenced -= ResetCooldowns;
+
             Dispose(true);
             GC.SuppressFinalize(this);
         }
@@ -133,10 +137,9 @@ namespace DelvUI.Interface.PartyCooldowns
 
         #endregion Singleton
 
-        private Hook<ActionEffectHandler.Delegates.Receive>? _onActionUsedHook;
+        private Hook<Delegates.Receive>? _onActionUsedHook;
 
-        private delegate void ActorControlDelegate(uint entityId, uint type, uint buffID, uint direct, uint actionId, uint sourceId, uint arg7, uint arg8, uint arg9, uint arg10, ulong targetId, byte arg12);
-        private Hook<ActorControlDelegate>? _actorControlHook;
+        private Hook<PacketDispatcher.Delegates.HandleActorControlPacket>? _actorControlHook;
 
         private Dictionary<uint, Dictionary<uint, PartyCooldown>>? _oldMap;
         private Dictionary<uint, Dictionary<uint, PartyCooldown>> _cooldownsMap = new Dictionary<uint, Dictionary<uint, PartyCooldown>>();
@@ -149,11 +152,11 @@ namespace DelvUI.Interface.PartyCooldowns
 
         private bool _wasInDuty = false;
 
-        private void OnActorControl(uint entityId, uint type, uint buffID, uint direct, uint actionId, uint sourceId, uint arg7, uint arg8, uint arg9, uint arg10, ulong targetId, byte arg12)
+        private void OnActorControl(uint entityId, uint type, uint buffID, uint direct, uint actionId, uint sourceId, uint arg7, uint arg8, uint arg9, uint arg10, GameObjectId targetId, bool isRecorded)
         {
-            _actorControlHook?.Original(entityId, type, buffID, direct, actionId, sourceId, arg7, arg8, arg9, arg10, targetId, arg12);
+            _actorControlHook?.Original(entityId, type, buffID, direct, actionId, sourceId, arg7, arg8, arg9, arg10, targetId, isRecorded);
 
-            // detect wipe fadeouts (not 100% reliable but good enough)
+            // detect wipe fadeouts (not 100% reliable but good enough), Dalamud DutyState doesn't check 0x4000000F yet.
             if (type == 0x4000000F)
             {
                 ResetCooldowns(null, 0);
@@ -162,6 +165,8 @@ namespace DelvUI.Interface.PartyCooldowns
 
         private static void ResetCooldowns(object? sender, ushort e)
         {
+            Instance._technicalStepMap.Clear();
+            
             foreach (uint actorId in Instance._cooldownsMap.Keys)
             {
                 foreach (PartyCooldown cooldown in Instance._cooldownsMap[actorId].Values)
