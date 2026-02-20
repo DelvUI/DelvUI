@@ -22,7 +22,6 @@ namespace DelvUI.Interface.PartyCooldowns
         public static PartyCooldownsManager Instance { get; private set; } = null!;
         private PartyCooldownsConfig _config = null!;
         private PartyCooldownsDataConfig _dataConfig = null!;
-        private static IDutyState DutyState { get; set; } = null!;
 
         private PartyCooldownsManager()
         {
@@ -61,13 +60,12 @@ namespace DelvUI.Interface.PartyCooldowns
             UpdatePreview();
         }
 
-        public static void Initialize(IDutyState dutyState)
+        public static void Initialize()
         {
-            DutyState = dutyState;
             Instance = new PartyCooldownsManager();
-            DutyState.DutyWiped += ResetCooldowns;
-            DutyState.DutyStarted += ResetCooldowns;
-            DutyState.DutyRecommenced += ResetCooldowns;
+            Plugin.DutyState.DutyWiped += ResetCooldowns;
+            Plugin.DutyState.DutyStarted += ResetCooldowns;
+            Plugin.DutyState.DutyRecommenced += ResetCooldowns;
         }
 
         ~PartyCooldownsManager()

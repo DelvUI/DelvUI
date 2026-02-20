@@ -28,6 +28,7 @@ namespace DelvUI
         public static ICondition Condition { get; private set; } = null!;
         public static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
         public static IDataManager DataManager { get; private set; } = null!;
+        public static IDutyState DutyState { get; private set; } = null!;
         public static IFramework Framework { get; private set; } = null!;
         public static IGameGui GameGui { get; private set; } = null!;
         public static IJobGauges JobGauges { get; private set; } = null!;
@@ -97,6 +98,7 @@ namespace DelvUI
             TextureProvider = textureProvider;
             AddonLifecycle = addonLifecycle;
             Chat = chat;
+            DutyState = dutyState;
 
             if (pluginInterface.AssemblyLocation.DirectoryName != null)
             {
@@ -126,7 +128,7 @@ namespace DelvUI
             InputsHelper.Initialize();
             NameplatesManager.Initialize();
             PartyManager.Initialize();
-            PartyCooldownsManager.Initialize(dutyState);
+            PartyCooldownsManager.Initialize();
             PullTimerHelper.Initialize();
             TextTagsHelper.Initialize();
             TooltipsHelper.Initialize();
