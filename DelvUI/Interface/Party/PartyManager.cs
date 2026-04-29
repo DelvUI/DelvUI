@@ -7,20 +7,65 @@ using DelvUI.Helpers;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using FFXIVClientStructs.FFXIV.Client.UI.Arrays;
 using FFXIVClientStructs.FFXIV.Client.UI.Info;
+using FFXIVClientStructs.FFXIV.Component.GUI;
+using FFXIVClientStructs.Interop;
+using InteropGenerator.Runtime.Attributes;
 using Lumina.Excel.Sheets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using FFXIVClientStructs.FFXIV.Client.UI.Arrays;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 using static FFXIVClientStructs.FFXIV.Client.Game.Group.GroupManager;
 using DalamudPartyMember = Dalamud.Game.ClientState.Party.IPartyMember;
 using StructsPartyMember = FFXIVClientStructs.FFXIV.Client.Game.Group.PartyMember;
 
 namespace DelvUI.Interface.Party
 {
+    [StructLayout(LayoutKind.Explicit, Size = 0x1590)]
+    public unsafe partial struct TmpAddonPartyList
+    {
+        [FieldOffset(0x238), FixedSizeArray] internal TmpPartyListMemberStruct[] PartyMembers;
+        [FieldOffset(0xA38), FixedSizeArray] internal TmpPartyListMemberStruct[] TrustMembers;
+
+        [FieldOffset(0x1550)] public AtkResNode* LeaderMarkResNode; // WRONG
+
+        [FieldOffset(0x1678)] public int MemberCount;
+        [FieldOffset(0x167C)] public int TrustCount;
+        [FieldOffset(0x1680)] public int EnmityLeaderIndex; // Starts from 0 (-1 if no leader)
+        [FieldOffset(0x169B)] public byte ChocoboCount; // or ChocoboSummoned?
+
+        [GenerateInterop]
+        [StructLayout(LayoutKind.Explicit, Size = 0x100)]
+        public partial struct TmpPartyListMemberStruct
+        {
+            [FieldOffset(0x50)] public AtkComponentBase* PartyMemberComponent;
+            [FieldOffset(0x58)] public AtkTextNode* IconBottomLeftText;
+            [FieldOffset(0x60)] public AtkResNode* NameAndBarsContainer;  // only contains hp/mp bars
+            [FieldOffset(0x68)] private AtkResNode* Unknown68;  // seems to be related to MPGaugeBar
+            [FieldOffset(0x70)] public AtkTextNode* GroupSlotIndicator;
+            [FieldOffset(0x78)] public AtkTextNode* Name;
+            [FieldOffset(0x80)] public AtkTextNode* CastingActionName;
+            [FieldOffset(0x88)] public AtkImageNode* CastingProgressBar;
+            [FieldOffset(0x90)] public AtkImageNode* CastingProgressBarBackground;
+            [FieldOffset(0x98)] public AtkResNode* EmnityBarContainer;
+            [FieldOffset(0xA0)] public AtkNineGridNode* EmnityBarFill;
+            [FieldOffset(0xA8)] public AtkImageNode* ClassJobIcon;
+            [FieldOffset(0xB0)] private void* UnknownB0;
+            [FieldOffset(0xB8)] private AtkImageNode* UnknownImageB8;
+            [FieldOffset(0xC0)] public AtkComponentBase* HPGaugeComponent;
+            [FieldOffset(0xC8)] public AtkComponentGaugeBar* HPGaugeBar;
+            [FieldOffset(0xD0)] public AtkComponentGaugeBar* MPGaugeBar;
+            [FieldOffset(0xD8)] public AtkResNode* TargetGlowContainer;
+            [FieldOffset(0xE0)] public AtkNineGridNode* ClickFlash;
+            [FieldOffset(0xE8)] public AtkNineGridNode* TargetGlow;
+            [FieldOffset(0xF0)] public AtkCollisionNode* Collision;
+            [FieldOffset(0xF8)] public byte EmnityByte; //01 or 02 or FF
+        }
+    }
+
+
     public delegate void PartyMembersChangedEventHandler(PartyManager sender);
 
     public unsafe class PartyManager : IDisposable
@@ -97,12 +142,12 @@ namespace DelvUI.Interface.Party
 
         #endregion Singleton
 
-        public AddonPartyList* PartyListAddon { get; private set; } = null;
+        public TmpAddonPartyList* PartyListAddon { get; private set; } = null;
         public IntPtr HudAgent { get; private set; } = IntPtr.Zero;
 
         private RaptureAtkModule* _raptureAtkModule = null;
 
-        private const int PartyListInfoOffset = 0x0D40;
+        private const int PartyListInfoOffset = 0x0E18;
         private const int PartyListMemberRawInfoSize = 0x28;
 
         private const int PartyMembersInfoIndex = 12; // TODO: Should be reworked to use PartyMemberListStringArray.Instance()
@@ -153,7 +198,7 @@ namespace DelvUI.Interface.Party
         public void Update()
         {
             // find party list hud agent
-            PartyListAddon = (AddonPartyList*)Plugin.GameGui.GetAddonByName("_PartyList", 1).Address;
+            PartyListAddon = (TmpAddonPartyList*)Plugin.GameGui.GetAddonByName("_PartyList", 1).Address;
             HudAgent = Plugin.GameGui.FindAgentInterface(PartyListAddon);
 
             if (PartyListAddon == null || HudAgent == IntPtr.Zero)
@@ -276,7 +321,7 @@ namespace DelvUI.Interface.Party
             }
 
             // raw info
-            int allianceNum = FindAlliance(player);
+            int allianceNum = 0; //FindAlliance(player);
             int count = isCrossWorld ? _crossRealmInfo->CrossRealmGroups[allianceNum].GroupMemberCount : _realMemberCount + PartyListAddon->TrustCount;
             for (int i = 0; i < count; i++)
             {
@@ -640,6 +685,7 @@ namespace DelvUI.Interface.Party
         #region utils
         private bool IsPartyLeader(int index)
         {
+            return false;
             if (PartyListAddon == null)
             {
                 return false;
