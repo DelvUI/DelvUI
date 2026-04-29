@@ -5,6 +5,8 @@ using DelvUI.Config.Attributes;
 using Dalamud.Bindings.ImGui;
 using System;
 using System.Numerics;
+using Lumina.Text;
+using Lumina.Text.ReadOnly;
 
 namespace DelvUI.Helpers
 {
@@ -56,10 +58,27 @@ namespace DelvUI.Helpers
         private Vector2 _size;
 
         private bool _dataIsValid = false;
+        private ReadOnlySeString? _currentTooltipSeString = null;
 
         public void ShowTooltipOnCursor(string text, string? title = null, uint id = 0, string name = "")
         {
             ShowTooltip(text, ImGui.GetMousePos(), title, id, name);
+        }
+
+        public void ShowSeStringTooltipOnCursor(ReadOnlySeString seString, string? title = null, uint id = 0, string name = "")
+        {
+            ShowSeStringTooltip(seString, ImGui.GetMousePos(), title, id, name);
+        }
+
+        public void ShowSeStringTooltip(ReadOnlySeString seString, Vector2 position, string? title = null, uint id = 0, string name = "")
+        {
+            if (seString.IsEmpty)
+            {
+                return;
+            }
+
+            ShowTooltip(seString.ToString(), position, title, id, name);
+            _currentTooltipSeString = seString;
         }
 
         public void ShowTooltip(string text, Vector2 position, string? title = null, uint id = 0, string name = "")
@@ -76,7 +95,7 @@ namespace DelvUI.Helpers
                 _previousRawText = text;
             }
 
-            // calcualte title size
+            // calculate title size
             _titleSize = Vector2.Zero;
             if (title != null)
             {
@@ -102,7 +121,27 @@ namespace DelvUI.Helpers
             // calculate text size
             using (FontsManager.Instance.PushFont(_config.TextFontID))
             {
-                _textSize = ImGui.CalcTextSize(_currentTooltipText, false, MaxWidth);
+                if (_currentTooltipSeString != null)
+                {
+                    ImGui.PushTextWrapPos(ImGui.GetCursorPosX() + MaxWidth);
+
+                    var drawResult = ImGuiHelpers.SeStringWrapped(_currentTooltipSeString.Value, new()
+                    {
+                        TargetDrawList = default,
+                        Font = ImGui.GetFont(),
+                        ScreenOffset = ImGui.GetCursorScreenPos(),
+                        FontSize = ImGui.GetFontSize(),
+                        WrapWidth = MaxWidth
+                    });
+
+                    _textSize = drawResult.Size;
+
+                    ImGui.PopTextWrapPos();
+                }
+                else
+                {
+                    _textSize = ImGui.CalcTextSize(_currentTooltipText, false, MaxWidth);
+                }
             }
 
             _size = new Vector2(Math.Max(_titleSize.X, _textSize.X) + Margin * 2, _titleSize.Y + _textSize.Y + Margin * 2);
@@ -115,11 +154,13 @@ namespace DelvUI.Helpers
             _position = ConstrainPosition(position, _size);
 
             _dataIsValid = true;
+            _currentTooltipSeString = null;
         }
 
         public void RemoveTooltip()
         {
             _dataIsValid = false;
+            _currentTooltipSeString = null;
         }
 
         public void Draw()
@@ -179,8 +220,26 @@ namespace DelvUI.Helpers
                 {
                     cursorPos = new Vector2(windowMargin.X + _size.X / 2f - _textSize.X / 2f, Margin + _titleSize.Y);
                     ImGui.SetCursorPos(cursorPos);
-                    ImGui.PushTextWrapPos(cursorPos.X + _textSize.X + globalScaleCorrection + Margin);
-                    ImGui.TextColored(_config.TextColor.Vector, _currentTooltipText);
+                    ImGui.PushTextWrapPos(cursorPos.X + MaxWidth);
+
+                    if (_currentTooltipSeString != null)
+                    {
+                        ImGui.PushStyleColor(ImGuiCol.Text, _config.TextColor.Vector);
+
+                        ImGuiHelpers.SeStringWrapped(_currentTooltipSeString.Value, new()
+                        {
+                            Font = ImGui.GetFont(),
+                            ScreenOffset = ImGui.GetCursorScreenPos(),
+                            FontSize = ImGui.GetFontSize(),
+                            WrapWidth = MaxWidth
+                        });
+
+                        ImGui.PopStyleColor();
+                    }
+                    else
+                    {
+                        ImGui.TextColored(_config.TextColor.Vector, _currentTooltipText);
+                    }
                     ImGui.PopTextWrapPos();
                 }
             }
@@ -190,11 +249,29 @@ namespace DelvUI.Helpers
                 using (FontsManager.Instance.PushFont(_config.TextFontID))
                 {
                     var cursorPos = windowMargin + new Vector2(Margin, Margin);
-                    var textWidth = _size.X - Margin * 2;
 
                     ImGui.SetCursorPos(cursorPos);
-                    ImGui.PushTextWrapPos(cursorPos.X + textWidth + globalScaleCorrection + Margin);
-                    ImGui.TextColored(_config.TextColor.Vector, _currentTooltipText);
+
+                    ImGui.PushTextWrapPos(cursorPos.X + MaxWidth);
+
+                    if (_currentTooltipSeString != null)
+                    {
+                        ImGui.PushStyleColor(ImGuiCol.Text, _config.TextColor.Vector);
+
+                        ImGuiHelpers.SeStringWrapped(_currentTooltipSeString.Value, new()
+                        {
+                            Font = ImGui.GetFont(),
+                            ScreenOffset = ImGui.GetCursorScreenPos(),
+                            FontSize = ImGui.GetFontSize(),
+                            WrapWidth = MaxWidth
+                        });
+
+                        ImGui.PopStyleColor();
+                    }
+                    else
+                    {
+                        ImGui.TextColored(_config.TextColor.Vector, _currentTooltipText);
+                    }
                     ImGui.PopTextWrapPos();
                 }
             }
