@@ -12,6 +12,7 @@ using Dalamud.Bindings.ImGui;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Dalamud.Game.DutyState;
 using FFXIVClientStructs.FFXIV.Client.Network;
 using static FFXIVClientStructs.FFXIV.Client.Game.Character.ActionEffectHandler;
 
@@ -159,14 +160,21 @@ namespace DelvUI.Interface.PartyCooldowns
             // detect wipe fadeouts (not 100% reliable but good enough), Dalamud DutyState doesn't check 0x4000000F yet.
             if (type == 0x4000000F)
             {
-                ResetCooldowns(null, 0);
+                ResetCooldowns();
             }
         }
 
-        private static void ResetCooldowns(object? sender, ushort e)
+        private static void ResetCooldowns(IDutyStateEventArgs args)
         {
+            ResetCooldowns();
+        }
+
+        private static void ResetCooldowns()
+        {
+            if (Instance == null) { return; }
+
             Instance._technicalStepMap.Clear();
-            
+
             foreach (uint actorId in Instance._cooldownsMap.Keys)
             {
                 foreach (PartyCooldown cooldown in Instance._cooldownsMap[actorId].Values)
@@ -345,7 +353,7 @@ namespace DelvUI.Interface.PartyCooldowns
             ForcedUpdate();
         }
 
-        private void OnTerritoryChanged(ushort territoryId)
+        private void OnTerritoryChanged(uint territoryId)
         {
             bool isInDuty = Plugin.Condition[ConditionFlag.BoundByDuty];
             if (_config.ShowOnlyInDuties && _wasInDuty != isInDuty)

@@ -47,7 +47,7 @@ namespace DelvUI.Interface.EnemyList
                 return null;
             }
 
-            string name = enemyStringArrayMembers[index].EnemyName;
+            string name = enemyStringArrayMembers[index].EnemyName.ToString();
 
             bool isMarked = Utils.SignIconIDForObjectID((uint)objectId) != null;
             char letterSymbol = isMarked && name.Length > 1 ? name[2] : name[0];

@@ -76,7 +76,7 @@ namespace DelvUI.Interface.Nameplates
 
         private NameplatesCache _cache = new NameplatesCache(50);
 
-        private void ClientStateOnTerritoryChangedEvent(ushort territoryId)
+        private void ClientStateOnTerritoryChangedEvent(uint territoryId)
         {
             _cache.Clear();
         }
@@ -171,7 +171,7 @@ namespace DelvUI.Interface.Nameplates
                     string order = "";
                     try
                     {
-                        if (stringArray->AtkArrayData.Size > arrayIndex && stringArray->StringArray[arrayIndex] != null)
+                        if (stringArray->AtkArrayData.Size > arrayIndex && stringArray->StringArray[arrayIndex].HasValue)
                         {
                             order = MemoryHelper.ReadSeStringNullTerminated(new IntPtr(stringArray->StringArray[arrayIndex])).ToString();
                         }

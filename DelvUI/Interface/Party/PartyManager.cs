@@ -312,8 +312,8 @@ namespace DelvUI.Interface.Party
             {
                 int index = i * 5;
                 if (stringArrayData->AtkArrayData.Size <= index + 3 ||
-                    stringArrayData->StringArray[index] == null ||
-                    stringArrayData->StringArray[index + 3] == null) { break; }
+                    !stringArrayData->StringArray[index].HasValue ||
+                    !stringArrayData->StringArray[index + 3].HasValue) { break; }
 
                 IntPtr ptr = new IntPtr(stringArrayData->StringArray[index]);
                 string name = MemoryHelper.ReadSeStringNullTerminated(ptr).ToString();
