@@ -263,10 +263,10 @@ namespace DelvUI.Helpers
                 // special case for AST cards and SMN rekindle
                 if (actionID is 37019 or 37020 or 37021 or 25822)
                 {
-                    return target is IPlayerCharacter or IBattleNpc { BattleNpcKind: BattleNpcSubKind.Chocobo };
+                    return target is IPlayerCharacter or IBattleNpc { BattleNpcKind: BattleNpcSubKind.Buddy };
                 }
 
-                return target is IBattleNpc npcTarget && npcTarget.BattleNpcKind == BattleNpcSubKind.Enemy;
+                return target is IBattleNpc npcTarget && npcTarget.BattleNpcKind == BattleNpcSubKind.Combatant;
             }
 
             // friendly player (TODO: pvp? lol)
@@ -278,7 +278,7 @@ namespace DelvUI.Helpers
             // friendly npc
             if (target is IBattleNpc npc)
             {
-                if (npc.BattleNpcKind != BattleNpcSubKind.Enemy)
+                if (npc.BattleNpcKind != BattleNpcSubKind.Combatant)
                 {
                     return action.CanTargetAlly || action.CanTargetParty || action.CanTargetSelf;
                 }

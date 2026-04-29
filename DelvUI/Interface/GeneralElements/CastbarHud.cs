@@ -54,7 +54,7 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             if (!Config.Preview &&
-                (Actor == null || Actor is not ICharacter || Actor.ObjectKind != ObjectKind.Player && Actor.ObjectKind != ObjectKind.BattleNpc))
+                (Actor == null || Actor is not ICharacter || Actor.ObjectKind != ObjectKind.Pc && Actor.ObjectKind != ObjectKind.BattleNpc))
             {
                 return;
             }

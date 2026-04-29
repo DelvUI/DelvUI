@@ -382,7 +382,7 @@ namespace DelvUI.Interface.Party
                 uint iconId = 0;
 
                 // chocobo icon
-                if (character is IBattleNpc battleNpc && battleNpc.BattleNpcKind == BattleNpcSubKind.Chocobo)
+                if (character is IBattleNpc battleNpc && battleNpc.BattleNpcKind == BattleNpcSubKind.Buddy)
                 {
                     iconId = JobsHelper.RoleIconIDForBattleCompanion + (uint)RoleIcon.Style * 100;
                 }
@@ -578,7 +578,7 @@ namespace DelvUI.Interface.Party
                 drawActions.Add((_configs.HealthBar.NameLabelConfig.StrataLevel, () =>
                 {
                     bool? playerName = null;
-                    if (character == null || character.ObjectKind == ObjectKind.Player)
+                    if (character == null || character.ObjectKind == ObjectKind.Pc)
                     {
                         playerName = true;
                     }

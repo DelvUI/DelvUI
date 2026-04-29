@@ -33,7 +33,7 @@ namespace DelvUI.Helpers
                 return null;
             }
 
-            return GetBuddy(player.GameObjectId, BattleNpcSubKind.Chocobo);
+            return GetBuddy(player.GameObjectId, BattleNpcSubKind.Buddy);
         }
 
         public static IGameObject? GetBuddy(ulong ownerId, BattleNpcSubKind kind)
@@ -223,7 +223,7 @@ namespace DelvUI.Helpers
             // We only need to check for companions.
             // Why not check target.TargetObject?.ObjectKind == ObjectKind.Companion?
             // Due to the Non-Networked game object bug the game is unaware of what type the object should actually be
-            if (target.TargetObject?.ObjectKind != ObjectKind.Player)
+            if (target.TargetObject?.ObjectKind != ObjectKind.Pc)
             {
                 return -1;
             }

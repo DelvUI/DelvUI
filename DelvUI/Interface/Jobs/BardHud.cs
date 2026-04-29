@@ -98,7 +98,11 @@ namespace DelvUI.Interface.Jobs
         private void DrawCodaBar(Vector2 origin, IPlayerCharacter player)
         {
             BRDGauge gauge = Plugin.JobGauges.Get<BRDGauge>();
-            var containsCoda = new[] { gauge.Coda.Contains(Song.Wanderer) ? 1 : 0, gauge.Coda.Contains(Song.Mage) ? 1 : 0, gauge.Coda.Contains(Song.Army) ? 1 : 0 };
+            int[] containsCoda = new[] { 
+                gauge.Coda.Contains(Song.WanderersMinuet) ? 1 : 0, 
+                gauge.Coda.Contains(Song.MagesBallad) ? 1 : 0, 
+                gauge.Coda.Contains(Song.ArmysPaeon) ? 1 : 0 
+            };
             bool hasCoda = containsCoda.Any(o => o == 1);
 
             if (!Config.CodaBar.HideWhenInactive || hasCoda)
@@ -157,7 +161,7 @@ namespace DelvUI.Interface.Jobs
 
             switch (song)
             {
-                case Song.Wanderer:
+                case Song.WanderersMinuet:
                     if (Config.StacksBar.Enabled && Config.StacksBar.ShowWMStacks)
                     {
                         DrawStacksBar(
@@ -174,7 +178,7 @@ namespace DelvUI.Interface.Jobs
 
                     break;
 
-                case Song.Mage:
+                case Song.MagesBallad:
                     if (Config.StacksBar.Enabled && Config.StacksBar.ShowMBProc)
                     {
                         DrawBloodletterReady(origin, player);
@@ -184,7 +188,7 @@ namespace DelvUI.Interface.Jobs
 
                     break;
 
-                case Song.Army:
+                case Song.ArmysPaeon:
                     if (Config.StacksBar.Enabled && Config.StacksBar.ShowAPStacks)
                     {
                         DrawStacksBar(origin, player, songStacks, 4, Config.StacksBar.APStackColor);

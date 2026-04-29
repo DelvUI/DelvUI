@@ -152,7 +152,7 @@ namespace DelvUI.Interface.Jobs
             MNKGauge gauge = Plugin.JobGauges.Get<MNKGauge>();
 
             if (Config.MastersGauge.HideWhenInactive &&
-                gauge.Nadi == Nadi.None &&
+                gauge.Nadi == 0 &&
                 gauge.BeastChakra[0] == BeastChakra.None &&
                 gauge.BeastChakra[1] == BeastChakra.None &&
                 gauge.BeastChakra[2] == BeastChakra.None)

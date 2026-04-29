@@ -56,7 +56,7 @@ namespace DelvUI.Helpers
         {
             if (_getCharacterTitle == null || 
                 actor == null || 
-                actor.ObjectKind != ObjectKind.Player || 
+                actor.ObjectKind != ObjectKind.Pc || 
                 actor is not ICharacter character)
             {
                 return null;

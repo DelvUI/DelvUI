@@ -239,7 +239,7 @@ namespace DelvUI.Helpers
             {
                 unsafe
                 {
-                    if (chara is IBattleNpc npc && npc.BattleNpcKind == BattleNpcSubKind.Chocobo)
+                    if (chara is IBattleNpc npc && npc.BattleNpcKind == BattleNpcSubKind.Buddy)
                     {
                         float seconds = UIState.Instance()->Buddy.CompanionInfo.TimeLeft;
                         if (seconds <= 0)
@@ -332,7 +332,7 @@ namespace DelvUI.Helpers
             string? title = null)
         {
             bool isPlayer = (isPlayerName.HasValue && isPlayerName.Value == true) ||
-                            (actor != null && actor.ObjectKind == ObjectKind.Player);
+                            (actor != null && actor.ObjectKind == ObjectKind.Pc);
 
             try
             {
@@ -472,7 +472,7 @@ namespace DelvUI.Helpers
             {
                 return "";
             }
-            else if (!isPlayerName.HasValue && actor?.ObjectKind != ObjectKind.Player)
+            else if (!isPlayerName.HasValue && actor?.ObjectKind != ObjectKind.Pc)
             {
                 return "";
             }
@@ -486,7 +486,7 @@ namespace DelvUI.Helpers
             {
                 return "";
             }
-            else if (!isPlayerName.HasValue && actor?.ObjectKind == ObjectKind.Player)
+            else if (!isPlayerName.HasValue && actor?.ObjectKind == ObjectKind.Pc)
             {
                 return "";
             }

@@ -122,7 +122,7 @@ namespace DelvUI.Interface.Nameplates
         {
             switch (data.Kind)
             {
-                case ObjectKind.Player:
+                case ObjectKind.Pc:
                     if (data.GameObject?.EntityId == Plugin.ObjectTable.LocalPlayer?.EntityId)
                     {
                         return _playerHud;
@@ -150,12 +150,12 @@ namespace DelvUI.Interface.Nameplates
                     if (data.GameObject is IBattleNpc battleNpc)
                     {
                         if ((BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.Pet ||
-                            (BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.Chocobo)
+                            (BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.Buddy)
                         {
                             return _petHud;
                         }
-                        else if ((BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.Enemy ||
-                                 (BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.BattleNpcPart)
+                        else if ((BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.Combatant ||
+                                 (BattleNpcSubKind)battleNpc.SubKind == BattleNpcSubKind.BNpcPart)
                         {
                             return Utils.IsHostile(data.GameObject) ? _enemyHud : _npcHud;
                         }

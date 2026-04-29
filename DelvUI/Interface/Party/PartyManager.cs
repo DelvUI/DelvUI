@@ -147,7 +147,7 @@ namespace DelvUI.Interface.Party
 
             return _groupMembers.Count <= 1 ||
                 (_groupMembers.Count == 2 && _config.ShowChocobo &&
-                _groupMembers[1].Character is IBattleNpc npc && npc.BattleNpcKind == BattleNpcSubKind.Chocobo);
+                _groupMembers[1].Character is IBattleNpc npc && npc.BattleNpcKind == BattleNpcSubKind.Buddy);
         }
 
         public void Update()

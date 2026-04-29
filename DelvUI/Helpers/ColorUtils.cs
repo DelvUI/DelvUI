@@ -233,7 +233,7 @@ namespace DelvUI.Helpers
                 return GlobalColors.Instance.NPCNeutralColor;
             }
 
-            if (character.ObjectKind == ObjectKind.Player ||
+            if (character.ObjectKind == ObjectKind.Pc ||
                 character.SubKind == 9 && character.ClassJob.RowId > 0)
             {
                 return GlobalColors.Instance.SafeColorForJobId(character.ClassJob.RowId);
@@ -243,7 +243,7 @@ namespace DelvUI.Helpers
 
             if (character is IBattleNpc npc)
             {
-                if ((npc.BattleNpcKind == BattleNpcSubKind.Enemy || npc.BattleNpcKind == BattleNpcSubKind.BattleNpcPart) && isHostile)
+                if ((npc.BattleNpcKind == BattleNpcSubKind.Combatant || npc.BattleNpcKind == BattleNpcSubKind.BNpcPart) && isHostile)
                 {
                     return GlobalColors.Instance.NPCHostileColor;
                 }

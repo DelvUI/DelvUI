@@ -68,7 +68,7 @@ namespace DelvUI.Interface.Nameplates
 
             // name
             float nameAlpha = _config.RangeConfig.AlphaForDistance(data.Distance, _config.NameLabelConfig.Color.Vector.W);
-            var (nameText, namePos, nameSize, nameColor) = _nameLabelHud.PreCalculate(origin + swapOffset, barAnchor?.Size, data.GameObject, data.Name, isPlayerName: data.Kind == ObjectKind.Player);
+            var (nameText, namePos, nameSize, nameColor) = _nameLabelHud.PreCalculate(origin + swapOffset, barAnchor?.Size, data.GameObject, data.Name, isPlayerName: data.Kind == ObjectKind.Pc);
             drawActions.Add((_config.NameLabelConfig.StrataLevel, () =>
             {
                 _nameLabelHud.DrawLabel(nameText, namePos, nameSize, nameColor, nameAlpha);
@@ -204,7 +204,7 @@ namespace DelvUI.Interface.Nameplates
             {
                 LabelConfig labelConfig = (LabelConfig)label.GetConfig();
                 float alpha = _config.RangeConfig.AlphaForDistance(data.Distance, labelConfig.Color.Vector.W);
-                var (labelText, labelPos, labelSize, labelColor) = label.PreCalculate(barPos, barSize, data.GameObject, data.Name, currentHp, maxHp, data.Kind == ObjectKind.Player);
+                var (labelText, labelPos, labelSize, labelColor) = label.PreCalculate(barPos, barSize, data.GameObject, data.Name, currentHp, maxHp, data.Kind == ObjectKind.Pc);
 
                 drawActions.Add((labelConfig.StrataLevel, () =>
                 {
@@ -313,7 +313,7 @@ namespace DelvUI.Interface.Nameplates
 
             // name
             float nameAlpha = _config.RangeConfig.AlphaForDistance(data.Distance, _config.NameLabelConfig.Color.Vector.W);
-            var (nameText, namePos, nameSize, nameColor) = _nameLabelHud.PreCalculate(origin + swapOffset, barAnchor?.Size, data.GameObject, data.Name, isPlayerName: data.Kind == ObjectKind.Player);
+            var (nameText, namePos, nameSize, nameColor) = _nameLabelHud.PreCalculate(origin + swapOffset, barAnchor?.Size, data.GameObject, data.Name, isPlayerName: data.Kind == ObjectKind.Pc);
             drawActions.Add((_config.NameLabelConfig.StrataLevel, () =>
             {
                 _nameLabelHud.DrawLabel(nameText, namePos, nameSize, nameColor, nameAlpha);

@@ -313,7 +313,7 @@ namespace DelvUI.Interface.StatusEffects
                 return;
             }
 
-            if (_fakeEffects == null && (Actor == null || Actor.ObjectKind != ObjectKind.Player && Actor.ObjectKind != ObjectKind.BattleNpc))
+            if (_fakeEffects == null && (Actor == null || Actor.ObjectKind != ObjectKind.Pc && Actor.ObjectKind != ObjectKind.BattleNpc))
             {
                 return;
             }

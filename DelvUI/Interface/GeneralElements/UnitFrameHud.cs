@@ -281,7 +281,7 @@ namespace DelvUI.Interface.GeneralElements
             float currentAlpha = color.Vector.W * 100f;
             float alpha = Config.RangeConfig.AlphaForDistance(distance, currentAlpha) / 100f;
 
-            if (character is IBattleNpc { BattleNpcKind: BattleNpcSubKind.Enemy or BattleNpcSubKind.BattleNpcPart } && Config.EnemyRangeConfig.Enabled)
+            if (character is IBattleNpc { BattleNpcKind: BattleNpcSubKind.Combatant or BattleNpcSubKind.BNpcPart } && Config.EnemyRangeConfig.Enabled)
             {
                 alpha = Config.EnemyRangeConfig.AlphaForDistance(distance, currentAlpha) / 100f;
             }
