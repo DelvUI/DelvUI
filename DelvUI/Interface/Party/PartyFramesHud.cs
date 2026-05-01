@@ -78,10 +78,9 @@ namespace DelvUI.Interface.Party
             {
                 return;
             }
-
-            /*
+            
             int addonId = PartyManager.Instance.PartyListAddon->AtkUnitBase.Id;
-            AgentModule.Instance()->GetAgentHUD()->OpenContextMenuFromPartyAddon(addonId, bar.Member.Index);*/
+            AgentModule.Instance()->GetAgentHUD()->OpenContextMenuFromPartyAddon(addonId, bar.Member.Index);
         }
 
         private void OnLayoutPropertyChanged(object sender, OnChangeBaseArgs args)

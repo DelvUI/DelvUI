@@ -1,3 +1,7 @@
+# 2.7.0.1
+- Fixed Summoner's Bars.
+- Fixed Party List context menu not working.
+
 # 2.7.0.0
 - Added support for Patch 7.5 and Dalamud API 15.
 - Fixed a bug with status tooltips sometimes missing information in the description.
