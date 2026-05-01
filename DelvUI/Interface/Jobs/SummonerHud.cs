@@ -1,14 +1,12 @@
-using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
-using FFXIVClientStructs.FFXIV.Common.Lua;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -104,8 +102,8 @@ namespace DelvUI.Interface.Jobs
 
         private unsafe void DrawIfritBar(Vector2 origin, IPlayerCharacter player)
         {
-            SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
-            int stackCount = gauge.IsIfritReady ? 1 : 0;
+            SummonerGauge* smnGauge = &JobGaugeManager.Instance()->Summoner;
+            int stackCount = smnGauge->AetherFlags.HasFlag(AetherFlags.IfritReady) ? 1 : 0;
 
             if (!Config.IfritBar.HideWhenInactive || stackCount > 1)
             {
@@ -117,10 +115,10 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawTitanBar(Vector2 origin, IPlayerCharacter player)
+        private unsafe void DrawTitanBar(Vector2 origin, IPlayerCharacter player)
         {
-            SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
-            int stackCount = gauge.IsTitanReady ? 1 : 0;
+            SummonerGauge* smnGauge = &JobGaugeManager.Instance()->Summoner;
+            int stackCount = smnGauge->AetherFlags.HasFlag(AetherFlags.TitanReady) ? 1 : 0;
 
             if (!Config.TitanBar.HideWhenInactive || stackCount > 1)
             {
@@ -132,10 +130,10 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawGarudaBar(Vector2 origin, IPlayerCharacter player)
+        private unsafe void DrawGarudaBar(Vector2 origin, IPlayerCharacter player)
         {
-            SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
-            int stackCount = gauge.IsGarudaReady ? 1 : 0;
+            SummonerGauge* smnGauge = &JobGaugeManager.Instance()->Summoner;
+            int stackCount = smnGauge->AetherFlags.HasFlag(AetherFlags.GarudaReady) ? 1 : 0;
 
             if (!Config.GarudaBar.HideWhenInactive || stackCount > 1)
             {
@@ -157,11 +155,10 @@ namespace DelvUI.Interface.Jobs
 
         private unsafe void HandleAttunementStacks(Vector2 origin, IPlayerCharacter player)
         {
-            SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
+            SummonerGauge* smnGauge = &JobGaugeManager.Instance()->Summoner;
 
-            byte value = *((byte*)(new IntPtr(gauge.Address) + 0xE));
-            Primal primal = (Primal)(value & 3);
-            int stacks = ((value >> 2) & 7);
+            Primal primal = (Primal)smnGauge->AttunementType;
+            int stacks = smnGauge->AttunementCount;
 
             if (primal == Primal.Ifrit && Config.StacksBar.ShowIfritStacks)
             {
@@ -199,7 +196,9 @@ namespace DelvUI.Interface.Jobs
 
         private unsafe void DrawTranceBar(Vector2 origin, IPlayerCharacter player)
         {
-            SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
+            SummonerGauge* smnGauge = &JobGaugeManager.Instance()->Summoner;
+            AetherFlags flags = smnGauge->AetherFlags;
+
             PluginConfigColor tranceColor;
             uint spellID = 0;
             float maxDuration = 0f;
@@ -207,19 +206,16 @@ namespace DelvUI.Interface.Jobs
             float tranceDuration = 0f;
             tranceColor = Config.TranceBar.FillColor;
 
-            // Dawntrail Fixes
-            bool isSolarBahamutReady = gauge.AetherFlags.HasFlag(AetherFlags.None + 0x8) ||         // 0x8    Formerly Titan Attuned
-                                       gauge.AetherFlags.HasFlag(AetherFlags.None + 0xC);           // 0xC    Formerly Garuda Attuned
-            bool isPhoenixReady = gauge.AetherFlags.HasFlag(AetherFlags.None + 0x4);                // 0x4    Formerly Ifrit Attuned
-            bool isNormalBahamutReady = !isSolarBahamutReady && !isPhoenixReady;                    // You'd think it would be 0x10, but thats unused now
+            bool isSolarBahamutReady = flags.HasFlag(AetherFlags.SolarBahamutFirstPrimed) || flags.HasFlag(AetherFlags.SolarBahamutSecondPrimed);
+            bool isPhoenixReady = flags.HasFlag(AetherFlags.PhoenixPrimed);
+            bool isNormalBahamutReady = !isSolarBahamutReady && !isPhoenixReady;
 
-            byte summonedPrimal = *((byte*)(new IntPtr(gauge.Address) + 0xE));                      // Formally Attunement, now...?
-            Primal primal = (Primal)(summonedPrimal & 3);
+            Primal primal = (Primal)smnGauge->AttunementType;
 
             if (primal != Primal.None)
             {
                 tranceColor = primal == Primal.Ifrit ? Config.TranceBar.IfritColor : primal == Primal.Titan ? Config.TranceBar.TitanColor : primal == Primal.Garuda ? Config.TranceBar.GarudaColor : Config.TranceBar.FillColor;
-                tranceDuration = gauge.AttunementTimerRemaining;
+                tranceDuration = smnGauge->AttunementTimer;
                 maxDuration = 30f;
             }
             else
@@ -227,21 +223,21 @@ namespace DelvUI.Interface.Jobs
                 if (isSolarBahamutReady)
                 {
                     tranceColor = Config.TranceBar.SolarBahamutColor;
-                    tranceDuration = gauge.SummonTimerRemaining;
+                    tranceDuration = smnGauge->SummonTimer;
                     spellID = 36992;
                     maxDuration = 15f;
                 }
                 else if (isNormalBahamutReady)
                 {
                     tranceColor = Config.TranceBar.BahamutColor;
-                    tranceDuration = gauge.SummonTimerRemaining;
+                    tranceDuration = smnGauge->SummonTimer;
                     spellID = 7427;
                     maxDuration = 15f;
                 }
                 else if (isPhoenixReady)
                 {
                     tranceColor = Config.TranceBar.PhoenixColor;
-                    tranceDuration = gauge.SummonTimerRemaining;
+                    tranceDuration = smnGauge->SummonTimer;
                     spellID = 25831;
                     maxDuration = 15f;
                 }
@@ -249,7 +245,7 @@ namespace DelvUI.Interface.Jobs
 
             if (tranceDuration != 0)
             {
-                if (gauge.AttunementTimerRemaining > 0 && Config.TranceBar.HidePrimals)
+                if (smnGauge->AttunementTimer > 0 && Config.TranceBar.HidePrimals)
                 {
                     return;
                 }
@@ -263,7 +259,7 @@ namespace DelvUI.Interface.Jobs
             {
                 if (!Config.TranceBar.HideWhenInactive)
                 {
-                    if (gauge.AttunementTimerRemaining == 0)
+                    if (smnGauge->AttunementTimer == 0)
                     {
                         maxDuration = SpellHelper.Instance.GetRecastTime(spellID);
                         float tranceCooldown = SpellHelper.Instance.GetSpellCooldown(spellID);
