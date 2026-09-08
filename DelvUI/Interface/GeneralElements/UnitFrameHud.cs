@@ -277,7 +277,7 @@ namespace DelvUI.Interface.GeneralElements
 
         private PluginConfigColor GetDistanceColor(Character? character, PluginConfigColor color)
         {
-            byte distance = character != null ? character.YalmDistanceX : byte.MaxValue;
+            byte distance = character != null ? character.CurrentDistance : byte.MaxValue;
             float currentAlpha = color.Vector.W * 100f;
             float alpha = Config.RangeConfig.AlphaForDistance(distance, currentAlpha) / 100f;
 

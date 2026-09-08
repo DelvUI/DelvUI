@@ -312,6 +312,7 @@ namespace DelvUI.Helpers
             [JobIDs.SAM] = JobRoles.DPSMelee,
             [JobIDs.RPR] = JobRoles.DPSMelee,
             [JobIDs.VPR] = JobRoles.DPSMelee,
+            [JobIDs.BST] = JobRoles.DPSMelee,
 
             // ranged phys dps
             [JobIDs.ARC] = JobRoles.DPSRanged,
@@ -376,7 +377,8 @@ namespace DelvUI.Helpers
                 JobIDs.NIN,
                 JobIDs.SAM,
                 JobIDs.RPR,
-                JobIDs.VPR
+                JobIDs.VPR,
+                JobIDs.BST
             },
 
             // ranged phys dps
@@ -445,6 +447,7 @@ namespace DelvUI.Helpers
             [JobIDs.SAM] = "SAM",
             [JobIDs.RPR] = "RPR",
             [JobIDs.VPR] = "VPR",
+            [JobIDs.BST] = "BST",
 
             // ranged phys dps
             [JobIDs.ARC] = "ARC",
@@ -504,6 +507,7 @@ namespace DelvUI.Helpers
             [JobIDs.SAM] = "Samurai",
             [JobIDs.RPR] = "Reaper",
             [JobIDs.VPR] = "Viper",
+            [JobIDs.BST] = "Beastmaster",
 
             // ranged phys dps
             [JobIDs.ARC] = "Archer",
@@ -567,6 +571,7 @@ namespace DelvUI.Helpers
             [JobIDs.SAM] = 62584,
             [JobIDs.RPR] = 62584,
             [JobIDs.VPR] = 62584,
+            [JobIDs.BST] = 62584,
 
             // ranged phys dps
             [JobIDs.ARC] = 62586,
@@ -604,6 +609,7 @@ namespace DelvUI.Helpers
             [JobIDs.SAM] = 92627,
             [JobIDs.RPR] = 92632,
             [JobIDs.VPR] = 92685,
+            [JobIDs.BST] = 92685,
 
             // ranged phys dps
             [JobIDs.ARC] = 92526,
@@ -680,6 +686,7 @@ namespace DelvUI.Helpers
         public const uint SAM = 34;
         public const uint RPR = 39;
         public const uint VPR = 41;
+        public const uint BST = 43;
 
         public const uint ARC = 5;
         public const uint BRD = 23;

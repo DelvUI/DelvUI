@@ -276,7 +276,10 @@ namespace DelvUI.Interface
             ["JobHudNIN1"] = "JobHudNIN1v70",
 
             ["JobHudVPR0"] = "JobHudRDB0",
-            ["JobHudVPR1"] = "JobHudRDB1"
+            ["JobHudVPR1"] = "JobHudRDB1",
+
+            ["JobHudBST0"] = "JobHudXBM0",
+            ["JobHudBST1"] = "JobHudXBM1"
         };
 
         private unsafe void UpdateJobGauges(bool forceVisible = false)

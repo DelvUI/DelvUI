@@ -57,4 +57,9 @@ namespace DelvUI.Interface.Jobs
     {
         [JsonIgnore] public override uint JobId => JobIDs.CNJ;
     }
+
+    public class BeastmasterConfig : BaseJobsConfig
+    {
+        [JsonIgnore] public override uint JobId => JobIDs.BST;
+    }
 }

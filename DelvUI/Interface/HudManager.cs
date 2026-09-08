@@ -685,7 +685,10 @@ namespace DelvUI.Interface
                 // gatherers
                 [JobIDs.MIN] = typeof(MinerConfig),
                 [JobIDs.BOT] = typeof(BotanistConfig),
-                [JobIDs.FSH] = typeof(FisherConfig)
+                [JobIDs.FSH] = typeof(FisherConfig),
+
+                // beastmaster
+                [JobIDs.BST] = typeof(BeastmasterConfig)
             };
 
             _jobTypes = new List<Type>()

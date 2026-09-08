@@ -1,3 +1,6 @@
+# 2.8.0.0
+- Fixing plugin errors with Beastmaster.
+
 # 2.7.0.1
 - Fixed Summoner's Bars.
 - Fixed Party List context menu not working.

@@ -1,9 +1,8 @@
-﻿using Dalamud.Hooking;
-using Dalamud.Logging;
-using Dalamud.Memory;
+﻿using Dalamud.Bindings.ImGui;
+using Dalamud.Hooking;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using FFXIVClientStructs.FFXIV.Client.Network;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
-using FFXIVClientStructs.FFXIV.Client.UI.Info;
-using Dalamud.Bindings.ImGui;
 using System;
 
 namespace DelvUI.Interface.Party
@@ -21,8 +20,7 @@ namespace DelvUI.Interface.Party
         private Hook<AgentReadyCheck.Delegates.InitiateReadyCheck>? _onReadyCheckStartHook;
         private Hook<AgentReadyCheck.Delegates.EndReadyCheck>? _onReadyCheckEndHook;
 
-        private delegate void ActorControlDelegate(uint entityId, uint type, uint buffID, uint direct, uint actionId, uint sourceId, uint arg7, uint arg8, uint arg9, uint arg10, ulong targetId, byte arg12);
-        private Hook<ActorControlDelegate>? _actorControlHook;
+        private Hook<PacketDispatcher.Delegates.HandleActorControlPacket>? _actorControlHook;
 
         private bool _readyCheckOngoing = false;
         private double _lastReadyCheckEndTime = -1;
@@ -33,7 +31,7 @@ namespace DelvUI.Interface.Party
             try
             {
                 _onReadyCheckStartHook = Plugin.GameInteropProvider.HookFromAddress<AgentReadyCheck.Delegates.InitiateReadyCheck>(
-                    AgentReadyCheck.MemberFunctionPointers.InitiateReadyCheck, 
+                    AgentReadyCheck.MemberFunctionPointers.InitiateReadyCheck,
                     OnReadyCheckStart
                 );
                 _onReadyCheckStartHook?.Enable();
@@ -44,10 +42,9 @@ namespace DelvUI.Interface.Party
                 );
                 _onReadyCheckEndHook?.Enable();
 
-                _actorControlHook = Plugin.GameInteropProvider.HookFromSignature<ActorControlDelegate>(
-                    "E8 ?? ?? ?? ?? 0F B7 0B 83 E9 64", 
-                    OnActorControl
-                );
+                _actorControlHook = Plugin.GameInteropProvider.HookFromAddress(
+                    (nint)PacketDispatcher.MemberFunctionPointers.HandleActorControlPacket,
+                    new PacketDispatcher.Delegates.HandleActorControlPacket(OnActorControl));
                 _actorControlHook?.Enable();
             }
             catch (Exception e)
@@ -79,22 +76,22 @@ namespace DelvUI.Interface.Party
             _actorControlHook?.Dispose();
         }
 
-        private unsafe void OnReadyCheckStart(AgentReadyCheck *ptr)
+        private unsafe void OnReadyCheckStart(AgentReadyCheck* ptr)
         {
             _onReadyCheckStartHook?.Original(ptr);
             _readyCheckOngoing = true;
             _lastReadyCheckEndTime = -1;
         }
 
-        private unsafe void OnReadycheckEnd(AgentReadyCheck *ptr)
+        private unsafe void OnReadycheckEnd(AgentReadyCheck* ptr)
         {
             _onReadyCheckEndHook?.Original(ptr);
             _lastReadyCheckEndTime = ImGui.GetTime();
         }
 
-        private void OnActorControl(uint entityId, uint type, uint buffID, uint direct, uint actionId, uint sourceId, uint arg7, uint arg8, uint arg9, uint arg10, ulong targetId, byte arg12)
+        private void OnActorControl(uint entityId, uint type, uint buffID, uint direct, uint actionId, uint sourceId, uint arg7, uint arg8, uint arg9, uint arg10, GameObjectId targetId, bool isRecorded)
         {
-            _actorControlHook?.Original(entityId, type, buffID, direct, actionId, sourceId, arg7, arg8, arg9, arg10, targetId, arg12);
+            _actorControlHook?.Original(entityId, type, buffID, direct, actionId, sourceId, arg7, arg8, arg9, arg10, targetId, isRecorded);
 
             // I'm not exactly sure what id == 503 means, but its always triggered when the fight starts
             // which is all I care about

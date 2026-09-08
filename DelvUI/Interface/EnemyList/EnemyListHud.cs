@@ -378,7 +378,7 @@ namespace DelvUI.Interface.EnemyList
 
         private PluginConfigColor GetDistanceColor(ICharacter? character, PluginConfigColor color)
         {
-            byte distance = character != null ? character.YalmDistanceX : byte.MaxValue;
+            byte distance = character != null ? character.CurrentDistance : byte.MaxValue;
             float currentAlpha = color.Vector.W * 100f;
             float alpha = Configs.HealthBar.RangeConfig.AlphaForDistance(distance, currentAlpha) / 100f;
 

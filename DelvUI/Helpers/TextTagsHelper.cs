@@ -209,7 +209,7 @@ namespace DelvUI.Helpers
         public static Dictionary<string, Func<ICharacter, string>> CharaTextTags = new Dictionary<string, Func<ICharacter, string>>()
         {
             #region misc
-            ["[distance]"] = (chara) => (chara.YalmDistanceX + 1).ToString(),
+            ["[distance]"] = (chara) => (chara.CurrentDistance + 1).ToString(),
 
             ["[company]"] = (chara) => chara.CompanyTag.ToString(),
             
