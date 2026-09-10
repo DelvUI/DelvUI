@@ -75,7 +75,7 @@ namespace DelvUI.Helpers
                     ActionManager.Addresses.UseAction.String,
                     HandleRequestAction
                 );
-                _requestActionHook?.Enable();
+                // enabled by OnFrameworkUpdate depending on the mouseover config
             }
             catch
             {
@@ -361,6 +361,19 @@ namespace DelvUI.Helpers
 
         public void OnFrameworkUpdate(IFramework framework)
         {
+            // only hook when automatic mouseover is on
+            if (_config.MouseoverEnabled && _config.MouseoverAutomaticMode)
+            {
+                if (_requestActionHook?.IsEnabled == false)
+                {
+                    _requestActionHook.Enable();
+                }
+            }
+            else if (_requestActionHook?.IsEnabled == true)
+            {
+                _requestActionHook.Disable();
+            }
+
             if (IsProxyEnabled)
             {
                 if (_wndProcPtr == IntPtr.Zero) {
